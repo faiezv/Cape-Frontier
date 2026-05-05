@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300..900&family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300..900&family=Lobster&family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300..900&family=Lobster&family=Montserrat:ital,wght@0,100..900;1,100..900&family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,100..900;1,100..900&family=Frank+Ruhl+Libre:wght@300..900&family=Lobster&family=Montserrat:ital,wght@0,100..900;1,100..900&family=VT323&display=swap');
+
+@import "tailwindcss";
+
+
+@layer base {
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html, body, #root {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    font-size: 90%;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  img, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  .maitree {
+    font-family: "Maitree", serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .hero-gradient {
+    background: linear-gradient(145deg, #001eff 43.55%, #0f0a71 85.62%);
+  }
+  .hero-gradient-bl {
+    background: linear-gradient(245deg, #001eff 43.55%, #0f0a71 85.62%);
+  }
+
+  .font-frank {
+    font-family: "Frank Ruhl Libre", serif;
+  }
+
+  .font-vt323 {
+    font-family: "VT323", monospace;
+  }
+
+  .font-lobster {
+    font-family: "Lobster", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .font-mont {
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: auto;
+  font-style: normal;
+  }
+
+  .font-bitter {
+    font-family: "Bitter", serif;
+    font-optical-sizing: auto;
+    font-weight: auto;
+    font-style: normal;
+  }
+}
+
+
+::-webkit-scrollbar {
+  width: 0;
+}
+
+@theme {
+  --color-brand-darkblue: #0F0A71;
+  --color-brand-lightblue: #001EFF;
+
+  --color-brand-pastel-1: #FE71B9;
+  --color-brand-pastel-2: #FFE86B;
+  --color-brand-pastel-3: #F49C81;
+  --color-brand-pastel-4: #BBE4EC;
+}
+
+
+/* Glow background bounce */
+@keyframes glow-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.glow-bounce {
+  animation: glow-bounce 3s ease-in-out infinite;
+}
+
+/* Infinite loading bar animation with slow start → fast middle → slow end */
+@keyframes loading-bar-animation {
+  0%   { transform: translateX(-100%); }
+  50%  { transform: translateX(0%); }
+  100% { transform: translateX(100) }
+}
+
+.loaading-bar {
+  width: 50%; /* bar width */
+  animation: loading-bar-animation 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes loading {
+  0% { width: 0%; }
+  50% { width: 100%; }
+  100% { width: 0%; }
+}
+.loading-bar {
+  animation: loading 4s infinite ease-in-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0px); }
+}

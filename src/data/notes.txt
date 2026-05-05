@@ -1,0 +1,79 @@
+QUESTIONS:
+a) Do far pickup areas cost extra? yes/no
+b) How does cancelation policy work in detail.
+c) Refund/reschedule policy
+d) Should this tour be instantly payable or request-first?
+e) Reschedule policy?
+g) If custom/private tour, are there additonal fees?
+i) Please send list of real reviews.
+k) Confirmation: instant confirmation or manual confirmation after request?
+l) Booking/payment: pay-now, deposit, or request-first?
+m) Child pricing: same as adult? discounted? not allowed?
+
+TOURS 
+Available tours:
+ADRENALINE
+- shark-cage-diving
+- snorkelling
+- paragliding
+- gun-range
+
+HISTORICAL
+- langa
+- robben-island
+
+HIKING
+- lions-head
+- platteklip
+- silvermine-nature-reserve
+- newlands-forest
+
+PACKAGES
+- pen-tour-1
+- pen-tout-2
+- stellenbosch-wine-farms
+
+----------------------------------------------------------------------------------------------------------
+For EVERY TOUR above please list the following:
+- price from:
+- description:
+- location: 
+- pickup-time-options:
+- total duration:
+- min/max participants:
+- discounts/price-tiers: 1 person: R____, 2 people: R____, etc.
+- inluded: basic equoptment, extra equipment, snacks, food, water etc.
+- excluded: transport? additional fees like ammo or tickets? or what should customer bring?
+- modifiers: isPrivate? isCustom? Please include price increase.
+- category: half-day or full-day
+- experience-level: bginner, intermediate, hard. 
+- fitness/swimming/legal requirements.
+- refund policy:
+- cancel policy:
+- reschedule policy:
+----------------------------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------------------------
+once complete, please forward to faiezviljoen@gmail.com
+----------------------------------------------------------------------------------------------------------
+
+DEV ISSUES:
+ADRENALINE
+- shark-cage-diving
+- snorkelling
+- paragliding
+- gun-range
+  + ADD "id required".
+
+HIKING
+- lions-head
+- platteklip
+- silvermine-nature-reserve
+  + ADD silvermine bature reserve: This trail is well marked and suitable for all skill levels. Reserve is known for its beautiful scenery and wildlife. Great option for those looking for a leisurely hike. 
+- newlands-forest
+  + ADD newlands forest: This area offers a variety of trails through lush forests, making it a safe and pleasant hiking environment. The trails are well-maintained, and the presence of other hikers adds to the safety factor.
+
+PACKAGES
+- pen-tour-1
+- pen-tout-2
+- stellenbosch-wine-farms
