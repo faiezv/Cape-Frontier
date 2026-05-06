@@ -86,6 +86,7 @@ const Hero = () => {
   const tourSelectRef = useRef(null)
   const actionsRefs = useRef([])
   const titleRef = useRef(null)
+  const titleShineRef = useRef(null)
   const subRef = useRef(null)
   const trustRefs = useRef([])
   const trustTrackRef = useRef(null)
@@ -130,7 +131,7 @@ const Hero = () => {
       if (!bgRefs.current.length) return
 
       gsap.set(bgRefs.current, { opacity: 0, scale: 1.02 })
-      gsap.set(bgRefs.current[0], { opacity: 1, scale: 1.02 })
+      gsap.set(bgRefs.current[0], { opacity: 0.98, scale: 1.02 })
 
       if (bgRefs.current[0]) {
         gsap.to(bgRefs.current[0], {
@@ -164,13 +165,19 @@ const Hero = () => {
       }
 
       if (titleRef.current) {
-        tl.from(
+        tl.fromTo(
           titleRef.current,
           {
-            y: 12,
+            y: 10,
             opacity: 0,
-            scale: 0.97,
-            duration: 0.75,
+            scale: 0.985,
+          },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 0.55,
+            ease: 'power2.out',
           },
           '-=0.2'
         )
@@ -214,14 +221,28 @@ const Hero = () => {
         )
       }
 
+      // Travel & Tours stays visually stable after the entrance animation.
+      // No pulsing, breathing, or floating loop here.
       if (titleRef.current) {
-        gsap.to(titleRef.current, {
-          y: -2,
-          duration: 4.2,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
+        gsap.set(titleRef.current, {
+          y: 0,
+          scale: 1,
+          clearProps: 'filter',
         })
+      }
+
+      if (titleShineRef.current) {
+        gsap.fromTo(
+          titleShineRef.current,
+          { xPercent: -220 },
+          {
+            xPercent: 720,
+            duration: 1.15,
+            repeat: -1,
+            repeatDelay: 2.2,
+            ease: 'power2.inOut',
+          }
+        )
       }
 
       if (arrowRef.current) {
@@ -255,7 +276,7 @@ const Hero = () => {
 
         gsap.to(trustTrackRef.current, {
           x: -setWidth,
-          duration: 18,
+          duration: 22,
           ease: 'none',
           repeat: -1,
           delay: 1.6,
@@ -357,13 +378,18 @@ const Hero = () => {
           <div className={`${isVeryShort ? 'mt-4' : 'mt-5'} flex w-full flex-col items-center sm:mt-6`}>
             <div
               ref={titleRef}
-              className="w-full max-w-fit rounded-[28px] border border-white/16 
+              className="relative w-full max-w-fit overflow-hidden rounded-[28px] border border-white/16 
               shadow-[0_20px_60px_rgba(0,0,0,0.22)] backdrop-blur-md 
               hero-gradient-bl
               sm:rounded-4xl 
               sm:px-8 sm:py-2 md:px-12 md:py-6 lg:px-14 px-5 py-4"
             >
-              <div className="text-center font-lobster text-[2rem] font-extrabold leading-none text-white drop-shadow-[0_6px_18px_rgba(0,0,0,0.28)] sm:text-5xl md:text-6xl lg:text-7xl">
+              <span
+                ref={titleShineRef}
+                className="pointer-events-none absolute inset-y-0 left-[-48%] w-[30%] skew-x-[-20deg] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.34),transparent)]"
+                aria-hidden="true"
+              />
+              <div className="relative z-10 text-center font-lobster text-[2rem] font-extrabold leading-none text-white drop-shadow-[0_6px_18px_rgba(0,0,0,0.28)] sm:text-5xl md:text-6xl lg:text-7xl">
                 Travel &amp; Tours
               </div>
             </div>
@@ -405,7 +431,7 @@ const Hero = () => {
           </div> */}
           <div className={`${isVeryShort ? 'mt-4' : 'mt-6'} z-10 w-full max-w-5xl overflow-hidden sm:mt-7`}>
             <div className="relative w-full overflow-hidden">
-              <div ref={trustTrackRef} className="flex w-max flex-nowrap gap-3">
+              <div ref={trustTrackRef} className="flex w-max flex-nowrap gap-3 will-change-transform">
                 <div ref={trustSetRef} className="flex flex-nowrap gap-3">
                   {trustItems.map((item, index) => (
                     <div
@@ -413,7 +439,7 @@ const Hero = () => {
                       ref={(el) => {
                         trustRefs.current[index] = el
                       }}
-                      className="group min-w-[250px] shrink-0 rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-white backdrop-blur-md"
+                      className="group min-w-[250px] shrink-0 rounded-2xl border border-white/18 bg-white/14 px-4 py-3 text-white shadow-[0_10px_26px_rgba(0,0,0,0.12)] backdrop-blur-sm"
                     >
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/14 bg-white/10 text-white/95 sm:h-11 sm:w-11">
@@ -433,7 +459,7 @@ const Hero = () => {
                   {trustItems.map((item) => (
                     <div
                       key={`${item.title}-b`}
-                      className="group min-w-[250px] shrink-0 rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-white backdrop-blur-md"
+                      className="group min-w-[250px] shrink-0 rounded-2xl border border-white/18 bg-white/14 px-4 py-3 text-white shadow-[0_10px_26px_rgba(0,0,0,0.12)] backdrop-blur-sm"
                     >
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/14 bg-white/10 text-white/95 sm:h-11 sm:w-11">
@@ -450,8 +476,8 @@ const Hero = () => {
                 </div>
               </div>
 
-              <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-black/35 to-transparent" />
-              <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-black/35 to-transparent" />
+              <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-[linear-gradient(90deg,rgba(2,8,23,0.62)_0%,rgba(2,8,23,0.28)_42%,rgba(2,8,23,0)_100%)] sm:w-24" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-[linear-gradient(270deg,rgba(2,8,23,0.62)_0%,rgba(2,8,23,0.28)_42%,rgba(2,8,23,0)_100%)] sm:w-24" />
             </div>
           </div>
         </div>
@@ -459,7 +485,7 @@ const Hero = () => {
         <button
           ref={scrollRef}
           onClick={() => safeScroll('featured-tours')}
-          className="absolute bottom-9 md:bottom-0 left-0 z-30 flex w-full max-w-full items-center justify-center overflow-hidden border-t border-white/10 bg-[linear-gradient(90deg,#002dcb_0%,#0938ef_50%,#002dcb_100%)] px-4 py-3 text-sm font-medium text-white/95 shadow-[0_-8px_30px_rgba(0,0,0,0.16)] backdrop-blur-md sm:py-4 sm:text-base md:text-lg"
+          className="absolute bottom-0 left-0 z-30 flex w-full max-w-full items-center justify-center overflow-hidden border-t border-white/10 bg-[linear-gradient(90deg,#002dcb_0%,#0938ef_50%,#002dcb_100%)] px-4 py-3 text-sm font-medium text-white/95 shadow-[0_-8px_30px_rgba(0,0,0,0.16)] backdrop-blur-md sm:py-4 sm:text-base md:text-lg"
         >
           <div
             ref={shineRef}

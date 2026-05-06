@@ -1,18 +1,21 @@
-import React, { useState, useLayoutEffect, useRef } from 'react'
-import PopularTours from './PopularTours.jsx'
-import StripeSponsored from './StripeSponsored.jsx'
-import TourSelect from '../Tours/TourSelect.jsx'
-import ClassicTourBanner from './CurrentPopularTour.jsx'
+import React, { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+import PopularTours from './PopularTours.jsx'
+import StripeSponsored from './StripeSponsored.jsx'
+import CurrentPopularTour from './CurrentPopularTour.jsx'
 import ReviewsShowcase from './ReviewsShowcase.jsx'
 import WhatMakesUsDifferent from './WhatMakesUsDifferent.jsx'
+import JourneyToursBlock from './JourneyToursBlock.jsx'
 
 import reviews from '../../data/reviews.js'
-import SuggestedTours from './SuggestedTours.jsx'
 
 gsap.registerPlugin(ScrollTrigger)
 
+// -----------------------------------------------------------------------------
+// intro slides
+// -----------------------------------------------------------------------------
 const exploreSlides = [
   {
     img: './images/content/random/1.webp',
@@ -39,52 +42,124 @@ const linkCards = [
   'Plan premium routes with scenic stops, local stories, and unforgettable views.',
 ]
 
+const stats = [
+  { value: '10+', label: 'Years of experience' },
+  { value: '20+', label: 'Tour Packages' },
+  { value: '500+', label: 'Happy Customers' },
+]
+
+const WORD_HOLD_TIME = 12.4
+
+// -----------------------------------------------------------------------------
+// small local display components
+// -----------------------------------------------------------------------------
 const NumberBadge = ({ children }) => (
-  <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-[28px] bg-[linear-gradient(135deg,rgba(148,197,255,0.88)_0%,rgba(152,255,213,0.88)_100%)] text-5xl font-bold text-white shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:h-28 sm:w-28 sm:text-6xl">
+  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[24px] bg-[linear-gradient(135deg,rgba(148,197,255,0.9)_0%,rgba(152,255,213,0.9)_100%)] font-frank text-5xl font-black text-white shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:h-24 sm:w-24 sm:text-6xl md:h-28 md:w-28">
     {children}
   </div>
 )
 
+const ArrowIcon = ({ className = 'h-4 w-4' }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.4"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M5 12h14" />
+    <path d="m13 6 6 6-6 6" />
+  </svg>
+)
+
+const shouldReduceMotion = () => {
+  if (typeof window === 'undefined') return true
+  return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+}
+
+const isTouchDevice = () => {
+  if (typeof window === 'undefined') return false
+
+  return (
+    window.matchMedia?.('(pointer: coarse)').matches ||
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0
+  )
+}
+
 const About = () => {
   const textRefs = useRef([])
   const statsRef = useRef([])
-  const statsContainerRef = useRef(null)
   const linkStripRef = useRef(null)
   const linkCardRefs = useRef([])
-  const bookingShellRef = useRef(null)
-  const bookingRef = useRef(null)
-  const tourSelectTeaserRef = useRef(null)
-  const tourSelectDropRef = useRef(null)
 
   const [slideIndex, setSlideIndex] = useState(0)
-  const [isTourSelectOpen, setIsTourSelectOpen] = useState(false)
-  const [hasTourSelectPeeked, setHasTourSelectPeeked] = useState(false)
 
   const slide = exploreSlides[slideIndex]
 
-  const WORD_HOLD_TIME = 12.4
+  // ---------------------------------------------------------------------------
+  // page navigation helpers
+  // ---------------------------------------------------------------------------
+  const scrollToSection = useCallback((primaryId, fallbackId = null) => {
+    const target =
+      document.getElementById(primaryId) ||
+      (fallbackId ? document.getElementById(fallbackId) : null)
 
-  const handleToggleTourSelect = () => {
-    setHasTourSelectPeeked(true)
-    setIsTourSelectOpen((prevValue) => !prevValue)
-  }
+    if (!target) return
 
-  const handleOpenTourSelect = () => {
-    setHasTourSelectPeeked(true)
-    setIsTourSelectOpen(true)
-  }
+    const y = target.getBoundingClientRect().top + window.scrollY
 
+    if (window.lenis) {
+      window.lenis.scrollTo(y, {
+        duration: 0.85,
+        force: true,
+      })
+
+      return
+    }
+
+    window.scrollTo({
+      top: y,
+      behavior: 'smooth',
+    })
+  }, [])
+
+  const scrollToJourney = useCallback(() => {
+    scrollToSection('journey-start', 'tours')
+  }, [scrollToSection])
+
+  const scrollToContact = useCallback(() => {
+    scrollToSection('contact')
+  }, [scrollToSection])
+
+  // ---------------------------------------------------------------------------
+  // rotating intro text animation
+  // ---------------------------------------------------------------------------
   useLayoutEffect(() => {
-    const words = textRefs.current?.filter(Boolean)
+    const words = textRefs.current.filter(Boolean)
 
-    if (!words || words.length === 0) return
+    if (!words.length) return undefined
+
+    if (shouldReduceMotion()) {
+      gsap.set(words, {
+        yPercent: 0,
+        opacity: 1,
+        scale: 1,
+        filter: 'blur(0px)',
+      })
+
+      return undefined
+    }
 
     const tl = gsap.timeline({
       defaults: {
         ease: 'power2.out',
       },
       onComplete: () => {
-        setSlideIndex((i) => (i + 1) % exploreSlides.length)
+        setSlideIndex((current) => (current + 1) % exploreSlides.length)
       },
     })
 
@@ -127,9 +202,13 @@ const About = () => {
     return () => tl.kill()
   }, [slideIndex])
 
+  // ---------------------------------------------------------------------------
+  // link strip entrance animation
+  // ---------------------------------------------------------------------------
   useLayoutEffect(() => {
     const cards = linkCardRefs.current.filter(Boolean)
-    if (!cards.length || !linkStripRef.current) return
+
+    if (!cards.length || !linkStripRef.current || shouldReduceMotion()) return undefined
 
     gsap.set(cards, {
       yPercent: 100,
@@ -139,8 +218,8 @@ const About = () => {
     const tween = gsap.to(cards, {
       yPercent: 0,
       opacity: 1,
-      duration: 0.55,
-      stagger: 0.1,
+      duration: 0.5,
+      stagger: 0.08,
       ease: 'power2.out',
       scrollTrigger: {
         trigger: linkStripRef.current,
@@ -155,158 +234,37 @@ const About = () => {
     }
   }, [])
 
+  // ---------------------------------------------------------------------------
+  // stats animation
+  // static on touch devices for better mobile performance
+  // ---------------------------------------------------------------------------
   useLayoutEffect(() => {
-    if (!bookingShellRef.current || !bookingRef.current) return
+    const statItems = statsRef.current.filter(Boolean)
 
-    const ctx = gsap.context(() => {
-      gsap
-        .timeline({
-          scrollTrigger: {
-            trigger: bookingShellRef.current,
-            start: 'top 75%',
-            end: 'top 45%',
-            scrub: true,
-            invalidateOnRefresh: true,
-          },
-        })
-        .fromTo(
-          bookingRef.current,
-          {
-            y: 0,
-            backgroundColor: 'rgba(255, 255, 255, 0)',
-            boxShadow: '0 18px 40px rgba(0,0,0,0.05)',
-          },
-          {
-            y: -8,
-            backgroundColor: 'rgba(255,255,255,0.98)',
-            boxShadow: '0 24px 60px rgba(15,10,113,0.12)',
-            ease: 'none',
-          }
-        )
-    }, bookingShellRef)
-
-    return () => ctx.revert()
-  }, [])
-
-  useLayoutEffect(() => {
-    if (!bookingShellRef.current) return
-
-    const trigger = ScrollTrigger.create({
-      trigger: bookingShellRef.current,
-      start: 'top 62%',
-      end: 'bottom 28%',
-      onEnter: () => {
-        setHasTourSelectPeeked(true)
-      },
-      onEnterBack: () => {
-        setHasTourSelectPeeked(true)
-      },
-      onLeaveBack: () => {
-        if (!isTourSelectOpen) {
-          setHasTourSelectPeeked(false)
-        }
-      },
-    })
-
-    return () => trigger.kill()
-  }, [isTourSelectOpen])
-
-  useLayoutEffect(() => {
-    if (!tourSelectTeaserRef.current) return
-
-    const teaser = tourSelectTeaserRef.current
-    const shouldShowTeaser = hasTourSelectPeeked && !isTourSelectOpen
-
-    gsap.killTweensOf(teaser)
-
-    gsap.to(teaser, {
-      opacity: shouldShowTeaser ? 1 : 0,
-      y: shouldShowTeaser ? 0 : -18,
-      scale: shouldShowTeaser ? 1 : 0.96,
-      duration: shouldShowTeaser ? 0.45 : 0.25,
-      ease: shouldShowTeaser ? 'power3.out' : 'power2.inOut',
-      onStart: () => {
-        if (shouldShowTeaser) {
-          teaser.style.pointerEvents = 'auto'
-        }
-      },
-      onComplete: () => {
-        if (!shouldShowTeaser) {
-          teaser.style.pointerEvents = 'none'
-        }
-      },
-    })
-  }, [hasTourSelectPeeked, isTourSelectOpen])
-
-  useLayoutEffect(() => {
-    if (!tourSelectDropRef.current) return
-
-    gsap.set(tourSelectDropRef.current, {
-      height: 0,
-      opacity: 0,
-      y: -18,
-      scale: 0.985,
-      transformOrigin: 'top center',
-      pointerEvents: 'none',
-    })
-  }, [])
-
-  useLayoutEffect(() => {
-    if (!tourSelectDropRef.current) return
-
-    const panel = tourSelectDropRef.current
-
-    gsap.killTweensOf(panel)
-
-    gsap.to(panel, {
-      height: isTourSelectOpen ? 'auto' : 0,
-      opacity: isTourSelectOpen ? 1 : 0,
-      y: isTourSelectOpen ? 0 : -18,
-      scale: isTourSelectOpen ? 1 : 0.985,
-      duration: isTourSelectOpen ? 0.6 : 0.35,
-      ease: isTourSelectOpen ? 'power3.out' : 'power2.inOut',
-      onStart: () => {
-        if (isTourSelectOpen) {
-          panel.style.pointerEvents = 'auto'
-        }
-      },
-      onComplete: () => {
-        if (!isTourSelectOpen) {
-          panel.style.pointerEvents = 'none'
-        }
-
-        ScrollTrigger.refresh()
-      },
-    })
-  }, [isTourSelectOpen])
-
-  useLayoutEffect(() => {
-    const stats = statsRef.current.filter(Boolean)
-
-    if (!stats.length) return
+    if (!statItems.length || shouldReduceMotion() || isTouchDevice()) return undefined
 
     const tl = gsap.timeline({
       repeat: -1,
-      repeatDelay: 0.2,
+      repeatDelay: 0.35,
     })
 
     tl.fromTo(
-      stats,
-      { opacity: 0, y: 16 },
+      statItems,
+      { opacity: 0, y: 14 },
       {
         opacity: 1,
         y: 0,
-        duration: 0.45,
-        stagger: 0.18,
+        duration: 0.38,
+        stagger: 0.14,
         ease: 'power2.out',
       }
     )
-      .to({}, { duration: 0.6 })
-      .to(stats, {
+      .to({}, { duration: 0.7 })
+      .to(statItems, {
         opacity: 0,
-        y: -10,
-        duration: 0.35,
-        stagger: 0.18,
+        y: -8,
+        duration: 0.3,
+        stagger: 0.14,
         ease: 'power2.in',
       })
 
@@ -317,20 +275,27 @@ const About = () => {
     <div className="relative flex w-full max-w-full flex-col bg-white">
       <img
         src="/assets/content/clip-art/section1-bg.png"
-        className="absolute inset-0 h-full w-full object-cover"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-70"
         alt=""
       />
 
+      {/* ---------------------------------------------------------------------
+          intro section
+          mobile is intentionally compact so users reach tours faster
+      --------------------------------------------------------------------- */}
       <section className="relative z-20 w-full bg-white">
-        <div className="relative z-20 mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-8 pt-14 sm:px-6 md:gap-8 md:pt-20 lg:px-8">
+        <div className="relative z-20 mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 pb-5 pt-8 sm:px-6 sm:pb-8 sm:pt-12 md:gap-8 md:pt-16 lg:px-8">
           <div className="flex w-full flex-col items-stretch gap-6 md:flex-row md:gap-8">
-            <div className="relative min-w-0 md:w-1/2">
-              <div className="relative aspect-[4/4.4] w-full overflow-hidden rounded-[28px] bg-blue-100 shadow-[0_16px_40px_rgba(0,0,0,0.12)] sm:aspect-[4/4.1]">
+            {/* desktop/tablet image panel only; hidden on mobile to reduce vertical length */}
+            <div className="relative hidden min-w-0 md:block md:w-1/2">
+              <div className="relative aspect-[4/4.15] w-full overflow-hidden rounded-[24px] bg-blue-100 shadow-[0_16px_40px_rgba(0,0,0,0.12)] lg:rounded-[28px]">
                 {exploreSlides.map((item, index) => (
                   <img
                     key={item.img}
                     src={item.img}
                     alt={item.title}
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    decoding="async"
                     className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
                       index === slideIndex ? 'opacity-100' : 'opacity-0'
                     }`}
@@ -341,10 +306,10 @@ const About = () => {
 
                 <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-2xl border border-white/20 bg-white/14 px-4 py-3 text-white backdrop-blur-md">
                   <div className="min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/75 sm:text-xs">
+                    <p className="font-bitter text-[10px] font- uppercase tracking-[0.2em] text-white/75 sm:text-xs">
                       {slide.eyebrow}
                     </p>
-                    <p className="mt-1 truncate text-sm font-semibold sm:text-base">
+                    <p className="mt-1 truncate font-frank text-sm font-semibold sm:text-base">
                       Cape Frontier Moments
                     </p>
                   </div>
@@ -366,199 +331,144 @@ const About = () => {
               </div>
             </div>
 
-            <div className="flex min-w-0 flex-col justify-between gap-8 md:w-1/2">
-              <div className="flex flex-col gap-4">
+            {/* intro copy */}
+            <div className="flex min-w-0 flex-col justify-between gap-5 md:w-1/2 md:gap-8">
+              <div className="flex flex-col gap-3 md:gap-4">
                 <div className="overflow-hidden">
                   <p
-                    ref={(el) => (textRefs.current[0] = el)}
-                    className="text-xs font-bold uppercase tracking-[0.22em] text-blue-700/70 sm:text-sm"
+                    ref={(el) => {
+                      textRefs.current[0] = el
+                    }}
+                    className="font-bitter text-[10px] font-black uppercase tracking-[0.22em] text-blue-700/70 sm:text-xs md:text-sm"
                   >
                     {slide.eyebrow}
                   </p>
                 </div>
 
                 <div className="overflow-hidden">
-                  <div
-                    ref={(el) => (textRefs.current[1] = el)}
-                    className="font-bitter text-4xl font-bold leading-[0.95] text-black sm:text-5xl lg:text-6xl"
+                  <h1
+                    ref={(el) => {
+                      textRefs.current[1] = el
+                    }}
+                    className="font-bitter text-3xl font-bold leading-[0.95] text-black sm:text-5xl lg:text-6xl"
                   >
                     {slide.title}
-                  </div>
+                  </h1>
                 </div>
 
                 <div className="overflow-hidden">
                   <p
-                    ref={(el) => (textRefs.current[2] = el)}
-                    className="max-w-xl font-mont text-sm leading-7 text-black/60 sm:text-base"
+                    ref={(el) => {
+                      textRefs.current[2] = el
+                    }}
+                    className="max-w-xl font-mont text-sm leading-6 text-black/60 sm:text-base sm:leading-7"
                   >
-                    {slide.desc}
+                    <span className="md:hidden">
+                      Guided Cape Town routes with local insight, scenic stops, and easy booking.
+                    </span>
+                    <span className="hidden md:inline">{slide.desc}</span>
                   </p>
                 </div>
 
-                <button className="flex w-fit items-center gap-2 rounded-full bg-green-200 px-3 py-1.5 text-blue-600 transition hover:scale-[1.02]">
-                  <img src="./icons/faqBlue.png" className="h-5 sm:h-6" alt="" />
-                  <span className="font-mont text-sm font-bold sm:text-base">Contact</span>
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={scrollToJourney}
+                    className="hero-gradient inline-flex items-center gap-2 rounded-xl px-4 py-3 font-mont text-xs font-black uppercase tracking-[0.14em] text-white shadow-[0_12px_28px_rgba(15,10,113,0.16)] transition hover:opacity-90 sm:text-sm"
+                  >
+                    <span>Start your journey</span>
+                    <ArrowIcon />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={scrollToContact}
+                    className="inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 font-mont text-xs font-black uppercase tracking-[0.14em] text-blue-700 transition hover:bg-blue-100 sm:text-sm"
+                  >
+                    <img src="./icons/faqBlue.png" className="h-4 sm:h-5" alt="" />
+                    <span>Contact</span>
+                  </button>
+                </div>
               </div>
 
-              <div className="flex flex-col gap-6">
-                <div ref={statsContainerRef} className="grid grid-cols-3 gap-4 sm:gap-5">
-                  <div ref={(el) => (statsRef.current[0] = el)}>
-                    <p className="font-bitter text-3xl font-extrabold text-blue-700 sm:text-4xl">
-                      10+
+              {/* compact stats; no long vertical stack on mobile */}
+              <div className="grid grid-cols-3 gap-2 rounded-2xl border border-black/5 bg-white/75 p-3 shadow-[0_14px_34px_rgba(15,23,42,0.06)] backdrop-blur-sm sm:gap-4 sm:p-4">
+                {stats.map((item, index) => (
+                  <div
+                    key={item.label}
+                    ref={(el) => {
+                      statsRef.current[index] = el
+                    }}
+                    className="min-w-0 text-center sm:text-left"
+                  >
+                    <p className="font-bitter text-2xl font-black leading-none text-blue-700 sm:text-3xl lg:text-4xl">
+                      {item.value}
                     </p>
-                    <p className="font-mont text-xs font-bold text-black/50 sm:text-sm">
-                      Years of experience
-                    </p>
-                  </div>
-
-                  <div ref={(el) => (statsRef.current[1] = el)}>
-                    <p className="font-bitter text-3xl font-extrabold text-blue-700 sm:text-4xl">
-                      20+
-                    </p>
-                    <p className="font-mont text-xs font-bold text-black/50 sm:text-sm">
-                      Tour Packages
+                    <p className="mt-1 font-mont text-[10px] font-bold leading-tight text-black/50 sm:text-xs lg:text-sm">
+                      {item.label}
                     </p>
                   </div>
-
-                  <div ref={(el) => (statsRef.current[2] = el)}>
-                    <p className="font-bitter text-3xl font-extrabold text-blue-700 sm:text-4xl">
-                      500+
-                    </p>
-                    <p className="font-mont text-xs font-bold text-black/50 sm:text-sm">
-                      Happy Customers
-                    </p>
-                  </div>
-                </div>
-
-                <button className="hero-gradient flex w-fit items-center gap-2 rounded-lg px-5 py-3 text-sm text-white transition hover:opacity-90 sm:text-base">
-                  <span>Start your journey</span>
-                  <img src="./icons/go.png" className="h-4" alt="" />
-                </button>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* ---------------------------------------------------------------------
+          journey area
+          link strip + popular tour + booking/suggested tours + reviews
+      --------------------------------------------------------------------- */}
       <section className="relative z-20 w-full">
-        <div className="mx-auto mt-4 flex w-full max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto mt-2 flex w-full max-w-5xl flex-col gap-5 px-4 sm:mt-4 sm:gap-8 sm:px-6 lg:px-8">
+          {/* link strip: second card hidden on mobile to reduce vertical length */}
           <div ref={linkStripRef} className="grid w-full gap-2 md:grid-cols-2">
             {linkCards.map((text, index) => (
               <div
                 key={text}
-                ref={(el) => (linkCardRefs.current[index] = el)}
-                className="overflow-hidden rounded-2xl"
+                ref={(el) => {
+                  linkCardRefs.current[index] = el
+                }}
+                className={`overflow-hidden rounded-2xl ${index > 0 ? 'hidden sm:block' : ''}`}
               >
-                <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-green-300/60 bg-green-200 px-4 py-3 text-sm text-black shadow-[0_10px_24px_rgba(0,0,0,0.05)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgba(0,0,0,0.08)] sm:px-5 sm:py-4 sm:text-[15px]">
+                <button
+                  type="button"
+                  onClick={scrollToJourney}
+                  className="flex w-full min-w-0 items-center gap-3 rounded-2xl border border-green-300/60 bg-green-200 px-4 py-3 text-left font-mont text-sm text-black shadow-[0_10px_24px_rgba(0,0,0,0.05)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgba(0,0,0,0.08)] sm:px-5 sm:py-4 sm:text-[15px]"
+                >
                   <p className="min-w-0 flex-1 leading-relaxed">{text}</p>
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-black/6">
                     <img src="./icons/topRightArrowDark.png" className="h-4 w-4" alt="" />
                   </div>
-                </div>
+                </button>
               </div>
             ))}
           </div>
 
-          <ClassicTourBanner />
-
-          <div ref={bookingShellRef} className="relative mx-auto h-full max-w-5xl overflow-visible pt-10">
-            <div
-              ref={bookingRef}
-              className={`relative z-30 overflow-hidden rounded-[28px] border border-black/8 bg-white/10 backdrop-blur-sm transition-[border-radius] duration-300 ${
-                isTourSelectOpen ? 'rounded-b-[20px]' : ''
-              }`}
-            >
-              <div className="relative flex flex-col gap-5 p-5 transition-colors sm:p-6 md:flex-row md:items-center md:gap-8 lg:p-8">
-                <div className="shrink-0">
-                  <NumberBadge>1</NumberBadge>
-                </div>
-
-                <div className="min-w-0 flex-1 text-black">
-                  <p
-                    className="text-xs font-bold uppercase tracking-[0.24em] sm:text-sm"
-                    style={{ color: 'var(--color-brand-lightblue)' }}
-                  >
-                    Booking step
-                  </p>
-
-                  <p
-                    className="mt-2 font-frank text-4xl leading-[0.95] sm:text-5xl lg:text-6xl"
-                    style={{ color: 'var(--color-brand-darkblue)' }}
-                  >
-                    Start your journey.
-                  </p>
-
-                  <p className="mt-3 max-w-2xl font-mont text-sm leading-7 text-black/60 sm:text-base md:text-lg">
-                    <span className="font-bold text-black">Book your tour</span> with your
-                    preferred route, date, and group details, then get ready for a Cape Town
-                    experience built to feel seamless from start to finish.
-                  </p>
-                </div>
-
-                <div className="flex shrink-0 items-center self-start md:self-center">
-                  <button
-                    type="button"
-                    onClick={handleToggleTourSelect}
-                    aria-expanded={isTourSelectOpen}
-                    className="group flex items-center gap-3 rounded-full border border-black/10 bg-white px-4 py-2.5 font-mont text-xs font-bold uppercase tracking-[0.18em] text-black/70 shadow-[0_12px_28px_rgba(0,0,0,0.08)] transition duration-300 hover:-translate-y-0.5 hover:border-blue-400/40 hover:text-blue-700"
-                  >
-                    <span>{isTourSelectOpen ? 'Close form' : 'Choose tour'}</span>
-
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green-200 text-black transition-transform duration-300 group-hover:translate-y-0.5">
-                      <svg
-                        className={`h-4 w-4 transition-transform duration-300 ${
-                          isTourSelectOpen ? 'rotate-180' : ''
-                        }`}
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.2"
-                      >
-                        <path d="m6 9 6 6 6-6" />
-                      </svg>
-                    </span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative z-40 flex  justify-center">
-              <button
-                ref={tourSelectTeaserRef}
-                type="button"
-                onClick={handleOpenTourSelect}
-                className="pointer-events-none -translate-y-4 rounded-full border border-black/10 bg-white px-4 py-2 font-mont text-[11px] font-bold text-black/65 opacity-0 shadow-[0_14px_32px_rgba(0,0,0,0.10)] backdrop-blur-sm transition-colors hover:text-blue-700"
-              >
-                <span className="inline-flex items-center gap-2">
-                  <span>Open tour form</span>
-                  <span className="rounded-full bg-green-200 px-2 py-0.5 text-[9px] uppercase tracking-[0.14em] text-black/70">
-                    quick
-                  </span>
-                </span>
-              </button>
-            </div>
-
-            <div
-              ref={tourSelectDropRef}
-              className="relative z-20 mx-auto w-full max-w-5xl overflow-hidden"
-            >
-              <div className="rounded-b-[28px] border border-t-0 border-black/8 bg-white/95 px-2 pb-4 pt-5 shadow-[0_24px_60px_rgba(15,10,113,0.10)] backdrop-blur-sm sm:px-4">
-                <TourSelect />
-              </div>
-            </div>
+          {/* desktop/tablet feature only; mobile goes straight to journey block */}
+          <div className=" md:block">
+            <CurrentPopularTour />
           </div>
 
-          <SuggestedTours />
+          {/* coupled booking + suggested tours block */}
+          <div id="journey-start" className="scroll-mt-24">
+            <JourneyToursBlock />
+          </div>
 
           <ReviewsShowcase reviews={reviews} NumberBadge={NumberBadge} />
+
+         {/* Hidden bg mobile only  */}
+        <div className="md:hidden absolute w-2vw -bottom-20 -inset-x-12 h-1/4 hero-gradient-bl"></div>
         </div>
       </section>
 
+      {/* ---------------------------------------------------------------------
+          trust + remaining tour/payment sections
+      --------------------------------------------------------------------- */}
       <section className="relative z-20 w-full scroll-mt-24">
         <WhatMakesUsDifferent />
 
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-5xl flex-col px-4 sm:px-6 lg:px-8">
           <PopularTours />
           <StripeSponsored />
         </div>

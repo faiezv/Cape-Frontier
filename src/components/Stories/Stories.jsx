@@ -1,430 +1,497 @@
-import React, { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import React, { useLayoutEffect, useMemo, useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-import TestimonialsSection from "./TestimonialsSection";
-import Gallery from "./GoalsGallery";
+import TestimonialsSection from './TestimonialsSection'
+import Gallery from './GoalsGallery'
+import reviews from '../../data/reviews.js'
+import ContactPlatforms from '../ContactPlatforms.jsx'
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger)
+
+// ============================================================
+// 1. STORY MEDIA + REVIEW HELPERS
+// ============================================================
 
 const storyImages = [
-  "/images/content/random/1.webp",
-  "/images/content/random/2.webp",
-  "/images/content/random/3.webp",
-  "/images/content/random/4.webp",
-  // "/images/content/random/5.webp",
-];
+  '/images/tours/hiking/platteklip/1.webp',
+  '/images/tours/hiking/platteklip/3.webp',
+  '/images/tours/historical/robben-island/1.webp',
+]
+
+const fallbackTestimonial = {
+  text:
+    "The most incredible experience of my life. Cape Town's beauty from the ocean was breathtaking. The guides were professional and kind.",
+  title: 'A memorable Cape Town experience',
+  name: 'Sarah Johnson',
+  country: 'USA',
+  date: 'March 2024',
+  rating: 5,
+}
+
+const getLatestReview = () => {
+  if (!Array.isArray(reviews) || reviews.length === 0) return fallbackTestimonial
+
+  const latest = reviews[reviews.length - 1]
+
+  return {
+    text:
+      latest.desc ||
+      latest.review ||
+      latest.mainReview ||
+      latest.text ||
+      fallbackTestimonial.text,
+    title:
+      latest.title ||
+      latest.tour ||
+      latest.tourTitle ||
+      latest.tourName ||
+      fallbackTestimonial.title,
+    name:
+      latest.name ||
+      latest.mainReviewerName ||
+      latest.reviewerName ||
+      fallbackTestimonial.name,
+    country:
+      latest.country ||
+      latest.mainReviewerCountry ||
+      latest.reviewerCountry ||
+      fallbackTestimonial.country,
+    date:
+      latest.date ||
+      latest.reviewDate ||
+      latest.reviewYear ||
+      fallbackTestimonial.date,
+    rating: latest.rating || latest.stars || fallbackTestimonial.rating,
+  }
+}
+
+const clampRating = (rating) => Math.max(0, Math.min(5, Number(rating) || 0))
+
+// ============================================================
+// 2. MAIN COMPONENT
+// ============================================================
 
 const Stories = () => {
-  const sectionRef = useRef(null);
-  const imageFrameRef = useRef(null);
-  const imageRefs = useRef([]);
-  const headingRef = useRef(null);
-  const buttonsRef = useRef(null);
-  const recentBadgeRef = useRef(null);
-  const reviewCardRef = useRef(null);
-  const socialRef = useRef(null);
-  const leaveReviewRef = useRef(null);
+  const sectionRef = useRef(null)
+  const cardShellRef = useRef(null)
+  const imageFrameRef = useRef(null)
+  const imageRefs = useRef([])
+  const quoteRef = useRef(null)
+  const testimonialTextRef = useRef(null)
+  const headingRef = useRef(null)
+  const copyRef = useRef(null)
+  const buttonsRef = useRef(null)
+  const recentBadgeRef = useRef(null)
+  const reviewMetaRef = useRef(null)
+  const leaveReviewRef = useRef(null)
 
-  const testimonial = {
-    text: "The most incredible experience of my life. Cape Town's beauty from the ocean was breathtaking. The guides were professional and kind.",
-    name: "Sarah Johnson",
-    country: "USA",
-    date: "March 2024",
-    rating: 5,
-  };
+  const testimonial = useMemo(() => getLatestReview(), [])
+  const rating = clampRating(testimonial.rating)
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      const stackedImages = imageRefs.current.filter(Boolean);
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const images = imageRefs.current.filter(Boolean).slice(0, 3)
+
+      gsap.set(cardShellRef.current, {
+        autoAlpha: 0,
+        y: 44,
+        scale: 0.985,
+      })
 
       gsap.set(imageFrameRef.current, {
-        opacity: 0,
+        autoAlpha: 0,
         y: 80,
         rotate: -2,
         scale: 0.94,
-      });
+      })
 
-      gsap.set(stackedImages, {
+      gsap.set(images, {
         yPercent: 115,
         scale: 1.14,
-        opacity: 1,
-      });
+        autoAlpha: 1,
+        willChange: 'transform',
+      })
 
-      gsap.set(stackedImages[0], {
-        yPercent: 0,
-        scale: 1.08,
-      });
+      if (images[0]) {
+        gsap.set(images[0], {
+          yPercent: 0,
+          scale: 1.08,
+        })
+      }
 
-      gsap.set(".story-heading-word", {
-        yPercent: 115,
-        rotate: 3,
-      });
+      gsap.set([quoteRef.current, testimonialTextRef.current], {
+        autoAlpha: 0,
+        y: 22,
+      })
 
-      gsap.set(buttonsRef.current, {
-        opacity: 0,
-        y: 28,
-      });
+      gsap.set('.story-heading-word', {
+        yPercent: 112,
+        rotate: 2,
+      })
 
-      gsap.set(recentBadgeRef.current, {
-        opacity: 0,
-        x: -28,
-      });
+      gsap.set([copyRef.current, buttonsRef.current, recentBadgeRef.current, reviewMetaRef.current], {
+        autoAlpha: 0,
+        y: 18,
+      })
 
-      gsap.set(reviewCardRef.current, {
-        opacity: 0,
-        y: 70,
-        scale: 0.96,
-        rotateX: 8,
-        transformPerspective: 900,
-      });
+      if (reducedMotion) {
+        gsap.set(
+          [
+            cardShellRef.current,
+            imageFrameRef.current,
+            quoteRef.current,
+            testimonialTextRef.current,
+            copyRef.current,
+            buttonsRef.current,
+            recentBadgeRef.current,
+            reviewMetaRef.current,
+          ],
+          {
+            autoAlpha: 1,
+            y: 0,
+            rotate: 0,
+            scale: 1,
+          }
+        )
 
-      gsap.set(socialRef.current, {
-        opacity: 0,
-        y: 20,
-      });
+        gsap.set('.story-heading-word', {
+          yPercent: 0,
+          rotate: 0,
+        })
+
+        return
+      }
 
       const introTl = gsap.timeline({
+        defaults: {
+          ease: 'power3.out',
+        },
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 82%",
-          end: "top 28%",
-          scrub: 1.2,
+          start: 'top 82%',
+          end: 'top 38%',
+          scrub: 0.9,
+          invalidateOnRefresh: true,
         },
-      });
+      })
 
       introTl
-        .to(imageFrameRef.current, {
-          opacity: 1,
+        .to(cardShellRef.current, {
+          autoAlpha: 1,
           y: 0,
-          rotate: 0,
           scale: 1,
-          duration: 1,
-          ease: "power3.out",
+          duration: 0.7,
         })
         .to(
-          ".story-heading-word",
+          imageFrameRef.current,
+          {
+            autoAlpha: 1,
+            y: 0,
+            rotate: 0,
+            scale: 1,
+            duration: 0.78,
+          },
+          0.08
+        )
+        .to(
+          quoteRef.current,
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.45,
+          },
+          0.14
+        )
+        .to(
+          testimonialTextRef.current,
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.55,
+          },
+          0.22
+        )
+        .to(
+          '.story-heading-word',
           {
             yPercent: 0,
             rotate: 0,
-            duration: 1,
-            stagger: 0.08,
-            ease: "power4.out",
+            duration: 0.55,
+            stagger: 0.055,
+            ease: 'power4.out',
           },
-          "<0.1"
+          0.28
         )
-        .to(
-          buttonsRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            ease: "power3.out",
-          },
-          "<0.25"
-        )
-        .to(
-          recentBadgeRef.current,
-          {
-            opacity: 1,
-            x: 0,
-            duration: 0.65,
-            ease: "power3.out",
-          },
-          "<0.3"
-        )
-        .to(
-          reviewCardRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            rotateX: 0,
-            duration: 1,
-            ease: "power3.out",
-          },
-          "<0.15"
-        )
-        .to(
-          socialRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            ease: "power3.out",
-          },
-          "<0.35"
-        );
+        .to(copyRef.current, { autoAlpha: 1, y: 0, duration: 0.42 }, 0.44)
+        .to(buttonsRef.current, { autoAlpha: 1, y: 0, duration: 0.42 }, 0.5)
+        .to(recentBadgeRef.current, { autoAlpha: 1, y: 0, duration: 0.36 }, 0.56)
+        .to(reviewMetaRef.current, { autoAlpha: 1, y: 0, duration: 0.36 }, 0.62)
 
-      const imageStackTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: imageFrameRef.current,
-          start: "top 72%",
-          endTrigger: reviewCardRef.current,
-          end: "center center",
-          scrub: 1.35,
-        },
-      });
+      if (images.length > 1) {
+        const imageStackTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: imageFrameRef.current,
+            start: 'top 72%',
+            endTrigger: cardShellRef.current,
+            end: 'bottom 44%',
+            scrub: 1.35,
+            invalidateOnRefresh: true,
+          },
+        })
 
-      stackedImages.forEach((img, index) => {
-        if (index === 0) return;
+        images.forEach((image, index) => {
+          if (index === 0) return
 
-        imageStackTl
-          .to(
-            img,
-            {
-              yPercent: 0,
-              scale: 1.08,
-              duration: 1,
-              ease: "none",
-            },
-            index - 1
-          )
-          .to(
-            stackedImages[index - 1],
-            {
-              yPercent: -42,
-              scale: 1.02,
-              duration: 1,
-              ease: "none",
-            },
-            index - 1
-          );
-      });
-
-      gsap.to(imageFrameRef.current, {
-        y: -36,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1.4,
-        },
-      });
+          imageStackTl
+            .to(
+              image,
+              {
+                yPercent: 0,
+                scale: 1.08,
+                duration: 1,
+                ease: 'none',
+              },
+              index - 1
+            )
+            .to(
+              images[index - 1],
+              {
+                yPercent: -42,
+                scale: 1.02,
+                duration: 1,
+                ease: 'none',
+              },
+              index - 1
+            )
+        })
+      }
 
       gsap.fromTo(
         leaveReviewRef.current,
         {
-          opacity: 0,
-          y: 80,
-          scale: 0.96,
+          autoAlpha: 0,
+          y: 42,
+          scale: 0.98,
         },
         {
-          opacity: 1,
+          autoAlpha: 1,
           y: 0,
           scale: 1,
-          ease: "power3.out",
+          ease: 'power3.out',
           scrollTrigger: {
             trigger: leaveReviewRef.current,
-            start: "top 82%",
-            end: "top 45%",
-            scrub: 1,
+            start: 'top 86%',
+            end: 'top 52%',
+            scrub: 0.8,
           },
         }
-      );
+      )
 
-      ScrollTrigger.refresh();
-    }, sectionRef);
+      ScrollTrigger.refresh()
+    }, sectionRef)
 
-    return () => ctx.revert();
-  }, []);
+    return () => ctx.revert()
+  }, [])
 
   return (
     <div
       ref={sectionRef}
-      className="relative w-full min-h-screen overflow-hidden bg-white text-black"
+      className="relative w-full overflow-hidden bg-white text-black"
+      id="stories"
     >
-      {/* <img src="./assets/content/clip-art/section3-bg.png" className='absolute z-20 w-full h-full content-cover' alt="" /> */}
-      {/* Section 1 */}
-      <section className="relative z-30 w-full bg-none px-4 pt-6 md:pt-10">
-
-
-        <div className="pointer-events-none absolute inset-0 overflow-hidden ">
-          <div className="absolute left-[-10rem] top-20 h-96 w-96 rounded-full bg-green-200/45 blur-3xl" />
-          <div className="absolute right-[-8rem] top-40 h-[28rem] w-[28rem] rounded-full bg-blue-200/30 blur-3xl" />
-          <div className="absolute left-1/2 top-[28rem] h-80 w-80 -translate-x-1/2 rounded-full bg-yellow-100/40 blur-3xl" />
+      {/* ============================================================
+          SECTION 1: REAL STORIES HERO
+      ============================================================ */}
+      <section className="relative z-30 w-full px-4 pt-8 sm:px-6 md:pt-12">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute left-[-12rem] top-20 h-96 w-96 rounded-full bg-green-200/45 blur-3xl" />
+          <div className="absolute right-[-10rem] top-44 h-[30rem] w-[30rem] rounded-full bg-blue-200/30 blur-3xl" />
+          <div className="absolute left-1/2 top-[34rem] h-80 w-80 -translate-x-1/2 rounded-full bg-yellow-100/35 blur-3xl" />
         </div>
 
         <div className="relative mx-auto max-w-5xl">
-          <div className="rounded-t-[2rem] border border-black/5 bg-white/80 px-4 py-6 shadow-2xl shadow-black/10 backdrop-blur-md md:px-6 lg:px-8">
-            <div className="grid items-center gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-              {/* Animated image stack */}
+          <div
+            ref={cardShellRef}
+            className="overflow-hidden rounded-[2rem] border border-black/5 bg-white/88 p-4 shadow-[0_22px_70px_rgba(0,0,0,0.10)] backdrop-blur-md sm:p-5 md:p-6 lg:p-8"
+          >
+            {/* Top centered quote + latest testimonial */}
+            <div className="mx-auto mb-7 max-w-4xl text-center md:my-24">
+              <img
+                ref={quoteRef}
+                src="/icons/quote-green.png"
+                className="mx-auto h-12 w-12 object-contain sm:h-14 sm:w-14"
+                alt=""
+                aria-hidden="true"
+              />
+
+              <p
+                ref={testimonialTextRef}
+                className="mt-4 font-frank text-4xl font-light leading-[0.95] tracking-[-0.04em] text-black/82 sm:text-5xl md:text-6xl lg:text-7xl"
+              >
+                “{testimonial.text}”
+              </p>
+
+              <div className="mx-auto mt-5 flex w-full max-w-2xl flex-col items-center gap-3 sm:mt-6 sm:flex-row sm:justify-center">
+                <div
+                  ref={recentBadgeRef}
+                  className="inline-flex items-center gap-2 rounded-full border border-green-300/70 bg-green-200 px-4 py-2 font-bitter text-[10px] font-black uppercase tracking-[0.14em] text-green-950 shadow-[0_12px_26px_rgba(34,197,94,0.12)]"
+                >
+                  <img src="/icons/recent.png" alt="" className="h-4 w-4" />
+                  <span>Recent testimonial</span>
+                </div>
+
+                <div
+                  ref={reviewMetaRef}
+                  className="flex w-full max-w-md flex-wrap items-center justify-center gap-2 rounded-full border border-black/6 bg-black/[0.025] px-4 py-2 sm:w-auto sm:justify-start"
+                >
+                  <div className="min-w-0 text-center sm:text-left">
+                    <p className="truncate font-bitter text-sm font-semibold text-black/80">
+                      {testimonial.name}
+                    </p>
+                    <p className="font-bitter text-xs text-black/48">
+                      {testimonial.country}, {testimonial.date}
+                    </p>
+                  </div>
+
+                  <div className="flex shrink-0 items-center gap-0.5">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <svg
+                        key={index}
+                        className="h-3.5 w-3.5"
+                        viewBox="0 0 24 24"
+                        fill={index < Math.round(rating) ? '#22C55E' : 'none'}
+                        stroke="#22C55E"
+                        strokeWidth="1.6"
+                        aria-hidden="true"
+                      >
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid items-center gap-6 lg:grid-cols-[0.96fr_1.04fr] lg:gap-8">
+              {/* Left image frame: only 3 sliding images */}
               <div
                 ref={imageFrameRef}
-                className="relative h-[340px] w-full overflow-hidden rounded-[2rem] bg-black shadow-2xl shadow-green-950/15 md:h-[430px]"
+                className="relative min-h-[320px] w-full overflow-hidden rounded-[1.6rem] bg-black shadow-[0_24px_60px_rgba(10,38,20,0.16)] sm:min-h-[380px] md:min-h-[430px]"
               >
                 {storyImages.map((src, index) => (
                   <img
                     key={src}
-                    ref={(el) => (imageRefs.current[index] = el)}
+                    ref={(el) => {
+                      imageRefs.current[index] = el
+                    }}
                     src={src}
-                    className="absolute inset-0 h-full w-full object-cover will-change-transform"
-                    alt={`Cape Frontier story ${index + 1}`}
-                    loading={index === 0 ? "eager" : "lazy"}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    alt={`Cape Frontier guest story ${index + 1}`}
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    decoding={index === 0 ? 'sync' : 'async'}
                   />
                 ))}
 
-                {/* GRADIENT OVERLAY */}
-                {/* <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/5" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(187,247,208,0.22),transparent_35%)]" /> */}
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-950/68 via-black/12 to-black/5" />
 
-                <div className="absolute left-4 top-4 rounded-full border border-white/25 bg-white/15 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white backdrop-blur-md">
+                <div className="absolute left-4 top-4 rounded-full border border-white/20 bg-white/14 px-3 py-2 font-bitter text-[10px] font-black uppercase tracking-[0.2em] text-white backdrop-blur-md">
                   Guest moments
                 </div>
 
-                <div className="absolute bottom-5 left-5 right-5">
-                  <p className="mb-3 w-fit rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-black shadow-sm">
-                    Scroll to reveal
-                  </p>
-
-                  {/* <h3 className="max-w-sm font-frank text-4xl font-bold leading-none text-white md:text-5xl">
-                    Real Cape Town experiences, one frame at a time.
-                  </h3> */}
-                </div>
               </div>
 
-              {/* Right text content */}
-              <div className="flex min-h-full flex-col justify-between">
-                <div className="relative mb-6">
-                  <div className="absolute -left-3 -top-3 h-16 w-16 rounded-full bg-green-300/20 blur-xl" />
+              {/* Right story content */}
+              <div className="flex w-full flex-col justify-center self-center">
+                <div className="flex w-full flex-col justify-center lg:py-6">
+                  <div>
+                    <div
+                      ref={headingRef}
+                      className="overflow-hidden font-frank text-5xl font-bold leading-none tracking-tight text-black sm:text-6xl lg:text-7xl"
+                    >
+                      <span className="story-heading-word inline-block">REAL</span>{' '}
+                      <span className="story-heading-word inline-block">STORIES.</span>
+                    </div>
 
-                  <img
-                    src="/icons/quote-green.png"
-                    className="relative h-12 w-12"
-                    alt="quote"
-                  />
-                </div>
+                    <div className="mt-2 overflow-hidden font-frank text-3xl font-bold leading-none tracking-tight sm:text-4xl lg:text-5xl">
+                      <span className="story-heading-word inline-block bg-gradient-to-r from-green-700 via-emerald-500 to-blue-700 bg-clip-text text-transparent">
+                        Beyond the Ordinary.
+                      </span>
+                    </div>
 
-                <div>
-                  <div
-                    ref={headingRef}
-                    className="overflow-hidden font-frank text-5xl font-bold leading-none tracking-tight md:text-6xl lg:text-7xl"
-                  >
-                    <span className="story-heading-word inline-block">
-                      REAL
-                    </span>{" "}
-                    <span className="story-heading-word inline-block">
-                      STORIES.
-                    </span>
+                    <p
+                      ref={copyRef}
+                      className="mt-5 max-w-xl font-bitter text-sm leading-relaxed text-black/58 sm:text-base"
+                    >
+                      Real guest feedback helps future travellers understand the
+                      pace, atmosphere, and care behind each Cape Frontier route.
+                      Explore recent stories, then choose the tour that feels right
+                      for your own group.
+                    </p>
                   </div>
 
-                  <div className="mt-2 overflow-hidden font-frank text-3xl font-bold leading-none tracking-tight md:text-5xl lg:text-5xl">
-                    <span className="story-heading-word inline-block bg-gradient-to-r from-green-700 via-emerald-500 to-blue-700 bg-clip-text text-transparent">
-                      Beyond the Ordinary.
-                    </span>
-                  </div>
-
-                  <p className="mt-4 max-w-xl font-bitter text-sm leading-relaxed text-black/55 md:text-base">
-                    A softer, cleaner review intro with motion that feels more
-                    premium: image movement on the left, copy reveal on the
-                    right, and the review card pulling into view underneath.
-                  </p>
-
-                  <div ref={buttonsRef} className="mt-5 flex flex-wrap gap-3">
-                    <button className="rounded-full border border-blue-400/50 bg-white px-6 py-3 font-bitter text-sm font-semibold text-blue-700 shadow-md shadow-black/5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-400 hover:text-white hover:shadow-lg">
+                  <div ref={buttonsRef} className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <button className="flex min-h-[3.4rem] items-center justify-center rounded-full border border-blue-400/45 bg-white px-6 py-3 font-bitter text-sm font-semibold text-blue-700 shadow-[0_12px_28px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500 hover:text-white">
                       Read their stories
                     </button>
 
-                    <button className="hero-gradient rounded-full px-8 py-3 font-bitter text-sm font-semibold text-white shadow-lg shadow-black/10 transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-xl">
+                    <button className="hero-gradient flex min-h-[3.4rem] items-center justify-center rounded-full px-6 py-3 font-bitter text-sm font-semibold text-white shadow-[0_14px_32px_rgba(0,0,0,0.10)] transition-all duration-300 hover:-translate-y-0.5">
                       View Tours
                     </button>
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* RECENT TESTIMONIALS */}
-            <div
-              ref={recentBadgeRef}
-              className="my-8 flex w-fit items-center gap-3 rounded-full border border-amber-300/70 bg-amber-300/90 px-5 py-2 font-frank font-bold text-black shadow-lg shadow-amber-500/10"
-            >
-              <img src="/icons/recent.png" alt="" className="h-5 w-5" />
-              <div>Recent Testimonials</div>
-            </div>
-
-            {/* SINGLE TESTIMONIAL */}
-            <div className="w-full">
-              <div
-                ref={reviewCardRef}
-                className="relative overflow-hidden rounded-[2rem] border border-black/5  p-6 shadow-xl shadow-black/5 md:p-8"
-              >
-                <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full blur-3xl" />
-
-                <p className="relative font-frank text-3xl leading-none text-black/75 md:text-4xl">
-                  "{testimonial.text}"
-                </p>
-
-                <div className="relative mt-6 border-t border-black/5 pt-4">
-                  <p className="font-bitter text-sm font-semibold italic text-gray-800 md:text-base">
-                    - {testimonial.name}{" "}
-                    <span className="font-normal opacity-70">
-                      {testimonial.country}, {testimonial.date}
-                    </span>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Social icons */}
-            <div
-              ref={socialRef}
-              className="mx-auto mt-8 flex w-fit flex-col items-center gap-4"
-            >
-              <div className="flex items-center justify-center gap-3 opacity-70">
-                <img className="h-5 w-5 object-cover" src="/icons/facebook.png" alt="" />
-                <img className="h-5 w-5 object-cover" src="/icons/x.png" alt="" />
-                <img className="h-5 w-5 object-cover" src="/icons/pinterest.png" alt="" />
-                <img className="h-5 w-5 object-cover" src="/icons/mail.png" alt="" />
-                <img className="h-5 w-5 object-cover" src="/icons/share.png" alt="" />
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Section 2 - Gallery and Testimonials */}
-      <section className="relative z-30 mx-auto w-full ">
+
+      {/* ============================================================
+          SECTION 2: TESTIMONIALS + GALLERY
+      ============================================================ */}
+      <section className="relative z-30 mx-auto w-full pt-8">
         <img
           src="/assets/content/clip-art/section2-bg.png"
           className="absolute inset-0 -z-10 h-full w-full object-cover opacity-100"
-          alt="background"
+          alt=""
+          aria-hidden="true"
         />
 
-        <div className="absolute z-0 h-1/6 w-full bg-white" />
+        <div className="absolute top-0 z-0 h-1/5 w-full bg-white" />
 
         <TestimonialsSection />
 
-        <div className="mx-auto max-w-5xl rounded-lg">
+        <div className="mx-auto max-w-5xl rounded-lg px-4 sm:px-6 lg:px-0">
           <Gallery />
         </div>
 
-        <div ref={leaveReviewRef} className="mx-auto flex max-w-5xl flex-col">
-          <div className="z-10 my-10 flex w-full items-center justify-center rounded-[2rem] border border-black/5 bg-white p-8 font-bitter leading-none text-black shadow-xl shadow-black/5">
-            <div className="flex w-1/4 gap-5">
-              <img src="/icons/quote-green.png" className="h-12" alt="" />
-              <img src="/icons/quote-green.png" className="h-12 opacity-60" alt="" />
+        <ContactPlatforms className='w-5xl mx-auto ' />
+        {/* <div ref={leaveReviewRef} className="mx-auto flex max-w-5xl flex-col px-4 sm:px-6 lg:px-0">
+          <div className="z-10 my-10 grid w-full gap-5 rounded-[2rem] border border-black/5 bg-white p-6 font-bitter leading-none text-black shadow-[0_18px_45px_rgba(0,0,0,0.08)] sm:p-8 md:grid-cols-[0.25fr_0.75fr] md:items-center">
+            <div className="flex gap-4">
+              <img src="/icons/quote-green.png" className="h-10 sm:h-12" alt="" />
+              <img src="/icons/quote-green.png" className="h-10 opacity-60 sm:h-12" alt="" />
             </div>
 
-            <div className="w-3/4 leading-snug">
+            <div className="leading-snug">
               <p className="font-frank text-4xl font-bold">Leave a review</p>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-black/55">
-                Experience the Cape's wonders and leave your review here with
-                the rest of our guest stories.
+                After your Cape Frontier experience, use your traveller code to
+                share feedback and help future guests choose with confidence.
               </p>
-            </div>
-          </div>
 
-          <div className="z-10 flex w-full -translate-y-[130%] items-start justify-end px-10">
-            <div className="hero-gradient flex items-center gap-8 rounded-full px-8 py-2 text-white shadow-xl shadow-black/10">
-              <button className="font-frank text-2xl">Proceed</button>
-              <img src="/icons/go.png" alt="" className="h-8 w-8" />
+              <button className="hero-gradient mt-5 flex w-fit items-center gap-4 rounded-full px-6 py-3 text-white shadow-xl shadow-black/10">
+                <span className="font-frank text-xl">Proceed</span>
+                <img src="/icons/go.png" alt="" className="h-6 w-6" />
+              </button>
             </div>
           </div>
-        </div>
+        </div> */}
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default Stories;
+export default Stories

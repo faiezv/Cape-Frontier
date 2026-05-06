@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import reviews from "../../data/reviews.js";
 import FloatingTooltip from "../FloatingTooltip.jsx";
 
@@ -49,7 +49,7 @@ const ReviewMeta = ({ review }) => {
         <img
           src={review.avatar}
           alt={review.name}
-          className="h-10 w-10 shrink-0 rounded-full border-2 border-white object-cover shadow-sm"
+          className="h-9 w-9 shrink-0 rounded-full border-2 border-white object-cover shadow-sm lg:h-10 lg:w-10"
           loading="lazy"
         />
 
@@ -85,7 +85,37 @@ const ReviewMeta = ({ review }) => {
   );
 };
 
+const useIsMobileReviews = () => {
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth < 768;
+  });
+
+  useEffect(() => {
+    const update = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    update();
+
+    window.addEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
+
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", update);
+    };
+  }, []);
+
+  return isMobile;
+};
+
 const TestimonialsSection = () => {
+  const isMobileReviews = useIsMobileReviews();
+  const [activeTopReviewIndex, setActiveTopReviewIndex] = useState(0);
+  const topTrackRef = useRef(null);
+  const topCardRefs = useRef([]);
+
   const topReviews = reviews
     .filter((review) =>
       ["Shark Cage Diving", "Paragliding", "Delaire Graff"].includes(
@@ -116,8 +146,35 @@ const TestimonialsSection = () => {
     .filter((review) => !topReviewIds.has(review.id))
     .slice(0, 4);
 
+  useEffect(() => {
+    if (!isMobileReviews || topReviews.length <= 1) return undefined;
+
+    const interval = window.setInterval(() => {
+      setActiveTopReviewIndex((current) => (current + 1) % topReviews.length);
+    }, 2600);
+
+    return () => window.clearInterval(interval);
+  }, [isMobileReviews, topReviews.length]);
+
+  useLayoutEffect(() => {
+    if (!isMobileReviews) return;
+
+    const track = topTrackRef.current;
+    const activeCard = topCardRefs.current[activeTopReviewIndex];
+
+    if (!track || !activeCard) return;
+
+    const targetLeft =
+      activeCard.offsetLeft - track.offsetLeft - (track.clientWidth - activeCard.clientWidth) / 2;
+
+    track.scrollTo({
+      left: Math.max(0, targetLeft),
+      behavior: "smooth",
+    });
+  }, [activeTopReviewIndex, isMobileReviews]);
+
   return (
-    <div className="w-full px-4 py-8 font-bitter">
+    <div className="w-full px-4 py-5 font-bitter md:py-8">
       <div className="mx-auto max-w-5xl">
         <FloatingTooltip
           text="See more"
@@ -125,17 +182,33 @@ const TestimonialsSection = () => {
           followCursor={true}
           className="w-full"
         >
-          <div className="mb-10 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {topReviews.map((review) => (
-              <div
-                key={review.id}
-                className="relative z-10 flex h-full flex-col overflow-hidden rounded-2xl bg-green-200 shadow-lg transition-transform duration-300 hover:scale-[1.02]"
-              >
+          <div
+            ref={topTrackRef}
+            className="mb-7 flex h-[30.5rem] snap-x snap-mandatory items-center gap-3 overflow-x-auto pb-3 [-ms-overflow-style:none] [scrollbar-width:none] md:mb-10 md:grid md:h-auto md:grid-cols-3 md:items-stretch md:gap-4 md:overflow-visible md:pb-0 [&::-webkit-scrollbar]:hidden"
+          >
+            {topReviews.map((review, index) => {
+              const isActiveMobile = isMobileReviews && index === activeTopReviewIndex;
+
+              return (
+                <div
+                  key={review.id}
+                  ref={(el) => {
+                    topCardRefs.current[index] = el;
+                  }}
+                  onClick={() => setActiveTopReviewIndex(index)}
+                  className={`relative z-10 flex h-[28.75rem] snap-center flex-col overflow-hidden rounded-2xl bg-green-200 shadow-lg transition-all duration-500 ease-out hover:scale-[1.02] md:h-full md:min-w-0 ${
+                    isMobileReviews
+                      ? isActiveMobile
+                        ? "min-w-[84vw] scale-100 opacity-100 shadow-xl"
+                        : "min-w-[64vw] scale-[0.92] opacity-70"
+                      : ""
+                  }`}
+                >
                 <div className="absolute z-20 flex gap-1 p-4">
                   <StarRating rating={review.rating} />
                 </div>
 
-                <div className="relative h-48 overflow-hidden">
+                <div className="relative h-40 overflow-hidden md:h-48">
                   <TourReviewImage src={review.img} alt={review.tour} />
 
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10" />
@@ -153,12 +226,12 @@ const TestimonialsSection = () => {
                   </div>
                 </div>
 
-                <div className="z-10 flex flex-grow flex-col p-5">
-                  <div className="mb-3 font-frank text-4xl font-bold leading-none text-black">
+                <div className="z-10 flex flex-grow flex-col p-4 md:p-5">
+                  <div className={`mb-2 line-clamp-2 min-h-[3.55rem] font-frank text-3xl font-bold leading-none text-black transition-all duration-500 md:mb-3 md:min-h-0 md:text-3xl lg:text-4xl ${isMobileReviews && !isActiveMobile ? "scale-[0.96] opacity-70" : "scale-100 opacity-100"}`}>
                     {review.title}
                   </div>
 
-                  <div className="scrollbar-thin scrollbar-thumb-green-400 scrollbar-track-green-100 relative mb-4 h-24 overflow-y-auto pr-2">
+                  <div className={`scrollbar-thin scrollbar-thumb-green-400 scrollbar-track-green-100 relative mb-4 h-[4.5rem] overflow-hidden pr-2 transition-opacity duration-500 md:h-24 md:overflow-y-auto ${isMobileReviews && !isActiveMobile ? "opacity-45" : "opacity-100"}`}>
                     <p className="text-sm leading-relaxed text-gray-800">
                       {review.desc}
                     </p>
@@ -168,11 +241,26 @@ const TestimonialsSection = () => {
 
                   <ReviewMeta review={review} />
                 </div>
-              </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="-mt-3 mb-5 flex items-center justify-center gap-1.5 md:hidden">
+            {topReviews.map((review, index) => (
+              <button
+                key={`top-review-dot-${review.id}`}
+                type="button"
+                onClick={() => setActiveTopReviewIndex(index)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  index === activeTopReviewIndex ? "w-7 bg-green-700" : "w-2 bg-black/18"
+                }`}
+                aria-label={`Show top review ${index + 1}`}
+              />
             ))}
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="hidden grid-cols-4 gap-3 lg:grid">
             {bottomReviews.map((review) => (
               <div
                 key={review.id}
@@ -206,7 +294,7 @@ const TestimonialsSection = () => {
           </div>
         </FloatingTooltip>
 
-        <div className="mb-20 my-8 flex w-full items-center justify-center text-white">
+        <div className="mb-10 mt-5 flex w-full items-center justify-center text-white md:mb-12 md:mt-7 lg:mb-20 lg:mt-8">
           <button
             type="button"
             className="hero-gradient z-20 flex items-center justify-center gap-12 rounded-full p-2 px-4 transition hover:scale-[1.02]"
