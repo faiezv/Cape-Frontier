@@ -14,6 +14,7 @@ const navItems = [
   { label: 'Contact' },
 ]
 
+
 const sectionIdMap = {
   About: 'about',
   Stories: 'stories',
@@ -532,7 +533,10 @@ const Navbar = () => {
         ref={navbarRef}
         onMouseLeave={scheduleCloseMega}
         onMouseEnter={keepMegaOpen}
-        className="fixed inset-x-0 top-0 z-[99990] w-screen max-w-[100dvw] overflow-x-clip border-white/10 bg-[linear-gradient(180deg,rgba(8,43,138,0.78)_0%,rgba(8,43,138,0.50)_100%)] text-white backdrop-blur-md"
+        className="fixed inset-x-0 top-0 z-[99990] w-screen max-w-[100dvw] overflow-x-clip border-white/10 
+        bg-[linear-gradient(180deg,rgba(8,43,138,0.78)_0%,rgba(8,43,138,0.50)_100%) 
+        bg-non hero-gradient
+         text-white backdrop-blur-xl"
       >
         <div className="mx-auto flex w-full max-w-[100dvw] min-w-0 items-center justify-between gap-1.5 px-2 py-2 sm:gap-3 sm:px-4 md:px-6 lg:px-8">
           <button
@@ -777,7 +781,7 @@ const Navbar = () => {
             onPointerDown={(event) => event.stopPropagation()}
             onTouchStart={(event) => event.stopPropagation()}
           >
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-md" />
 
             <div
               ref={mobilePanelRef}
@@ -788,143 +792,163 @@ const Navbar = () => {
             >
               <div
                 ref={mobileMenuContentRef}
-                className="h-full w-full overflow-y-auto overscroll-contain rounded-3xl border border-white/12 bg-[linear-gradient(180deg,rgba(4,27,95,0.98)_0%,rgba(7,41,130,0.96)_100%)] p-3 shadow-[0_18px_45px_rgba(0,0,0,0.28)] backdrop-blur-xl"
+                className="h-full w-full overflow-y-auto rounded-[1.7rem] border border-white/10 bg-[#06164f]/88 p-3 shadow-[0_18px_45px_rgba(0,0,0,0.30)] backdrop-blur-2xl"
                 style={{ WebkitOverflowScrolling: 'touch' }}
               >
-                <div className="sticky top-0 z-10 mb-2 rounded-2xl border border-white/10 bg-[#041b5f]/95 p-3 backdrop-blur-xl">
-                  <p className="font-bitter text-[10px] font-black uppercase tracking-[0.2em] text-green-200">
+                {/* top brand block */}
+                <div className="relative overflow-hidden rounded-[1.35rem] border border-white/10 bg-white/[0.07] p-4 backdrop-blur-xl">
+                  <button
+                    type="button"
+                    onClick={() => setMenuOpen(false)}
+                    className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/12 bg-white/[0.06] text-white/85 transition hover:bg-white/12 hover:text-white"
+                    aria-label="Close menu"
+                  >
+                    <span className="relative h-4 w-4" aria-hidden="true">
+                      <span className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 rotate-45 rounded-full bg-current" />
+                      <span className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 -rotate-45 rounded-full bg-current" />
+                    </span>
+                  </button>
+
+                  <img
+                    src="/icons/navLogo.png"
+                    alt="Cape Frontier logo"
+                    className="h-24 w-auto object-contain"
+                  />
+
+                  <p className="mt-3 font-bitter text-[10px] font-black uppercase tracking-[0.22em] text-green-200">
                     Menu
                   </p>
-                  <p className="mt-1 font-frank text-2xl font-bold leading-none text-white">
+
+                  <p className="mt-1 font-frank text-3xl font-bold leading-none text-white">
                     Explore Cape Frontier
+                  </p>
+
+                  <p className="mt-2 max-w-[18rem] font-bitter text-xs leading-5 text-white/58">
+                    Tours, reviews, policies, and direct contact in one clean menu.
                   </p>
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  {navItems.map((item) => {
-                    const data = megaMenus[item.label]
-                    const isActive = activeMobileMega === item.label
-
-                    return (
-                      <div
+                {/* modern minimal heading navigation */}
+                <nav className="mt-3 grid gap-1.5" aria-label="Mobile navigation">
+                  {navItems
+                    .filter((item) => item.label !== 'Contact')
+                    .map((item) => (
+                      <button
                         key={item.label}
-                        className="overflow-hidden rounded-2xl border border-white/10 bg-white/8"
+                        type="button"
+                        onClick={(event) => handleNavClick(item.label, event)}
+                        className="group flex w-full items-center justify-between rounded-2xl border border-white/[0.08] bg-white/[0.045] px-4 py-3.5 text-left backdrop-blur-md transition hover:border-white/14 hover:bg-white/[0.085]"
                       >
-                        <button
-                          type="button"
-                          onClick={(event) => toggleMobileMega(item.label, event)}
-                          className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-bold text-white/92 transition hover:bg-white/10"
-                        >
-                          <span>{item.label}</span>
+                        <span className="font-frank text-[1.45rem] font-semibold leading-none tracking-[-0.01em] text-white">
+                          {item.label}
+                        </span>
 
-                          <span
-                            className={`transition-transform duration-300 ${
-                              isActive ? 'rotate-180' : 'rotate-0'
-                            }`}
-                          >
-                            ↓
-                          </span>
-                        </button>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.08] font-bitter text-sm font-black text-white/78 transition group-hover:bg-green-200 group-hover:text-blue-950">
+                          →
+                        </span>
+                      </button>
+                    ))}
+                </nav>
 
-                        {isActive && data && (
-                          <div
-                            data-mobile-mega={item.label}
-                            className="overflow-hidden border-t border-white/10 bg-white p-3 text-black"
-                          >
-                            {data.logo && (
-                              <img
-                                src={data.logo}
-                                alt="Cape Frontier logo"
-                                className="mb-3 h-16 w-auto object-contain"
-                              />
-                            )}
+                {/* business information */}
+                <div className="mt-3 rounded-2xl border border-white/[0.08] bg-white/[0.045] p-3 backdrop-blur-lg">
+                  <p className="font-bitter text-[10px] font-black uppercase tracking-[0.2em] text-green-200">
+                    Business info
+                  </p>
 
-                            <p className="font-bitter text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">
-                              {data.eyebrow}
-                            </p>
-
-                            <h3 className="mt-1 font-frank text-2xl font-bold leading-none text-neutral-950">
-                              {data.title}
-                            </h3>
-
-                            <p className="mt-2 font-bitter text-xs leading-5 text-neutral-600">
-                              {data.desc}
-                            </p>
-
-                            <button
-                              type="button"
-                              onClick={(event) => handleNavClick(item.label, event)}
-                              className="mt-3 inline-flex rounded-full bg-green-200 px-4 py-2 font-bitter text-xs font-bold text-green-950"
-                            >
-                              Open {item.label}
-                            </button>
-
-                            {data.layout === 'cards' && (
-                              <div className="mt-3 grid grid-cols-2 gap-2">
-                                {data.cards.map((card) => (
-                                  <button
-                                    key={card.title}
-                                    type="button"
-                                    onClick={(event) => handleNavClick(card.target, event)}
-                                    className="overflow-hidden rounded-2xl border border-black/5 bg-neutral-50 text-left"
-                                  >
-                                    <div className="relative h-24 overflow-hidden">
-                                      <img
-                                        src={card.image}
-                                        alt={card.title}
-                                        className="h-full w-full object-cover"
-                                        loading="lazy"
-                                      />
-                                      <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" />
-                                      <p className="absolute bottom-2 left-2 rounded-full bg-white/90 px-2 py-1 font-bitter text-[10px] font-bold text-black">
-                                        {card.title}
-                                      </p>
-                                    </div>
-
-                                    <p className="p-2 font-bitter text-[10px] leading-4 text-neutral-600">
-                                      {card.desc}
-                                    </p>
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-
-                            {data.layout === 'links' && (
-                              <div className="mt-3 grid gap-2">
-                                {data.links.map((link) => (
-                                  <button
-                                    key={link.title}
-                                    type="button"
-                                    onClick={(event) => handleNavClick(link.target, event)}
-                                    className="rounded-2xl border border-black/5 bg-neutral-50 p-3 text-left"
-                                  >
-                                    <p className="font-bitter text-xs font-bold text-neutral-950">
-                                      {link.title}
-                                    </p>
-                                    <p className="mt-1 font-bitter text-[10px] leading-4 text-neutral-600">
-                                      {link.desc}
-                                    </p>
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-
-
-                          </div>
-                        )}
+                  <div className="mt-3 grid gap-2">
+                    <div className="flex items-start gap-2.5">
+                      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-green-200">
+                        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                          <path d="M12 21s7-4.4 7-11a7 7 0 1 0-14 0c0 6.6 7 11 7 11Z" />
+                          <circle cx="12" cy="10" r="2.5" />
+                        </svg>
+                      </span>
+                      <div className="min-w-0">
+                        <p className="font-bitter text-xs font-black uppercase tracking-[0.12em] text-white/86">
+                          Cape Town based
+                        </p>
+                        <p className="mt-0.5 font-bitter text-xs leading-5 text-white/52">
+                          Guided Cape Town routes, local pickup support, and manual booking confirmation.
+                        </p>
                       </div>
-                    )
-                  })}
+                    </div>
+
+                    <div className="flex items-start gap-2.5">
+                      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-green-200">
+                        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                          <path d="M20 7 10 17l-5-5" />
+                        </svg>
+                      </span>
+                      <div className="min-w-0">
+                        <p className="font-bitter text-xs font-black uppercase tracking-[0.12em] text-white/86">
+                          Secure booking flow
+                        </p>
+                        <p className="mt-0.5 font-bitter text-xs leading-5 text-white/52">
+                          Choose your tour, confirm your group, pay online, then receive confirmation.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={(event) => handleNavClick('Contact', event)}
-                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-extrabold text-white transition hover:bg-white/14"
-                >
-                  <img src="/icons/faqBubble.png" className="h-5 w-5" alt="FAQ" />
-                  <span>FAQ</span>
-                </button>
+                {/* policies and terms */}
+                <div className="mt-3 rounded-2xl border border-white/[0.08] bg-white/[0.045] p-3 backdrop-blur-lg">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-bitter text-[10px] font-black uppercase tracking-[0.2em] text-green-200">
+                      Terms & policies
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={(event) => handleNavClick('/policies', event)}
+                      className="rounded-full bg-white/[0.08] px-3 py-1 font-bitter text-[10px] font-black uppercase tracking-[0.12em] text-white/72 transition hover:bg-white/14 hover:text-white"
+                    >
+                      Open all
+                    </button>
+                  </div>
+
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    {[
+                      ['Booking', '/policies#booking-policy'],
+                      ['Pickup', '/policies#pickup-policy'],
+                      ['Payment', '/policies#payment-policy'],
+                      ['Cancellation', '/policies#cancellation-policy'],
+                      ['Reschedule', '/policies#reschedule-policy'],
+                      ['Private tours', '/policies#private-tour-policy'],
+                    ].map(([label, target]) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={(event) => handleNavClick(target, event)}
+                        className="rounded-xl border border-white/[0.08] bg-white/[0.045] px-3 py-2 text-left font-bitter text-[11px] font-black uppercase tracking-[0.09em] text-white/68 transition hover:bg-white/10 hover:text-white"
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* bottom contact actions */}
+                <div className="mt-3 grid grid-cols-2 gap-2 pb-1">
+                  <button
+                    type="button"
+                    onClick={(event) => handleNavClick('Contact', event)}
+                    className="flex items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3 font-bitter text-xs font-black uppercase tracking-[0.12em] text-blue-950 transition hover:bg-green-100"
+                  >
+                    <img src="/icons/faqBubble.png" className="h-5 w-5" alt="" aria-hidden="true" />
+                    <span>FAQ</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(event) => handleNavClick('Contact', event)}
+                    className="flex items-center justify-center gap-2 rounded-2xl bg-green-200 px-4 py-3 font-bitter text-xs font-black uppercase tracking-[0.12em] text-green-950 transition hover:bg-green-100"
+                  >
+                    <span>Contact</span>
+                    <span aria-hidden="true">→</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>,

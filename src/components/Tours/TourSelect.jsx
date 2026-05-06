@@ -1,10 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import DatePicker from 'react-datepicker'
 import gsap from 'gsap'
+import tours from '../../data/tours.js'
 import 'react-datepicker/dist/react-datepicker.css'
 
-const TOURS = [
+// -----------------------------------------------------------------------------
+// data helpers
+// -----------------------------------------------------------------------------
+const FALLBACK_TOURS = [
   'Table Mountain Hike',
   'Cape Point Explorer',
   'Winelands & Franschhoek',
@@ -15,10 +19,111 @@ const TOURS = [
   "Chapman's Peak Sunset",
 ]
 
+const getTourTitle = (tour) => {
+  if (typeof tour === 'string') return tour
+  return tour?.title || tour?.name || ''
+}
+
+const getTourImage = (tour) => {
+  if (typeof tour === 'string') return './images/content/random/1.webp'
+
+  return (
+    tour?.image ||
+    tour?.img ||
+    tour?.cover ||
+    tour?.gallery?.[0] ||
+    tour?.images?.[0] ||
+    './images/content/random/1.webp'
+  )
+}
+
+const getTourLocation = (tour) => {
+  if (typeof tour === 'string') return 'Cape Town, South Africa'
+  return tour?.location || tour?.area || 'Cape Town, South Africa'
+}
+
+const getTourLink = (tour) => {
+  if (typeof tour === 'string') return '#tours'
+  return tour?.canonicalPath || (tour?.slug ? `/tours/${tour.slug}` : '#tours')
+}
+
+const formatTourPrice = (tour) => {
+  if (typeof tour === 'string') return null
+
+  const amount = tour?.priceBase ?? tour?.price ?? tour?.fromPrice
+  const currency = tour?.baseCurrency || 'ZAR'
+
+  if (!amount) return null
+
+  try {
+    return new Intl.NumberFormat('en-ZA', {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: 0,
+    }).format(Number(amount))
+  } catch {
+    return `${currency} ${Number(amount).toLocaleString('en-ZA')}`
+  }
+}
+
+const getTourMeta = (tour) => {
+  if (typeof tour === 'string') return 'Guided Cape Town experience'
+
+  return [tour?.duration, tour?.category, tour?.type]
+    .filter(Boolean)
+    .join(' • ') || 'Guided Cape Town experience'
+}
+
+const getTourOptions = () => {
+  if (!Array.isArray(tours) || !tours.length) {
+    return FALLBACK_TOURS.map((title) => ({
+      title,
+      image: './images/content/random/1.webp',
+      location: 'Cape Town, South Africa',
+      meta: 'Guided Cape Town experience',
+      price: null,
+      duration: null,
+      category: null,
+      link: '#tours',
+      raw: title,
+    }))
+  }
+
+  const options = tours
+    .map((tour) => ({
+      title: getTourTitle(tour),
+      image: getTourImage(tour),
+      location: getTourLocation(tour),
+      meta: getTourMeta(tour),
+      price: formatTourPrice(tour),
+      duration: tour?.duration || null,
+      category: tour?.category || tour?.type || null,
+      link: getTourLink(tour),
+      raw: tour,
+    }))
+    .filter((tour) => tour.title)
+
+  return options.length ? options : FALLBACK_TOURS.map((title) => ({
+    title,
+    image: './images/content/random/1.webp',
+    location: 'Cape Town, South Africa',
+    meta: 'Guided Cape Town experience',
+    price: null,
+    duration: null,
+    category: null,
+    link: '#tours',
+    raw: title,
+  }))
+}
+
+// -----------------------------------------------------------------------------
+// component
+// -----------------------------------------------------------------------------
 function TourSelect() {
   const [destination, setDestination] = useState('')
   const [date, setDate] = useState(null)
-  const [participants, setParticipants] = useState(1)
+  const [adults, setAdults] = useState(1)
+  const [children, setChildren] = useState(0)
   const [participantsConfirmed, setParticipantsConfirmed] = useState(false)
   const [activeModal, setActiveModal] = useState(null)
   const [viewportWidth, setViewportWidth] = useState(
@@ -26,16 +131,16 @@ function TourSelect() {
   )
   const [mobileStep, setMobileStep] = useState(0)
   const [justCompletedStep, setJustCompletedStep] = useState(null)
-  const [searchAttempted, setSearchAttempted] = useState(false)
-  const [pendingPositiveFeedback, setPendingPositiveFeedback] = useState(null)
   const [selectionFeedback, setSelectionFeedback] = useState(null)
+  const [searchAttempted, setSearchAttempted] = useState(false)
   const [searchError, setSearchError] = useState(null)
 
-  const mobileTileRefs = useRef({})
+  const mobileCardRef = useRef(null)
   const desktopTileRefs = useRef({})
   const errorBarRef = useRef(null)
 
-  const isDeckMobile = viewportWidth < 700
+  const isMobileLayout = viewportWidth < 700
+  const tourOptions = useMemo(() => getTourOptions(), [])
 
   useEffect(() => {
     const onResize = () => setViewportWidth(window.innerWidth)
@@ -46,22 +151,6 @@ function TourSelect() {
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
-  const getRecommendedStep = () => {
-    if (!destination) return 0
-    if (!date) return 1
-    if (!participantsConfirmed) return 2
-    return 3
-  }
-
-  useEffect(() => {
-    if (!isDeckMobile) return
-
-    const recommendedStep = getRecommendedStep()
-    setMobileStep((prev) => Math.min(prev, recommendedStep))
-  }, [isDeckMobile, destination, date, participantsConfirmed])
-
-  const close = () => setActiveModal(null)
-
   const formattedDate = date
     ? date.toLocaleDateString('en-ZA', {
         day: 'numeric',
@@ -70,15 +159,33 @@ function TourSelect() {
       })
     : 'Select date'
 
+  const participants = adults + children
+
   const canSearch = Boolean(destination && date && participantsConfirmed)
+  const hasDetails = Boolean(
+    destination || date || adults !== 1 || children !== 0 || participantsConfirmed
+  )
+
+  const getRecommendedStep = () => {
+    if (!destination) return 0
+    if (!date) return 1
+    if (!participantsConfirmed) return 2
+    return 3
+  }
+
   const recommendedStep = getRecommendedStep()
-  const hasDetails = Boolean(destination || date || participants !== 1 || participantsConfirmed)
 
   useEffect(() => {
-    if (canSearch) {
-      setSearchAttempted(false)
-      setSearchError(null)
-    }
+    if (!isMobileLayout) return
+
+    setMobileStep((previousStep) => Math.min(previousStep, recommendedStep))
+  }, [isMobileLayout, destination, date, participantsConfirmed, recommendedStep])
+
+  useEffect(() => {
+    if (!canSearch) return
+
+    setSearchAttempted(false)
+    setSearchError(null)
   }, [canSearch])
 
   useEffect(() => {
@@ -92,6 +199,8 @@ function TourSelect() {
     }
   }, [activeModal])
 
+  const close = () => setActiveModal(null)
+
   const getPositiveFeedbackText = (stepIndex) => {
     if (stepIndex === 0) return 'Tour saved'
     if (stepIndex === 1) return 'Date saved'
@@ -99,96 +208,114 @@ function TourSelect() {
     return 'Saved'
   }
 
-  const completeStepWithDelay = (stepIndex, nextStep) => {
-    close()
-
-    setPendingPositiveFeedback({
-      id: Date.now(),
-      stepIndex,
-      nextStep,
-    })
-  }
-
-  useEffect(() => {
-    if (!pendingPositiveFeedback) return
-    if (activeModal) return
-
-    const { stepIndex, nextStep, id } = pendingPositiveFeedback
-
-    const target = isDeckMobile
-      ? mobileTileRefs.current[stepIndex]
-      : desktopTileRefs.current[stepIndex]
-
-    if (!target) {
-      if (isDeckMobile) {
-        setMobileStep(nextStep)
-      }
-
-      setPendingPositiveFeedback(null)
-      return
-    }
-
+  const animateSavedFeedback = (stepIndex, nextStep) => {
     setJustCompletedStep(stepIndex)
     setSelectionFeedback({
-      id,
+      id: Date.now(),
       stepIndex,
       text: getPositiveFeedbackText(stepIndex),
     })
 
-    gsap.killTweensOf(target)
+    const target = isMobileLayout ? mobileCardRef.current : desktopTileRefs.current[stepIndex]
 
-    const tl = gsap.timeline({
-      delay: 0.16,
-      defaults: {
-        ease: 'power3.out',
-      },
-      onComplete: () => {
-        setJustCompletedStep(null)
+    if (target) {
+      gsap.killTweensOf(target)
 
-        if (isDeckMobile) {
-          setMobileStep(nextStep)
-        }
+      gsap
+        .timeline({
+          defaults: {
+            ease: 'power3.out',
+          },
+          onComplete: () => {
+            setJustCompletedStep(null)
+            setSelectionFeedback(null)
 
-        setPendingPositiveFeedback(null)
-        setSelectionFeedback(null)
+            if (isMobileLayout) {
+              setMobileStep(Math.min(nextStep, 2))
+            }
 
-        gsap.set(target, {
-          clearProps: 'transform,backgroundColor,borderColor,boxShadow',
+            gsap.set(target, {
+              clearProps: 'transform,backgroundColor,borderColor,boxShadow',
+            })
+          },
         })
-      },
-    })
+        .to(target, {
+          y: -5,
+          scale: 1.01,
+          backgroundColor: '#f0fdf4',
+          borderColor: '#bbf7d0',
+          boxShadow: '0 18px 44px rgba(34,197,94,0.16)',
+          duration: 0.2,
+        })
+        .to(target, {
+          y: 0,
+          scale: 1,
+          duration: 0.24,
+          ease: 'back.out(1.7)',
+        })
+        .to(
+          target,
+          {
+            backgroundColor: '#ffffff',
+            borderColor: 'rgba(0,0,0,0.08)',
+            boxShadow: '0 10px 26px rgba(0,0,0,0.05)',
+            duration: 0.35,
+            ease: 'power2.out',
+          },
+          '+=0.12'
+        )
 
-    tl.to(target, {
-      y: -5,
-      scale: 1.01,
-      backgroundColor: '#f0fdf4',
-      borderColor: '#bbf7d0',
-      boxShadow: '0 18px 44px rgba(34,197,94,0.16)',
-      duration: 0.24,
-    })
-      .to(target, {
+      return
+    }
+
+    if (isMobileLayout) {
+      setMobileStep(Math.min(nextStep, 2))
+    }
+
+    window.setTimeout(() => {
+      setJustCompletedStep(null)
+      setSelectionFeedback(null)
+    }, 650)
+  }
+
+  const completeStepWithDelay = (stepIndex, nextStep) => {
+    close()
+
+    window.setTimeout(() => {
+      animateSavedFeedback(stepIndex, nextStep)
+    }, 120)
+  }
+
+  useLayoutEffect(() => {
+    if (!isMobileLayout || !mobileCardRef.current) return undefined
+
+    const card = mobileCardRef.current
+
+    gsap.killTweensOf(card)
+
+    gsap.fromTo(
+      card,
+      {
+        autoAlpha: 0,
+        y: 14,
+        scale: 0.985,
+        filter: 'blur(4px)',
+      },
+      {
+        autoAlpha: 1,
         y: 0,
         scale: 1,
-        duration: 0.28,
-        ease: 'back.out(1.7)',
-      })
-      .to(
-        target,
-        {
-          backgroundColor: '#ffffff',
-          borderColor: 'rgba(0,0,0,0.08)',
-          boxShadow: '0 10px 26px rgba(0,0,0,0.05)',
-          duration: 0.42,
-          ease: 'power2.out',
-        },
-        '+=0.18'
-      )
+        filter: 'blur(0px)',
+        duration: 0.26,
+        ease: 'power2.out',
+      }
+    )
 
-    return () => tl.kill()
-  }, [pendingPositiveFeedback, activeModal, isDeckMobile])
+    return undefined
+  }, [mobileStep, isMobileLayout])
 
   useEffect(() => {
-    if (!searchError || !errorBarRef.current) return
+    if (!searchError || !errorBarRef.current) return undefined
 
     const el = errorBarRef.current
 
@@ -210,7 +337,7 @@ function TourSelect() {
       }
     )
 
-    const timer = setTimeout(() => {
+    const timer = window.setTimeout(() => {
       gsap.to(el, {
         height: 0,
         y: -8,
@@ -223,7 +350,7 @@ function TourSelect() {
       })
     }, 3600)
 
-    return () => clearTimeout(timer)
+    return () => window.clearTimeout(timer)
   }, [searchError?.id])
 
   const getMissingDetails = () => {
@@ -241,13 +368,12 @@ function TourSelect() {
       const missing = getMissingDetails()
 
       setSearchAttempted(true)
-
       setSearchError({
         id: Date.now(),
         message: `Please select ${missing.join(', ')} before searching.`,
       })
 
-      if (isDeckMobile) {
+      if (isMobileLayout) {
         if (!destination) setMobileStep(0)
         else if (!date) setMobileStep(1)
         else if (!participantsConfirmed) setMobileStep(2)
@@ -257,29 +383,26 @@ function TourSelect() {
     }
 
     setSearchError(null)
-    console.log('Search submitted', { destination, date, participants })
+    console.log('Search submitted', { destination, date, adults, children, participants })
   }
 
   const handleResetDetails = () => {
     setDestination('')
     setDate(null)
-    setParticipants(1)
+    setAdults(1)
+    setChildren(0)
     setParticipantsConfirmed(false)
     setActiveModal(null)
     setMobileStep(0)
     setJustCompletedStep(null)
-    setSearchAttempted(false)
-    setPendingPositiveFeedback(null)
     setSelectionFeedback(null)
+    setSearchAttempted(false)
     setSearchError(null)
 
-    gsap.killTweensOf([
-      ...Object.values(mobileTileRefs.current),
-      ...Object.values(desktopTileRefs.current),
-    ])
+    gsap.killTweensOf([mobileCardRef.current, ...Object.values(desktopTileRefs.current)].filter(Boolean))
   }
 
-  const mobileCards = useMemo(
+  const cards = useMemo(
     () => [
       {
         key: 'destination',
@@ -303,7 +426,18 @@ function TourSelect() {
         icon: './icons/calendar.png',
         status: date ? 'Done' : mobileStep === 1 ? 'Current' : 'Pending',
         complete: Boolean(date),
-        onClick: () => destination && setActiveModal('date'),
+        onClick: () => {
+          if (!destination) {
+            setMobileStep(0)
+            setSearchError({
+              id: Date.now(),
+              message: 'Please select a destination before choosing a date.',
+            })
+            return
+          }
+
+          setActiveModal('date')
+        },
       },
       {
         key: 'participants',
@@ -312,23 +446,44 @@ function TourSelect() {
         preview:
           destination && date
             ? participantsConfirmed
-              ? `${destination} • ${formattedDate} • ${participants} ${
-                  participants === 1 ? 'guest' : 'guests'
+              ? `${adults} ${adults === 1 ? 'adult' : 'adults'}${
+                  children ? ` • ${children} ${children === 1 ? 'child' : 'children'}` : ''
                 }`
-              : 'Confirm your guest count'
+              : 'Confirm adults and children'
             : 'Destination and date required first',
         icon: './icons/guest.png',
         status: participantsConfirmed ? 'Done' : mobileStep === 2 ? 'Current' : 'Pending',
         complete: Boolean(participantsConfirmed),
-        onClick: () => destination && date && setActiveModal('participants'),
+        onClick: () => {
+          if (!destination) {
+            setMobileStep(0)
+            setSearchError({
+              id: Date.now(),
+              message: 'Please select a destination first.',
+            })
+            return
+          }
+
+          if (!date) {
+            setMobileStep(1)
+            setSearchError({
+              id: Date.now(),
+              message: 'Please select a date before choosing guests.',
+            })
+            return
+          }
+
+          setActiveModal('participants')
+        },
       },
       {
         key: 'search',
-        value: canSearch ? 'Search available' : 'Complete the steps above',
+        label: 'Ready?',
+        value: canSearch ? 'Ready to search' : 'Complete booking details',
         preview: canSearch
-          ? `${destination} • ${formattedDate} • ${participants} ${
-              participants === 1 ? 'guest' : 'guests'
-            }`
+          ? `${destination} • ${formattedDate} • ${adults} ${
+              adults === 1 ? 'adult' : 'adults'
+            }${children ? ` • ${children} ${children === 1 ? 'child' : 'children'}` : ''}`
           : 'Finish the selections to continue',
         icon: './icons/go.png',
         status: canSearch ? 'Ready' : mobileStep === 3 ? 'Current' : 'Pending',
@@ -336,98 +491,44 @@ function TourSelect() {
         isSearch: true,
       },
     ],
-    [destination, formattedDate, participants, participantsConfirmed, canSearch, date, mobileStep]
+    [destination, formattedDate, adults, children, participants, participantsConfirmed, canSearch, date, mobileStep]
   )
 
-  const getDeckStyle = (index) => {
-    const offset = index - mobileStep
-
-    if (offset === 0) {
-      return {
-        transform: 'translateY(0px) scale(1)',
-        opacity: 1,
-        zIndex: 40,
-        pointerEvents: 'auto',
-      }
-    }
-
-    if (offset > 0) {
-      const y = 14 + (offset - 1) * 14
-      const scale = Math.max(0.88, 1 - offset * 0.04)
-      const opacity = Math.max(0.45, 1 - offset * 0.18)
-
-      return {
-        transform: `translateY(${y}px) scale(${scale})`,
-        opacity,
-        zIndex: 40 - offset,
-        pointerEvents: 'none',
-      }
-    }
-
-    const pastDepth = Math.abs(offset)
-    const y = 8 + (pastDepth - 1) * 10
-    const scale = Math.max(0.9, 0.97 - pastDepth * 0.03)
-    const opacity = Math.max(0.35, 0.72 - pastDepth * 0.15)
-
-    return {
-      transform: `translateY(${y}px) scale(${scale})`,
-      opacity,
-      zIndex: 18 - pastDepth,
-      pointerEvents: 'none',
-    }
-  }
+  const currentCard = cards[Math.min(mobileStep, 2)] || cards[0]
 
   const stepBadgeClass = (status) => {
     if (status === 'Done' || status === 'Ready') {
-      return 'bg-green-50 text-green-700 ring-1 ring-green-200'
+      return 'bg-green-100 text-green-800 ring-1 ring-green-300'
     }
 
     if (status === 'Current') {
-      return 'bg-blue-50 text-blue-700 ring-1 ring-blue-100'
+      return 'bg-blue-100 text-blue-800 ring-1 ring-blue-200'
     }
 
     return 'bg-black/[0.04] text-black/45 ring-1 ring-black/[0.05]'
   }
 
-  const stepCardClass = (complete, isCurrent, isJustCompleted) => {
-    if (isJustCompleted) {
-      return 'bg-white ring-1 ring-green-200 shadow-[0_12px_32px_rgba(34,197,94,0.12)]'
-    }
-
-    if (complete) {
-      return 'bg-white ring-1 ring-green-100 shadow-[0_10px_26px_rgba(0,0,0,0.05)]'
-    }
-
-    if (isCurrent) {
-      return 'bg-white ring-1 ring-blue-200 shadow-[0_12px_34px_rgba(59,130,246,0.12)]'
-    }
-
-    return 'bg-white ring-1 ring-black/8 shadow-[0_10px_26px_rgba(0,0,0,0.05)]'
-  }
-
-  const stepIconClass = (complete, isCurrent, isJustCompleted) => {
-    if (isJustCompleted) return 'bg-green-200'
+  const iconShellClass = (complete, isCurrent, isJustCompleted) => {
+    if (isJustCompleted) return 'bg-green-300 text-green-950'
     if (complete) return 'bg-green-100 ring-1 ring-green-200'
     if (isCurrent) return 'bg-blue-50 ring-1 ring-blue-100'
     return 'bg-black/[0.04]'
   }
 
-  const searchCardClass = (complete, attempted) => {
-    if (complete) return 'bg-green-50/80 ring-1 ring-green-200'
-    if (attempted) return 'bg-red-400/95 text-white ring-1 ring-red-300'
-    return 'bg-white ring-1 ring-black/8'
-  }
+  const fieldCardClass = (complete, isCurrent, isJustCompleted) => {
+    if (isJustCompleted) {
+      return 'border-green-200 bg-white shadow-[0_14px_34px_rgba(34,197,94,0.12)]'
+    }
 
-  const searchTextClass = (complete, attempted) => {
-    if (complete) return 'text-black/70'
-    if (attempted) return 'text-white/90'
-    return 'text-black/70'
-  }
+    if (complete) {
+      return 'border-green-100 bg-white shadow-[0_10px_26px_rgba(0,0,0,0.05)]'
+    }
 
-  const searchPreviewClass = (complete, attempted) => {
-    if (complete) return 'text-black/45'
-    if (attempted) return 'text-white/80'
-    return 'text-black/45'
+    if (isCurrent) {
+      return 'border-blue-100 bg-white shadow-[0_14px_34px_rgba(59,130,246,0.10)]'
+    }
+
+    return 'border-black/8 bg-white shadow-[0_10px_26px_rgba(0,0,0,0.05)]'
   }
 
   const searchButtonClass = (complete, attempted) => {
@@ -439,11 +540,11 @@ function TourSelect() {
       return 'bg-red-400 hover:bg-red-400 shadow-[0_14px_30px_rgba(248,113,113,0.22)]'
     }
 
-    return 'bg-black hover:bg-black/85 shadow-[0_14px_30px_rgba(0,0,0,0.18)]'
+    return 'bg-[#020817] hover:bg-black shadow-[0_14px_30px_rgba(0,0,0,0.18)]'
   }
 
   const DesktopLabel = ({ children }) => (
-    <div className="mb-1 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-black/35">
+    <div className="mb-1 flex items-center gap-1.5 font-bitter text-[11px] font-black uppercase tracking-[0.18em] text-black/35">
       <span className="h-1.5 w-1.5 rounded-full bg-green-200" />
       {children}
     </div>
@@ -453,7 +554,7 @@ function TourSelect() {
     if (!show) return null
 
     return (
-      <span className="ml-auto hidden shrink-0 items-center gap-1 rounded-full bg-green-50 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-green-700 ring-1 ring-green-200 sm:flex">
+      <span className="ml-auto hidden shrink-0 items-center gap-1 rounded-full bg-green-50 px-2 py-1 font-bitter text-[10px] font-black uppercase tracking-[0.14em] text-green-700 ring-1 ring-green-200 sm:flex">
         <svg
           className="h-3 w-3"
           viewBox="0 0 24 24"
@@ -462,6 +563,7 @@ function TourSelect() {
           strokeWidth="2.8"
           strokeLinecap="round"
           strokeLinejoin="round"
+          aria-hidden="true"
         >
           <polyline points="20 6 9 17 4 12" />
         </svg>
@@ -470,33 +572,94 @@ function TourSelect() {
     )
   }
 
-  const LeaderStep = () => (
-    <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-black/45">
-      {[1, 2, 3, 4].map((n, idx) => {
-        const stepIndex = n - 1
-        const isActive = mobileStep === stepIndex
-        const isDone = stepIndex < recommendedStep || (stepIndex === 3 && canSearch)
+  const ResetIcon = () => (
+    <svg
+      className="h-4 w-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 12a9 9 0 1 0 3-6.7" />
+      <path d="M3 4v5h5" />
+    </svg>
+  )
 
-        return (
-          <div key={n} className="flex items-center gap-2">
-            <div
-              className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] tracking-normal transition-all duration-300 ${
-                isDone
-                  ? 'bg-green-200 text-green-900 shadow-[0_0_0_3px_rgba(187,247,208,0.35)]'
-                  : isActive
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-black/8 text-black/45'
-              }`}
-            >
-              {n}
+  const StepProgress = () => (
+    <div className="flex w-full items-center gap-2">
+      <span className={`hidden shrink-0 rounded-full px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.16em] sm:inline-flex ${
+        canSearch
+          ? 'bg-green-100 text-green-800 ring-1 ring-green-300'
+          : 'bg-blue-100 text-blue-800 ring-1 ring-blue-200'
+      }`}>
+        {canSearch ? 'Ready to search' : `Step ${Math.min(mobileStep + 1, 3)} of 3`}
+      </span>
+
+      <div className="flex min-w-0 flex-1 items-center">
+        {[1, 2, 3].map((stepNumber, index) => {
+          const isActive = mobileStep === index
+          const isDone = index < recommendedStep
+
+          return (
+            <div key={stepNumber} className="flex min-w-0 flex-1 items-center last:flex-none">
+              <button
+                type="button"
+                onClick={() => setMobileStep(Math.min(index, recommendedStep))}
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-bitter text-[11px] font-black tracking-normal transition-all duration-300 ${
+                  isDone
+                    ? 'bg-green-300 text-green-950 shadow-[0_0_0_3px_rgba(134,239,172,0.35)]'
+                    : isActive
+                      ? 'bg-blue-600 text-white shadow-[0_10px_24px_rgba(37,99,235,0.22)]'
+                      : 'bg-black/7 text-black/40'
+                }`}
+                aria-label={`Go to step ${stepNumber}`}
+              >
+                {stepNumber}
+              </button>
+
+              {index < 2 && <span className="mx-2 h-px flex-1 bg-black/14" />}
             </div>
+          )
+        })}
+      </div>
 
-            {idx < 3 && <div className="h-px w-5 bg-black/12" />}
-          </div>
-        )
-      })}
+      <span className={`shrink-0 rounded-full px-2.5 py-1 font-bitter text-[9px] font-black uppercase tracking-[0.12em] sm:hidden ${
+        canSearch
+          ? 'bg-green-100 text-green-800 ring-1 ring-green-300'
+          : 'bg-blue-100 text-blue-800 ring-1 ring-blue-200'
+      }`}>
+        {canSearch ? 'Ready' : 'Current'}
+      </span>
+
+      <button
+        type="button"
+        onClick={handleResetDetails}
+        disabled={!hasDetails}
+        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black/8 bg-white text-black/45 transition hover:text-blue-700 disabled:pointer-events-none disabled:opacity-30"
+        aria-label="Reset booking details"
+        title="Reset details"
+      >
+        <ResetIcon />
+      </button>
     </div>
   )
+
+  const handleMobileContinue = () => {
+    if (canSearch && mobileStep >= 2) {
+      handleSearchClick()
+      return
+    }
+
+    if (!currentCard.complete) {
+      currentCard.onClick()
+      return
+    }
+
+    setMobileStep((previousStep) => Math.min(2, previousStep + 1))
+  }
 
   const modalNode =
     activeModal && typeof document !== 'undefined'
@@ -506,20 +669,16 @@ function TourSelect() {
             onClick={close}
           >
             <div
-              className="w-full max-w-[92vw] overflow-hidden rounded-2xl bg-white font-mont shadow-2xl sm:max-w-md"
-              onClick={(e) => e.stopPropagation()}
+              className="flex max-h-[88vh] w-full max-w-[94vw] flex-col overflow-hidden rounded-2xl bg-white font-mont shadow-2xl sm:max-h-[82vh] sm:max-w-xl"
+              onClick={(event) => event.stopPropagation()}
               style={{ animation: 'modal-in 0.2s ease both' }}
             >
-              <div className="flex items-center justify-between border-b border-black/10 px-4 py-4 text-black sm:px-5">
-                <h3 className="text-sm font-semibold sm:text-base">
-                  {activeModal === 'destination' && 'Select a tour'}
-                  {activeModal === 'date' && 'Choose a date'}
-                  {activeModal === 'participants' && 'Number of guests'}
-                </h3>
-
+              <div className="flex items-center justify-end px-3 py-2 text-black sm:px-4">
                 <button
+                  type="button"
                   onClick={close}
                   className="flex h-8 w-8 items-center justify-center rounded-full text-black/40 transition-colors hover:bg-gray-100 hover:text-black"
+                  aria-label="Close"
                 >
                   <svg
                     className="h-4 w-4"
@@ -527,6 +686,7 @@ function TourSelect() {
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
+                    aria-hidden="true"
                   >
                     <path d="M18 6 6 18M6 6l12 12" />
                   </svg>
@@ -534,43 +694,110 @@ function TourSelect() {
               </div>
 
               {activeModal === 'destination' && (
-                <div className="max-h-72 overflow-y-auto py-2">
-                  {TOURS.map((tour) => (
-                    <button
-                      key={tour}
-                      onClick={() => {
-                        setDestination(tour)
-                        setParticipantsConfirmed(false)
-                        completeStepWithDelay(0, 1)
-                      }}
-                      className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm transition-colors hover:bg-gray-50 sm:px-5 ${
-                        destination === tour ? 'font-semibold text-black' : 'text-black/70'
-                      }`}
-                    >
-                      <span className="pr-4">{tour}</span>
+                <div className="max-h-[76vh] overflow-y-auto pb-2 sm:max-h-[34rem]">
+                  {tourOptions.map((tour) => {
+                    const selected = destination === tour.title
 
-                      {destination === tour && (
-                        <svg
-                          className="h-4 w-4 shrink-0 text-green-600"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                        >
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      )}
-                    </button>
-                  ))}
+                    return (
+                      <div
+                        key={tour.title}
+                        className={`mx-2 mb-1.5 rounded-2xl border transition ${
+                          selected
+                            ? 'border-green-400 bg-green-100'
+                            : 'border-black/8 bg-white hover:bg-blue-50/40'
+                        }`}
+                      >
+                        <div className="flex w-full items-center gap-2.5 p-2 text-left sm:p-2.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDestination(tour.title)
+                              setParticipantsConfirmed(false)
+                              completeStepWithDelay(0, 1)
+                            }}
+                            className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
+                          >
+                            <img
+                              src={tour.image}
+                              className="h-14 w-16 shrink-0 rounded-xl object-cover sm:h-16 sm:w-20"
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                            />
+
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-start justify-between gap-2">
+                                <p className="line-clamp-2 font-frank text-sm font-black leading-tight text-black/82 sm:text-base">
+                                  {tour.title}
+                                </p>
+
+                                {selected && (
+                                  <svg
+                                    className="h-4 w-4 shrink-0 text-green-700"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                    aria-hidden="true"
+                                  >
+                                    <polyline points="20 6 9 17 4 12" />
+                                  </svg>
+                                )}
+                              </div>
+
+                              <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                                <span className="line-clamp-1 rounded-full bg-black/[0.04] px-2 py-0.5 font-mont text-[10px] text-black/55">
+                                  {tour.location}
+                                </span>
+
+                                {tour.duration && (
+                                  <span className="rounded-full bg-blue-50 px-2 py-0.5 font-mont text-[10px] text-blue-800">
+                                    {tour.duration}
+                                  </span>
+                                )}
+
+                                {tour.price && (
+                                  <span className="rounded-full bg-green-100 px-2 py-0.5 font-bitter text-[10px] font-black text-green-800">
+                                    From {tour.price}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </button>
+
+                          <a
+                            href={tour.link}
+                            onClick={(event) => event.stopPropagation()}
+                            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1.5 font-bitter text-[9px] font-black uppercase tracking-[0.1em] text-blue-800 transition hover:bg-blue-200"
+                          >
+                            Details
+                            <svg
+                              className="h-3 w-3"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.4"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path d="M7 17 17 7" />
+                              <path d="M9 7h8v8" />
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               )}
 
               {activeModal === 'date' && (
-                <div className="flex justify-center overflow-x-auto p-3 sm:p-4 [&_.react-datepicker]:border-none [&_.react-datepicker]:shadow-none [&_.react-datepicker__day:hover]:rounded-full [&_.react-datepicker__day:hover]:bg-gray-100 [&_.react-datepicker__day--selected]:rounded-full [&_.react-datepicker__day--selected]:bg-black [&_.react-datepicker__header]:border-black/10 [&_.react-datepicker__header]:bg-white">
+                <div className="flex justify-center overflow-x-auto px-2 pb-3 pt-0 sm:px-3 sm:pb-4 [&_.react-datepicker]:w-full [&_.react-datepicker]:max-w-[21rem] [&_.react-datepicker]:border-none [&_.react-datepicker]:font-mont [&_.react-datepicker]:shadow-none [&_.react-datepicker__month-container]:w-full [&_.react-datepicker__day]:mx-[0.12rem] [&_.react-datepicker__day:hover]:rounded-full [&_.react-datepicker__day:hover]:bg-gray-100 [&_.react-datepicker__day--selected]:rounded-full [&_.react-datepicker__day--selected]:bg-black [&_.react-datepicker__header]:border-black/10 [&_.react-datepicker__header]:bg-white [&_.react-datepicker__header]:pt-2">
                   <DatePicker
                     selected={date}
-                    onChange={(d) => {
-                      setDate(d)
+                    onChange={(selectedDate) => {
+                      setDate(selectedDate)
                       setParticipantsConfirmed(false)
                       completeStepWithDelay(1, 2)
                     }}
@@ -581,41 +808,94 @@ function TourSelect() {
               )}
 
               {activeModal === 'participants' && (
-                <div className="px-4 py-5 text-black sm:px-5 sm:py-6">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-medium sm:text-base">Guests</p>
-                      <p className="text-xs text-black/40 sm:text-sm">Adults &amp; children</p>
+                <div className="px-4 pb-5 pt-0 text-black sm:px-5 sm:pb-6">
+                  <div className="grid gap-3">
+                    <div className="flex items-center justify-between gap-4 rounded-2xl border border-black/8 bg-black/[0.02] px-4 py-3">
+                      <div>
+                        <p className="font-bitter text-sm font-black uppercase tracking-[0.12em]">
+                          Adults
+                        </p>
+                        <p className="font-mont text-xs text-black/40">Ages 13+</p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAdults((previous) => Math.max(1, previous - 1))
+                            setParticipantsConfirmed(false)
+                          }}
+                          className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black disabled:opacity-30"
+                          disabled={adults === 1}
+                        >
+                          −
+                        </button>
+
+                        <span className="w-7 text-center font-mont text-base">{adults}</span>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAdults((previous) => Math.min(20, previous + 1))
+                            setParticipantsConfirmed(false)
+                          }}
+                          className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-3 sm:gap-4">
-                      <button
-                        onClick={() => setParticipants((p) => Math.max(1, p - 1))}
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black disabled:opacity-30"
-                        disabled={participants === 1}
-                      >
-                        −
-                      </button>
+                    <div className="flex items-center justify-between gap-4 rounded-2xl border border-black/8 bg-black/[0.02] px-4 py-3">
+                      <div>
+                        <p className="font-bitter text-sm font-black uppercase tracking-[0.12em]">
+                          Children
+                        </p>
+                        <p className="font-mont text-xs text-black/40">Ages 0–12</p>
+                      </div>
 
-                      <span className="w-6 text-center text-base">{participants}</span>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setChildren((previous) => Math.max(0, previous - 1))
+                            setParticipantsConfirmed(false)
+                          }}
+                          className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black disabled:opacity-30"
+                          disabled={children === 0}
+                        >
+                          −
+                        </button>
 
-                      <button
-                        onClick={() => setParticipants((p) => Math.min(20, p + 1))}
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black"
-                      >
-                        +
-                      </button>
+                        <span className="w-7 text-center font-mont text-base">{children}</span>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setChildren((previous) => Math.min(20, previous + 1))
+                            setParticipantsConfirmed(false)
+                          }}
+                          className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
 
+                  <div className="mt-4 rounded-2xl bg-green-50 px-4 py-3 font-mont text-xs text-green-800 ring-1 ring-green-200">
+                    Total guests: <span className="font-bold">{participants}</span>
+                  </div>
+
                   <button
+                    type="button"
                     onClick={() => {
                       setParticipantsConfirmed(true)
                       completeStepWithDelay(2, 3)
                     }}
-                    className="mt-6 w-full rounded-xl bg-black py-3 text-sm font-semibold text-white transition-colors hover:bg-black/80"
+                    className="mt-4 w-full rounded-xl bg-black py-3 font-bitter text-sm font-black uppercase tracking-[0.12em] text-white transition-colors hover:bg-black/80"
                   >
-                    Confirm
+                    Confirm guests
                   </button>
                 </div>
               )}
@@ -627,304 +907,158 @@ function TourSelect() {
 
   return (
     <>
-      <div className="relative mx-auto w-full max-w-5xl overflow-visible rounded-[24px] bg-white/16 p-2 shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-md sm:rounded-[28px] sm:p-3">
-        <button
-          type="button"
-          onClick={handleResetDetails}
-          disabled={!hasDetails}
-          className="absolute -top-7 right-2 z-20 rounded-full border border-white/20 bg-white/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/75 backdrop-blur-md transition hover:bg-white/30 hover:text-white disabled:pointer-events-none disabled:opacity-0"
-        >
-          reset details
-        </button>
+      <div className="relative mx-auto w-full max-w-5xl overflow-visible rounded-[26px] border border-black/8 bg-white/92 p-3 shadow-[0_18px_50px_rgba(15,23,42,0.10)] sm:rounded-[28px] sm:p-4">
+        <div className="mb-3 px-1">
+          <StepProgress />
+        </div>
 
-        {isDeckMobile ? (
-          <div className="relative min-h-[236px] overflow-hidden rounded-[18px]">
-            {mobileCards.map((card, index) => {
-              const isCurrent = mobileStep === index
-              const isJustCompleted = justCompletedStep === index
-              const isFeedbackActive = selectionFeedback?.stepIndex === index
+        {isMobileLayout ? (
+          <div className="rounded-[22px] bg-white">
+            <button
+              ref={mobileCardRef}
+              type="button"
+              onClick={currentCard.isSearch ? handleSearchClick : currentCard.onClick}
+              className={`flex min-h-[128px] w-full items-center gap-4 rounded-[22px] border px-4 text-left transition-all duration-300 ${fieldCardClass(
+                currentCard.complete,
+                currentCard.status === 'Current',
+                justCompletedStep === mobileStep
+              )}`}
+            >
+              <div
+                className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full transition-colors duration-300 ${iconShellClass(
+                  currentCard.complete,
+                  currentCard.status === 'Current',
+                  justCompletedStep === mobileStep
+                )}`}
+              >
+                <img
+                  src={currentCard.icon}
+                  className="h-7 w-auto"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </div>
 
-              return (
-                <div
-                  key={card.key}
-                  style={getDeckStyle(index)}
-                  className="absolute inset-x-0 top-0 transition-all duration-500 ease-out"
-                >
-                  <div className="overflow-hidden rounded-[22px] border border-black/8 bg-white shadow-[0_16px_32px_rgba(0,0,0,0.12)]">
-                    {card.isSearch ? (
-                      <div className="flex min-h-[184px] flex-col gap-3 px-4 py-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex flex-col gap-2">
-                            <LeaderStep />
-                          </div>
-
-                          <div
-                            className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${stepBadgeClass(card.status)}`}
-                          >
-                            {card.status}
-                          </div>
-                        </div>
-
-                        <div
-                          className={`flex items-center gap-3 rounded-2xl px-3 py-3 ${searchCardClass(
-                            card.complete,
-                            searchAttempted
-                          )}`}
-                        >
-                          <div
-                            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${
-                              card.complete
-                                ? 'bg-green-200'
-                                : searchAttempted
-                                  ? 'bg-white/20'
-                                  : 'bg-black/[0.04]'
-                            }`}
-                          >
-                            <img src={card.icon} className="h-5 w-auto" alt="Search" />
-                          </div>
-
-                          <div className="min-w-0">
-                            <div
-                              className={`truncate text-sm ${searchTextClass(
-                                card.complete,
-                                searchAttempted
-                              )}`}
-                            >
-                              {card.value}
-                            </div>
-
-                            <div
-                              className={`mt-1 truncate text-xs ${searchPreviewClass(
-                                card.complete,
-                                searchAttempted
-                              )}`}
-                            >
-                              {card.preview}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="mt-auto flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setMobileStep((prev) => Math.max(0, prev - 1))}
-                            className="rounded-xl border border-black/10 px-4 py-3 text-sm font-semibold text-black/70 transition hover:bg-black/[0.03]"
-                          >
-                            Back
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={handleSearchClick}
-                            className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-5 py-3 text-base font-bold text-white transition ${searchButtonClass(
-                              canSearch,
-                              searchAttempted
-                            )}`}
-                          >
-                            <span>Search</span>
-                            <img src="./icons/go.png" className="h-5 w-auto" alt="Go" />
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="px-4 py-4">
-                        <div className="mb-3 flex items-start justify-between gap-3">
-                          <div className="flex flex-col gap-2">
-                            <LeaderStep />
-                          </div>
-
-                          <div
-                            className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${stepBadgeClass(card.status)}`}
-                          >
-                            {card.status}
-                          </div>
-                        </div>
-
-                        <button
-                          ref={(el) => {
-                            mobileTileRefs.current[index] = el
-                          }}
-                          type="button"
-                          onClick={card.onClick}
-                          className={`flex min-h-[96px] w-full items-center gap-3 rounded-[18px] border border-transparent px-3 text-left transition-all duration-300 hover:-translate-y-0.5 ${stepCardClass(
-                            card.complete,
-                            isCurrent,
-                            isJustCompleted
-                          )}`}
-                        >
-                          <div
-                            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors duration-300 ${stepIconClass(
-                              card.complete,
-                              isCurrent,
-                              isJustCompleted
-                            )}`}
-                          >
-                            <img src={card.icon} className="h-5 w-auto" alt={card.key} />
-                          </div>
-
-                          <div className="min-w-0 flex-1">
-                            {card.label && (
-                              <div className="mb-1 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-black/35">
-                                <span className="h-1.5 w-1.5 rounded-full bg-green-200" />
-                                {card.label}
-                              </div>
-                            )}
-
-                            <div className="truncate text-sm font-semibold text-black/75">
-                              {card.value}
-                            </div>
-
-                            <div className="mt-1 truncate text-xs text-black/45">
-                              {card.preview}
-                            </div>
-                          </div>
-
-                          <PositivePill
-                            show={isFeedbackActive}
-                            text={selectionFeedback?.text}
-                          />
-                        </button>
-
-                        <div className="mt-3 flex items-center justify-between gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setMobileStep((prev) => Math.max(0, prev - 1))}
-                            disabled={mobileStep === 0}
-                            className="rounded-xl border border-black/10 px-4 py-2.5 text-sm font-semibold text-black/70 transition hover:bg-black/[0.03] disabled:cursor-not-allowed disabled:opacity-40"
-                          >
-                            Back
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setMobileStep((prev) =>
-                                Math.min(3, Math.max(prev + 1, recommendedStep))
-                              )
-                            }
-                            className="rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-black/85"
-                          >
-                            Continue
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 flex items-center gap-1.5 font-bitter text-[11px] font-black uppercase tracking-[0.18em] text-black/35">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-300" />
+                  {currentCard.label}
                 </div>
-              )
-            })}
 
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-[linear-gradient(to_top,rgba(255,255,255,0.16),transparent)]" />
+                <div className="truncate font-frank text-xl font-black leading-tight text-[#020817]">
+                  {currentCard.value}
+                </div>
+
+                <div className="mt-1 line-clamp-2 font-mont text-sm text-black/45">
+                  {currentCard.preview}
+                </div>
+              </div>
+
+              <PositivePill
+                show={selectionFeedback?.stepIndex === mobileStep}
+                text={selectionFeedback?.text}
+              />
+            </button>
+
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setMobileStep((previousStep) => Math.max(0, previousStep - 1))}
+                disabled={mobileStep === 0}
+                className="rounded-2xl border border-black/10 px-5 py-3 font-bitter text-sm font-black text-black/45 transition hover:bg-black/[0.03] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Back
+              </button>
+
+              <button
+                type="button"
+                onClick={handleMobileContinue}
+                className={`flex min-w-[9.5rem] items-center justify-center gap-2 rounded-2xl px-5 py-3 font-bitter text-sm font-black uppercase tracking-[0.08em] text-white transition ${
+                  canSearch && mobileStep >= 2
+                    ? searchButtonClass(canSearch, searchAttempted)
+                    : 'bg-[#020817] hover:bg-black shadow-[0_14px_30px_rgba(0,0,0,0.18)]'
+                }`}
+              >
+                <span>{canSearch && mobileStep >= 2 ? 'Search' : 'Continue'}</span>
+                <img
+                  src={canSearch && mobileStep >= 2 ? './icons/go.png' : './icons/topRightArrow.png'}
+                  className="h-4 w-auto"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="grid max-w-full overflow-hidden rounded-[18px] bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)] min-[700px]:grid-cols-2 min-[1100px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_200px]">
-            <button
-              ref={(el) => {
-                desktopTileRefs.current[0] = el
-              }}
-              type="button"
-              onClick={() => setActiveModal('destination')}
-              className="group flex min-w-0 items-center gap-3 border border-transparent bg-white px-4 py-4 text-left ring-1 ring-black/8 transition-all duration-300 hover:bg-gray-50 sm:px-5 sm:py-5 min-[700px]:min-h-[92px] min-[1100px]:border-r min-[1100px]:border-gray-200"
-            >
-              <img
-                src="./icons/car.png"
-                className={`h-8 w-auto shrink-0 rounded-full p-2 transition-transform duration-300 group-hover:scale-105 sm:h-9 md:h-10 ${
-                  destination ? 'bg-green-100 ring-1 ring-green-200' : 'bg-black/[0.04]'
+          <div className="grid max-w-full overflow-hidden rounded-[22px] border border-black/8 bg-white min-[700px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_190px] min-[1100px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_220px]">
+            {cards.slice(0, 3).map((card, index) => (
+              <button
+                key={card.key}
+                ref={(el) => {
+                  desktopTileRefs.current[index] = el
+                }}
+                type="button"
+                onClick={card.onClick}
+                className={`group flex min-w-0 items-center gap-3 border-black/8 bg-white px-4 py-4 text-left transition-all duration-300 hover:bg-blue-50/35 sm:px-5 sm:py-5 min-[700px]:min-h-[92px] min-[700px]:px-3 min-[900px]:px-5 ${
+                  index < 2
+                    ? 'border-b min-[700px]:border-b-0 min-[700px]:border-r'
+                    : 'border-b min-[700px]:border-b-0 min-[700px]:border-r'
                 }`}
-                alt="Destination"
-              />
-
-              <div className="min-w-0 flex-1">
-                <DesktopLabel>Where?</DesktopLabel>
-
-                <div className="truncate text-sm font-semibold text-black/75">
-                  {destination || 'Select destination'}
+              >
+                <div
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-colors duration-300 group-hover:scale-105 ${
+                    card.complete ? 'bg-green-100 ring-1 ring-green-200' : 'bg-black/[0.04]'
+                  }`}
+                >
+                  <img src={card.icon} className="h-6 w-auto" alt="" aria-hidden="true" />
                 </div>
-              </div>
 
-              <PositivePill
-                show={selectionFeedback?.stepIndex === 0}
-                text={selectionFeedback?.text}
-              />
-            </button>
+                <div className="min-w-0 flex-1">
+                  <DesktopLabel>{card.label}</DesktopLabel>
 
-            <button
-              ref={(el) => {
-                desktopTileRefs.current[1] = el
-              }}
-              type="button"
-              onClick={() => setActiveModal('date')}
-              className="group flex min-w-0 items-center gap-3 border border-transparent border-t-gray-200 bg-white px-4 py-4 text-left ring-1 ring-black/8 transition-all duration-300 hover:bg-gray-50 sm:px-5 sm:py-5 min-[700px]:border-l-0 min-[700px]:border-t min-[700px]:min-h-[92px] min-[1100px]:border-r min-[1100px]:border-t-0 min-[1100px]:border-gray-200"
-            >
-              <img
-                src="./icons/calendar.png"
-                className={`h-8 w-auto shrink-0 rounded-full p-2 transition-transform duration-300 group-hover:scale-105 sm:h-9 md:h-10 ${
-                  date ? 'bg-green-100 ring-1 ring-green-200' : 'bg-black/[0.04]'
-                }`}
-                alt="Date"
-              />
+                  <div className="truncate font-frank text-base font-black text-black/75">
+                    {card.value}
+                  </div>
 
-              <div className="min-w-0 flex-1">
-                <DesktopLabel>When?</DesktopLabel>
-
-                <div className="truncate text-sm font-semibold text-black/75">
-                  {formattedDate}
+                  <div className="mt-0.5 hidden truncate font-mont text-xs text-black/40 sm:block">
+                    {card.preview}
+                  </div>
                 </div>
-              </div>
 
-              <PositivePill
-                show={selectionFeedback?.stepIndex === 1}
-                text={selectionFeedback?.text}
-              />
-            </button>
+                <PositivePill
+                  show={selectionFeedback?.stepIndex === index}
+                  text={selectionFeedback?.text}
+                />
+              </button>
+            ))}
 
-            <button
-              ref={(el) => {
-                desktopTileRefs.current[2] = el
-              }}
-              type="button"
-              onClick={() => setActiveModal('participants')}
-              className="group flex min-w-0 items-center gap-3 border border-transparent border-t-gray-200 bg-white px-4 py-4 text-left ring-1 ring-black/8 transition-all duration-300 hover:bg-gray-50 sm:px-5 sm:py-5 min-[700px]:min-h-[92px] min-[700px]:border-r min-[700px]:border-gray-200 min-[1100px]:border-t-0"
-            >
-              <img
-                src="./icons/guest.png"
-                className={`h-8 w-auto shrink-0 rounded-full p-2 transition-transform duration-300 group-hover:scale-105 sm:h-9 md:h-10 ${
-                  participantsConfirmed
-                    ? 'bg-green-100 ring-1 ring-green-200'
-                    : 'bg-black/[0.04]'
-                }`}
-                alt="Participants"
-              />
-
-              <div className="min-w-0 flex-1">
-                <DesktopLabel>Who?</DesktopLabel>
-
-                <div className="truncate text-sm font-semibold text-black/75">
-                  {participants} {participants === 1 ? 'participant' : 'participants'}
-                </div>
-              </div>
-
-              <PositivePill
-                show={selectionFeedback?.stepIndex === 2}
-                text={selectionFeedback?.text}
-              />
-            </button>
-
-            <div className="min-w-0 border-t border-gray-200 bg-white p-3 sm:p-4 min-[700px]:p-4 min-[1100px]:border-t-0">
+            <div className="min-w-0 bg-white p-3 sm:p-4 min-[700px]:p-3 min-[1100px]:p-4">
               <button
                 type="button"
                 onClick={handleSearchClick}
-                className={`flex h-full min-h-[56px] w-full max-w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-base font-bold text-white transition sm:text-lg ${searchButtonClass(
+                className={`flex h-full min-h-[60px] w-full max-w-full items-center justify-center gap-2 rounded-2xl px-5 py-3 font-bitter text-base font-black uppercase tracking-[0.08em] text-white transition sm:text-lg ${searchButtonClass(
                   canSearch,
                   searchAttempted
                 )}`}
               >
                 <span>Search</span>
-                <img src="./icons/go.png" className="h-5 w-auto sm:h-6" alt="Go" />
+                <img src="./icons/go.png" className="h-5 w-auto sm:h-6" alt="" aria-hidden="true" />
               </button>
             </div>
           </div>
         )}
+      </div>
+
+      <div className="mx-auto mt-2 flex w-full max-w-5xl items-center gap-2 rounded-2xl border border-green-300/80 bg-green-100/95 px-3 py-2">
+        <img
+          src="./icons/savemore.png"
+          className="h-5 w-5 shrink-0 object-contain"
+          alt=""
+          aria-hidden="true"
+        />
+        <p className="truncate font-bitter text-[11px] font-black uppercase tracking-[0.1em] text-green-900">
+          Save more when you book as a group
+        </p>
       </div>
 
       {searchError && (
@@ -943,6 +1077,7 @@ function TourSelect() {
                   strokeWidth="2.4"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  aria-hidden="true"
                 >
                   <circle cx="12" cy="12" r="10" />
                   <path d="M12 8v5" />
@@ -951,8 +1086,8 @@ function TourSelect() {
               </div>
 
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-red-700">Missing details</p>
-                <p className="truncate text-xs text-red-600/80">{searchError.message}</p>
+                <p className="font-bitter text-sm font-black text-red-700">Missing details</p>
+                <p className="truncate font-mont text-xs text-red-600/80">{searchError.message}</p>
               </div>
             </div>
           </div>

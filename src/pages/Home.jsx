@@ -11,6 +11,16 @@ import Contact from '../components/Contact.jsx'
 
 gsap.registerPlugin(ScrollTrigger)
 
+const isTouchDevice = () => {
+  if (typeof window === 'undefined') return false
+
+  return (
+    window.matchMedia?.('(pointer: coarse)').matches ||
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0
+  )
+}
+
 const Home = () => {
   const location = useLocation()
 
@@ -54,6 +64,8 @@ const Home = () => {
     const ctx = gsap.context(() => {
       if (!heroRef.current || !aboutRef.current) return
 
+      const touchDevice = isTouchDevice()
+
       const resetHero = () => {
         gsap.set(heroRef.current, {
           clearProps: 'filter',
@@ -62,6 +74,9 @@ const Home = () => {
           x: 0,
           y: 0,
           transformOrigin: 'center top',
+          force3D: true,
+          backfaceVisibility: 'hidden',
+          willChange: 'transform, opacity',
         })
       }
 
@@ -75,6 +90,12 @@ const Home = () => {
 
       resetHero()
 
+      gsap.set([heroRef.current, aboutRef.current], {
+        force3D: true,
+        backfaceVisibility: 'hidden',
+        willChange: 'transform, opacity',
+      })
+
       gsap.set(aboutRef.current, {
         y: 40,
       })
@@ -83,23 +104,12 @@ const Home = () => {
         scrollTrigger: {
           id: 'home-hero-pin-scale',
           trigger: heroRef.current,
-
-          /*
-            Important fix:
-            The old trigger used aboutRef with start: 'top bottom'.
-            On touch Chrome, the layout viewport and the visible viewport can disagree while
-            the address bar / tab bar / bottom UI are visible. That can make the trigger start
-            before scrollY 0, so the hero scale animation is already progressed on first load.
-
-            Using the hero itself as the trigger and starting at 'top top' makes the animation
-            begin at the real page top instead of being calculated from the next section.
-          */
           start: 'top top',
-          end: () => `+=${getHeroScrollDistance()}`,
-          scrub: true,
+          end: () => `+=${Math.round(getHeroScrollDistance() * (touchDevice ? 1.15 : 1))}`,
+          scrub: touchDevice ? 0.55 : 0.3,
           pin: heroRef.current,
           pinSpacing: false,
-          anticipatePin: 1,
+          anticipatePin: touchDevice ? 0 : 1,
           invalidateOnRefresh: true,
           refreshPriority: 2,
 
@@ -122,14 +132,16 @@ const Home = () => {
         aboutRef.current,
         {
           y: 0,
+          force3D: true,
           ease: 'none',
         },
         0
       ).to(
         heroRef.current,
         {
-          scale: 0.6,
-          opacity: 0.72,
+          scale: touchDevice ? 0.72 : 0.6,
+          opacity: touchDevice ? 0.82 : 0.1,
+          force3D: true,
           ease: 'none',
         },
         0

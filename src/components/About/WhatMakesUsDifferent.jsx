@@ -23,17 +23,17 @@ const differenceCards = [
   {
     icon: '/icons/5stars.png',
     title: 'Top Tier Service',
-    desc: 'All our tours are led by certified local guides with years of experience keeping you safe.',
+    desc: 'Premium planning, clear communication, and a guided experience that feels organised before you even leave your accommodation.',
   },
   {
     icon: '/icons/group.png',
     title: 'Local Expertise',
-    desc: 'We know Cape Town inside out — hidden gems, best times, and the stories behind every stop.',
+    desc: 'Cape Town routes are shaped around timing, viewpoints, pickup flow, and the local details that make each stop feel meaningful.',
   },
   {
     icon: '/icons/global.png',
-    title: 'Safe & Trusted',
-    desc: 'Consistently rated 5 stars by hundreds of travellers from around the world.',
+    title: 'High Availability',
+    desc: 'On-demand vehicle planning gives Cape Frontier more flexibility to support bookings without relying on one fixed vehicle setup.',
   },
 ]
 
@@ -42,30 +42,30 @@ const trustCards = [
     icon: '/icons/heartHandGreen.png',
     image: '/images/content/random/3.webp',
     label: 'Real Cape Town',
-    title: 'Authenticity & Integrity',
-    desc: 'We showcase the true essence of Cape Town through immersive local experiences built around culture, history, and natural beauty.',
+    title: 'Authentic routes with real Cape Town context',
+    desc: 'Each experience is shaped around Cape Town scenery, culture, timing, local stories, and practical route flow. Instead of simply moving guests from stop to stop, the route is planned to feel connected: where you are going, why it matters, what makes the view or place special, and how the day fits together without feeling rushed.',
     layout: 'md:col-span-2 xl:col-span-5 xl:row-span-2',
-    imageHeight: 'h-72 xl:h-[30rem]',
+    imageHeight: 'h-52 sm:h-60 xl:h-[26rem]',
     horizontal: false,
   },
   {
     icon: '/icons/approvedGreen.png',
     image: '/images/content/random/4.webp',
     label: 'Easy Booking',
-    title: 'Confidence & Trust',
-    desc: 'Every tour is planned with care, clear communication, and reliable guidance so guests feel comfortable from booking to drop-off.',
+    title: 'Clear booking and payment flow',
+    desc: 'Guests choose the tour, date, pickup details, and participant count before checkout. Cape Frontier then confirms the booking details manually.',
     layout: 'xl:col-span-7',
-    imageHeight: 'h-64 xl:h-full',
+    imageHeight: 'h-44 sm:h-52 xl:h-full',
     horizontal: true,
   },
   {
     icon: '/icons/professional.png',
     image: '/images/content/random/7.webp',
     label: 'Guided Safely',
-    title: 'Security & Professionalism',
-    desc: 'We focus on safe routes, professional conduct, and consistent service so every trip feels smooth, organised, and memorable.',
+    title: 'Reliable vehicle planning',
+    desc: 'Because transport can be arranged on demand, Cape Frontier can match the vehicle to the group size and route instead of forcing one fixed setup.',
     layout: 'xl:col-span-7',
-    imageHeight: 'h-64 xl:h-full',
+    imageHeight: 'h-44 sm:h-52 xl:h-full',
     horizontal: true,
     reverse: true,
   },
@@ -113,6 +113,35 @@ const WhatMakesUsDifferent = () => {
       const trustIcons = gsap.utils.toArray('.trust-icon-wrap')
       const trustCopyItems = gsap.utils.toArray('.trust-copy > *')
       const parallaxImgs = gsap.utils.toArray('.parallax-img')
+      const promoPieces = gsap.utils.toArray('.promo-piece')
+      const isTouch = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+      if (reduceMotion) {
+        gsap.set(
+          [
+            ...words,
+            ...pills,
+            ...newBubbles,
+            ...diffCards,
+            ...trustCardEls,
+            ...trustIcons,
+            ...trustCopyItems,
+            ...promoPieces,
+            '.wmud-subcopy',
+          ],
+          {
+            y: 0,
+            yPercent: 0,
+            x: 0,
+            scale: 1,
+            rotate: 0,
+            autoAlpha: 1,
+          },
+        )
+
+        return
+      }
 
       gsap.set(words, { yPercent: 115 })
 
@@ -220,23 +249,23 @@ const WhatMakesUsDifferent = () => {
       })
 
       gsap.fromTo(
-        '.promo-banner',
+        promoPieces,
         {
-          y: 55,
-          scale: 0.97,
+          y: isTouch ? 18 : 32,
+          scale: 0.98,
           autoAlpha: 0,
         },
         {
           y: 0,
           scale: 1,
           autoAlpha: 1,
-          ease: 'none',
+          stagger: 0.07,
+          duration: isTouch ? 0.32 : 0.46,
+          ease: 'power3.out',
           scrollTrigger: {
             trigger: '.promo-banner',
-            start: 'top 85%',
-            end: 'top 50%',
-            scrub: 0.8,
-            invalidateOnRefresh: true,
+            start: 'top 86%',
+            once: true,
           },
         },
       )
@@ -244,24 +273,21 @@ const WhatMakesUsDifferent = () => {
       gsap.fromTo(
         diffCards,
         {
-          y: 55,
-          scale: 0.94,
-          rotate: (index) => (index % 2 === 0 ? -1.5 : 1.5),
+          y: isTouch ? 18 : 34,
+          scale: 0.97,
           autoAlpha: 0,
         },
         {
           y: 0,
           scale: 1,
-          rotate: 0,
           autoAlpha: 1,
-          stagger: 0.12,
-          ease: 'none',
+          stagger: isTouch ? 0.05 : 0.1,
+          duration: isTouch ? 0.32 : 0.46,
+          ease: 'power3.out',
           scrollTrigger: {
             trigger: '.diff-grid',
-            start: 'top 85%',
-            end: 'top 42%',
-            scrub: 0.8,
-            invalidateOnRefresh: true,
+            start: 'top 86%',
+            once: true,
           },
         },
       )
@@ -269,26 +295,21 @@ const WhatMakesUsDifferent = () => {
       gsap.fromTo(
         trustCardEls,
         {
-          y: 90,
-          x: (index) => (index === 0 ? -40 : index === 1 ? 40 : 20),
-          scale: 0.92,
-          rotate: (index) => (index === 0 ? -2 : index === 1 ? 2 : -1),
+          y: isTouch ? 22 : 46,
+          scale: 0.97,
           autoAlpha: 0,
         },
         {
           y: 0,
-          x: 0,
           scale: 1,
-          rotate: 0,
           autoAlpha: 1,
-          stagger: 0.14,
-          ease: 'none',
+          stagger: isTouch ? 0.05 : 0.11,
+          duration: isTouch ? 0.34 : 0.5,
+          ease: 'power3.out',
           scrollTrigger: {
             trigger: '.trust-section',
-            start: 'top 82%',
-            end: 'top 28%',
-            scrub: 0.9,
-            invalidateOnRefresh: true,
+            start: 'top 84%',
+            once: true,
           },
         },
       )
@@ -296,24 +317,22 @@ const WhatMakesUsDifferent = () => {
       gsap.fromTo(
         trustIcons,
         {
-          y: 20,
-          scale: 0.55,
-          rotate: -10,
+          y: 12,
+          scale: 0.82,
+          rotate: -5,
           autoAlpha: 0,
         },
         {
           y: 0,
           scale: 1,
-          rotate: 0,
           autoAlpha: 1,
-          stagger: 0.08,
-          ease: 'none',
+          stagger: 0.06,
+          duration: 0.34,
+          ease: 'back.out(1.45)',
           scrollTrigger: {
             trigger: '.trust-section',
-            start: 'top 70%',
-            end: 'top 35%',
-            scrub: 0.8,
-            invalidateOnRefresh: true,
+            start: 'top 76%',
+            once: true,
           },
         },
       )
@@ -321,48 +340,49 @@ const WhatMakesUsDifferent = () => {
       gsap.fromTo(
         trustCopyItems,
         {
-          y: 18,
+          y: 12,
           autoAlpha: 0,
         },
         {
           y: 0,
           autoAlpha: 1,
           stagger: 0.025,
-          ease: 'none',
+          duration: 0.3,
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: '.trust-section',
-            start: 'top 68%',
-            end: 'top 22%',
-            scrub: 0.8,
-            invalidateOnRefresh: true,
+            start: 'top 72%',
+            once: true,
           },
         },
       )
 
-      parallaxImgs.forEach((img) => {
-        const frame = img.closest('.parallax-frame')
-        const isSoft = img.classList.contains('soft-parallax')
+      if (!isTouch) {
+        parallaxImgs.forEach((img) => {
+          const frame = img.closest('.parallax-frame')
+          const isSoft = img.classList.contains('soft-parallax')
 
-        gsap.fromTo(
-          img,
-          {
-            yPercent: isSoft ? -4 : -8,
-            scale: isSoft ? 1.03 : 1.08,
-          },
-          {
-            yPercent: isSoft ? 4 : 8,
-            scale: isSoft ? 1.01 : 1.03,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: frame || img,
-              start: 'top bottom',
-              end: 'bottom top',
-              scrub: true,
-              invalidateOnRefresh: true,
+          gsap.fromTo(
+            img,
+            {
+              yPercent: isSoft ? -2 : -4,
+              scale: isSoft ? 1.02 : 1.04,
             },
-          },
-        )
-      })
+            {
+              yPercent: isSoft ? 2 : 4,
+              scale: isSoft ? 1.01 : 1.025,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: frame || img,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 1.1,
+                invalidateOnRefresh: true,
+              },
+            },
+          )
+        })
+      }
 
       requestAnimationFrame(() => {
         ScrollTrigger.refresh()
@@ -379,8 +399,11 @@ const WhatMakesUsDifferent = () => {
   }, [])
 
   return (
-    <section ref={pageRef} className="relative z-20 w-full py-12">
-      <div className="mx-auto flex w-full flex-col gap-8">
+    <section ref={pageRef} className="relative z-20 w-full py-10 sm:py-12">
+      <div className="mx-auto flex w-full flex-col gap-6">
+        {/* ============================================================
+            BANNER — KEPT
+        ============================================================ */}
         <div
           ref={headerRef}
           className="z-30 mx-auto flex w-full max-w-5xl flex-col items-center gap-8 bg-white px-4 py-14 text-center text-black sm:py-16"
@@ -399,7 +422,10 @@ const WhatMakesUsDifferent = () => {
           </p>
         </div>
 
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 sm:px-6 lg:px-8">
+          {/* ============================================================
+              PILLS — KEPT
+          ============================================================ */}
           <div className="wmud-pill-wrap relative z-10 flex flex-wrap justify-center gap-4">
             {chips.map((item) => (
               <div
@@ -417,75 +443,63 @@ const WhatMakesUsDifferent = () => {
             ))}
           </div>
 
-          <div className="promo-banner relative z-10 flex flex-col items-stretch gap-4 overflow-hidden rounded-2xl border border-blue-100 bg-blue-50 p-4 shadow-sm md:flex-row">
-            <div className="parallax-frame h-56 overflow-hidden rounded-xl md:h-auto md:w-1/4 md:shrink-0">
-              <img
-                src="/images/content/random/1.webp"
-                className="parallax-img soft-parallax h-[108%] w-full object-cover object-center will-change-transform"
-                alt=""
-              />
-            </div>
 
-            <div className="flex flex-col justify-center gap-3 px-2 font-bitter text-gray-800 md:w-1/2">
-              <p className="text-2xl font-bold leading-none sm:text-3xl">
-                Cape Frontier is the adventure tour central capital.
-              </p>
-
-              <p className="text-sm leading-snug text-gray-500 sm:text-base">
-                Discover the best adventures that await you. See our tours that will inspire you to
-                explore beyond the ordinary.
-              </p>
-            </div>
-
-            <div className="flex items-center justify-start md:w-1/4 md:justify-center">
-              <button className="hero-gradient-bl flex items-center gap-2 rounded-xl px-8 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02]">
-                Learn More
-                <img
-                  src="/icons/topRightArrow.png"
-                  className="h-3.5 brightness-0 invert"
-                  alt=""
-                />
-              </button>
-            </div>
-          </div>
-
-          <div className="diff-grid relative z-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {/* ============================================================
+              DIFF CARDS — ROW ON MOBILE/MEDIUM
+          ============================================================ */}
+          <div className="diff-grid relative z-10 flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] md:grid md:grid-cols-3 md:overflow-visible md:pb-0 [&::-webkit-scrollbar]:hidden">
             {differenceCards.map((item) => (
               <div
                 key={item.title}
-                className="diff-card flex flex-col items-start gap-3 rounded-2xl bg-white px-6 py-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                className="diff-card flex min-w-[76vw] flex-col items-start gap-3 rounded-[1.25rem] bg-white px-4 py-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md sm:min-w-[18rem] md:min-w-0"
               >
-                <div className="flex items-center justify-center">
-                  <img src={item.icon} className="h-20 w-fit object-contain" alt="" />
+                <div className="flex h-12 items-center justify-center">
+                  <img src={item.icon} className="h-11 w-fit object-contain" alt="" />
                 </div>
 
-                <p className="font-frank text-lg font-bold leading-none text-black">
+                <p className="font-frank text-2xl font-bold leading-none text-black">
                   {item.title}
                 </p>
 
-                <p className="font-frank text-sm leading-snug text-black/50">
+                <p className="font-bitter text-sm leading-relaxed text-black/52">
                   {item.desc}
                 </p>
               </div>
             ))}
           </div>
 
-          <div className="trust-section relative z-10 overflow-hidden rounded-b-4xl bg-blue-200 p-4 shadow-2xl sm:p-6 lg:p-8">
-            <div className="mb-6 rounded-3xl bg-white/70 px-5 py-6 font-frank shadow-sm ring-1 ring-white/70 backdrop-blur">
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-green-600">
-                Why guests feel confident
-              </p>
+          {/* ============================================================
+              SIMPLE TRUST PILL
+          ============================================================ */}
+          <div className="promo-banner relative z-10">
+            <div className="promo-piece mx-auto flex w-4xl items-center gap-2 rounded-full bg-green-200 px-3 py-2 shadow-sm sm:px-4">
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/80 shadow-sm">
+                <img
+                  src="/icons/approvedGreen.png"
+                  className="h-5 w-5 object-contain"
+                  alt=""
+                />
+              </span>
 
-              <p className="mt-2 max-w-2xl text-2xl font-black leading-none text-black/85 sm:text-3xl">
-                Local knowledge, reliable planning, and simple communication before every trip.
+              <p className="min-w-0 font-bitter text-xs font-bold leading-snug text-green-950 sm:text-sm">
+                Book your group, pay securely, and receive manual confirmation.
               </p>
             </div>
+          </div>
 
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-12">
+          {/* ============================================================
+              TRUST SECTION — LIGHTER GAPS, LESS ROUNDNESS, NO CARD BORDERS
+          ============================================================ */}
+          <div className="trust-section relative z-10 overflow-hidden rounded-[1.5rem] bg-transparent p-3 shadow-[0_16px_42px_rgba(15,23,42,0.08)] sm:p-4 lg:p-5">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 hero-gradient opacity-95" />
+            <div className="pointer-events-none absolute inset-x-0 top-[38%] h-28 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.35)_42%,rgba(255,255,255,0)_100%)]" />
+
+            <div className="relative z-10 grid gap-3 md:grid-cols-2 xl:grid-cols-12">
               {trustCards.map((item) => (
                 <article
                   key={item.title}
-                  className={`trust-card group overflow-hidden rounded-[2rem] bg-white/90 shadow-sm ring-1 ring-white/70 will-change-transform ${item.layout}`}
+                  className={`trust-card group overflow-hidden rounded-[1.25rem] bg-white/90 shadow-sm will-change-transform ${item.layout}`}
                 >
                   <div
                     className={`grid h-full ${
@@ -499,34 +513,59 @@ const WhatMakesUsDifferent = () => {
                     >
                       <img
                         src={item.image}
-                        className="parallax-img h-[112%] w-full object-cover will-change-transform"
+                        className="parallax-img h-[108%] w-full object-cover will-change-transform"
                         alt=""
                       />
 
                       <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
 
-                      <div className="absolute left-4 top-4 rounded-full bg-white/90 px-4 py-1.5 font-bitter text-xs font-bold text-black shadow-sm backdrop-blur">
+                      <div className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1.5 font-bitter text-[11px] font-bold text-black shadow-sm backdrop-blur">
                         {item.label}
                       </div>
                     </div>
 
-                    <div className="trust-copy relative flex flex-col justify-between gap-5 p-5 sm:p-6">
-                      <div className="trust-icon-wrap -mt-12 flex h-16 w-16 items-center justify-center rounded-2xl bg-green-200 shadow-sm ring-4 ring-white xl:mt-0">
-                        <img src={item.icon} className="h-10 w-10 object-contain" alt="" />
+                    <div className="trust-copy relative flex flex-col justify-between gap-4 p-4 sm:p-5">
+                      <div className="trust-icon-wrap -mt-10 flex h-14 w-14 items-center justify-center rounded-[1rem] bg-green-200 shadow-sm ring-4 ring-white xl:mt-0">
+                        <img src={item.icon} className="h-8 w-8 object-contain" alt="" />
                       </div>
 
-                      <div className="flex flex-col gap-3">
+                      <div className="flex flex-col gap-2">
                         <p className="font-frank text-3xl font-black leading-none text-black/85">
                           {item.title}
                         </p>
 
-                        <p className="font-frank text-sm leading-relaxed text-gray-500">
+                        <p className="font-bitter text-sm leading-relaxed text-gray-500">
                           {item.desc}
                         </p>
+
+                        {item.title === 'Reliable vehicle planning' && (
+                          <div className="mt-2">
+                            <p className="mb-2 font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-black/35">
+                              Fleet support
+                            </p>
+
+                            <div className="grid grid-cols-3 gap-1.5">
+                              {[
+                                '/images/content/vehicles/hyundai-staria-silver.webp',
+                                '/images/content/vehicles/hyundai-staria-white.webp',
+                                '/images/content/vehicles/mitsubishi-xpander.webp',
+                              ].map((src, index) => (
+                                <img
+                                  key={src}
+                                  src={src}
+                                  className="h-12 w-full rounded-lg object-cover shadow-sm"
+                                  alt={['Hyundai Staria Silver', 'Hyundai Staria White', 'Mitsubishi Xpander'][index]}
+                                  loading="lazy"
+                                  decoding="async"
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
 
-                      <div className="flex items-center justify-between border-t border-black/5 pt-4">
-                        <p className="font-bitter text-xs font-bold uppercase tracking-[0.16em] text-black/40">
+                      <div className="flex items-center justify-between border-t border-black/5 pt-3">
+                        <p className="font-bitter text-[11px] font-bold uppercase tracking-[0.16em] text-black/40">
                           Cape Frontier
                         </p>
 
@@ -538,11 +577,34 @@ const WhatMakesUsDifferent = () => {
               ))}
             </div>
 
-            <div className="mt-6 flex justify-center">
-              <button className="flex items-center justify-center gap-4 rounded-xl bg-blue-400 px-8 py-4 font-bold text-white transition-all hover:scale-[1.02] hover:bg-blue-500">
+            <div className="relative z-10 mt-3 grid gap-2 sm:grid-cols-2">
+              <div className="rounded-[1rem] bg-white/75 px-4 py-3 shadow-sm">
+                <p className="font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-blue-700">
+                  Reschedule support
+                </p>
+                <p className="mt-1 font-bitter text-xs leading-relaxed text-black/50">
+                  Weather-affected trips can be guided through reschedule options depending on availability.
+                </p>
+              </div>
+
+              <div className="rounded-[1rem] bg-white/75 px-4 py-3 shadow-sm">
+                <p className="font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-green-700">
+                  Refund clarity
+                </p>
+                <p className="mt-1 font-bitter text-xs leading-relaxed text-black/50">
+                  Refund handling follows the stated cancellation window, with weather cases reviewed fairly.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative z-10 mt-4 flex justify-center">
+              <a
+                href="#popular-tours"
+                className="flex items-center justify-center gap-3 rounded-full bg-blue-400 px-6 py-3 font-bold text-white transition-all hover:-translate-y-0.5 hover:scale-[1.02] hover:bg-blue-500"
+              >
                 Learn More
                 <img src="/icons/go.png" className="h-4 w-4 object-contain" alt="" />
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -550,7 +612,5 @@ const WhatMakesUsDifferent = () => {
     </section>
   )
 }
-
-
 
 export default WhatMakesUsDifferent
