@@ -10,7 +10,7 @@ import React, {
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import TourBrowser from "./ToursBrowser";
-import TourSelectDeck from "./TourSelectSideDeck";
+import TourSelect from "./TourSelect";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -295,11 +295,11 @@ const Tours = () => {
             {/* right 1/2 */}
             <div className="tours-step-card flex min-h-[320px] w-full flex-col gap-3 overflow-visible">
               <div className="relative z-10 w-full flex-1">
-                <TourSelectDeck />
+                <TourSelect />
               </div>
 
               {/* pills kept */}
-              <div className="flex flex-wrap gap-2">
+              {/* <div className="flex flex-wrap gap-2">
                 {ribbonItems.map((item) => (
                   <div
                     key={item.label}
@@ -309,7 +309,7 @@ const Tours = () => {
                     {item.badge && <Bubble>{item.badge}</Bubble>}
                   </div>
                 ))}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
