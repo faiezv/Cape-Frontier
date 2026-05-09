@@ -1,3 +1,213 @@
+/*
+===============================================================================
+TOURSBROWSER QUICK SCAN REFERENCE
+===============================================================================
+
+PURPOSE
+- Displays Cape Frontier tours by category.
+- Mobile/tablet: category navbar pins above the tour cards.
+- Desktop: category navbar stays on the left.
+- Each category uses a pinned card deck where tours transition one after another.
+- Cards are intentionally NOT stretched to fill the full viewport so more content
+  can be added underneath later.
+
+-------------------------------------------------------------------------------
+1) IMPORTS
+-------------------------------------------------------------------------------
+- React hooks:
+  useRef, useEffect, useLayoutEffect, useState, useCallback, useMemo
+- createPortal:
+  used for the decked details overlay modal.
+- GSAP / ScrollTrigger / ScrollToPlugin:
+  used for card pinning, scroll snapping, reveal animations, and scroll-to-category.
+- useNavigate:
+  routes users to the full tour page or booking section.
+- tours data:
+  comes from /src/data/tours.js and drives all categories/cards.
+
+-------------------------------------------------------------------------------
+2) TOP CONSTANTS + NAV OFFSETS
+-------------------------------------------------------------------------------
+- DESKTOP_DECK_PIN_TOP_OFFSET:
+  desktop card deck pin start offset.
+- MOBILE_NAV_TOP_OFFSET:
+  base mobile nav offset.
+- getMobileNavTopOffset():
+  returns different top offsets for phone/tablet/large screens.
+- getDeckPinTopOffset():
+  calculates how far below the pinned navbar the card deck should start.
+  This prevents cards from sliding underneath the mobile/tablet navbar.
+  mobileCardGap adds extra breathing room below the navbar.
+
+-------------------------------------------------------------------------------
+3) CATEGORY DEFINITIONS
+-------------------------------------------------------------------------------
+- TYPE_LABELS:
+  maps tour type ids to readable labels.
+- CATEGORY_LABELS:
+  maps tour modifiers to readable labels.
+- browseSections:
+  controls the category navbar:
+  Adrenaline, Hiking, Historical, Packages.
+  Wine routes are grouped under Packages.
+
+-------------------------------------------------------------------------------
+4) TEXT + DATA HELPERS
+-------------------------------------------------------------------------------
+- toText():
+  safely converts strings, numbers, arrays, and objects into readable text.
+- getLocationText():
+  extracts a readable location from tour.location or stops.
+- getStopText():
+  extracts stop names for previews.
+- getCategoryText() / getTypeText():
+  returns readable labels for each tour.
+- getGroupDiscountText(), getCancellationText(), getWeatherText():
+  builds trust/policy copy for side pills.
+
+-------------------------------------------------------------------------------
+5) IMAGE FALLBACK HELPERS
+-------------------------------------------------------------------------------
+- uniqueList():
+  removes duplicate image paths.
+- getImagePathAliases():
+  tries alternate known folder names when an image path fails.
+  Example: paragliding / para-gliding, langa / langa-township.
+- getTourImageSources():
+  builds fallback source list for a tour image.
+- getReviewAvatarSources():
+  builds fallback source list for review avatars.
+- FallbackImage:
+  reusable image component that tries multiple sources before hiding/fallback.
+
+-------------------------------------------------------------------------------
+6) SMALL UI COMPONENTS
+-------------------------------------------------------------------------------
+- ReviewAvatars:
+  stacked avatar bubbles used inside tour cards.
+- StarRating:
+  normal SVG stars for ratings.
+- FloatingTooltip:
+  hover tooltip used around the review area.
+- TickItem / PreviewSection:
+  reusable blocks for the learn-more drawer previews.
+- GroupDiscountPreview / PickupPreview / StopsPreview:
+  preview sections shown in the details drawer.
+
+-------------------------------------------------------------------------------
+7) LEARN MORE DRAWER
+-------------------------------------------------------------------------------
+- LearnMoreDrawer:
+  expandable detail area for non-decked cards.
+  Shows:
+  tour description, highlights, pickup, group discount, images, included items,
+  stops, and need-to-know items.
+- DeckDetailsOverlay:
+  when a card is inside the pinned deck, details open in a portal overlay instead
+  of expanding inside the pinned card stack.
+
+-------------------------------------------------------------------------------
+8) TOUR CARD
+-------------------------------------------------------------------------------
+- TourCard:
+  the main visual card for each tour.
+  Handles:
+  - image panel
+  - price/currency conversion
+  - location + duration cards
+  - review preview area
+  - details button
+  - request trip button
+  - route navigation to /tours/:slug and /tours/:slug#booking
+
+Important refs:
+- cardRef: whole card
+- imgRef: image being animated
+- contentRef: right-side content animation
+- priceRef: price reveal
+- review refs: open/close review animation
+- chevronRef: details arrow rotation
+
+Important state:
+- open: details drawer/overlay state
+- reviewOpen: expands review preview
+- currency: selected currency display
+
+-------------------------------------------------------------------------------
+9) CATEGORY SECTION / PINNED CARD DECK
+-------------------------------------------------------------------------------
+- CategorySection:
+  one full category group.
+  It creates a pinned deck of cards for that category.
+
+Important logic:
+- cards are positioned absolute inside pinRef.
+- each card is stacked by z-index.
+- ScrollTrigger pins pinRef.
+- timeline clips the previous card upward and reveals the next card.
+- snap locks to full-opacity card states so text/images do not stop mid-fade.
+- onSnapComplete hard-sets the active image/content to the clean final state.
+
+Important note:
+- setPinHeight() uses natural card height, not remaining viewport height.
+  This keeps cards from stretching and leaves room for future content underneath.
+
+-------------------------------------------------------------------------------
+10) DESKTOP SIDE PILLS
+-------------------------------------------------------------------------------
+- DesktopTourSidePills:
+  visible on xl screens only.
+  Shows:
+  - group discount / save more
+  - cancellation summary
+  - weather planning note
+- These are outside the card but tied to the active stacked card.
+
+-------------------------------------------------------------------------------
+11) CATEGORY NAVBAR
+-------------------------------------------------------------------------------
+- BrowseButton:
+  each category tab in the nav.
+- CategoryProgressDots:
+  small progress dots showing current tour index within active category.
+
+Mobile/tablet navbar:
+- mobileNavRef is pinned with ScrollTrigger.
+- mobileNavScrollerRef allows horizontal scrolling.
+- mobileCategoryItemRefs stores each category tab.
+- active category auto-scrolls into view so Historical/Packages do not sit off-screen.
+- mobile heading text was removed for compactness.
+
+Desktop navbar:
+- railSlotRef and railRef control the left-side rail.
+- progress is kept inside the desktop rail to avoid overlapping cards.
+
+-------------------------------------------------------------------------------
+12) MAIN TOURSBROWSER COMPONENT
+-------------------------------------------------------------------------------
+- visibleSections:
+  filters tours into the category groups.
+- currentSection/currentTourIndex:
+  tracks current category and active card number.
+- activateCategory():
+  updates active category when nav is clicked.
+- handleTourProgress():
+  updates active category and active tour while scrolling.
+- scrollTo():
+  scrolls to category section with the correct navbar/card offset.
+
+-------------------------------------------------------------------------------
+MAINTENANCE NOTES
+-------------------------------------------------------------------------------
+- Do not reintroduce full viewport card stretching unless specifically requested.
+- Keep mobile navbar pinning logic stable; it is sensitive to ScrollTrigger timing.
+- When changing card heights, run ScrollTrigger.refresh().
+- If images show black bars, avoid yPercent image movement inside dark panels.
+- Prefer data from tours.js and reviews.js instead of hardcoding tour/review content.
+
+===============================================================================
+*/
+
 import {
   useRef,
   useEffect,
@@ -5,6 +215,7 @@ import {
   useState,
   useCallback,
   useMemo,
+  forwardRef,
 } from "react";
 import { createPortal } from "react-dom";
 import { gsap } from "gsap";
@@ -12,17 +223,28 @@ import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useNavigate } from "react-router-dom";
 import { tours, TOUR_TYPES, TOUR_MODIFIERS, FX_RATES } from "/src/data/tours.js";
+import reviews from "/src/data/reviews.js";
 
 gsap.registerPlugin(ScrollToPlugin, ScrollTrigger);
 
 const DESKTOP_DECK_PIN_TOP_OFFSET = 104;
-const RESPONSIVE_DECK_PIN_TOP_OFFSET = 176;
+const MOBILE_NAV_TOP_OFFSET = 48;
+
+const getMobileNavTopOffset = () => {
+  if (typeof window === "undefined") return MOBILE_NAV_TOP_OFFSET;
+  return window.innerWidth < 640 ? 46 : window.innerWidth < 1024 ? 58 : 72;
+};
 
 const getDeckPinTopOffset = () => {
   if (typeof window === "undefined") return DESKTOP_DECK_PIN_TOP_OFFSET;
-  return window.innerWidth < 1280
-    ? RESPONSIVE_DECK_PIN_TOP_OFFSET
-    : DESKTOP_DECK_PIN_TOP_OFFSET;
+
+  if (window.innerWidth < 1280) {
+    const nav = document.querySelector("[data-mobile-category-nav]");
+    const mobileCardGap = window.innerWidth < 768 ? 28 : 16;
+    return getMobileNavTopOffset() + (nav?.offsetHeight || 118) + mobileCardGap;
+  }
+
+  return DESKTOP_DECK_PIN_TOP_OFFSET;
 };
 
 const TYPE_LABELS = {
@@ -144,6 +366,402 @@ function getCategoryText(tour) {
 function getTypeText(tour) {
   return TYPE_LABELS[tour.type] || toText(tour.type, "Guided Tour");
 }
+
+function uniqueList(items = []) {
+  return Array.from(new Set(items.filter(Boolean)));
+}
+
+function getImagePathAliases(path = "") {
+  if (!path) return [];
+
+  const aliases = [path];
+
+  const replacements = [
+    ["/adrenaline/paragliding/", "/adrenaline/para-gliding/"],
+    ["/adrenaline/para-gliding/", "/adrenaline/paragliding/"],
+    ["/historical/langa/", "/historical/langa-township/"],
+    ["/historical/langa-township/", "/historical/langa/"],
+    ["/hiking/platteklip/", "/hiking/platteklip-gorge/"],
+    ["/hiking/platteklip-gorge/", "/hiking/platteklip/"],
+    ["/packages/peninsula-tour-1/boulders-beach/", "/packages/peninsula-tour-1/boulders/"],
+    ["/packages/peninsula-tour-1/boulders/", "/packages/peninsula-tour-1/boulders-beach/"],
+    ["/packages/stellenbosch-wine-farms/delaire/", "/wine-routes/delaire-graff/"],
+    ["/wine-routes/delaire-graff/", "/packages/stellenbosch-wine-farms/delaire/"],
+  ];
+
+  replacements.forEach(([from, to]) => {
+    if (path.includes(from)) {
+      aliases.push(path.replace(from, to));
+    }
+  });
+
+  return aliases;
+}
+
+function getTourImageSources(tour) {
+  const baseSources = [
+    tour?.image,
+    ...(Array.isArray(tour?.images) ? tour.images : []),
+    tour?.cover,
+    tour?.img,
+  ];
+
+  return uniqueList(baseSources.flatMap(getImagePathAliases));
+}
+
+function getReviewAvatarSources(review) {
+  const avatar = toText(review?.avatar);
+  const match = avatar.match(/(\d+)\.(webp|png|jpg|jpeg)$/i);
+  const id = review?.id || match?.[1] || 1;
+
+  return uniqueList([
+    `/images/content/reviews/profile-photos/${id}.webp`,
+    `/images/reviews/profile-photos/${id}.webp`,
+    avatar,
+    "/images/content/reviews/profile-photos/1.webp",
+    "/images/reviews/profile-photos/1.webp",
+  ]);
+}
+
+const FallbackImage = forwardRef(function FallbackImage(
+  { sources = [], onFinalError, onError, ...props },
+  ref,
+) {
+  const cleanSources = uniqueList(Array.isArray(sources) ? sources : [sources]);
+  const [sourceIndex, setSourceIndex] = useState(0);
+  const src = cleanSources[sourceIndex] || "";
+
+  useEffect(() => {
+    setSourceIndex(0);
+  }, [cleanSources.join("|")]);
+
+  return (
+    <img
+      ref={ref}
+      {...props}
+      src={src}
+      onError={(event) => {
+        onError?.(event);
+
+        if (sourceIndex < cleanSources.length - 1) {
+          setSourceIndex((index) => index + 1);
+          return;
+        }
+
+        onFinalError?.(event);
+      }}
+    />
+  );
+});
+
+
+function normalizeReviewText(value, fallback = "") {
+  return toText(value, fallback).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function getReviewAvatar(review) {
+  return getReviewAvatarSources(review)[0];
+}
+
+function getInitials(name = "Guest") {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+}
+
+function getReviewsForTour(tour) {
+  const allReviews = Array.isArray(reviews) ? reviews : [];
+  const tourTitle = normalizeReviewText(tour?.title);
+  const tourType = normalizeReviewText(getTypeText(tour));
+  const tourCategory = normalizeReviewText(getCategoryText(tour));
+
+  const exactMatches = allReviews.filter((review) => {
+    const reviewTour = normalizeReviewText(review?.tour);
+    const reviewTitle = normalizeReviewText(review?.title);
+
+    return (
+      (tourTitle && reviewTour && (reviewTour.includes(tourTitle) || tourTitle.includes(reviewTour))) ||
+      (tourTitle && reviewTitle && reviewTitle.includes(tourTitle.split(" ")[0]))
+    );
+  });
+
+  if (exactMatches.length >= 2) return exactMatches.slice(0, 4);
+  if (exactMatches.length === 1) {
+    const otherMatches = allReviews.filter((review) => review.id !== exactMatches[0].id).slice(0, 3);
+    return [...exactMatches, ...otherMatches].slice(0, 4);
+  }
+
+  const relatedMatches = allReviews.filter((review) => {
+    const haystack = normalizeReviewText(`${review?.tour || ""} ${review?.title || ""} ${review?.desc || ""}`);
+
+    return (
+      (tourType && haystack.includes(tourType.split(" ")[0])) ||
+      (tourCategory && haystack.includes(tourCategory.split(" ")[0])) ||
+      haystack.includes("cape town")
+    );
+  });
+
+  const fallbackStart = Math.abs(Number(tour?.id || 0)) % Math.max(allReviews.length, 1);
+  const fallback = [...allReviews.slice(fallbackStart), ...allReviews.slice(0, fallbackStart)];
+
+  return (relatedMatches.length ? relatedMatches : fallback).slice(0, 4);
+}
+
+const reviewPastelClasses = [
+  "bg-green-200/78",
+  "bg-blue-100/78",
+  "bg-emerald-100/82",
+];
+
+function ReviewMiniReplaceCard({ tour, tourReviews, slotIndex = 0, className = "" }) {
+  const cardRef = useRef(null);
+  const wordsRef = useRef(null);
+  const currentIndexRef = useRef(slotIndex);
+  const isAnimatingRef = useRef(false);
+  const [activeIndex, setActiveIndex] = useState(slotIndex);
+  const [toneIndex, setToneIndex] = useState(slotIndex);
+
+  const activeReview =
+    tourReviews[activeIndex % Math.max(tourReviews.length, 1)] || {
+      title: "Smooth Cape Town experience",
+      desc: "Organised, friendly, and easy to enjoy from pickup to the final stop.",
+      name: "Cape Frontier guest",
+      country: "Traveller",
+      date: "2026",
+      rating: 4.8,
+      tour: tour?.title || "Cape Town tour",
+      verified: true,
+      id: slotIndex + 1,
+    };
+
+  const replaceReview = useCallback(() => {
+    if (!wordsRef.current || !cardRef.current || tourReviews.length <= 1 || isAnimatingRef.current) return;
+
+    isAnimatingRef.current = true;
+
+    const nextIndex = (currentIndexRef.current + 3) % tourReviews.length;
+    const wordParts = wordsRef.current.querySelectorAll("[data-review-word-part]");
+
+    const tl = gsap.timeline({
+      defaults: {
+        overwrite: "auto",
+      },
+      onComplete: () => {
+        isAnimatingRef.current = false;
+      },
+    });
+
+    tl.to(cardRef.current, {
+      y: -2,
+      scale: 0.992,
+      autoAlpha: 0.86,
+      duration: 0.18,
+      ease: "power2.inOut",
+    })
+      .to(
+        wordParts,
+        {
+          y: -12,
+          autoAlpha: 0,
+          filter: "blur(2px)",
+          stagger: 0.022,
+          duration: 0.18,
+          ease: "power2.in",
+        },
+        0,
+      )
+      .add(() => {
+        currentIndexRef.current = nextIndex;
+        setActiveIndex(nextIndex);
+        setToneIndex((prev) => (prev + 1) % reviewPastelClasses.length);
+      })
+      .set(wordParts, {
+        y: 12,
+        autoAlpha: 0,
+        filter: "blur(2px)",
+      })
+      .to(cardRef.current, {
+        y: 0,
+        scale: 1,
+        autoAlpha: 1,
+        duration: 0.24,
+        ease: "power3.out",
+      })
+      .to(
+        wordParts,
+        {
+          y: 0,
+          autoAlpha: 1,
+          filter: "blur(0px)",
+          stagger: 0.03,
+          duration: 0.23,
+          ease: "power3.out",
+        },
+        "-=0.18",
+      );
+  }, [tourReviews.length]);
+
+  useEffect(() => {
+    if (tourReviews.length <= 1) return undefined;
+
+    const interval = window.setInterval(replaceReview, 5600 + slotIndex * 520);
+
+    return () => window.clearInterval(interval);
+  }, [replaceReview, tourReviews.length, slotIndex]);
+
+  return (
+    <article
+      ref={cardRef}
+      className={`relative min-w-0 overflow-hidden rounded-[0.95rem] px-3 py-2.5 shadow-[0_8px_20px_rgba(22,101,52,0.07)] ring-1 ring-white/55 transition-colors duration-500 ${reviewPastelClasses[toneIndex]} ${className}`}
+      data-tour-review-card
+    >
+      <div className="pointer-events-none absolute -right-8 -top-8 h-20 w-20 rounded-full bg-white/35 blur-2xl" />
+
+      <div ref={wordsRef} className="relative z-10">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="relative grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-white/80 text-[9px] font-bold text-green-900 shadow-sm">
+              <span>{getInitials(activeReview.name)}</span>
+              <FallbackImage
+                sources={getReviewAvatarSources(activeReview)}
+                alt={activeReview.name || "Guest"}
+                className="absolute inset-0 h-full w-full object-cover"
+                loading="lazy"
+                decoding="async"
+                onFinalError={(event) => {
+                  event.currentTarget.style.display = "none";
+                }}
+              />
+            </div>
+
+            <div className="min-w-0">
+              <p
+                data-review-word-part
+                className="line-clamp-1 font-frank text-base font-bold leading-none text-green-950"
+              >
+                {toText(activeReview.title, "Guest experience")}
+              </p>
+
+              <p
+                data-review-word-part
+                className="mt-1 truncate font-bitter text-[8px] font-black uppercase tracking-[0.13em] text-green-900/45"
+              >
+                {toText(activeReview.tour, tour?.title || "Cape Frontier tour")}
+              </p>
+            </div>
+          </div>
+
+          <p
+            data-review-word-part
+            className="shrink-0 rounded-full bg-white/75 px-2 py-1 font-frank text-sm font-bold leading-none text-green-950 shadow-sm"
+          >
+            {Number(activeReview.rating || 4.8).toFixed(1)}
+          </p>
+        </div>
+
+        <div className="mt-2 flex items-center justify-between gap-2 border-t border-green-900/10 pt-2">
+          <div className="min-w-0">
+            <p
+              data-review-word-part
+              className="truncate font-bitter text-[10px] font-bold text-green-950"
+            >
+              {toText(activeReview.name, "Cape Frontier guest")}
+              {activeReview.country ? ` · ${activeReview.country}` : ""}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={replaceReview}
+            className="shrink-0 rounded-full bg-white px-2.5 py-1 font-bitter text-[8px] font-black uppercase tracking-[0.12em] text-green-950 shadow-sm transition hover:-translate-y-0.5"
+          >
+            Click to see review
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function ReviewFlipCard({ tour }) {
+  const wrapRef = useRef(null);
+  const tourReviews = useMemo(() => getReviewsForTour(tour), [tour]);
+
+  useLayoutEffect(() => {
+    if (!wrapRef.current) return undefined;
+
+    const ctx = gsap.context(() => {
+      const reviewCards = wrapRef.current.querySelectorAll("[data-tour-review-card]");
+      const words = wrapRef.current.querySelectorAll("[data-review-word-part]");
+
+      gsap.set(words, {
+        autoAlpha: 0,
+        y: 10,
+      });
+
+      gsap.fromTo(
+        reviewCards,
+        {
+          autoAlpha: 0,
+          y: 10,
+          scale: 0.992,
+        },
+        {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          stagger: 0.06,
+          duration: 0.3,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: wrapRef.current,
+            start: "top 94%",
+            once: true,
+            onEnter: () => {
+              gsap.to(words, {
+                autoAlpha: 1,
+                y: 0,
+                stagger: 0.016,
+                duration: 0.22,
+                ease: "power3.out",
+              });
+            },
+          },
+        },
+      );
+    }, wrapRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <div
+      ref={wrapRef}
+      className="relative z-10 mt-2 grid grid-cols-1 gap-2 overflow-visible pb-0 md:grid-cols-2 lg:grid-cols-3"
+    >
+      {[0, 1, 2].map((slotIndex) => (
+        <ReviewMiniReplaceCard
+          key={`${tour?.id || tour?.slug || "tour"}-review-face-${slotIndex}`}
+          tour={tour}
+          tourReviews={tourReviews}
+          slotIndex={slotIndex}
+          className={
+            slotIndex === 0
+              ? ""
+              : slotIndex === 1
+                ? "hidden md:block"
+                : "hidden lg:block"
+          }
+        />
+      ))}
+    </div>
+  );
+}
+
 
 function ReviewAvatars() {
   return (
@@ -290,15 +908,13 @@ function FloatingTooltip({
         ref={tooltipRef}
         className={`
           pointer-events-none absolute z-50
-          ${
-            followCursor
-              ? "left-0 top-0 opacity-0"
-              : positionClasses[position] || positionClasses.top
+          ${followCursor
+            ? "left-0 top-0 opacity-0"
+            : positionClasses[position] || positionClasses.top
           }
-          ${
-            followCursor
-              ? ""
-              : "opacity-0 translate-y-1 scale-95 group-hover/tooltip:opacity-100 group-hover/tooltip:translate-y-0 group-hover/tooltip:scale-100 group-focus-within/tooltip:opacity-100 group-focus-within/tooltip:translate-y-0 group-focus-within/tooltip:scale-100 transition-all duration-300 ease-out"
+          ${followCursor
+            ? ""
+            : "opacity-0 translate-y-1 scale-95 group-hover/tooltip:opacity-100 group-hover/tooltip:translate-y-0 group-hover/tooltip:scale-100 group-focus-within/tooltip:opacity-100 group-focus-within/tooltip:translate-y-0 group-focus-within/tooltip:scale-100 transition-all duration-300 ease-out"
           }
         `}
       >
@@ -369,7 +985,7 @@ function GroupDiscountPreview({ groupDiscount }) {
               <img
                 src="/icons/savemore.png"
                 alt="savemore"
-                className="h-6 w-6 object-contain"
+                className="h-5 w-5 object-contain"
                 onError={(e) => {
                   e.currentTarget.style.display = "none";
                 }}
@@ -402,11 +1018,10 @@ function PickupPreview({ pickupOptions = [] }) {
           return (
             <span
               key={option}
-              className={`rounded-full border px-3 py-1.5 text-xs font-bitter ${
-                isCustom
+              className={`rounded-full border px-3 py-1.5 text-xs font-bitter ${isCustom
                   ? "bg-green-200 border-green-300 text-green-950 font-semibold shadow-sm"
                   : "bg-white border-black/10 text-neutral-600"
-              }`}
+                }`}
             >
               {option}
             </span>
@@ -626,13 +1241,16 @@ function LearnMoreDrawer({ tour, isOpen, onFullTour, onBook, onClose }) {
                   <div data-preview-item>
                     <div className="grid grid-cols-3 gap-3 rounded-[1.75rem] bg-neutral-50/90 p-2.5 sm:p-3">
                       {images.slice(0, 3).map((image, index) => (
-                        <img
+                        <FallbackImage
                           key={`${tour.slug}-preview-image-${index}`}
-                          src={image}
+                          sources={getImagePathAliases(image)}
                           alt={`${tour.title} ${index + 1}`}
                           className="h-36 sm:h-44 w-full rounded-3xl object-cover"
                           loading="lazy"
                           decoding="async"
+                          onFinalError={(event) => {
+                            event.currentTarget.style.display = "none";
+                          }}
                         />
                       ))}
                     </div>
@@ -1084,7 +1702,7 @@ function TourCard({ tour, decked = false }) {
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="w-full rounded-[1.5rem] sm:rounded-[2rem] shadow-[0_14px_42px_rgba(0,0,0,0.08)] sm:shadow-[0_18px_60px_rgba(0,0,0,0.08)] my-3 sm:my-5 overflow-hidden relative border border-black/5 bg-white"
+      className={`w-full rounded-[1.5rem] sm:rounded-[2rem] shadow-[0_14px_42px_rgba(0,0,0,0.08)] sm:shadow-[0_18px_60px_rgba(0,0,0,0.08)] my-3 sm:my-5 overflow-hidden relative border border-black/5 bg-white ${decked ? "max-xl:my-0" : ""}`}
       data-tour-card
       style={{ opacity: decked ? 1 : 0 }}
     >
@@ -1101,27 +1719,25 @@ function TourCard({ tour, decked = false }) {
 
       <div className="relative">
         <div
-          className={`absolute inset-0 z-30 bg-black/55 backdrop-blur-[1.5px] transition-all duration-500 ease-out pointer-events-none ${
-            open ? "opacity-100" : "opacity-0"
-          }`}
+          className={`absolute inset-0 z-30 bg-black/55 backdrop-blur-[1.5px] transition-all duration-500 ease-out pointer-events-none ${open ? "opacity-100" : "opacity-0"
+            }`}
         />
 
         <div
-          className={`grid grid-cols-1 md:grid-cols-2 text-black font-bitter bg-white min-h-[auto] md:min-h-[390px] xl:min-h-[420px] transition-all duration-500 ease-out ${
-            open ? "scale-[0.985] brightness-75" : "scale-100 brightness-100"
-          }`}
+          className={`grid grid-cols-1 md:grid-cols-2 text-black font-bitter bg-white min-h-[auto] md:min-h-[390px] xl:min-h-[420px] transition-all duration-500 ease-out ${decked ? "max-xl:min-h-0" : ""} ${open ? "scale-[0.985] brightness-75" : "scale-100 brightness-100"
+            }`}
         >
-          <div data-card-image-panel className="relative overflow-hidden min-h-[210px] sm:min-h-[280px] md:min-h-[390px] xl:min-h-[420px] bg-black">
-            <img
+          <div data-card-image-panel className="relative overflow-hidden min-h-[210px] sm:min-h-[260px] md:min-h-[360px] xl:min-h-[420px] bg-neutral-900">
+            <FallbackImage
               data-card-image
               ref={imgRef}
-              src={tour.image}
+              sources={getTourImageSources(tour)}
               alt={tour.title}
               className="absolute inset-0 w-full h-full object-cover"
               loading="lazy"
               decoding="async"
               style={{ willChange: "transform" }}
-              onError={(e) => {
+              onFinalError={(e) => {
                 e.currentTarget.style.display = "none";
                 e.currentTarget.parentNode.style.background =
                   "linear-gradient(135deg,#0f2027,#203a43,#2c5364)";
@@ -1139,18 +1755,18 @@ function TourCard({ tour, decked = false }) {
             <div className="absolute -top-24 -right-24 z-10 h-56 w-56 rounded-full bg-green-200/20 blur-3xl" />
             <div className="absolute -bottom-20 -left-20 z-10 h-52 w-52 rounded-full bg-blue-300/10 blur-3xl" />
 
-            <div className="absolute top-5 left-5 right-5 z-20 flex items-start justify-between gap-3">
+            <div className="absolute top-4 left-4 right-4 z-20 flex items-start justify-between gap-2 sm:top-5 sm:left-5 sm:right-5 sm:gap-3">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-green-200/95 border border-white/25 px-4 py-1.5 text-xs text-green-950 font-bitter font-semibold shadow-lg">
+                <span className="rounded-full bg-green-200/95 border border-white/25 px-3 py-1.5 text-[11px] text-green-950 font-bitter font-semibold shadow-lg sm:px-4 sm:text-xs">
                   {categoryLabel}
                 </span>
 
-                <span className="rounded-full bg-white/15 backdrop-blur-md border border-white/20 px-4 py-1.5 text-xs text-white/90 font-bitter shadow-lg">
+                <span className="rounded-full bg-white/15 backdrop-blur-md border border-white/20 px-3 py-1.5 text-[11px] text-white/90 font-bitter shadow-lg sm:px-4 sm:text-xs">
                   {typeLabel}
                 </span>
               </div>
 
-              <div className="h-14 w-14 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex flex-col items-center justify-center shadow-lg shrink-0">
+              <div className="h-12 w-12 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex flex-col items-center justify-center shadow-lg shrink-0 sm:h-14 sm:w-14">
                 <span className="text-white font-frank text-xl font-bold leading-none">
                   {tour.rating}
                 </span>
@@ -1161,24 +1777,24 @@ function TourCard({ tour, decked = false }) {
               </div>
             </div>
 
-            <div className="absolute bottom-0 left-0 right-0 z-20 p-5 sm:p-6 md:p-7 xl:p-8">
+            <div className="absolute bottom-0 left-0 right-0 z-20 p-4 sm:p-6 md:p-7 xl:p-8">
               <div className="relative">
                 <span className="text-white/55 text-[11px] uppercase tracking-[0.22em] font-bitter">
                   {categoryLabel} · {typeLabel}
                 </span>
 
-                <h3 className="mt-3 text-white font-frank text-3xl sm:text-4xl xl:text-5xl font-bold leading-[0.9] drop-shadow-lg max-w-[12ch]">
+                <h3 className="mt-2 text-white font-frank text-2xl sm:text-4xl xl:text-5xl font-bold leading-[0.9] drop-shadow-lg max-w-[12ch]">
                   {tour.title}
                 </h3>
 
-                <div className="mt-5 h-px w-24 bg-green-200/80" />
+                <div className="mt-3 h-px w-20 bg-green-200/80 sm:mt-5 sm:w-24" />
               </div>
             </div>
           </div>
 
           <div ref={contentRef} data-card-content-panel className="flex flex-col bg-white">
-            <div className="flex-1 p-4 sm:p-5 md:p-7 xl:p-8 flex flex-col justify-between gap-3.5 sm:gap-5 xl:gap-6">
-              <div data-card-stagger-item className="flex items-end justify-between gap-5">
+            <div className={`p-4 sm:p-5 md:p-6 xl:p-8 flex flex-col justify-start gap-3 sm:gap-4 xl:gap-5 ${decked ? "max-xl:p-3 max-xl:gap-2.5" : ""}`}>
+              <div data-card-stagger-item className="flex items-center justify-between gap-4">
                 <div>
                   <span className="block leading-none text-[11px] uppercase tracking-[0.2em] text-red-400 font-bitter">
                     From
@@ -1186,7 +1802,7 @@ function TourCard({ tour, decked = false }) {
 
                   <div ref={priceRef} style={{ opacity: 0 }} className="mt-0.5">
                     <p className="flex items-end gap-2">
-                      <span className="font-frank font-bold text-neutral-950 tracking-tight leading-none text-3xl sm:text-4xl xl:text-5xl">
+                      <span className="font-frank font-bold text-neutral-950 tracking-tight leading-none text-2xl sm:text-4xl xl:text-5xl">
                         {displayPrice}
                       </span>
 
@@ -1201,8 +1817,8 @@ function TourCard({ tour, decked = false }) {
                   <select
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
-                    className="w-fit flex justify-center items-center p-4
-                    rounded-2xl text-lg border border-black/10 bg-neutral-50 text-neutral-700 
+                    className="w-fit flex justify-center items-center p-2.5 sm:p-3
+                    rounded-2xl text-sm sm:text-base border border-black/10 bg-neutral-50 text-neutral-700 
                     font-bitter hover:border-red-300 focus:border-red-400 transition-colors"
                   >
                     {supportedCurrencies.map((code) => (
@@ -1214,8 +1830,8 @@ function TourCard({ tour, decked = false }) {
                 </div>
               </div>
 
-              <div ref={metaWrapRef} data-card-stagger-item className="grid grid-cols-2 gap-3">
-                <div className="group rounded-2xl bg-neutral-50 border border-black/5 px-4 py-4 transition-all duration-300 hover:bg-green-200 hover:border-green-300 hover:-translate-y-0.5">
+              <div ref={metaWrapRef} data-card-stagger-item className="grid grid-cols-2 gap-2 sm:gap-3">
+                <div className="group rounded-2xl bg-neutral-50 border border-black/5 px-3 py-2.5 sm:px-4 sm:py-4 transition-all duration-300 hover:bg-green-200 hover:border-green-300 hover:-translate-y-0.5">
                   <div className="flex items-center gap-2 text-neutral-400 group-hover:text-green-900 transition-colors">
                     <img
                       src="/icons/mapPin.png"
@@ -1231,12 +1847,12 @@ function TourCard({ tour, decked = false }) {
                     </span>
                   </div>
 
-                  <p className="mt-2 text-sm text-neutral-700 group-hover:text-green-950 leading-snug font-bitter transition-colors">
+                  <p className="mt-1 text-xs sm:mt-2 sm:text-sm text-neutral-700 group-hover:text-green-950 leading-snug font-bitter transition-colors">
                     {locationText}
                   </p>
                 </div>
 
-                <div className="group rounded-2xl bg-neutral-50 border border-black/5 px-4 py-4 transition-all duration-300 hover:bg-green-200 hover:border-green-300 hover:-translate-y-0.5">
+                <div className="group rounded-2xl bg-neutral-50 border border-black/5 px-3 py-2.5 sm:px-4 sm:py-4 transition-all duration-300 hover:bg-green-200 hover:border-green-300 hover:-translate-y-0.5">
                   <div className="flex items-center gap-2 text-neutral-400 group-hover:text-green-900 transition-colors">
                     <svg
                       width="15"
@@ -1256,7 +1872,7 @@ function TourCard({ tour, decked = false }) {
                     </span>
                   </div>
 
-                  <p className="mt-2 text-sm text-neutral-700 group-hover:text-green-950 leading-snug font-bitter transition-colors">
+                  <p className="mt-1 text-xs sm:mt-2 sm:text-sm text-neutral-700 group-hover:text-green-950 leading-snug font-bitter transition-colors">
                     {toText(tour.duration, "Flexible")}
                   </p>
                 </div>
@@ -1265,7 +1881,7 @@ function TourCard({ tour, decked = false }) {
               <div
                 data-card-stagger-item
                 ref={reviewWrapRef}
-                className={`${reviewOpen ? "flex min-h-[260px]" : "block"}`}
+                className={`${reviewOpen ? "flex min-h-[260px] max-xl:min-h-0" : "block"}`}
               >
                 <FloatingTooltip
                   text="Review"
@@ -1278,11 +1894,10 @@ function TourCard({ tour, decked = false }) {
                     ref={reviewCardRef}
                     type="button"
                     onClick={handleReviewToggle}
-                    className={`w-full text-left rounded-3xl border px-5 py-4 overflow-hidden transition-colors duration-500
-                      ${
-                        reviewOpen
-                          ? "h-full min-h-[260px] flex flex-col justify-between bg-green-200 border-green-300 shadow-sm will-change-transform"
-                          : "bg-green-50/70 border-green-100 hover:bg-green-200 hover:border-green-300"
+                    className={`w-full text-left rounded-2xl sm:rounded-3xl border px-3 py-2.5 sm:px-5 sm:py-4 overflow-hidden transition-colors duration-500
+                      ${reviewOpen
+                        ? "h-full min-h-[260px] max-xl:min-h-0 flex flex-col justify-between bg-green-200 border-green-300 shadow-sm will-change-transform"
+                        : "bg-green-50/70 border-green-100 hover:bg-green-200 hover:border-green-300"
                       }`}
                   >
                     <div className="flex items-center justify-between gap-3">
@@ -1301,13 +1916,13 @@ function TourCard({ tour, decked = false }) {
 
                     <p
                       ref={reviewQuoteRef}
-                      className={`mt-3 text-sm text-neutral-600 italic leading-relaxed transition-all duration-300
-                        ${reviewOpen ? "line-clamp-none text-base" : "line-clamp-2"}`}
+                      className={`mt-1.5 text-xs sm:mt-3 sm:text-sm text-neutral-600 italic leading-relaxed transition-all duration-300
+                        ${reviewOpen ? "line-clamp-none sm:text-base" : "line-clamp-2"}`}
                     >
                       “{toText(tour.mainReview, "A highly rated Cape Town experience.")}”
                     </p>
 
-                    <div className="mt-4 flex items-center justify-between gap-3">
+                    <div className="mt-2 flex items-center justify-between gap-2 sm:mt-4 sm:gap-3">
                       <p className="text-xs text-neutral-500 font-bitter">
                         Reviewed by{" "}
                         <span className="text-neutral-700">
@@ -1332,10 +1947,10 @@ function TourCard({ tour, decked = false }) {
             </div>
 
             <div ref={ctaWrapRef} data-card-stagger-item className="overflow-hidden">
-              <div className="px-4 sm:px-6 md:px-7 xl:px-8 py-3.5 sm:py-5 border-t border-black/5 bg-neutral-50 flex items-center justify-between gap-3">
+              <div className="px-3 sm:px-5 md:px-6 xl:px-8 py-3 sm:py-4 border-t border-black/5 bg-neutral-50 flex items-center justify-between gap-3">
                 <button
                   onClick={handleToggle}
-                  className="flex items-center justify-center gap-2 px-5 py-2 rounded-full border border-black/10 text-neutral-600
+                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-black/10 text-neutral-600
                     bg-white text-sm font-bitter font-medium hover:border-red-300 hover:text-red-400 active:scale-95 transition-all duration-200"
                 >
                   <svg
@@ -1359,7 +1974,7 @@ function TourCard({ tour, decked = false }) {
                     e.stopPropagation();
                     goToBooking();
                   }}
-                  className="px-6 py-2 hero-gradient rounded-full text-sm font-bitter font-semibold text-white
+                  className="px-5 py-2 hero-gradient rounded-full text-sm font-bitter font-semibold text-white
                     flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all duration-200 shadow-sm"
                 >
                   Request Trip
@@ -1381,9 +1996,8 @@ function TourCard({ tour, decked = false }) {
 
       {!decked && (
         <div
-          className={`relative z-40 transition-all duration-500 ease-out ${
-            open ? "-mt-[32rem] sm:-mt-44 md:-mt-48" : "mt-0"
-          }`}
+          className={`relative z-40 transition-all duration-500 ease-out ${open ? "-mt-[32rem] sm:-mt-44 md:-mt-48" : "mt-0"
+            }`}
         >
           <LearnMoreDrawer
             tour={tour}
@@ -1410,10 +2024,11 @@ function TourCard({ tour, decked = false }) {
   );
 }
 
-function CategorySection({ section, sectionTours }) {
+function CategorySection({ section, sectionTours, onTourProgress }) {
   const sectionRef = useRef(null);
   const pinRef = useRef(null);
   const cardRefs = useRef([]);
+  const lastProgressIndexRef = useRef(-1);
 
   useLayoutEffect(() => {
     const sectionEl = sectionRef.current;
@@ -1430,18 +2045,31 @@ function CategorySection({ section, sectionTours }) {
         image: card.querySelector("[data-card-image]"),
         contentPanel: card.querySelector("[data-card-content-panel]"),
         staggerItems: Array.from(card.querySelectorAll("[data-card-stagger-item]")),
+        sidePills: Array.from(card.querySelectorAll("[data-side-pill]")),
       });
 
       const cardParts = cards.map(getCardParts);
 
       const setPinHeight = () => {
+        const deckOffset = getDeckPinTopOffset();
+        pinEl.style.setProperty("--tour-deck-offset", `${deckOffset}px`);
+
         const tallestCard = Math.max(
           ...cards.map((card) => card.offsetHeight || card.scrollHeight || 520)
         );
 
         gsap.set(pinEl, {
-          minHeight: Math.max(tallestCard + 8, window.innerWidth < 1024 ? 430 : 490),
+          minHeight: Math.max(tallestCard + 28, 520),
         });
+      };
+
+      const setProgress = (index) => {
+        const safeIndex = Math.max(0, Math.min(index, cards.length - 1));
+
+        if (lastProgressIndexRef.current === safeIndex) return;
+
+        lastProgressIndexRef.current = safeIndex;
+        onTourProgress?.(section.id, safeIndex);
       };
 
       setPinHeight();
@@ -1452,10 +2080,10 @@ function CategorySection({ section, sectionTours }) {
         right: 0,
         top: 0,
         width: "100%",
-        autoAlpha: 1,
-        clipPath: "inset(0% 0% 0% 0%)",
+        autoAlpha: 0,
+        clipPath: "inset(0% 0% 100% 0%)",
         transformOrigin: "center center",
-        willChange: "clip-path, transform",
+        willChange: "clip-path, transform, opacity",
       });
 
       cards.forEach((card, index) => {
@@ -1464,6 +2092,8 @@ function CategorySection({ section, sectionTours }) {
         gsap.set(card, {
           zIndex: cards.length - index,
           pointerEvents: index === 0 ? "auto" : "none",
+          autoAlpha: index === 0 ? 1 : 0,
+          clipPath: index === 0 ? "inset(0% 0% 0% 0%)" : "inset(0% 0% 100% 0%)",
           y: 0,
         });
 
@@ -1477,7 +2107,7 @@ function CategorySection({ section, sectionTours }) {
         if (parts.image) {
           gsap.set(parts.image, {
             scale: 1.06,
-            yPercent: index === 0 ? 0 : 8,
+            yPercent: 0,
             willChange: "transform",
           });
         }
@@ -1495,32 +2125,112 @@ function CategorySection({ section, sectionTours }) {
             willChange: "transform, opacity",
           });
         }
+
+        if (parts.sidePills?.length) {
+          gsap.set(parts.sidePills, {
+            autoAlpha: index === 0 ? 1 : 0,
+            x: index === 0 ? 0 : 18,
+            scale: index === 0 ? 1 : 0.96,
+            willChange: "transform, opacity",
+          });
+        }
       });
 
       const transitions = Math.max(cards.length - 1, 1);
 
-      const tl = gsap.timeline({
+      let tl;
+
+      const getFullOpacitySnapEntries = () => {
+        const totalDuration = Math.max(
+          tl?.duration?.() || transitions + 1.35,
+          1
+        );
+
+        const fullOpacityOffset = 0.92;
+
+        const entries = [{ progress: 0, index: 0 }];
+
+        for (let index = 1; index < cards.length; index += 1) {
+          entries.push({
+            progress: Math.min(1, (index - 1 + fullOpacityOffset) / totalDuration),
+            index,
+          });
+        }
+
+        entries.push({
+          progress: 1,
+          index: cards.length - 1,
+        });
+
+        return entries;
+      };
+
+      const getClosestSnapEntry = (progress) => {
+        const entries = getFullOpacitySnapEntries();
+
+        return entries.reduce((closest, entry) =>
+          Math.abs(entry.progress - progress) < Math.abs(closest.progress - progress)
+            ? entry
+            : closest
+        );
+      };
+
+      tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionEl,
           start: () => `top ${getDeckPinTopOffset()}px`,
-          end: () => `+=${transitions * (window.innerWidth < 768 ? 320 : window.innerWidth < 1024 ? 360 : 400)}`,
+          end: () => `+=${(transitions + 1.05) * (window.innerWidth < 768 ? 500 : window.innerWidth < 1024 ? 520 : 560)}`,
           pin: pinEl,
           pinSpacing: true,
-          scrub: 0.32,
+          scrub: 0.16,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           snap:
             cards.length > 1
               ? {
-                  snapTo: (value) => {
-                    const steps = cards.length - 1;
-                    return Math.round(value * steps) / steps;
-                  },
-                  duration: { min: 0.07, max: 0.16 },
-                  delay: 0.01,
-                  ease: "power2.out",
-                }
+                snapTo: (progress) => getClosestSnapEntry(progress).progress,
+                duration: { min: 0.12, max: 0.22 },
+                delay: 0.02,
+                ease: "power3.out",
+                inertia: false,
+              }
               : false,
+          onEnter: () => setProgress(0),
+          onEnterBack: () => setProgress(cards.length - 1),
+          onUpdate: (self) => {
+            const nextIndex = getClosestSnapEntry(self.progress).index;
+            setProgress(nextIndex);
+          },
+          onSnapComplete: (self) => {
+            const snapIndex = getClosestSnapEntry(self.progress).index;
+            const parts = cardParts[snapIndex];
+
+            cards.forEach((card, index) => {
+              gsap.set(card, {
+                autoAlpha: index === snapIndex ? 1 : 0,
+                pointerEvents: index === snapIndex ? "auto" : "none",
+                clipPath:
+                  index === snapIndex
+                    ? "inset(0% 0% 0% 0%)"
+                    : "inset(0% 0% 100% 0%)",
+                y: index === snapIndex ? 0 : -18,
+              });
+            });
+
+            if (parts?.image) {
+              gsap.set(parts.image, {
+                yPercent: 0,
+                scale: 1.06,
+              });
+            }
+
+            if (parts?.staggerItems?.length) {
+              gsap.set(parts.staggerItems, {
+                autoAlpha: 1,
+                y: 0,
+              });
+            }
+          },
           onRefresh: setPinHeight,
         },
       });
@@ -1534,7 +2244,16 @@ function CategorySection({ section, sectionTours }) {
         const current = cardParts[index];
         const at = index - 1;
 
-        tl.set(currentCard, { pointerEvents: "auto" }, at);
+        tl.set(
+          currentCard,
+          {
+            autoAlpha: 1,
+            pointerEvents: "auto",
+            clipPath: "inset(0% 0% 0% 0%)",
+            y: 0,
+          },
+          at
+        );
         tl.set(previousCard, { pointerEvents: "none" }, at + 0.68);
 
         if (previous.staggerItems?.length) {
@@ -1545,6 +2264,21 @@ function CategorySection({ section, sectionTours }) {
               y: -18,
               stagger: 0.028,
               duration: 0.2,
+              ease: "none",
+            },
+            at
+          );
+        }
+
+        if (previous.sidePills?.length) {
+          tl.to(
+            previous.sidePills,
+            {
+              autoAlpha: 0,
+              x: 18,
+              scale: 0.96,
+              stagger: 0.035,
+              duration: 0.22,
               ease: "none",
             },
             at
@@ -1569,12 +2303,32 @@ function CategorySection({ section, sectionTours }) {
           );
         }
 
+        if (current.sidePills?.length) {
+          tl.fromTo(
+            current.sidePills,
+            {
+              autoAlpha: 0,
+              x: 18,
+              scale: 0.96,
+            },
+            {
+              autoAlpha: 1,
+              x: 0,
+              scale: 1,
+              stagger: 0.045,
+              duration: 0.32,
+              ease: "none",
+            },
+            at + 0.14
+          );
+        }
+
         if (previous.image) {
           tl.to(
             previous.image,
             {
-              yPercent: -12,
-              scale: 1.08,
+              yPercent: 0,
+              scale: 1.075,
               duration: 0.62,
               ease: "none",
             },
@@ -1586,8 +2340,8 @@ function CategorySection({ section, sectionTours }) {
           tl.fromTo(
             current.image,
             {
-              yPercent: 9,
-              scale: 1.08,
+              yPercent: 0,
+              scale: 1.075,
             },
             {
               yPercent: 0,
@@ -1609,7 +2363,13 @@ function CategorySection({ section, sectionTours }) {
           },
           at
         );
+
+        tl.set(previousCard, { autoAlpha: 0 }, at + 0.71);
+
+        tl.set(previousCard, { autoAlpha: 0 }, at + 0.71);
       });
+
+      tl.to({}, { duration: 0.65 });
 
       ScrollTrigger.refresh();
 
@@ -1642,16 +2402,22 @@ function CategorySection({ section, sectionTours }) {
               clearProps: "transform,opacity,visibility,willChange",
             });
           }
+
+          if (parts.sidePills?.length) {
+            gsap.set(parts.sidePills, {
+              clearProps: "transform,opacity,visibility,willChange",
+            });
+          }
         });
       };
     });
 
     return () => mm.revert();
-  }, [section.id, sectionTours]);
+  }, [section.id, sectionTours, onTourProgress]);
 
   return (
-    <section ref={sectionRef} id={section.id} className="scroll-mt-24 md:scroll-mt-28 py-2 md:py-3">
-      <div ref={pinRef} className="relative w-full overflow-visible">
+    <section ref={sectionRef} id={section.id} className="relative z-10 scroll-mt-[14rem] md:scroll-mt-[13rem] xl:scroll-mt-28 py-3 md:py-4">
+      <div ref={pinRef} className="relative z-10 w-full overflow-visible">
         <div className="lg:absolute lg:left-0 lg:right-0 lg:top-0">
           <div className="space-y-5 lg:space-y-0">
             {sectionTours.map((tour, index) => (
@@ -1662,7 +2428,16 @@ function CategorySection({ section, sectionTours }) {
                 }}
                 className="relative"
               >
-                <TourCard tour={tour} decked />
+                <div className="relative">
+                  <TourCard tour={tour} decked />
+                  <DesktopTourSidePills
+                    tour={tour}
+                    section={section}
+                    sectionSize={sectionTours.length}
+                  />
+                </div>
+
+                <ReviewFlipCard tour={tour} />
               </div>
             ))}
           </div>
@@ -1803,26 +2578,155 @@ function DeckDetailsOverlay({ tour, onFullTour, onBook, onClose }) {
 }
 
 
+function WeatherIcon({ className = "h-4 w-4" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M17.5 19H8a5 5 0 1 1 1.1-9.88A6.5 6.5 0 0 1 21 12.5" />
+      <path d="M16 13v6" />
+      <path d="M13 16h6" />
+    </svg>
+  );
+}
+
+function getGroupDiscountText(tour) {
+  const rules = tour.groupDiscount?.rules || [];
+  if (!tour.groupDiscount?.enabled || !rules.length) {
+    return "Group-friendly pricing";
+  }
+
+  const bestRule = rules.reduce((best, rule) => {
+    if (!best) return rule;
+    return Number(rule.discountPercent || 0) > Number(best.discountPercent || 0)
+      ? rule
+      : best;
+  }, null);
+
+  if (!bestRule) return "Group-friendly pricing";
+
+  return `Up to ${bestRule.discountPercent}% off for ${bestRule.minPeople}+ guests`;
+}
+
+function getCancellationText(tour) {
+  const summary = toText(tour.cancellationPolicy?.summary || tour.cancellationPolicy);
+  if (summary) return summary;
+
+  return "Refund or reschedule options available";
+}
+
+function getWeatherText(tour) {
+  const weatherNote = tour.needToKnow
+    ?.map((item) => toText(item))
+    .find((item) => /weather|wind|rain|sea|conditions/i.test(item));
+
+  if (weatherNote) return weatherNote;
+
+  return "Weather-aware planning before departure";
+}
+
+function DesktopTourSidePills({ tour }) {
+  return (
+    <div className="pointer-events-none absolute left-[calc(100%+0.75rem)] top-1/2 z-30 hidden w-48 -translate-y-1/2 flex-col gap-2 xl:flex">
+      <div
+        data-side-pill
+        className="rounded-3xl border border-green-300/60 bg-green-200/95 px-4 py-4 shadow-[0_14px_36px_rgba(22,101,52,0.14)] backdrop-blur-md"
+      >
+        <p className="font-bitter text-[11px] font-bold uppercase tracking-[0.16em] text-green-950/70">
+          Save more
+        </p>
+        <p className="mt-1 font-bitter text-sm font-semibold leading-snug text-green-950">
+          {getGroupDiscountText(tour)}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <div
+          data-side-pill
+          className="rounded-2xl border border-black/5 bg-white/95 px-3 py-3 shadow-[0_10px_28px_rgba(0,0,0,0.08)] backdrop-blur-md"
+        >
+          <p className="font-bitter text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">
+            Cancel
+          </p>
+          <p className="mt-1 font-bitter text-[11px] leading-snug text-neutral-700 line-clamp-3">
+            {getCancellationText(tour)}
+          </p>
+        </div>
+
+        <div
+          data-side-pill
+          className="rounded-2xl border border-black/5 bg-white/95 px-3 py-3 shadow-[0_10px_28px_rgba(0,0,0,0.08)] backdrop-blur-md"
+        >
+          <div className="flex items-center gap-1.5 text-neutral-400">
+            <WeatherIcon className="h-3.5 w-3.5" />
+            <p className="font-bitter text-[10px] font-bold uppercase tracking-[0.14em]">
+              Weather
+            </p>
+          </div>
+          <p className="mt-1 font-bitter text-[11px] leading-snug text-neutral-700 line-clamp-3">
+            {getWeatherText(tour)}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CategoryProgressDots({ total = 0, activeIndex = 0, orientation = "horizontal" }) {
+  if (!total) return null;
+
+  const safeIndex = Math.max(0, Math.min(activeIndex, total - 1));
+  const isVertical = orientation === "vertical";
+
+  return (
+    <div
+      className={`flex ${isVertical ? "flex-col items-center" : "items-center"} gap-2`}
+      aria-label={`Tour ${safeIndex + 1} of ${total}`}
+    >
+      {Array.from({ length: total }).map((_, index) => {
+        const complete = index <= safeIndex;
+        const current = index === safeIndex;
+
+        return (
+          <span
+            key={index}
+            className={`block rounded-full border transition-colors duration-200 ${isVertical ? "h-3 w-3" : "h-2.5 w-2.5"
+              } ${complete
+                ? "border-green-300 bg-green-200 shadow-[0_0_0_3px_rgba(187,247,208,0.18)]"
+                : "border-white/15 bg-white/12"
+              } ${current ? "scale-110" : "scale-100"}`}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+
 function BrowseButton({ section, index, active, onClick, compact = false }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`group relative w-full rounded-2xl text-left transition-all duration-300 ${
-        compact ? "px-3 py-2.5" : "px-3.5 py-3"
-      } ${
-        active
+      className={`group relative w-full rounded-2xl text-left transition-all duration-300 ${compact ? "px-2.5 py-2" : "px-3.5 py-3"
+        } ${active
           ? "bg-white/95 text-neutral-950 shadow-[0_10px_30px_rgba(0,0,0,0.12)]"
           : "text-white/72 hover:text-white hover:bg-white/10"
-      }`}
+        }`}
     >
       <div className="flex items-center gap-3">
         <div
-          className={`h-9 w-9 rounded-xl flex items-center justify-center border transition-all duration-300 shrink-0 ${
-            active
+          className={`h-8 w-8 rounded-lg flex items-center justify-center border transition-all duration-300 shrink-0 ${active
               ? "bg-green-200 border-green-300"
               : "bg-white/8 border-white/10 group-hover:bg-white/12"
-          }`}
+            }`}
         >
           <img
             src={section.icon}
@@ -1836,14 +2740,13 @@ function BrowseButton({ section, index, active, onClick, compact = false }) {
 
         <div className="min-w-0 flex-1">
           <p
-            className={`text-[9px] font-bitter tracking-[0.14em] uppercase leading-none ${
-              active ? "text-neutral-400" : "text-white/35"
-            }`}
+            className={`text-[9px] font-bitter tracking-[0.14em] uppercase leading-none ${active ? "text-neutral-400" : "text-white/35"
+              }`}
           >
             0{index + 1}
           </p>
 
-          <p className="mt-1 font-bitter text-[13px] font-semibold leading-tight truncate">
+          <p className="mt-0.5 font-bitter text-[12px] font-semibold leading-tight truncate">
             {section.label}
           </p>
         </div>
@@ -1858,12 +2761,16 @@ function BrowseButton({ section, index, active, onClick, compact = false }) {
 
 export default function ToursBrowser() {
   const [activeCategory, setActiveCategory] = useState(null);
-  const [showMobileNav, setShowMobileNav] = useState(false);
+  const [activeTourByCategory, setActiveTourByCategory] = useState({});
 
   const browserRef = useRef(null);
   const railSlotRef = useRef(null);
   const railRef = useRef(null);
+  const desktopRailPortalRef = useRef(null);
   const mobileNavRef = useRef(null);
+  const mobileNavScrollerRef = useRef(null);
+  const mobileCategoryItemRefs = useRef({});
+  const activeCategoryRef = useRef(null);
 
   const visibleSections = useMemo(() => {
     return browseSections
@@ -1881,11 +2788,134 @@ export default function ToursBrowser() {
     );
   }, [activeCategory, visibleSections]);
 
+  const currentTourTotal = currentSection?.tours?.length || 0;
+  const currentTourIndex = Math.max(
+    0,
+    Math.min(activeTourByCategory[currentSection?.id] ?? 0, Math.max(currentTourTotal - 1, 0))
+  );
+
+  const activateCategory = useCallback((sectionId) => {
+    if (!sectionId) return;
+
+    const changed = activeCategoryRef.current !== sectionId;
+
+    activeCategoryRef.current = sectionId;
+    setActiveCategory(sectionId);
+
+    if (changed) {
+      setActiveTourByCategory((prev) =>
+        prev[sectionId] === 0 ? prev : { ...prev, [sectionId]: 0 }
+      );
+    }
+  }, []);
+
+  const handleTourProgress = useCallback((sectionId, index) => {
+    if (!sectionId) return;
+
+    activeCategoryRef.current = sectionId;
+    setActiveCategory((prev) => (prev === sectionId ? prev : sectionId));
+    setActiveTourByCategory((prev) =>
+      prev[sectionId] === index ? prev : { ...prev, [sectionId]: index }
+    );
+  }, []);
+
+  useEffect(() => {
+    activeCategoryRef.current = activeCategory;
+  }, [activeCategory]);
+
+  useEffect(() => {
+    if (!activeCategory || typeof window === "undefined" || window.innerWidth >= 1280) {
+      return;
+    }
+
+    const scroller = mobileNavScrollerRef.current;
+    const item = mobileCategoryItemRefs.current[activeCategory];
+
+    if (!scroller || !item) return;
+
+    const isMobile = window.innerWidth < 768;
+    const leftPadding = isMobile ? 6 : 10;
+    const targetLeft = Math.max(item.offsetLeft - leftPadding, 0);
+
+    scroller.scrollTo({
+      left: targetLeft,
+      behavior: "smooth",
+    });
+  }, [activeCategory]);
+
   useEffect(() => {
     if (!activeCategory && visibleSections[0]?.id) {
-      setActiveCategory(visibleSections[0].id);
+      activateCategory(visibleSections[0].id);
     }
-  }, [activeCategory, visibleSections]);
+  }, [activeCategory, visibleSections, activateCategory]);
+
+  useLayoutEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const browser = browserRef.current;
+    const desktopRail = desktopRailPortalRef.current;
+
+    if (!browser || !desktopRail) return undefined;
+
+    let frame = null;
+
+    const updateDesktopRail = () => {
+      frame = null;
+
+      if (window.innerWidth < 1280) {
+        desktopRail.style.opacity = "0";
+        desktopRail.style.visibility = "hidden";
+        desktopRail.style.pointerEvents = "none";
+        return;
+      }
+
+      const rect = browser.getBoundingClientRect();
+
+      /*
+        Desktop nav is intentionally simple:
+        - original desktop rail stays hidden as layout/ScrollTrigger backup
+        - this fixed body-level rail appears while the ToursBrowser section is active
+        - no ScrollTrigger pin state is required for desktop rail reappearing after return
+      */
+      const active = rect.top <= 120 && rect.bottom > 180;
+
+      desktopRail.style.opacity = active ? "1" : "0";
+      desktopRail.style.visibility = active ? "visible" : "hidden";
+      desktopRail.style.pointerEvents = active ? "none" : "none";
+    };
+
+    const requestUpdate = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(updateDesktopRail);
+    };
+
+    const requestUpdateSoon = () => {
+      requestUpdate();
+      window.setTimeout(requestUpdate, 80);
+      window.setTimeout(requestUpdate, 240);
+      window.setTimeout(requestUpdate, 600);
+      window.setTimeout(requestUpdate, 1000);
+    };
+
+    requestUpdateSoon();
+
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdateSoon);
+    window.addEventListener("orientationchange", requestUpdateSoon);
+    window.addEventListener("pageshow", requestUpdateSoon);
+    window.addEventListener("focus", requestUpdateSoon);
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdateSoon);
+      window.removeEventListener("orientationchange", requestUpdateSoon);
+      window.removeEventListener("pageshow", requestUpdateSoon);
+      window.removeEventListener("focus", requestUpdateSoon);
+    };
+  }, [visibleSections.length]);
+
 
   useLayoutEffect(() => {
     const browser = browserRef.current;
@@ -1925,32 +2955,44 @@ export default function ToursBrowser() {
 
       mm = gsap.matchMedia();
 
-      mm.add("(max-width: 1279px)", () => {
-        const mobileNavTrigger = ScrollTrigger.create({
-          trigger: browser,
-          start: "top top+=64",
-          end: "bottom top+=120",
-          onEnter: () => setShowMobileNav(true),
-          onEnterBack: () => setShowMobileNav(true),
-          onLeave: () => setShowMobileNav(false),
-          onLeaveBack: () => setShowMobileNav(false),
-        });
-
-        return () => {
-          mobileNavTrigger.kill();
-          setShowMobileNav(false);
-        };
-      });
-
       mm.add("(min-width: 1280px)", () => {
+        const getRailPinDistance = () => {
+          const naturalHeight = browser.scrollHeight || browser.offsetHeight || 0;
+
+          const deckScrollDistance = visibleSections.reduce((total, section) => {
+            const transitions = Math.max((section.tours?.length || 1) - 1, 1);
+            return total + (transitions + 1.25) * 560;
+          }, 0);
+
+          const railHeight = railSlot.offsetHeight || 320;
+          const safetyBuffer = window.innerHeight * 0.9;
+
+          return Math.max(
+            naturalHeight + deckScrollDistance - railHeight,
+            deckScrollDistance + safetyBuffer,
+            window.innerHeight * 3
+          );
+        };
+
         const pinTrigger = ScrollTrigger.create({
+          id: "tours-desktop-left-nav-pin",
           trigger: browser,
           start: "top top",
-          end: "bottom bottom",
+          end: () => `+=${getRailPinDistance()}`,
           pin: railSlot,
           pinSpacing: false,
+          pinReparent: true,
           anticipatePin: 1,
+          refreshPriority: 2,
           invalidateOnRefresh: true,
+          onRefresh: () => {
+            gsap.set(railSlot, { autoAlpha: 1, zIndex: 90 });
+            gsap.set(rail, { autoAlpha: 1 });
+          },
+          onUpdate: () => {
+            gsap.set(railSlot, { autoAlpha: 1, zIndex: 90 });
+            gsap.set(rail, { autoAlpha: 1 });
+          },
         });
 
         return () => {
@@ -1958,70 +3000,290 @@ export default function ToursBrowser() {
         };
       });
 
-      visibleSections.forEach((section) => {
-        ScrollTrigger.create({
-          trigger: `#${section.id}`,
-          start: "top center",
-          end: "bottom center",
-          onEnter: () => setActiveCategory(section.id),
-          onEnterBack: () => setActiveCategory(section.id),
+      mm.add("(max-width: 767px)", () => {
+        const mobileNav = mobileNavRef.current;
+
+        if (!mobileNav) return undefined;
+
+        gsap.set(mobileNav, {
+          zIndex: 220,
+          force3D: true,
+        });
+
+        const getMobileNavPinDistance = () => {
+          const naturalHeight = browser.scrollHeight || browser.offsetHeight || 0;
+
+          const deckScrollDistance = visibleSections.reduce((total, section) => {
+            const transitions = Math.max((section.tours?.length || 1) - 1, 1);
+            return total + (transitions + 1.25) * 500;
+          }, 0);
+
+          const navHeight = mobileNav.offsetHeight || 142;
+          const safetyBuffer = window.innerHeight * 0.9;
+
+          const documentHeight =
+            document.documentElement.scrollHeight || document.body.scrollHeight || 0;
+
+          return Math.max(
+            naturalHeight + deckScrollDistance - navHeight,
+            deckScrollDistance + safetyBuffer,
+            documentHeight,
+            window.innerHeight * 12
+          );
+        };
+
+        const pinTrigger = ScrollTrigger.create({
+          id: "tours-mobile-category-nav-pin",
+          trigger: browser,
+          start: () => `top ${getMobileNavTopOffset()}px`,
+          end: () => `+=${getMobileNavPinDistance()}`,
+          pin: mobileNav,
+          pinSpacing: false,
+          pinReparent: true,
+          pinType: "fixed",
+          anticipatePin: 1,
+          refreshPriority: 2,
+          invalidateOnRefresh: true,
+          onRefresh: () => {
+            const navHeight = mobileNav.offsetHeight || 142;
+            document.documentElement.style.setProperty("--tour-category-nav-height", `${navHeight}px`);
+            gsap.set(mobileNav, {
+              autoAlpha: 1,
+              zIndex: 240,
+              pointerEvents: "auto",
+            });
+          },
+          onUpdate: () => {
+            gsap.set(mobileNav, {
+              autoAlpha: 1,
+              zIndex: 240,
+              pointerEvents: "auto",
+            });
+          },
+        });
+
+        return () => {
+          pinTrigger.kill();
+          gsap.set(mobileNav, { clearProps: "all" });
+        };
+      });
+
+      mm.add("(min-width: 768px) and (max-width: 1279px)", () => {
+        const mobileNav = mobileNavRef.current;
+
+        if (!mobileNav) return undefined;
+
+        gsap.set(mobileNav, {
+          zIndex: 220,
+          force3D: true,
+        });
+
+        const getTabletNavPinDistance = () => {
+          const naturalHeight = browser.scrollHeight || browser.offsetHeight || 0;
+
+          const deckScrollDistance = visibleSections.reduce((total, section) => {
+            const transitions = Math.max((section.tours?.length || 1) - 1, 1);
+            const step = window.innerWidth < 1024 ? 520 : 540;
+            return total + (transitions + 1.25) * step;
+          }, 0);
+
+          const navHeight = mobileNav.offsetHeight || 142;
+          const safetyBuffer = window.innerHeight * 0.9;
+
+          const documentHeight =
+            document.documentElement.scrollHeight || document.body.scrollHeight || 0;
+
+          return Math.max(
+            naturalHeight + deckScrollDistance - navHeight,
+            deckScrollDistance + safetyBuffer,
+            documentHeight,
+            window.innerHeight * 12
+          );
+        };
+
+        const pinTrigger = ScrollTrigger.create({
+          id: "tours-tablet-category-nav-pin",
+          trigger: browser,
+          start: () => `top ${getMobileNavTopOffset()}px`,
+          end: () => `+=${getTabletNavPinDistance()}`,
+          pin: mobileNav,
+          pinSpacing: false,
+          pinReparent: true,
+          pinType: "fixed",
+          anticipatePin: 1,
+          refreshPriority: 2,
+          invalidateOnRefresh: true,
+          onRefresh: () => {
+            const navHeight = mobileNav.offsetHeight || 142;
+            document.documentElement.style.setProperty("--tour-category-nav-height", `${navHeight}px`);
+            gsap.set(mobileNav, {
+              autoAlpha: 1,
+              zIndex: 240,
+              pointerEvents: "auto",
+            });
+          },
+          onUpdate: () => {
+            gsap.set(mobileNav, {
+              autoAlpha: 1,
+              zIndex: 240,
+              pointerEvents: "auto",
+            });
+          },
+        });
+
+        return () => {
+          pinTrigger.kill();
+          gsap.set(mobileNav, { clearProps: "all" });
+        };
+      });
+
+      const refreshFrame = window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          ScrollTrigger.refresh();
+          ScrollTrigger.update();
         });
       });
 
-      ScrollTrigger.refresh();
+      return () => {
+        window.cancelAnimationFrame(refreshFrame);
+      };
     }, browser);
 
     return () => {
       if (mm) mm.revert();
       ctx.revert();
     };
-  }, [visibleSections]);
-
+  }, [visibleSections, activateCategory]);
 
   const scrollTo = (id) => {
     const el = document.getElementById(id);
 
     if (!el) return;
 
+    activateCategory(id);
+
     gsap.to(window, {
       scrollTo: {
         y: el,
         offsetY: getDeckPinTopOffset() + 18,
       },
-      duration: 0.9,
-      ease: "expo.inOut",
+      duration: 0.78,
+      ease: "power3.inOut",
     });
   };
 
   return (
-    <div ref={browserRef} className="relative bg-stone-200/0 overflow-visible">
-      <div
-        ref={mobileNavRef}
-        className={`xl:hidden fixed left-0 right-0 top-16 md:top-20 z-[120] px-4 pt-3 transition-all duration-300 ${
-          showMobileNav
-            ? "translate-y-0 opacity-100 pointer-events-auto"
-            : "-translate-y-4 opacity-0 pointer-events-none"
-        }`}
-      >
-        <div className="mx-auto max-w-5xl">
-          <div className="rounded-[1.5rem] border border-white/10 bg-black/68 p-2 backdrop-blur-md shadow-[0_12px_35px_rgba(0,0,0,0.16)] sm:p-2.5">
-            <div className="mb-2 flex items-center justify-between px-1 sm:px-2">
-              <div>
-                <p className="font-bitter text-[9px] uppercase tracking-[0.2em] text-white/45 leading-none">
-                  Browse tours
-                </p>
-                <p className="mt-1 font-bitter text-sm font-semibold text-white/92">
-                  {currentSection?.label || "Tours"}
-                </p>
-              </div>
-              <div className="rounded-full bg-white/8 px-2.5 py-1 font-bitter text-[10px] uppercase tracking-[0.16em] text-white/55">
-                categories
-              </div>
+    <>
+      {createPortal(
+        <aside
+          ref={desktopRailPortalRef}
+          data-desktop-category-rail-portal
+          className="fixed hidden xl:block z-[300] pointer-events-none transition-opacity duration-150"
+          style={{
+            top: "calc(50vh - 7.75rem)",
+            left: "max(0.75rem, calc(50% - 32rem - 9rem))",
+            width: "8rem",
+            opacity: 0,
+            visibility: "hidden",
+          }}
+        >
+          <div className="w-full overflow-y-auto rounded-[1.75rem] bg-black/42 backdrop-blur-md border border-white/10 shadow-[0_14px_38px_rgba(0,0,0,0.11)] p-2 pointer-events-auto">
+            <div className="mt-2.5 flex flex-col gap-1.5">
+              {visibleSections.map((section, index) => (
+                <BrowseButton
+                  key={`desktop-portal-${section.id}`}
+                  section={section}
+                  index={index}
+                  active={activeCategory === section.id}
+                  compact
+                  onClick={() => scrollTo(section.id)}
+                />
+              ))}
             </div>
 
-            <div className="flex gap-2 overflow-x-auto pb-1 md:grid md:grid-cols-4 md:overflow-visible md:pb-0">
+            <div className="mt-2.5 rounded-2xl border border-white/10 bg-white/[0.07] px-3 py-2">
+              <div className="flex items-center justify-between gap-2">
+                <CategoryProgressDots
+                  total={currentTourTotal}
+                  activeIndex={currentTourIndex}
+                />
+                <span className="shrink-0 font-bitter text-[10px] font-bold text-green-200">
+                  {currentTourIndex + 1}/{currentTourTotal || 1}
+                </span>
+              </div>
+            </div>
+          </div>
+        </aside>,
+        document.body,
+      )}
+
+      <div ref={browserRef} className="relative bg-stone-200/0 overflow-visible pt-5 sm:pt-6 lg:pt-7 xl:pt-0">
+
+
+      <aside
+        ref={railSlotRef}
+        className="hidden xl:block absolute z-[90] pointer-events-none opacity-0"
+        style={{
+          top: "calc(50vh - 7.75rem)",
+          left: "max(0.75rem, calc(50% - 32rem - 9rem))",
+          width: "8rem",
+        }}
+      >
+        <div
+          ref={railRef}
+          className="w-full overflow-y-auto rounded-[1.75rem] bg-black/42 backdrop-blur-md border border-white/10 shadow-[0_14px_38px_rgba(0,0,0,0.11)] p-2 pointer-events-auto"
+          style={{ opacity: 0 }}
+        >
+          <div className="mt-2.5 flex flex-col gap-1.5">
+            {visibleSections.map((section, index) => (
+              <BrowseButton
+                key={section.id}
+                section={section}
+                index={index}
+                active={activeCategory === section.id}
+                compact
+                onClick={() => scrollTo(section.id)}
+              />
+            ))}
+          </div>
+
+          <div className="mt-2.5 rounded-2xl border border-white/10 bg-white/[0.07] px-3 py-2">
+            <div className="flex items-center justify-between gap-2">
+              <CategoryProgressDots
+                total={currentTourTotal}
+                activeIndex={currentTourIndex}
+              />
+              <span className="shrink-0 font-bitter text-[10px] font-bold text-green-200">
+                {currentTourIndex + 1}/{currentTourTotal || 1}
+              </span>
+            </div>
+          </div>
+        </div>
+
+
+      </aside>
+
+      <main className="relative z-10 max-w-5xl mx-auto px-4 xl:px-0 pb-24 w-full overflow-visible">
+        <div
+          ref={mobileNavRef}
+          data-mobile-category-nav
+          className="relative z-[220] mt-8 mb-3 pointer-events-auto sm:mt-10 xl:hidden"
+        >
+          <div className="rounded-[1.25rem] border border-white/10 bg-black/72 p-1.5 backdrop-blur-md shadow-[0_12px_35px_rgba(0,0,0,0.16)] sm:p-2">
+            <div
+              ref={mobileNavScrollerRef}
+              className="flex snap-x snap-mandatory gap-1.5 overflow-x-auto scroll-smooth pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] md:grid md:grid-cols-4 md:overflow-visible md:pb-0 [&::-webkit-scrollbar]:hidden"
+            >
               {visibleSections.map((section, index) => (
-                <div key={section.id} className="min-w-[9rem] flex-1 md:min-w-0">
+                <div
+                  key={section.id}
+                  ref={(el) => {
+                    if (el) {
+                      mobileCategoryItemRefs.current[section.id] = el;
+                    }
+                  }}
+                  className="min-w-[8rem] flex-1 snap-start md:min-w-0"
+                >
                   <BrowseButton
                     section={section}
                     index={index}
@@ -2032,59 +3294,36 @@ export default function ToursBrowser() {
                 </div>
               ))}
             </div>
+
+            <div className="mt-1.5 rounded-2xl border border-white/10 bg-white/[0.07] px-2.5 py-1.5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="relative flex flex-1 items-center overflow-hidden py-0.5">
+                  <span className="absolute left-1 right-1 top-1/2 h-px -translate-y-1/2 bg-white/12" />
+                  <div className="relative z-10">
+                    <CategoryProgressDots
+                      total={currentTourTotal}
+                      activeIndex={currentTourIndex}
+                    />
+                  </div>
+                </div>
+
+                <span className="shrink-0 rounded-full bg-green-200 px-2 py-0.5 font-bitter text-[9px] font-bold text-green-950">
+                  {String(currentTourIndex + 1).padStart(2, "0")} / {String(currentTourTotal || 1).padStart(2, "0")}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="xl:hidden h-[8.75rem] md:h-[8.25rem]" />
-
-      <aside
-        ref={railSlotRef}
-        className="hidden xl:block absolute z-[90] pointer-events-none"
-        style={{
-          top: "calc(50vh - 7.75rem)",
-          left: "max(1rem, calc(50% - 32rem - 11rem))",
-          width: "10rem",
-        }}
-      >
-        <div
-          ref={railRef}
-          className="w-full overflow-y-auto rounded-[1.75rem] bg-black/42 backdrop-blur-md border border-white/10 shadow-[0_14px_38px_rgba(0,0,0,0.11)] p-2.5 pointer-events-auto"
-          style={{ opacity: 0 }}
-        >
-          {/* <div className="px-2.5 pt-2 pb-3 border-b border-white/10">
-            <p className="text-[9px] uppercase tracking-[0.22em] text-white/42 font-bitter">
-              Browse
-            </p>
-
-            <h3 className="mt-1 font-frank text-xl leading-none text-white">
-              Tours
-            </h3>
-          </div> */}
-
-          <div className="mt-2.5 flex flex-col gap-1.5">
-            {visibleSections.map((section, index) => (
-              <BrowseButton
-                key={section.id}
-                section={section}
-                index={index}
-                active={activeCategory === section.id}
-                onClick={() => scrollTo(section.id)}
-              />
-            ))}
-          </div>
-        </div>
-      </aside>
-
-      <main className="relative z-10 max-w-5xl mx-auto px-0 pb-24 w-full overflow-visible">
         {visibleSections.map((section) => (
           <CategorySection
             key={section.id}
             section={section}
             sectionTours={section.tours}
+            onTourProgress={handleTourProgress}
           />
         ))}
       </main>
-    </div>
+      </div>
+    </>
   );
 }
