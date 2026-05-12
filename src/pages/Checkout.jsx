@@ -17,6 +17,26 @@ gsap.registerPlugin(ScrollTrigger);
 const DEFAULT_PRIVATE_TOUR_FEE_ZAR = 750;
 const DEFAULT_CUSTOM_TRIP_FEE_ZAR = 500;
 
+const getTourReturnPath = (tour) => {
+  const rawSlug =
+    tour?.slug ||
+    tour?.canonicalSlug ||
+    tour?.canonicalPath?.split("/").filter(Boolean).pop() ||
+    tour?.title ||
+    tour?.info ||
+    "";
+
+  const slug = String(rawSlug)
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/['’]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return slug ? `/tours/${slug}` : "/";
+};
+
 const getBasePriceZar = (tour) => {
   if (typeof tour?.priceBase === "number" && Number.isFinite(tour.priceBase)) {
     return tour.priceBase;
@@ -50,6 +70,23 @@ const formatMoney = (amount, currency) => {
   }).format(Number.isFinite(safeAmount) ? safeAmount : 0);
 };
 
+const formatDisplayTime = (value) => {
+  if (!value) return "";
+
+  const text = String(value).trim();
+  if (!text) return "";
+
+  if (/\b(am|pm)\b/i.test(text)) return text;
+
+  return text.replace(/\b([01]?\d|2[0-3]):([0-5]\d)\b/g, (_, hourText, minuteText) => {
+    const hour = Number(hourText);
+    const suffix = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour % 12 || 12;
+
+    return `${displayHour}:${minuteText} ${suffix}`;
+  });
+};
+
 const toMinorUnit = (amount, currency) => {
   const safeAmount = Number(amount);
   const code = String(currency || "ZAR").toUpperCase();
@@ -73,24 +110,32 @@ const getPickupTime = (tour, bookingDetails) => {
   const directTime =
     bookingDetails?.pickupTime ||
     bookingDetails?.preferredPickupTime ||
+    bookingDetails?.pickupTimeLabel ||
     bookingDetails?.time ||
-    bookingDetails?.pickup?.time;
+    bookingDetails?.pickup?.time ||
+    tour?.pickupTime ||
+    tour?.startTime ||
+    tour?.departureTime;
 
-  if (directTime) return directTime;
+  if (directTime) return formatDisplayTime(directTime);
 
   const pickupStop = tour?.stops?.find((stop) => {
     const text = `${stop?.id || ""} ${stop?.name || ""}`.toLowerCase();
-    return text.includes("pickup") || text.includes("meeting");
+    return (text.includes("pickup") || text.includes("meeting")) && stop?.time;
   });
 
-  return pickupStop?.time || "To be confirmed";
+  if (pickupStop?.time) return formatDisplayTime(pickupStop.time);
+
+  const firstTimedStop = tour?.stops?.find((stop) => stop?.time);
+
+  return firstTimedStop?.time ? formatDisplayTime(firstTimedStop.time) : "To be confirmed";
 };
 
 const InfoPill = ({ children, tone = "neutral" }) => {
   const tones = {
     neutral: "border-white/70 bg-white/80 text-slate-600",
-    green: "border-green-300/60 bg-green-200 text-green-950",
-    blue: "border-blue-200/70 bg-blue-100 text-blue-700",
+    green: "border-[#071f4f]/20 bg-[#071f4f] text-white",
+    blue: "border-[#071f4f]/15 bg-[#eef4ff] text-[#071f4f]",
     dark: "border-[#071f4f] bg-[#071f4f] text-white",
     stone: "border-stone-200 bg-stone-100 text-slate-600",
   };
@@ -119,8 +164,8 @@ const SummaryRow = ({ label, value, strong = false }) => (
 
 const MiniCard = ({ label, value, note, tone = "blue" }) => {
   const toneClasses = {
-    blue: "from-blue-50 to-white",
-    green: "from-green-50 to-white",
+    blue: "from-[#eef4ff] to-white",
+    green: "from-[#eef4ff] to-white",
     stone: "from-stone-50 to-white",
   };
 
@@ -145,8 +190,8 @@ const PolicyNote = ({ title, children }) => (
 );
 
 const EmailChip = ({ email }) => (
-  <span className="inline-flex max-w-full items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
-    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-blue-500 shadow-sm">
+  <span className="inline-flex max-w-full items-center gap-2 rounded-full bg-[#eef4ff] px-3 py-1.5 text-xs font-semibold text-[#071f4f]">
+    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-[#071f4f] shadow-sm">
       <svg
         className="h-3.5 w-3.5"
         viewBox="0 0 24 24"
@@ -193,10 +238,10 @@ const VehicleOptionCard = ({ vehicle }) => (
       </p>
 
       <div className="mt-2 flex flex-wrap gap-1.5">
-        <span className="rounded-full bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-700">
+        <span className="rounded-full bg-[#eef4ff] px-2 py-1 text-[10px] font-bold text-[#071f4f]">
           {vehicle.luggage}
         </span>
-        <span className="rounded-full bg-green-50 px-2 py-1 text-[10px] font-bold text-green-700">
+        <span className="rounded-full bg-[#f3f6fb] px-2 py-1 text-[10px] font-bold text-[#071f4f]">
           {vehicle.transmission}
         </span>
       </div>
@@ -226,7 +271,7 @@ const RevealButton = ({ active, title, detail, onClick }) => (
 
     <span
       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg font-bold transition ${
-        active ? "bg-white/70 rotate-45" : "bg-slate-50 group-hover:bg-green-50"
+        active ? "bg-white/70 rotate-45 text-green-950" : "bg-slate-50 group-hover:bg-[#eef4ff]"
       }`}
     >
       +
@@ -235,11 +280,22 @@ const RevealButton = ({ active, title, detail, onClick }) => (
 );
 
 const RevealPanel = ({ open, children }) => {
-  if (!open) return null;
-
   return (
-    <div className="overflow-hidden rounded-[1.5rem]">
-      {children}
+    <div
+      className={`overflow-hidden rounded-[1.5rem] transition-all duration-500 ease-out ${
+        open
+          ? "max-h-[3200px] translate-y-0 opacity-100"
+          : "max-h-0 -translate-y-2 opacity-0 pointer-events-none"
+      }`}
+      aria-hidden={!open}
+    >
+      <div
+        className={`transition-all duration-500 ease-out ${
+          open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+        }`}
+      >
+        {children}
+      </div>
     </div>
   );
 };
@@ -259,6 +315,7 @@ const CheckoutForm = ({
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [successFade, setSuccessFade] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -352,6 +409,12 @@ const CheckoutForm = ({
         console.error("Booking email request failed:", emailError);
       }
 
+      setSuccessFade(true);
+
+      await new Promise((resolve) => {
+        window.setTimeout(resolve, 400);
+      });
+
       navigate("/success", {
         state: {
           tour,
@@ -372,6 +435,27 @@ const CheckoutForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4 overflow-visible">
+      {successFade && (
+        <>
+          <style>{`
+            @keyframes checkoutFadeToWhite {
+              from {
+                opacity: 0;
+              }
+              to {
+                opacity: 1;
+              }
+            }
+          `}</style>
+
+          <div
+            className="fixed inset-0 z-[120] bg-white"
+            style={{ animation: "checkoutFadeToWhite 400ms ease-out forwards" }}
+            aria-hidden="true"
+          />
+        </>
+      )}
+
       <div className="rounded-[1.35rem] bg-white p-3 shadow-[0_14px_34px_rgba(7,31,79,0.06)] md:p-4">
         <PaymentElement />
       </div>
@@ -379,9 +463,10 @@ const CheckoutForm = ({
       <button
         type="submit"
         disabled={!stripe || loading}
-        className="hero-gradient-bl flex w-full items-center justify-center rounded-2xl px-6 py-3.5 font-frank text-lg font-bold text-white shadow-[0_16px_34px_rgba(7,31,79,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_42px_rgba(7,31,79,0.24)] disabled:cursor-not-allowed disabled:opacity-60"
+        className="hero-gradient-bl group relative flex w-full items-center justify-center overflow-hidden rounded-[1.35rem] px-6 py-4 font-frank text-xl font-bold text-white shadow-[0_18px_42px_rgba(7,31,79,0.22)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_52px_rgba(7,31,79,0.30)] disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {loading ? "Processing..." : `Pay ${totalAmountLabel}`}
+        <span className="pointer-events-none absolute inset-0 translate-x-[-120%] bg-white/20 blur-xl transition duration-700 group-hover:translate-x-[120%]" />
+        <span className="relative">{loading ? "Processing..." : "Pay"}</span>
       </button>
 
       {message && (
@@ -406,17 +491,19 @@ const Checkout = () => {
   const rightColumnRef = useRef(null);
   const rightPinRef = useRef(null);
   const rightRef = useRef(null);
+  const infoMenuRef = useRef(null);
 
   const [notes, setNotes] = useState(bookingDetails?.customerNotes || "");
   const [clientSecret, setClientSecret] = useState("");
   const [checkoutError, setCheckoutError] = useState("");
   const [loadingSession, setLoadingSession] = useState(true);
   const [paymentCompact, setPaymentCompact] = useState(false);
+  const [showMobileBackTop, setShowMobileBackTop] = useState(false);
   const [openPanels, setOpenPanels] = useState({
-    trip: false,
+    trip: true,
     custom: false,
     vehicles: false,
-    summary: false,
+    summary: true,
     policies: false,
   });
 
@@ -432,17 +519,42 @@ const Checkout = () => {
   }, [selectedCurrency, tour]);
 
   const handleBackToBooking = () => {
-    if (window.lenis) {
-      window.lenis.stop();
+    if (window.lenis?.start) {
+      window.lenis.start();
     }
 
-    navigate("/booking", {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "auto";
+    }
+
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+
+    navigate(getTourReturnPath(tour), {
       state: {
         tour,
-        bookingDetails,
         selectedCurrency: currency,
-        forceScrollTop: true,
+        restorePreviousScroll: true,
       },
+      replace: true,
+    });
+  };
+
+  const handleScrollToTop = () => {
+    if (window.lenis?.scrollTo) {
+      window.lenis.scrollTo(0, {
+        duration: 0.75,
+        force: true,
+      });
+
+      return;
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
     });
   };
 
@@ -482,6 +594,49 @@ const Checkout = () => {
       navigate("/");
     }
   }, [tour, bookingDetails, navigate]);
+
+  useEffect(() => {
+    let rafId = null;
+
+    const updateMobileBackTop = () => {
+      rafId = null;
+
+      if (typeof window === "undefined" || window.innerWidth >= 768 || !infoMenuRef.current) {
+        setShowMobileBackTop(false);
+        return;
+      }
+
+      const menuBottom = infoMenuRef.current.getBoundingClientRect().bottom;
+      const triggerPoint = window.innerHeight * 0.2;
+
+      setShowMobileBackTop(menuBottom <= triggerPoint);
+    };
+
+    const requestUpdate = () => {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(updateMobileBackTop);
+    };
+
+    requestUpdate();
+
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+
+    if (window.lenis?.on) {
+      window.lenis.on("scroll", requestUpdate);
+    }
+
+    return () => {
+      if (rafId) window.cancelAnimationFrame(rafId);
+
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+
+      if (window.lenis?.off) {
+        window.lenis.off("scroll", requestUpdate);
+      }
+    };
+  }, [loadingSession, checkoutError, openPanels]);
 
   useLayoutEffect(() => {
     if (!tour || !bookingDetails || loadingSession || checkoutError) return;
@@ -708,13 +863,42 @@ const Checkout = () => {
     return convertFromZar(DEFAULT_CUSTOM_TRIP_FEE_ZAR, currency);
   }, [isCustom, pricingOptions?.customFee, currency]);
 
-  const subtotalTours = useMemo(() => {
+  const subtotalBeforeDiscount = useMemo(() => {
+    const provided = Number(pricingOptions?.subtotalBeforeGroupDiscount);
+    if (Number.isFinite(provided) && provided > 0) return provided;
+
     return pricePerPerson * participants;
-  }, [pricePerPerson, participants]);
+  }, [pricingOptions?.subtotalBeforeGroupDiscount, pricePerPerson, participants]);
+
+  const groupDiscountPercent = useMemo(() => {
+    const provided = Number(pricingOptions?.groupDiscountPercent);
+    return Number.isFinite(provided) && provided > 0 ? provided : 0;
+  }, [pricingOptions?.groupDiscountPercent]);
+
+  const groupDiscountAmount = useMemo(() => {
+    const provided = Number(pricingOptions?.groupDiscountAmount);
+    if (Number.isFinite(provided) && provided > 0) return provided;
+
+    return groupDiscountPercent > 0
+      ? subtotalBeforeDiscount * (groupDiscountPercent / 100)
+      : 0;
+  }, [pricingOptions?.groupDiscountAmount, groupDiscountPercent, subtotalBeforeDiscount]);
+
+  const discountedTourSubtotal = useMemo(() => {
+    const provided = Number(pricingOptions?.discountedTourSubtotal);
+    if (Number.isFinite(provided) && provided >= 0) return provided;
+
+    return Math.max(subtotalBeforeDiscount - groupDiscountAmount, 0);
+  }, [pricingOptions?.discountedTourSubtotal, subtotalBeforeDiscount, groupDiscountAmount]);
+
+  const subtotalTours = discountedTourSubtotal;
 
   const totalPrice = useMemo(() => {
-    return subtotalTours + privateFee + customFee;
-  }, [subtotalTours, privateFee, customFee]);
+    const provided = Number(pricingOptions?.estimatedTotal);
+    if (Number.isFinite(provided) && provided > 0) return provided;
+
+    return discountedTourSubtotal + privateFee + customFee;
+  }, [pricingOptions?.estimatedTotal, discountedTourSubtotal, privateFee, customFee]);
 
   const totalAmountLabel = useMemo(() => {
     return formatMoney(totalPrice, currency);
@@ -749,6 +933,19 @@ const Checkout = () => {
     return getPickupTime(tour, bookingDetails);
   }, [tour, bookingDetails]);
 
+  const checkoutStops = useMemo(() => {
+    if (!Array.isArray(tour?.stops)) return [];
+
+    return tour.stops
+      .map((stop, index) => ({
+        id: stop?.id || index + 1,
+        name: stop?.name || stop?.title || `Stop ${index + 1}`,
+        time: formatDisplayTime(stop?.time || ""),
+        duration: stop?.duration || "",
+      }))
+      .filter((stop) => stop.name);
+  }, [tour]);
+
   const displayedVehicles = useMemo(() => {
     return vehicles.slice(0, 3);
   }, []);
@@ -767,6 +964,10 @@ const Checkout = () => {
         basePriceZar,
         pricePerPerson,
         participants,
+        subtotalBeforeDiscount,
+        groupDiscountPercent,
+        groupDiscountAmount,
+        discountedTourSubtotal,
         subtotalTours,
         isPrivate,
         privateFee,
@@ -789,6 +990,10 @@ const Checkout = () => {
       basePriceZar,
       pricePerPerson,
       participants,
+      subtotalBeforeDiscount,
+      groupDiscountPercent,
+      groupDiscountAmount,
+      discountedTourSubtotal,
       subtotalTours,
       privateFee,
       customFee,
@@ -804,6 +1009,10 @@ const Checkout = () => {
       basePriceZar,
       pricePerPerson,
       participants,
+      subtotalBeforeDiscount,
+      groupDiscountPercent,
+      groupDiscountAmount,
+      discountedTourSubtotal,
       subtotalTours,
       isPrivate,
       privateFee,
@@ -818,6 +1027,10 @@ const Checkout = () => {
       basePriceZar,
       pricePerPerson,
       participants,
+      subtotalBeforeDiscount,
+      groupDiscountPercent,
+      groupDiscountAmount,
+      discountedTourSubtotal,
       subtotalTours,
       isPrivate,
       privateFee,
@@ -864,6 +1077,10 @@ const Checkout = () => {
               isCustom,
               privateFee,
               customFee,
+              subtotalBeforeGroupDiscount: subtotalBeforeDiscount,
+              groupDiscountPercent,
+              groupDiscountAmount,
+              discountedTourSubtotal,
               subtotalTours,
               totalPrice,
             },
@@ -899,6 +1116,10 @@ const Checkout = () => {
     isCustom,
     privateFee,
     customFee,
+    subtotalBeforeDiscount,
+    groupDiscountPercent,
+    groupDiscountAmount,
+    discountedTourSubtotal,
     subtotalTours,
     totalPrice,
     totalMinorUnit,
@@ -908,22 +1129,27 @@ const Checkout = () => {
 
   if (loadingSession) {
     return (
-      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-stone-50">
-        <img
-          src="/images/section2-bg.png"
-          alt=""
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-10"
-        />
-
-        <div className="absolute inset-0 bg-gradient-to-br from-white/85 via-green-50/80 to-blue-50/90" />
-
-        <div className="relative z-10 rounded-[2rem] bg-white/95 px-8 py-6 text-center shadow-[0_20px_60px_rgba(7,31,79,0.08)]">
-          <div className="font-frank text-xl text-slate-800 md:text-2xl">
-            Securing checkout session. Please wait...
+      <div className="flex min-h-screen items-center justify-center bg-white px-6">
+        <div className="text-center">
+          <div className="relative mx-auto mb-6 h-16 w-16">
+            <div className="absolute inset-0 rounded-full border border-[#071f4f]/10" />
+            <div className="absolute inset-1 rounded-full border-4 border-transparent border-t-[#071f4f] animate-spin" />
+            <div className="absolute inset-[1.35rem] rounded-full bg-[#071f4f]" />
           </div>
-          <p className="mt-2 text-sm text-slate-500">
-            We are preparing the payment form for {currency}.
+
+          <div className="font-frank text-xl text-slate-900 md:text-2xl">
+            Securing checkout session
+          </div>
+
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            Preparing the payment form for {currency}.
           </p>
+
+          <div className="mx-auto mt-6 flex w-fit items-center gap-1.5">
+            <span className="h-2 w-2 animate-bounce rounded-full bg-[#071f4f] [animation-delay:-0.24s]" />
+            <span className="h-2 w-2 animate-bounce rounded-full bg-[#071f4f] [animation-delay:-0.12s]" />
+            <span className="h-2 w-2 animate-bounce rounded-full bg-[#071f4f]" />
+          </div>
         </div>
       </div>
     );
@@ -938,7 +1164,7 @@ const Checkout = () => {
           className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-10"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-br from-white/85 via-green-50/80 to-blue-50/90" />
+        <div className="absolute inset-0 bg-gradient-to-br from-white/85 via-[#eef4ff]/85 to-[#e8f0fb]/92" />
 
         <div className="relative z-10 w-full max-w-xl rounded-[2rem] bg-white/95 p-8 text-center shadow-[0_20px_60px_rgba(7,31,79,0.08)]">
           <div className="font-frank text-2xl text-slate-800 md:text-3xl">
@@ -949,7 +1175,7 @@ const Checkout = () => {
 
           <button
             onClick={handleBackToBooking}
-            className="mt-6 rounded-full bg-blue-500 px-6 py-3 font-frank text-white transition hover:bg-blue-600"
+            className="mt-6 rounded-full bg-[#071f4f] px-6 py-3 font-frank text-white transition hover:bg-[#0b2d70]"
           >
             Back to booking
           </button>
@@ -960,7 +1186,14 @@ const Checkout = () => {
 
   const options = {
     clientSecret,
-    appearance,
+    appearance: {
+      ...appearance,
+      variables: {
+        ...(appearance?.variables || {}),
+        colorPrimary: "#071f4f",
+        colorText: "#071f4f",
+      },
+    },
   };
 
   return (
@@ -974,8 +1207,19 @@ const Checkout = () => {
         className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-10"
       />
 
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(232,246,255,0.88)_48%,rgba(220,252,231,0.9)_100%)]" />
-      <div className="pointer-events-none absolute right-[7%] top-[14%] h-64 w-64 rounded-full bg-green-200/50 blur-3xl" />
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(232,246,255,0.88)_48%,rgba(238,244,255,0.92)_100%)]" />
+      <div className="pointer-events-none absolute right-[7%] top-[14%] h-64 w-64 rounded-full bg-[#071f4f]/18 blur-3xl" />
+
+      {showMobileBackTop && (
+        <button
+          type="button"
+          onClick={handleScrollToTop}
+          className="fixed left-1/2 top-3 z-[80] inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#071f4f] px-4 py-2 text-xs font-bold text-white shadow-[0_14px_34px_rgba(7,31,79,0.25)] transition hover:-translate-y-0.5 md:hidden"
+        >
+          <span aria-hidden="true">↑</span>
+          Back to top
+        </button>
+      )}
 
       <div className="relative z-10 min-h-screen px-3 py-4 sm:px-5 sm:py-5 md:px-8 xl:px-16">
         <div className="mx-auto max-w-7xl">
@@ -985,10 +1229,10 @@ const Checkout = () => {
           >
             <button
               onClick={handleBackToBooking}
-              className="inline-flex w-fit items-center gap-2 rounded-full bg-white/90 px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-[0_12px_30px_rgba(7,31,79,0.06)] transition hover:-translate-y-0.5 hover:bg-green-200 hover:text-green-950"
+              className="inline-flex w-fit items-center gap-2 rounded-full bg-white/90 px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-[0_12px_30px_rgba(7,31,79,0.06)] transition hover:-translate-y-0.5 hover:bg-[#071f4f] hover:text-white"
             >
               <span aria-hidden="true">←</span>
-              <span>Back to booking</span>
+              <span>Back to tour booking</span>
             </button>
           </div>
 
@@ -1007,7 +1251,7 @@ const Checkout = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/86 via-slate-950/38 to-transparent" />
 
                 <div className="absolute bottom-0 left-0 right-0 p-5 text-white md:p-7">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-green-200">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/75">
                     Checkout summary
                   </p>
 
@@ -1034,7 +1278,7 @@ const Checkout = () => {
 
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-green-200/80">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/65">
                           Time
                         </p>
 
@@ -1044,7 +1288,7 @@ const Checkout = () => {
                       </div>
 
                       <div className="rounded-[1.15rem] bg-white/10 p-3">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-green-200/80">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/65">
                           Date
                         </p>
 
@@ -1082,7 +1326,13 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+                {Object.values(openPanels).some(Boolean) && (
+                  <div className="rounded-2xl border border-green-200 bg-green-50 p-3 text-center text-xs font-bold leading-5 text-green-900 sm:hidden">
+                    Details open underneath the menu. Choose a card, then scroll down to view it.
+                  </div>
+                )}
+
+                <div ref={infoMenuRef} className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
                   <RevealButton
                     active={openPanels.trip}
                     title="Trip details"
@@ -1150,6 +1400,39 @@ const Checkout = () => {
                         Coordinates: {pickupCoordLabel}
                       </p>
 
+                      {checkoutStops.length > 0 && (
+                        <div className="mt-4 rounded-2xl bg-white/82 p-3">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                            Route stops
+                          </p>
+
+                          <div className="mt-3 grid gap-2">
+                            {checkoutStops.map((stop, index) => (
+                              <div
+                                key={`${stop.id}-${stop.name}-${index}`}
+                                className="grid grid-cols-[auto_1fr] gap-3 rounded-xl border border-black/5 bg-white p-2.5"
+                              >
+                                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#eef4ff] text-[11px] font-bold text-[#071f4f]">
+                                  {index + 1}
+                                </span>
+
+                                <div className="min-w-0">
+                                  <p className="truncate text-xs font-bold text-slate-900">
+                                    {stop.name}
+                                  </p>
+
+                                  {(stop.time || stop.duration) && (
+                                    <p className="mt-0.5 text-[11px] font-semibold text-slate-500">
+                                      {[stop.time, stop.duration].filter(Boolean).join(" · ")}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       <p className="mt-3 rounded-2xl bg-white/80 p-3 text-xs leading-5 text-slate-500">
                         Pickup is included unless stated otherwise. Cape Frontier confirms
                         the final pickup point, vehicle details, and operational timing
@@ -1200,7 +1483,7 @@ const Checkout = () => {
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         rows="4"
-                        className="mt-3 w-full resize-none rounded-2xl bg-stone-50 p-3 text-sm text-slate-700 outline-none transition focus:bg-white focus:ring-2 focus:ring-blue-200"
+                        className="mt-3 w-full resize-none rounded-2xl bg-stone-50 p-3 text-sm text-slate-700 outline-none transition focus:bg-white focus:ring-2 focus:ring-[#071f4f]/20"
                         placeholder="Custom route requests, special pickup timing, accessibility needs, dietary restrictions, allergies, luggage notes..."
                       />
                     ) : (
@@ -1272,30 +1555,55 @@ const Checkout = () => {
 
                       <div className="mt-4 space-y-3">
                         <SummaryRow
-                          label="Participants"
+                          label="Guests"
                           value={`${participants} guest${participants > 1 ? "s" : ""}`}
                         />
                         <SummaryRow
-                          label="Price per person"
+                          label="Per person"
                           value={formatMoney(pricePerPerson, currency)}
                         />
                         <SummaryRow
                           label="Tour subtotal"
-                          value={formatMoney(subtotalTours, currency)}
+                          value={`${formatMoney(pricePerPerson, currency)} × ${participants} = ${formatMoney(subtotalBeforeDiscount, currency)}`}
                         />
-                        {isPrivate && (
-                          <SummaryRow
-                            label="Private tour"
-                            value={formatMoney(privateFee, currency)}
-                          />
-                        )}
-                        {isCustom && (
-                          <SummaryRow
-                            label="Custom trip"
-                            value={formatMoney(customFee, currency)}
-                          />
-                        )}
+                        <SummaryRow
+                          label="Group discount"
+                          value={
+                            groupDiscountAmount > 0
+                              ? `-${formatMoney(groupDiscountAmount, currency)} · ${groupDiscountPercent}% saved`
+                              : "No group discount applied"
+                          }
+                        />
+                        <SummaryRow
+                          label="Discounted tour total"
+                          value={formatMoney(discountedTourSubtotal, currency)}
+                          strong
+                        />
+                        <SummaryRow
+                          label="Private tour fee"
+                          value={isPrivate ? formatMoney(privateFee, currency) : "Not added"}
+                        />
+                        <SummaryRow
+                          label="Custom trip fee"
+                          value={isCustom ? formatMoney(customFee, currency) : "Not added"}
+                        />
                       </div>
+
+                      {groupDiscountAmount > 0 && (
+                        <div className="mt-4 rounded-[1.35rem] border border-green-200 bg-green-50 p-4">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-green-700">
+                            Group saving
+                          </p>
+
+                          <div className="mt-1 font-frank text-2xl font-bold leading-none text-green-950">
+                            {formatMoney(groupDiscountAmount, currency)} saved
+                          </div>
+
+                          <p className="mt-1 text-xs font-semibold text-green-900/70">
+                            {groupDiscountPercent}% discount for {participants} guest{participants > 1 ? "s" : ""}
+                          </p>
+                        </div>
+                      )}
 
                       <div className="mt-4 rounded-[1.35rem] bg-[#071f4f] p-4 text-white">
                         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/45">
@@ -1315,6 +1623,19 @@ const Checkout = () => {
                 </RevealPanel>
 
                 <RevealPanel open={openPanels.policies}>
+                  <div className="mb-4 flex justify-center">
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2 rounded-full border border-[#071f4f]/10 bg-white px-4 py-2 text-xs font-bold text-[#071f4f] shadow-[0_10px_24px_rgba(7,31,79,0.06)]"
+                      aria-label="Policy information"
+                    >
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#071f4f] text-[11px] text-white">
+                        i
+                      </span>
+                      Policy information
+                    </button>
+                  </div>
+
                   <div className="grid gap-3 md:grid-cols-2">
                     <PolicyNote title="Booking policy reminder">
                       Lower per-person rates apply only when the selected participant
@@ -1356,7 +1677,7 @@ const Checkout = () => {
               >
                 <div className="flex items-center justify-between gap-3 px-1">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-blue-500">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#071f4f]">
                       Payment
                     </p>
                     <p className="text-xs text-slate-500">
@@ -1364,7 +1685,7 @@ const Checkout = () => {
                     </p>
                   </div>
 
-                  <span className="rounded-full bg-green-200 px-3 py-1.5 text-xs font-bold text-green-950">
+                  <span className="rounded-full bg-[#071f4f] px-3 py-1.5 text-xs font-bold text-white">
                     Secure
                   </span>
                 </div>
@@ -1384,22 +1705,19 @@ const Checkout = () => {
                     />
                   </Elements>
                 ) : (
-                  <div className="rounded-[1.5rem] bg-blue-50/50 p-6 font-bitter text-slate-600">
-                    Loading secure payment form...
+                  <div className="rounded-[1.5rem] bg-[#eef4ff]/70 p-6 text-center text-[#071f4f]">
+                    <div className="mx-auto h-10 w-10 rounded-full border-4 border-[#071f4f]/10 border-t-[#071f4f] animate-spin" />
+
+                    <p className="mt-4 font-bitter text-sm font-bold">
+                      Loading secure payment form...
+                    </p>
+
+                    <p className="mt-1 text-xs text-[#071f4f]/65">
+                      This usually takes a few seconds.
+                    </p>
                   </div>
                 )}
 
-                <div className="flex items-center gap-3 rounded-[1.35rem] bg-stone-50 p-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-sm font-bold text-white">
-                    S
-                  </div>
-
-                  <div className="text-sm text-slate-600">
-                    <b className="text-slate-900">Powered by Stripe</b>
-                    <br />
-                    Secure payment form.
-                  </div>
-                </div>
               </div>
                 </aside>
               </div>
