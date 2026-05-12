@@ -268,13 +268,135 @@ function MiniAssurance({ title, text, icon = "✓" }) {
   );
 }
 
+function HomeIcon({ className = "h-4 w-4" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="m3 10.8 9-7 9 7" />
+      <path d="M5.5 9.5V20h13V9.5" />
+      <path d="M9.5 20v-6h5v6" />
+    </svg>
+  );
+}
+
+function CheckoutCartIcon({ className = "h-5 w-5" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.15"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M6.5 6h14l-1.4 7.2a2 2 0 0 1-2 1.6H9.1a2 2 0 0 1-2-1.6L5.6 3.8H3" />
+      <path d="M9 20.2h.01" />
+      <path d="M17 20.2h.01" />
+      <path d="M10 10.5h6" />
+    </svg>
+  );
+}
+
+function SaveIcon({ className = "h-4 w-4" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.15"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" />
+      <path d="M17 21v-8H7v8" />
+      <path d="M7 3v5h8" />
+    </svg>
+  );
+}
+
+function GuestStepper({
+  label,
+  value,
+  hint,
+  onDecrease,
+  onIncrease,
+  decreaseDisabled,
+  increaseDisabled,
+  inactive = false,
+}) {
+  return (
+    <div
+      className={`rounded-2xl border p-3 transition-all duration-300 ${
+        inactive ? "border-neutral-200 bg-neutral-50/70" : "border-green-100 bg-white"
+      }`}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p
+            className={`text-[10px] font-bold uppercase tracking-[0.16em] ${
+              inactive ? "text-neutral-400" : "text-green-700"
+            }`}
+          >
+            {label}
+          </p>
+          {hint && (
+            <p className={`mt-1 text-xs leading-5 ${inactive ? "text-neutral-400" : "text-neutral-500"}`}>
+              {hint}
+            </p>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onDecrease}
+            disabled={decreaseDisabled}
+            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-black/10 bg-white text-xl font-bold text-neutral-700 transition hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-35"
+          >
+            −
+          </button>
+
+          <span
+            className={`flex h-10 min-w-12 items-center justify-center rounded-2xl border bg-transparent px-4 font-frank text-2xl font-bold ${
+              inactive ? "border-neutral-200 text-neutral-400" : "border-green-200 text-green-950"
+            }`}
+          >
+            {value}
+          </span>
+
+          <button
+            type="button"
+            onClick={onIncrease}
+            disabled={increaseDisabled}
+            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-green-200 bg-white text-xl font-bold text-green-950 transition hover:-translate-y-0.5 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-35"
+          >
+            +
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ToggleOption({ active, title, text, price, icon, onClick }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`group flex min-h-[7rem] flex-col justify-between rounded-2xl border p-4 text-left transition-all duration-300 ${
+      className={`group flex min-h-[7rem] w-full flex-col justify-between rounded-2xl border p-4 text-left transition-all duration-300 ${
         active
           ? "border-green-300 bg-green-200 text-green-950 shadow-[0_14px_34px_rgba(34,197,94,0.18)]"
           : "border-black/5 bg-white text-neutral-700 hover:-translate-y-0.5 hover:border-green-200 hover:bg-green-50"
@@ -316,6 +438,7 @@ const Booking = ({ embeddedTour }) => {
   const location = useLocation();
 
   const tour = embeddedTour || location.state?.tour;
+  const isEmbedded = Boolean(embeddedTour);
 
   const pageRef = useRef(null);
   const backRef = useRef(null);
@@ -325,6 +448,9 @@ const Booking = ({ embeddedTour }) => {
   const checkoutRef = useRef(null);
   const bottomRef = useRef(null);
   const priceRef = useRef(null);
+  const groupSaveRef = useRef(null);
+  const pickupFeedbackRef = useRef(null);
+  const bookingBasicsCompleteRef = useRef(false);
   const activeImageRef = useRef(null);
 
   const initialCurrency = location.state?.selectedCurrency || "ZAR";
@@ -398,6 +524,8 @@ const Booking = ({ embeddedTour }) => {
     mobile: "",
     email: "",
     date: "",
+    adults: "1",
+    children: "0",
     participants: "1",
     pickupLocation: "",
     pickupCoords: null,
@@ -407,17 +535,101 @@ const Booking = ({ embeddedTour }) => {
     participantEmails: [],
   });
 
-  const participantCount = Number(formData.participants || 1);
+  const [showChildrenSelector, setShowChildrenSelector] = useState(false);
+
+  const adultCount = Math.max(Number(formData.adults || 0), 1);
+  const childCount = Math.max(Number(formData.children || 0), 0);
+  const participantCount = Math.max(adultCount + childCount, 1);
   const maxParticipantEmails = Math.max(participantCount - 1, 0);
+  const maxAdults = Math.max(1, 8 - childCount);
+  const maxChildren = Math.max(0, 8 - adultCount);
+  const shouldShowChildrenSelector = showChildrenSelector || childCount > 0;
+  const groupDiscountRules =
+    tour?.groupDiscount?.enabled === false
+      ? []
+      : Array.isArray(tour?.groupDiscount?.rules)
+        ? tour.groupDiscount.rules
+        : [];
+
+  const activeGroupDiscountRule = groupDiscountRules
+    .filter((rule) => participantCount >= Number(rule.minPeople || rule.minParticipants || 0))
+    .sort(
+      (a, b) =>
+        Number(b.discountPercent || b.discount || 0) -
+        Number(a.discountPercent || a.discount || 0)
+    )[0];
+
+  const groupDiscountPercent = activeGroupDiscountRule
+    ? Number(activeGroupDiscountRule.discountPercent || activeGroupDiscountRule.discount || 0)
+    : 0;
+
   const privateFee = formData.isPrivate ? convertPrice(PRIVATE_TOUR_FEE_ZAR, currency) : 0;
   const customFee = formData.isCustom ? convertPrice(CUSTOM_TRIP_FEE_ZAR, currency) : 0;
-  const estimatedTotal = pricePerPerson * participantCount + privateFee + customFee;
+  const baseSubtotal = pricePerPerson * participantCount;
+  const groupDiscountAmount =
+    groupDiscountPercent > 0 ? baseSubtotal * (groupDiscountPercent / 100) : 0;
+  const discountedTourSubtotal = Math.max(baseSubtotal - groupDiscountAmount, 0);
+  const estimatedTotal = discountedTourSubtotal + privateFee + customFee;
   const displayTotal = formatMoney(estimatedTotal, currency);
+  const displayBaseSubtotal = formatMoney(baseSubtotal, currency);
+  const displayGroupDiscountAmount = formatMoney(groupDiscountAmount, currency);
+  const displayDiscountedTourSubtotal = formatMoney(discountedTourSubtotal, currency);
   const displayPrivateFee = formatMoney(convertPrice(PRIVATE_TOUR_FEE_ZAR, currency), currency);
   const displayCustomFee = formatMoney(convertPrice(CUSTOM_TRIP_FEE_ZAR, currency), currency);
+  const displayActivePrivateFee = formatMoney(privateFee, currency);
+  const displayActiveCustomFee = formatMoney(customFee, currency);
+
+  const formatTourMeta = (value = "") => {
+    const cleaned = value
+      .toString()
+      .replace(/[-_]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (!cleaned) return "";
+
+    if (/half\s*day/i.test(cleaned)) return "Half-Day";
+    if (/full\s*day/i.test(cleaned)) return "Full-Day";
+
+    return cleaned.replace(/\b\w/g, (letter) => letter.toUpperCase());
+  };
+
+  const tourDurationLabel = formatTourMeta(tour?.duration || tour?.category || "Tour");
+  const tourLocationLabel = formatTourMeta(tour?.location || "Cape Town");
+  const tourStyleLabel = formatTourMeta(tour?.type || tour?.category || "Cape Town Tour");
+  const tourInfoPills = [
+    {
+      label: "Duration",
+      value: tourDurationLabel,
+      className: "border-[#f7b7c8]/60 bg-[#fde2eb]/90 text-[#7b334f]",
+    },
+    {
+      label: "Style",
+      value: tourStyleLabel,
+      className: "border-[#ffd08a]/70 bg-[#fff0c9]/90 text-[#76511c]",
+    },
+    {
+      label: "Location",
+      value: tourLocationLabel,
+      className: "border-[#a8d8ee]/70 bg-[#dff4ff]/90 text-[#24566b]",
+    },
+    {
+      label: "Pickup",
+      value: "Included",
+      className: "border-[#b8e6c8]/70 bg-[#e3f8df]/90 text-[#2d6139]",
+    },
+  ].filter((pill) => pill.value);
   const normalizedParticipantEmails = (formData.participantEmails || [])
     .map((email) => email.trim())
     .filter(Boolean);
+  const contactDetailsComplete = Boolean(
+    formData.fullName.trim() &&
+      formData.mobile.trim() &&
+      formData.email.trim()
+  );
+  const dateDetailsComplete = Boolean(formData.date);
+  const travellerDetailsComplete = contactDetailsComplete && dateDetailsComplete;
+  const pickupDetailsComplete = Boolean(formData.pickupCoords);
 
   const [mapCenter, setMapCenter] = useState({
     lat: DEFAULT_CENTER[0],
@@ -427,6 +639,10 @@ const Booking = ({ embeddedTour }) => {
   const [markerPosition, setMarkerPosition] = useState(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState("");
+  const [showPickupPicker, setShowPickupPicker] = useState(true);
+  const [pendingPickup, setPendingPickup] = useState(null);
+  const [showTravellerEditor, setShowTravellerEditor] = useState(true);
+  const [showGroupEditor, setShowGroupEditor] = useState(true);
 
   const handleImageError = (e) => {
     if (e.currentTarget.src.includes(fallbackImage)) return;
@@ -486,6 +702,34 @@ const Booking = ({ embeddedTour }) => {
     );
   }, [activeImage]);
 
+  useEffect(() => {
+    if (!formData.pickupCoords || !pickupFeedbackRef.current) return;
+
+    gsap.fromTo(
+      pickupFeedbackRef.current,
+      {
+        y: 10,
+        scale: 0.985,
+        autoAlpha: 0.82,
+      },
+      {
+        y: 0,
+        scale: 1,
+        autoAlpha: 1,
+        duration: 0.42,
+        ease: "back.out(1.7)",
+      }
+    );
+  }, [formData.pickupCoords]);
+
+  useEffect(() => {
+    if (travellerDetailsComplete && !bookingBasicsCompleteRef.current) {
+      setShowTravellerEditor(false);
+    }
+
+    bookingBasicsCompleteRef.current = travellerDetailsComplete;
+  }, [travellerDetailsComplete]);
+
   useLayoutEffect(() => {
     if (!tour) return;
 
@@ -494,60 +738,84 @@ const Booking = ({ embeddedTour }) => {
         defaults: { ease: "power3.out" },
       });
 
-      tl.fromTo(
-        backRef.current,
-        { opacity: 0, x: -30 },
-        { opacity: 1, x: 0, duration: 0.45 }
-      )
-        .fromTo(
+      if (!isEmbedded && backRef.current) {
+        tl.fromTo(
+          backRef.current,
+          { opacity: 0, x: -18 },
+          { opacity: 1, x: 0, duration: 0.45 }
+        );
+      }
+
+      if (cardRef.current) {
+        tl.fromTo(
           cardRef.current,
-          { opacity: 0, y: 36, scale: 0.985 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.65 },
-          "-=0.15"
-        )
-        .fromTo(
+          { opacity: 0, y: isEmbedded ? 18 : 36, scale: isEmbedded ? 1 : 0.985 },
+          { opacity: 1, y: 0, scale: 1, duration: isEmbedded ? 0.45 : 0.65 },
+          isEmbedded ? 0 : "-=0.15"
+        );
+      }
+
+      if (!isEmbedded && leftRef.current) {
+        tl.fromTo(
           leftRef.current,
           { opacity: 0, x: -34 },
           { opacity: 1, x: 0, duration: 0.55 },
           "-=0.45"
-        )
-        .fromTo(
+        );
+      }
+
+      if (rightRef.current) {
+        tl.fromTo(
           rightRef.current,
-          { opacity: 0, x: 34 },
-          { opacity: 1, x: 0, duration: 0.55 },
-          "-=0.5"
-        )
-        .fromTo(
+          { opacity: 0, x: isEmbedded ? 0 : 34, y: isEmbedded ? 14 : 0 },
+          { opacity: 1, x: 0, y: 0, duration: isEmbedded ? 0.42 : 0.55 },
+          isEmbedded ? "-=0.2" : "-=0.5"
+        );
+      }
+
+      if (checkoutRef.current) {
+        tl.fromTo(
           checkoutRef.current,
           { opacity: 0, y: 24 },
           { opacity: 1, y: 0, duration: 0.45 },
           "-=0.15"
-        )
-        .fromTo(
+        );
+      }
+
+      if (bottomRef.current) {
+        tl.fromTo(
           bottomRef.current,
           { opacity: 0, y: 18 },
           { opacity: 1, y: 0, duration: 0.45 },
           "-=0.12"
         );
+      }
 
-      gsap.fromTo(
-        priceRef.current,
-        { opacity: 0.5, scale: 0.95 },
-        {
-          opacity: 1,
-          scale: 1,
-          duration: 0.7,
-          delay: 0.7,
-          ease: "back.out(1.7)",
-        }
-      );
+      if (priceRef.current) {
+        gsap.fromTo(
+          priceRef.current,
+          { opacity: 0.5, scale: 0.95 },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.7,
+            delay: isEmbedded ? 0.35 : 0.7,
+            ease: "back.out(1.7)",
+          }
+        );
+      }
     }, pageRef);
 
     return () => ctx.revert();
-  }, [tour]);
+  }, [tour, isEmbedded]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "children") {
+      const nextChildValue = Number(value || 0);
+      setShowChildrenSelector(nextChildValue > 0);
+    }
 
     setFormData((prev) => {
       const next = {
@@ -555,8 +823,30 @@ const Booking = ({ embeddedTour }) => {
         [name]: value,
       };
 
-      if (name === "participants") {
-        const maxEmails = Math.max(Number(value || 1) - 1, 0);
+      if (name === "adults" || name === "children") {
+        let nextAdultCount = Math.max(
+          Number(name === "adults" ? value : prev.adults || 1),
+          1
+        );
+        let nextChildCount = Math.max(
+          Number(name === "children" ? value : prev.children || 0),
+          0
+        );
+
+        if (nextAdultCount + nextChildCount > 8) {
+          if (name === "adults") {
+            nextChildCount = Math.max(0, 8 - nextAdultCount);
+          } else {
+            nextChildCount = Math.max(0, 8 - nextAdultCount);
+          }
+        }
+
+        const nextParticipantCount = Math.max(nextAdultCount + nextChildCount, 1);
+        const maxEmails = Math.max(nextParticipantCount - 1, 0);
+
+        next.adults = String(nextAdultCount);
+        next.children = String(nextChildCount);
+        next.participants = String(nextParticipantCount);
         next.participantEmails = (prev.participantEmails || []).slice(0, maxEmails);
         if (maxEmails === 0) next.ccParticipants = false;
       }
@@ -570,6 +860,56 @@ const Booking = ({ embeddedTour }) => {
       ...prev,
       [name]: !prev[name],
     }));
+  };
+
+  const handleAddChildren = () => {
+    setShowChildrenSelector(true);
+    setShowGroupEditor(true);
+
+    setFormData((prev) => {
+      const currentAdults = Math.max(Number(prev.adults || 1), 1);
+      const nextChildren = Math.min(Math.max(Number(prev.children || 0), 1), Math.max(0, 8 - currentAdults));
+      const nextParticipantCount = Math.max(currentAdults + nextChildren, 1);
+      const maxEmails = Math.max(nextParticipantCount - 1, 0);
+
+      return {
+        ...prev,
+        children: String(nextChildren),
+        participants: String(nextParticipantCount),
+        participantEmails: (prev.participantEmails || []).slice(0, maxEmails),
+        ccParticipants: maxEmails === 0 ? false : prev.ccParticipants,
+      };
+    });
+  };
+
+  const adjustGuestCount = (type, delta) => {
+    setShowGroupEditor(true);
+
+    setFormData((prev) => {
+      let nextAdults = Math.max(Number(prev.adults || 1), 1);
+      let nextChildren = Math.max(Number(prev.children || 0), 0);
+
+      if (type === "adults") {
+        nextAdults = Math.min(Math.max(nextAdults + delta, 1), Math.max(1, 8 - nextChildren));
+      }
+
+      if (type === "children") {
+        nextChildren = Math.min(Math.max(nextChildren + delta, 0), Math.max(0, 8 - nextAdults));
+        setShowChildrenSelector(nextChildren > 0);
+      }
+
+      const nextParticipantCount = Math.max(nextAdults + nextChildren, 1);
+      const maxEmails = Math.max(nextParticipantCount - 1, 0);
+
+      return {
+        ...prev,
+        adults: String(nextAdults),
+        children: String(nextChildren),
+        participants: String(nextParticipantCount),
+        participantEmails: (prev.participantEmails || []).slice(0, maxEmails),
+        ccParticipants: maxEmails === 0 ? false : prev.ccParticipants,
+      };
+    });
   };
 
   const addParticipantEmail = () => {
@@ -608,6 +948,33 @@ const Booking = ({ embeddedTour }) => {
     });
   };
 
+  const handlePickupInputChange = (e) => {
+    const { value } = e.target;
+
+    setPendingPickup(null);
+    setMarkerPosition(null);
+    setShowPickupPicker(true);
+
+    setFormData((prev) => ({
+      ...prev,
+      pickupLocation: value,
+      pickupCoords: null,
+    }));
+  };
+
+  const handleConfirmPickupLocation = () => {
+    if (!pendingPickup?.coords) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      pickupLocation: pendingPickup.location,
+      pickupCoords: pendingPickup.coords,
+    }));
+
+    setPendingPickup(null);
+    setShowPickupPicker(false);
+  };
+
   const handleMapPick = async (coords) => {
     setMarkerPosition(coords);
     setMapCenter(coords);
@@ -620,19 +987,17 @@ const Booking = ({ embeddedTour }) => {
 
       const data = await res.json();
 
-      setFormData((prev) => ({
-        ...prev,
-        pickupLocation:
+      setPendingPickup({
+        location:
           data?.display_name ||
           `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`,
-        pickupCoords: coords,
-      }));
+        coords,
+      });
     } catch {
-      setFormData((prev) => ({
-        ...prev,
-        pickupLocation: `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`,
-        pickupCoords: coords,
-      }));
+      setPendingPickup({
+        location: `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`,
+        coords,
+      });
     }
   };
 
@@ -673,11 +1038,10 @@ const Booking = ({ embeddedTour }) => {
       setMarkerPosition(coords);
       setMapCenter(coords);
 
-      setFormData((prev) => ({
-        ...prev,
-        pickupLocation: result.display_name || prev.pickupLocation,
-        pickupCoords: coords,
-      }));
+      setPendingPickup({
+        location: result.display_name || formData.pickupLocation,
+        coords,
+      });
     } catch {
       setLocationError("Could not find that address.");
     } finally {
@@ -693,7 +1057,8 @@ const Booking = ({ embeddedTour }) => {
       "mobile",
       "email",
       "date",
-      "participants",
+      "adults",
+      "children",
       "pickupLocation",
     ];
 
@@ -723,6 +1088,9 @@ const Booking = ({ embeddedTour }) => {
         tour,
         bookingDetails: {
           ...formData,
+          adults: adultCount,
+          children: childCount,
+          participants: String(participantCount),
           participantEmails: normalizedParticipantEmails,
           ccParticipantEmails: formData.ccParticipants ? normalizedParticipantEmails : [],
           pricingOptions: {
@@ -730,6 +1098,10 @@ const Booking = ({ embeddedTour }) => {
             isCustom: formData.isCustom,
             privateFee,
             customFee,
+            groupDiscountPercent,
+            groupDiscountAmount,
+            subtotalBeforeGroupDiscount: baseSubtotal,
+            discountedTourSubtotal,
             estimatedTotal,
             currency,
           },
@@ -744,18 +1116,33 @@ const Booking = ({ embeddedTour }) => {
   return (
     <div
       ref={pageRef}
-      className="relative min-h-screen overflow-hidden bg-stone-50 text-neutral-900"
+      className={`relative overflow-hidden text-neutral-900 ${
+        isEmbedded ? "min-h-0 bg-transparent" : "min-h-screen bg-stone-50"
+      }`}
     >
       <img
         src="/assets/content/clip-art/section1-bg.png"
         alt=""
-        className="pointer-events-none absolute z-10 h-full w-full select-none object-contain opacity-90"
+        className={`pointer-events-none absolute z-10 h-full w-full select-none object-contain opacity-90 ${
+          isEmbedded ? "hidden" : ""
+        }`}
       />
 
-      <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-stone-50/90 to-sky-100/80" />
+      <div
+        className={`absolute inset-0 bg-gradient-to-b from-white/70 via-stone-50/90 to-sky-100/80 ${
+          isEmbedded ? "hidden" : ""
+        }`}
+      />
 
-      <div className="relative z-10 px-6 py-10 md:px-12 xl:px-20">
-        <div ref={backRef} className="mx-auto mb-6 max-w-7xl">
+      <div
+        className={`relative z-10 ${
+          isEmbedded ? "px-4 py-0 sm:px-5" : "px-6 py-10 md:px-12 xl:px-20"
+        }`}
+      >
+        <div
+          ref={backRef}
+          className={`mx-auto mb-6 max-w-7xl ${isEmbedded ? "hidden" : ""}`}
+        >
           <button
             onClick={handleBack}
             className="group flex items-center gap-3 rounded-full border border-black/10 bg-white/90 px-5 py-3 text-neutral-800 shadow-sm transition-all duration-300 hover:bg-white hover:shadow-md"
@@ -772,10 +1159,14 @@ const Booking = ({ embeddedTour }) => {
 
         <div
           ref={cardRef}
-          className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] border border-black/5 bg-white/88 shadow-[0_24px_70px_rgba(0,0,0,0.10)] backdrop-blur-md"
+          className={`mx-auto overflow-hidden border border-black/5 bg-white/92 backdrop-blur-md ${
+            isEmbedded
+              ? "max-w-6xl rounded-[1.5rem] shadow-[0_16px_48px_rgba(37,99,235,0.08)]"
+              : "max-w-7xl rounded-[2rem] shadow-[0_24px_70px_rgba(0,0,0,0.10)]"
+          }`}
         >
-          <div className="grid lg:grid-cols-[0.95fr_1.05fr]">
-            <div ref={leftRef} className="relative bg-neutral-100">
+          <div className={isEmbedded ? "grid" : "grid lg:grid-cols-[0.95fr_1.05fr]"}>
+            <div ref={leftRef} className={isEmbedded ? "hidden" : "relative bg-neutral-100"}>
               <div className="relative h-[380px] overflow-hidden md:h-[460px] lg:h-[680px]">
                 <img
                   ref={activeImageRef}
@@ -936,25 +1327,44 @@ const Booking = ({ embeddedTour }) => {
               </div>
             </div>
 
-            <div ref={rightRef} className="group/right bg-gradient-to-br from-white via-white to-stone-50 p-5 transition-colors duration-500 hover:from-white hover:via-green-50/70 hover:to-blue-50/60 md:p-7 lg:p-8">
-              <div className="mb-6 rounded-[1.75rem] border border-black/5 bg-neutral-50 p-4 transition-all duration-500 group-hover/right:border-green-200 group-hover/right:bg-white sm:p-5">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-neutral-500">
-                      Booking details
-                    </p>
+            <div className="max-w-5xl mx-auto flex flex-col items-center mt-4">
+                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-green-500">
+                    {isEmbedded ? "Tour request" : "Booking details"}
+                  </p>
 
-                    <h2 className="mt-2 font-frank text-3xl leading-none text-neutral-950 md:text-4xl">
-                      Secure your slot
-                    </h2>
+                  <h2 className="mt-2 font-frank text-3xl leading-none text-black md:text-4xl">
+                    {isEmbedded ? "Complete your details" : "Secure your slot"}
+                  </h2>
+            </div>
 
-                    <p className="mt-2 max-w-md text-sm leading-6 text-neutral-500">
-                      Complete the important details first. Your final amount is recalculated securely at checkout.
-                    </p>
-                  </div>
+            <div
+              ref={rightRef}
+              className={`group/right transition-colors duration-500 ${
+                isEmbedded
+                  ? "p-4 sm:p-5 md:p-6 lg:p-7"
+                  : "p-5 hover:from-white hover:via-green-49/70 hover:to-blue-50/60 md:p-7 lg:p-8"
+              }`}
+            >
+              <div className="relative mb-6 overflow-hidden rounded-t-4xl border border-black/5 p-4 transition-all duration-500 group-hover/right:border-blue-200 sm:p-5">
+                <img
+                  src={tour.image || fallbackImage}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className="pointer-events-none absolute inset-0 h-full w-full object-fit opacity-10  blur-[0px]"
+                  onError={(e) => {
+                    e.currentTarget.src = fallbackImage;
+                  }}
+                />
 
-                  <div ref={priceRef} className="flex shrink-0 items-end justify-between gap-3 sm:justify-end">
-                    <div className="text-right">
+
+                <div className="relative z-10">
+                <div className="flex flex-col items-center text-center">
+                  <div
+                    ref={priceRef}
+                    className="mt-5 flex w-full shrink-0 flex-col items-center justify-center gap-3 rounded-2xl border border-black/5 bg-white/80 px-5 py-5 text-center shadow-[0_10px_26px_rgba(0,0,0,0.035)] sm:w-fit sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-4"
+                  >
+                    <div className="px-2 py-1.5 sm:min-w-[9.5rem] sm:px-3 sm:py-2">
                       <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400">
                         From
                       </div>
@@ -966,12 +1376,12 @@ const Booking = ({ embeddedTour }) => {
                       <div className="mt-1 text-xs text-neutral-500">per person</div>
                     </div>
 
-                    <div className="relative">
+                    <div className="relative py-1.5 sm:py-2">
                       <select
                         aria-label="Select currency"
                         value={currency}
                         onChange={(e) => setCurrency(e.target.value)}
-                        className="h-14 w-20 appearance-none rounded-2xl border border-black/10 bg-white px-3 pr-7 text-center text-lg font-bold text-neutral-900 outline-none transition hover:border-green-300 hover:bg-green-200 focus:border-green-400 focus:bg-green-200"
+                        className="h-14 w-24 appearance-none rounded-2xl border border-black/10 bg-white px-4 pr-8 text-center text-lg font-bold text-neutral-900 outline-none transition hover:border-green-300 hover:bg-green-200 focus:border-green-400 focus:bg-green-200"
                       >
                         {supportedCurrencies.map((code) => (
                           <option key={code} value={code}>
@@ -980,7 +1390,7 @@ const Booking = ({ embeddedTour }) => {
                         ))}
                       </select>
 
-                      <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400">
+                      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400">
                         <svg
                           width="12"
                           height="12"
@@ -998,58 +1408,36 @@ const Booking = ({ embeddedTour }) => {
                   </div>
                 </div>
 
-                <div className="mt-4 grid gap-3 rounded-2xl bg-white p-3 sm:grid-cols-3">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-400">
-                      Guests
-                    </p>
-                    <p className="mt-1 text-sm font-bold text-neutral-900">
-                      {participantCount}
-                    </p>
-                  </div>
+                <div className="mt-7 px-2 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-neutral-400">
+                    Selected tour
+                  </p>
 
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-400">
-                      Est. total
-                    </p>
-                    <p className="mt-1 text-sm font-bold text-neutral-900">
-                      {displayTotal}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-400">
-                      Status
-                    </p>
-                    <p className="mt-1 text-sm font-bold text-green-700">
-                      {formData.isPrivate || formData.isCustom
-                        ? "Adjusted estimate"
-                        : "Pay-now flow"}
-                    </p>
-                  </div>
+                  <h3 className="mx-auto mt-2 max-w-5xl font-frank text-[2.85rem] font-black leading-[0.9] tracking-[-0.055em] text-neutral-950 sm:text-[3.9rem] md:text-[4.75rem] lg:text-[5.6rem]">
+                    {tour.title || tour.info}
+                  </h3>
                 </div>
 
-                {(formData.isPrivate || formData.isCustom) && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {formData.isPrivate && (
-                      <span className="rounded-full bg-green-200 px-3 py-1.5 text-xs font-bold text-green-950">
-                        Private fee included: {formatMoney(privateFee, currency)}
+                <div className="mt-5 flex flex-wrap justify-center gap-2.5 sm:gap-3">
+                  {tourInfoPills.map((pill) => (
+                    <span
+                      key={`${pill.label}-${pill.value}`}
+                      className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold shadow-[0_8px_20px_rgba(0,0,0,0.035)] backdrop-blur-sm ${pill.className}`}
+                    >
+                      <span className="text-[9px] uppercase tracking-[0.18em] opacity-65">
+                        {pill.label}
                       </span>
-                    )}
-
-                    {formData.isCustom && (
-                      <span className="rounded-full bg-blue-100 px-3 py-1.5 text-xs font-bold text-blue-700">
-                        Custom planning included: {formatMoney(customFee, currency)}
-                      </span>
-                    )}
-                  </div>
-                )}
+                      <span>{pill.value}</span>
+                    </span>
+                  ))}
+                </div>
+                </div>
               </div>
 
               <form id="booking-form" onSubmit={handleSubmit} className="grid gap-5">
                 <div className="rounded-[1.75rem] border border-black/5 bg-white p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/80 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
                   <div className="mb-4 flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-green-200 text-sm font-bold text-green-950">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-green-200 text-sm font-bold text-green-950 ring-1 ring-green-300">
                       1
                     </span>
                     <div>
@@ -1057,58 +1445,124 @@ const Booking = ({ embeddedTour }) => {
                         Traveller details
                       </h3>
                       <p className="mt-1 text-xs text-neutral-500">
-                        Used for confirmation and support.
+                        Add contact details and choose the preferred tour date.
                       </p>
                     </div>
                   </div>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <BookingField label="Full name">
-                      <input
-                        name="fullName"
-                        placeholder="Faiez Viljoen"
-                        value={formData.fullName}
-                        onChange={handleChange}
-                        className="w-full rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
-                      />
-                    </BookingField>
+                  {travellerDetailsComplete && (
+                    <div className="mb-4 rounded-2xl border border-green-200 bg-green-50 p-4">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <p className="text-sm font-bold text-green-950">
+                            Traveller details saved
+                          </p>
+                          <p className="mt-1 text-xs leading-5 text-neutral-600">
+                            {formData.fullName} · {formData.mobile} · {formData.email} · {formData.date}
+                          </p>
+                        </div>
 
-                    <BookingField label="Mobile number">
-                      <input
-                        name="mobile"
-                        placeholder="081 000 0000"
-                        value={formData.mobile}
-                        onChange={handleChange}
-                        className="w-full rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
-                      />
-                    </BookingField>
+                        <button
+                          type="button"
+                          onClick={() => setShowTravellerEditor(true)}
+                          className="w-fit rounded-full border border-green-200 bg-white px-4 py-2 text-xs font-bold text-green-800 transition hover:bg-green-100"
+                        >
+                          Change
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
-                    <BookingField label="Email address">
-                      <input
-                        name="email"
-                        type="email"
-                        placeholder="name@email.com"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
-                      />
-                    </BookingField>
+                  <div
+                    className={`transition-all duration-500 ease-out ${
+                      travellerDetailsComplete && !showTravellerEditor
+                        ? "max-h-0 overflow-hidden opacity-0 pointer-events-none"
+                        : "max-h-[650px] opacity-100"
+                    }`}
+                  >
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <BookingField label="Full name">
+                        <input
+                          name="fullName"
+                          placeholder="Faiez Viljoen"
+                          value={formData.fullName}
+                          onChange={handleChange}
+                          className="w-full rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
+                        />
+                      </BookingField>
 
-                    <BookingField label="Preferred date">
-                      <input
-                        name="date"
-                        type="date"
-                        value={formData.date}
-                        onChange={handleChange}
-                        className="w-full rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
-                      />
-                    </BookingField>
+                      <BookingField label="Mobile number">
+                        <input
+                          name="mobile"
+                          placeholder="081 000 0000"
+                          value={formData.mobile}
+                          onChange={handleChange}
+                          className="w-full rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
+                        />
+                      </BookingField>
+
+                      <BookingField label="Email address">
+                        <input
+                          name="email"
+                          type="email"
+                          placeholder="name@email.com"
+                          value={formData.email}
+                          onChange={handleChange}
+                          className="w-full rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
+                        />
+                      </BookingField>
+
+                      <BookingField label="Preferred date">
+                        <input
+                          name="date"
+                          type="date"
+                          value={formData.date}
+                          onClick={(e) => e.currentTarget.showPicker?.()}
+                          onFocus={(e) => e.currentTarget.showPicker?.()}
+                          onChange={handleChange}
+                          className="w-full cursor-pointer rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
+                        />
+                      </BookingField>
+                    </div>
+
+                    {travellerDetailsComplete && (
+                      <div className="mt-4 flex justify-center">
+                        <button
+                          type="button"
+                          onClick={() => setShowTravellerEditor(false)}
+                          className="rounded-2xl bg-green-200 px-5 py-3 text-sm font-bold text-green-950 transition hover:-translate-y-0.5 hover:bg-green-300"
+                        >
+                          Save traveller details
+                        </button>
+                      </div>
+                    )}
                   </div>
+
+                </div>
+
+                <div className="flex flex-col gap-3 lg:flex-row [&>button]:flex-1">
+                  <ToggleOption
+                    active={formData.isPrivate}
+                    title="Private tour"
+                    text="Book this as a private vehicle-based experience."
+                    price={`+ ${displayPrivateFee}`}
+                    icon="P"
+                    onClick={() => handleToggleOption("isPrivate")}
+                  />
+
+                  <ToggleOption
+                    active={formData.isCustom}
+                    title="Custom trip"
+                    text="Request custom planning, route timing, or special adjustments."
+                    price={`+ ${displayCustomFee}`}
+                    icon="C"
+                    onClick={() => handleToggleOption("isCustom")}
+                  />
                 </div>
 
                 <div className="rounded-[1.75rem] border border-black/5 bg-white p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/80 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
                   <div className="mb-4 flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-100 text-sm font-bold text-blue-700">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-100 text-sm font-bold text-blue-700 ring-1 ring-blue-200">
                       2
                     </span>
                     <div>
@@ -1121,45 +1575,144 @@ const Booking = ({ embeddedTour }) => {
                     </div>
                   </div>
 
-                  <BookingField
-                    label="Participants"
-                    hint="Discount tiers only apply when you book and pay for that full number of guests."
-                  >
-                    <select
-                      name="participants"
-                      value={formData.participants}
-                      onChange={handleChange}
-                      className="w-full rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
+                  <div className="rounded-2xl border border-green-200 bg-green-50/65 p-4 transition-all duration-300">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-green-700">
+                          Selected guests
+                        </p>
+                        <p className="mt-1 font-frank text-3xl font-bold leading-none text-neutral-950">
+                          {participantCount} total
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-neutral-500">
+                          {adultCount} adult{adultCount === 1 ? "" : "s"}
+                          {childCount > 0
+                            ? ` · ${childCount} child${childCount === 1 ? "" : "ren"}`
+                            : ""}
+                          {normalizedParticipantEmails.length > 0
+                            ? ` · ${normalizedParticipantEmails.length} email${normalizedParticipantEmails.length === 1 ? "" : "s"} added`
+                            : ""}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setShowGroupEditor(true)}
+                        className="w-fit rounded-full border border-green-200 bg-white px-4 py-2 text-xs font-bold text-green-800 transition hover:-translate-y-0.5 hover:bg-green-100"
+                      >
+                        Change
+                      </button>
+                    </div>
+
+                    <div
+                      className={`transition-all duration-500 ease-out ${
+                        !showGroupEditor
+                          ? "max-h-0 overflow-hidden opacity-0 pointer-events-none"
+                          : "mt-4 max-h-[980px] opacity-100"
+                      }`}
                     >
-                      {[...Array(8).keys()].map((num) => (
-                        <option key={num + 1} value={num + 1}>
-                          {num + 1} Participant{num + 1 > 1 ? "s" : ""}
-                        </option>
-                      ))}
-                    </select>
-                  </BookingField>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <GuestStepper
+                          label="Adults"
+                          value={adultCount}
+                          hint="Adults in your own booking group."
+                          onDecrease={() => adjustGuestCount("adults", -1)}
+                          onIncrease={() => adjustGuestCount("adults", 1)}
+                          decreaseDisabled={adultCount <= 1}
+                          increaseDisabled={adultCount + childCount >= 8}
+                        />
 
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    <ToggleOption
-                      active={formData.isPrivate}
-                      title="Private tour"
-                      text="Book this as a private vehicle-based experience."
-                      price={`+ ${displayPrivateFee}`}
-                      icon="P"
-                      onClick={() => handleToggleOption("isPrivate")}
-                    />
+                        <GuestStepper
+                          label="Children"
+                          value={childCount}
+                          hint="Optional. Leave at 0 when there are no children."
+                          onDecrease={() => adjustGuestCount("children", -1)}
+                          onIncrease={() => adjustGuestCount("children", 1)}
+                          decreaseDisabled={childCount <= 0}
+                          increaseDisabled={adultCount + childCount >= 8}
+                          inactive={childCount === 0}
+                        />
+                      </div>
 
-                    <ToggleOption
-                      active={formData.isCustom}
-                      title="Custom trip"
-                      text="Request custom planning, route timing, or special adjustments."
-                      price={`+ ${displayCustomFee}`}
-                      icon="C"
-                      onClick={() => handleToggleOption("isCustom")}
-                    />
+                      <div className="mt-4 rounded-2xl border border-black/5 bg-white p-4">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <p className="text-sm font-bold text-neutral-950">
+                              Participant email CCs
+                            </p>
+                            <p className="mt-1 text-xs leading-5 text-neutral-500">
+                              Optional. Add guest emails under the selected number of guests.
+                            </p>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={addParticipantEmail}
+                            disabled={!maxParticipantEmails || formData.participantEmails.length >= maxParticipantEmails}
+                            className="rounded-2xl border border-black/10 bg-neutral-950 px-4 py-2.5 text-xs font-bold text-white transition hover:-translate-y-0.5 hover:bg-black disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            Add member email
+                          </button>
+                        </div>
+
+                        {maxParticipantEmails === 0 && (
+                          <p className="mt-3 rounded-xl bg-neutral-50 p-3 text-xs leading-5 text-neutral-500">
+                            Select at least 2 total guests to add extra guest emails.
+                          </p>
+                        )}
+
+                        {formData.participantEmails.length > 0 && (
+                          <div className="mt-4 grid gap-3">
+                            <label className="flex items-center gap-3 rounded-2xl bg-neutral-50 p-3 text-sm text-neutral-700">
+                              <input
+                                type="checkbox"
+                                checked={formData.ccParticipants}
+                                onChange={() => handleToggleOption("ccParticipants")}
+                                className="h-4 w-4 accent-green-500"
+                              />
+                              CC these participants after confirmed purchase
+                            </label>
+
+                            {formData.participantEmails.map((email, index) => (
+                              <div key={index} className="flex gap-2">
+                                <input
+                                  type="email"
+                                  value={email}
+                                  onChange={(e) => updateParticipantEmail(index, e.target.value)}
+                                  placeholder={`Participant ${index + 2} email`}
+                                  className="min-w-0 flex-1 rounded-2xl border border-neutral-200 bg-white p-3 text-sm outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
+                                />
+
+                                <button
+                                  type="button"
+                                  onClick={() => removeParticipantEmail(index)}
+                                  className="rounded-2xl border border-black/10 bg-white px-3 text-sm font-bold text-neutral-500 transition hover:bg-red-50 hover:text-red-500"
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mt-4 flex justify-center">
+                        <button
+                          type="button"
+                          onClick={() => setShowGroupEditor(false)}
+                          className="inline-flex items-center gap-2 rounded-2xl border border-green-200 bg-white px-5 py-3 text-sm font-bold text-green-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-green-50"
+                        >
+                          <SaveIcon />
+                          Confirm group details
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="mt-4 rounded-2xl border border-green-200 bg-green-50 p-4">
+                  <div
+                    ref={groupSaveRef}
+                    className="mt-4 rounded-2xl border border-green-200 bg-green-50 p-4 transition-all duration-300"
+                  >
                     <div className="flex items-start gap-3">
                       <img
                         src="/icons/savemore.png"
@@ -1170,85 +1723,34 @@ const Booking = ({ embeddedTour }) => {
                         }}
                       />
 
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <p className="text-sm font-bold text-green-950">
-                          Save more as a group
+                          Save more when you book as a group
                         </p>
 
                         <p className="mt-1 text-xs leading-5 text-green-900/75">
-                          Lower per-person rates apply only when the customer books and pays
-                          for the full selected group size.
+                          Bigger groups can unlock a lower per-person estimate. Group rates only apply to the full selected group size booked and paid for.
                         </p>
+
+                        <button
+                          type="button"
+                          onClick={() => nav("/policies")}
+                          className="mt-3 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-green-800 shadow-sm transition hover:-translate-y-0.5 hover:bg-green-100"
+                        >
+                          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-green-200 text-[10px] text-green-950">
+                            i
+                          </span>
+                          Learn more about group policy
+                        </button>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-4 rounded-2xl border border-black/5 bg-white p-4">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <p className="text-sm font-bold text-neutral-950">
-                          Participant email CCs
-                        </p>
-                        <p className="mt-1 text-xs leading-5 text-neutral-500">
-                          Optional. Add other guest emails so they can be CC’d after purchase.
-                        </p>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={addParticipantEmail}
-                        disabled={!maxParticipantEmails || formData.participantEmails.length >= maxParticipantEmails}
-                        className="rounded-2xl border border-black/10 bg-neutral-950 px-4 py-2.5 text-xs font-bold text-white transition hover:-translate-y-0.5 hover:bg-black disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        Add member email
-                      </button>
-                    </div>
-
-                    {maxParticipantEmails === 0 && (
-                      <p className="mt-3 rounded-xl bg-neutral-50 p-3 text-xs leading-5 text-neutral-500">
-                        Select at least 2 participants to add extra guest emails.
-                      </p>
-                    )}
-
-                    {formData.participantEmails.length > 0 && (
-                      <div className="mt-4 grid gap-3">
-                        <label className="flex items-center gap-3 rounded-2xl bg-neutral-50 p-3 text-sm text-neutral-700">
-                          <input
-                            type="checkbox"
-                            checked={formData.ccParticipants}
-                            onChange={() => handleToggleOption("ccParticipants")}
-                            className="h-4 w-4 accent-green-500"
-                          />
-                          CC these participants after confirmed purchase
-                        </label>
-
-                        {formData.participantEmails.map((email, index) => (
-                          <div key={index} className="flex gap-2">
-                            <input
-                              type="email"
-                              value={email}
-                              onChange={(e) => updateParticipantEmail(index, e.target.value)}
-                              placeholder={`Participant ${index + 2} email`}
-                              className="min-w-0 flex-1 rounded-2xl border border-neutral-200 bg-white p-3 text-sm outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
-                            />
-
-                            <button
-                              type="button"
-                              onClick={() => removeParticipantEmail(index)}
-                              className="rounded-2xl border border-black/10 bg-white px-3 text-sm font-bold text-neutral-500 transition hover:bg-red-50 hover:text-red-500"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
                 </div>
 
-                <div className="rounded-[1.75rem] border border-black/5 bg-stone-50 p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-blue-200/80 group-hover/right:bg-blue-50/40 group-hover/right:shadow-[0_16px_42px_rgba(59,130,246,0.08)] sm:p-5">
+                <div className="rounded-[1.75rem] border border-blue-100 bg-blue-50/45 p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/90 group-hover/right:bg-green-50/60 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
                   <div className="mb-4 flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-neutral-950 text-sm font-bold text-white">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-sky-100 text-sm font-bold text-sky-700 ring-1 ring-sky-200">
                       3
                     </span>
                     <div>
@@ -1261,30 +1763,67 @@ const Booking = ({ embeddedTour }) => {
                     </div>
                   </div>
 
-                  <div className="mb-4 flex flex-col gap-3 md:flex-row">
-                    <input
-                      name="pickupLocation"
-                      placeholder="Hotel, guesthouse, Airbnb, or pickup point"
-                      value={formData.pickupLocation}
-                      onChange={handleChange}
-                      className="flex-1 rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
+                  <div
+                    className={`transition-all duration-500 ease-out ${
+                      formData.pickupCoords && !showPickupPicker
+                        ? "max-h-0 overflow-hidden opacity-0 pointer-events-none -mt-2"
+                        : "max-h-[560px] opacity-100"
+                    }`}
+                  >
+                    <div className="mb-4 flex flex-col gap-3 md:flex-row">
+                      <input
+                        name="pickupLocation"
+                        placeholder="Hotel, guesthouse, Airbnb, or pickup point"
+                        value={formData.pickupLocation}
+                        onChange={handlePickupInputChange}
+                        className="flex-1 rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={handleFindAddress}
+                        disabled={locationLoading}
+                        className="rounded-2xl bg-blue-600 px-5 py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {locationLoading ? "Searching..." : "Find on map"}
+                      </button>
+                    </div>
+
+                    <PickupMap
+                      center={[mapCenter.lat, mapCenter.lng]}
+                      markerPosition={markerPosition}
+                      onPick={handleMapPick}
                     />
 
-                    <button
-                      type="button"
-                      onClick={handleFindAddress}
-                      disabled={locationLoading}
-                      className="rounded-2xl bg-neutral-950 px-5 py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {locationLoading ? "Searching..." : "Find on map"}
-                    </button>
-                  </div>
+                    {pendingPickup && (
+                      <div className="mt-3 rounded-2xl border border-blue-200 bg-white p-4 text-sm text-neutral-600 shadow-[0_14px_34px_rgba(59,130,246,0.10)]">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="min-w-0">
+                            <div className="font-bold text-blue-950">
+                              Confirm found pickup location
+                            </div>
 
-                  <PickupMap
-                    center={[mapCenter.lat, mapCenter.lng]}
-                    markerPosition={markerPosition}
-                    onPick={handleMapPick}
-                  />
+                            <div className="mt-1 leading-6 text-neutral-700">
+                              {pendingPickup.location}
+                            </div>
+
+                            <div className="mt-1 text-xs text-neutral-500">
+                              {pendingPickup.coords.lat.toFixed(6)},{" "}
+                              {pendingPickup.coords.lng.toFixed(6)}
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={handleConfirmPickupLocation}
+                            className="shrink-0 rounded-full bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:-translate-y-0.5 hover:bg-blue-700"
+                          >
+                            Confirm location
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {locationError && (
                     <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-600">
@@ -1293,16 +1832,40 @@ const Booking = ({ embeddedTour }) => {
                   )}
 
                   {formData.pickupCoords && (
-                    <div className="mt-3 rounded-2xl border border-green-200 bg-white p-4 text-sm text-neutral-600">
-                      <div className="font-bold text-neutral-900">
-                        Selected pickup point
-                      </div>
+                    <div
+                      ref={pickupFeedbackRef}
+                      className="mt-3 rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-neutral-600 shadow-[0_14px_34px_rgba(34,197,94,0.10)]"
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-green-200 text-green-950">
+                          <HomeIcon />
+                        </span>
 
-                      <div className="mt-1 leading-6">{formData.pickupLocation}</div>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-bold text-green-950">
+                            Pickup location saved
+                          </div>
 
-                      <div className="mt-1 text-xs text-neutral-500">
-                        {formData.pickupCoords.lat.toFixed(6)},{" "}
-                        {formData.pickupCoords.lng.toFixed(6)}
+                          <div className="mt-1 leading-6 text-neutral-700">
+                            {formData.pickupLocation}
+                          </div>
+
+                          <div className="mt-1 text-xs text-neutral-500">
+                            {formData.pickupCoords.lat.toFixed(6)},{" "}
+                            {formData.pickupCoords.lng.toFixed(6)}
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPendingPickup(null);
+                            setShowPickupPicker(true);
+                          }}
+                          className="shrink-0 rounded-full border border-green-200 bg-white px-3 py-1.5 text-xs font-bold text-green-800 transition hover:bg-green-100"
+                        >
+                          Change
+                        </button>
                       </div>
                     </div>
                   )}
@@ -1315,47 +1878,152 @@ const Booking = ({ embeddedTour }) => {
             ref={checkoutRef}
             className="border-t border-black/5 bg-white/92 px-4 py-4 md:px-8 md:py-5"
           >
-            <div className="grid items-stretch gap-3 lg:grid-cols-[0.82fr_1fr_auto]">
-              <div className="rounded-2xl bg-neutral-950 p-4 text-white">
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/45">
-                  Estimated total
-                </p>
+            <div className="grid items-stretch gap-3 lg:grid-cols-[1fr_auto]">
+              <div className="rounded-2xl border border-black/10 bg-white p-4 text-neutral-950 shadow-[0_12px_30px_rgba(0,0,0,0.05)]">
+                <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-500">
+                      Checkout summary
+                    </p>
 
-                <div className="mt-1 font-frank text-3xl font-bold leading-none">
-                  {displayTotal}
+                    <div className="mt-1 font-frank text-3xl font-bold leading-none text-neutral-950">
+                      {displayTotal}
+                    </div>
+
+                    <p className="mt-2 text-xs leading-5 text-neutral-500">
+                      {currency} estimate · final amount is recalculated securely at checkout.
+                    </p>
+                  </div>
+
+                  <div className="grid gap-2 sm:grid-cols-2 xl:min-w-[31rem]">
+                    <div className="rounded-2xl bg-neutral-50 p-3">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-400">
+                        Tour
+                      </p>
+                      <p className="mt-1 line-clamp-1 text-sm font-bold text-neutral-900">
+                        {tour.title || tour.info}
+                      </p>
+                    </div>
+
+                    <div className={`rounded-2xl p-3 transition ${contactDetailsComplete ? "bg-neutral-50" : "bg-neutral-100 opacity-55"}`}>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-400">
+                        Traveller
+                      </p>
+                      <p className={`mt-1 line-clamp-1 text-sm font-bold ${contactDetailsComplete ? "text-neutral-900" : "text-neutral-400"}`}>
+                        {contactDetailsComplete ? formData.fullName : "Details not completed"}
+                      </p>
+                    </div>
+
+                    <div className={`rounded-2xl p-3 transition ${dateDetailsComplete ? "bg-neutral-50" : "bg-neutral-100 opacity-55"}`}>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-400">
+                        Date
+                      </p>
+                      <p className={`mt-1 text-sm font-bold ${dateDetailsComplete ? "text-neutral-900" : "text-neutral-400"}`}>
+                        {formData.date || "Select date"}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl bg-neutral-50 p-3">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-400">
+                        Guests
+                      </p>
+                      <p className="mt-1 text-sm font-bold text-neutral-900">
+                        {adultCount} adult{adultCount === 1 ? "" : "s"}
+                        {childCount > 0 ? ` · ${childCount} child${childCount === 1 ? "" : "ren"}` : ""}
+                      </p>
+                    </div>
+
+                    <div className={`rounded-2xl p-3 transition sm:col-span-2 ${pickupDetailsComplete ? "bg-neutral-50" : "bg-neutral-100 opacity-55"}`}>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-400">
+                        Pickup
+                      </p>
+                      <p className={`mt-1 line-clamp-1 text-sm font-bold ${pickupDetailsComplete ? "text-neutral-900" : "text-neutral-400"}`}>
+                        {formData.pickupLocation || "Choose pickup location"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
-                <p className="mt-2 text-xs leading-5 text-white/60">
-                  {participantCount} guest{participantCount > 1 ? "s" : ""} · {currency}
-                  {(formData.isPrivate || formData.isCustom) && " · extras included"}
-                </p>
-              </div>
+                <div className="mt-4 rounded-2xl border border-black/5 bg-stone-50 p-3">
+                  <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-5">
+                    <div className="rounded-xl bg-white p-3">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">
+                        Tour subtotal
+                      </p>
+                      <p className="mt-1 text-sm font-bold text-neutral-900">
+                        {displayPrice} × {participantCount} = {displayBaseSubtotal}
+                      </p>
+                    </div>
 
-              <div className="rounded-2xl border border-black/5 bg-stone-50 p-4">
-                <p className="text-sm font-bold text-neutral-900">
-                  Secure checkout is next.
-                </p>
+                    <div className={`rounded-xl bg-white p-3 transition ${groupDiscountPercent > 0 ? "" : "opacity-55"}`}>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">
+                        Group discount
+                      </p>
+                      <p className={`mt-1 text-sm font-bold ${groupDiscountPercent > 0 ? "text-green-700" : "text-neutral-400"}`}>
+                        {groupDiscountPercent > 0
+                          ? `-${displayGroupDiscountAmount} · ${groupDiscountPercent}% off`
+                          : `No discount for ${participantCount} guest${participantCount === 1 ? "" : "s"}`}
+                      </p>
+                    </div>
 
-                <p className="mt-1 text-xs leading-5 text-neutral-500">
-                  Final price is recalculated on the server before payment. Pickup and
-                  vehicle details are confirmed manually after payment.
-                </p>
+                    <div className="rounded-xl bg-white p-3">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">
+                        Tour total
+                      </p>
+                      <p className="mt-1 text-sm font-bold text-neutral-900">
+                        {displayDiscountedTourSubtotal}
+                      </p>
+                    </div>
 
-                <div className="mt-3 flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">
-                  <span className="rounded-full bg-white px-3 py-1">Terms</span>
-                  <span className="rounded-full bg-white px-3 py-1">Privacy</span>
-                  <span className="rounded-full bg-green-200 px-3 py-1 text-green-950">
-                    Powered by Stripe
-                  </span>
+                    <div className={`rounded-xl bg-white p-3 transition ${formData.isPrivate ? "" : "opacity-55"}`}>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">
+                        Private tour fee
+                      </p>
+                      <p className={`mt-1 text-sm font-bold ${formData.isPrivate ? "text-green-700" : "text-neutral-400"}`}>
+                        {formData.isPrivate ? displayActivePrivateFee : "Not added"}
+                      </p>
+                    </div>
+
+                    <div className={`rounded-xl bg-white p-3 transition ${formData.isCustom ? "" : "opacity-55"}`}>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">
+                        Custom trip fee
+                      </p>
+                      <p className={`mt-1 text-sm font-bold ${formData.isCustom ? "text-blue-700" : "text-neutral-400"}`}>
+                        {formData.isCustom ? displayActiveCustomFee : "Not added"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 flex flex-col gap-2 rounded-xl bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-bold text-neutral-900">
+                        Secure checkout is next.
+                      </p>
+                      <p className="mt-1 text-xs leading-5 text-neutral-500">
+                        Payment opens after this form. Pickup and vehicle details are manually confirmed after payment.
+                      </p>
+                    </div>
+
+                    <div className="hidden flex-wrap gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500 sm:flex">
+                      <span className="rounded-full bg-neutral-50 px-3 py-1">Terms</span>
+                      <span className="rounded-full bg-neutral-50 px-3 py-1">Privacy</span>
+                      <span className="rounded-full bg-green-200 px-3 py-1 text-green-950">
+                        Powered by Stripe
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               <button
                 type="submit"
                 form="booking-form"
-                className="hero-gradient flex min-h-[5.5rem] w-full items-center justify-center rounded-2xl px-8 py-4 text-base font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl lg:w-[15rem]"
+                className={`hero-gradient flex w-full items-center justify-center gap-3 rounded-2xl px-8 py-4 text-base font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl lg:flex-col lg:gap-2 ${
+                  isEmbedded ? "min-h-[4.6rem] lg:min-h-[8.75rem] lg:w-[15rem]" : "min-h-[5.5rem] lg:min-h-[9rem] lg:w-[15rem]"
+                }`}
               >
-                Continue to checkout
+                <CheckoutCartIcon className="h-7 w-7 lg:h-10 lg:w-10" />
+                <span>Continue to checkout</span>
               </button>
             </div>
           </div>
@@ -1363,7 +2031,9 @@ const Booking = ({ embeddedTour }) => {
 
         <div
           ref={bottomRef}
-          className="mx-auto mt-6 max-w-7xl rounded-2xl border border-black/5 bg-white/72 px-5 py-4 shadow-[0_8px_24px_rgba(0,0,0,0.04)] backdrop-blur-md"
+          className={`mx-auto mt-6 rounded-2xl border border-black/5 bg-white/72 px-5 py-4 shadow-[0_8px_24px_rgba(0,0,0,0.04)] backdrop-blur-md ${
+            isEmbedded ? "max-w-6xl" : "max-w-7xl"
+          }`}
         >
           <div className="flex flex-col items-center justify-between gap-3 text-center md:flex-row md:text-left">
             <p className="text-sm leading-6 text-neutral-600">
