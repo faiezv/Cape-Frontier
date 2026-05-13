@@ -5,9 +5,12 @@ import Home from '../pages/Home';
 import TourDetails from '../pages/TourDetails'
 import Policies from '../pages/Policies'
 import Booking from '../pages/Booking';
-import Checkout from '../pages/Checkout';
-import Success from '../pages/CheckoutSuccess'
+// import Checkout from '../pages/Checkout';
+// import Success from '../pages/CheckoutSuccess'
 
+// While testing migration to Paystacl
+import CheckoutPaystack from '../pages/CheckoutPaystack';
+import Success from '../pages/CheckoutSuccessPayStack'
 const AnimatedRoutes = () => {
   const location = useLocation();
   return (
@@ -18,7 +21,7 @@ const AnimatedRoutes = () => {
       <Route path="/tours/:slug" element={<TourDetails />} />
       <Route path="/policies" element={<Policies />} />
       <Route path="/booking" element={<Booking />} />
-      <Route path="/checkout" element={<Checkout />} />
+      <Route path="/checkout" element={<CheckoutPaystack />} />
       <Route path="/success" element={<Success />} />
     </Routes>
   )
