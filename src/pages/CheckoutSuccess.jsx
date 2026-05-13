@@ -165,14 +165,7 @@ const CheckoutSuccess = () => {
   const searchParams = new URLSearchParams(location.search);
   const paymentIntentId = searchParams.get("payment_intent");
 
-  const [bookingReference] = useState(() => {
-    if (paymentIntentId) {
-      return `TOUR-${paymentIntentId.slice(-8).toUpperCase()}`;
-    }
-
-    return `TOUR-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
-  });
-
+  const bookingReference = location.state?.bookingReference || null;
   const customerEmail = bookingDetails?.email || "customer email";
   const ccParticipantEmails = normalizeEmails(
     bookingDetails?.ccParticipantEmails?.length

@@ -308,6 +308,7 @@ const CheckoutForm = ({
   bookingDetails,
   notes,
   pricingSummary,
+  checkoutStops = [],
 }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -333,6 +334,7 @@ const CheckoutForm = ({
         selectedCurrency: currency,
         totalAmountLabel,
         pricingSummary,
+        checkoutStops,
         notes,
         savedAt: new Date().toISOString(),
       })
@@ -352,14 +354,25 @@ const CheckoutForm = ({
       return;
     }
 
+    const generateBookingReference = (tour) => {
+      const prefix = "TOUR";
+      const random = Math.random().toString(36).slice(2, 10).toUpperCase();
+      return `${prefix}-${random}`;
+    };
+
+    const bookingReference = generateBookingReference(tour);
+
     if (paymentIntent?.status === "succeeded") {
       const emailPayload = {
+        bookingReference: bookingReference,
         customerName: bookingDetails.fullName,
         customerEmail: bookingDetails.email,
         mobile: bookingDetails.mobile,
         tourTitle: tour.title || tour.info,
         tourId: tour.id,
         tourSlug: tour.slug,
+        tourStops: checkoutStops,
+        stops: checkoutStops,
         date: bookingDetails.date,
         pickupTime: bookingDetails.pickupTimeLabel,
         participants: bookingDetails.participants,
@@ -418,10 +431,12 @@ const CheckoutForm = ({
       navigate("/success", {
         state: {
           tour,
+          bookingReference,
           bookingDetails,
           selectedCurrency: currency,
           totalAmountLabel,
           pricingSummary,
+          checkoutStops,
           notes,
         },
       });
@@ -1702,6 +1717,7 @@ const Checkout = () => {
                       bookingDetails={enrichedBookingDetails}
                       notes={isCustom ? notes : ""}
                       pricingSummary={pricingSummary}
+                      checkoutStops={checkoutStops}
                     />
                   </Elements>
                 ) : (
