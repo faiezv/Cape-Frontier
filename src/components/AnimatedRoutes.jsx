@@ -10,7 +10,7 @@ import Booking from '../pages/Booking';
 
 // While testing migration to Paystacl
 import CheckoutPaystack from '../pages/CheckoutPaystack';
-import Success from '../pages/CheckoutSuccessPayStack'
+import Success from '../pages/CheckoutSuccessPaystack'
 const AnimatedRoutes = () => {
   const location = useLocation();
   return (
