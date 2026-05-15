@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react'
+import React, { useEffect, useLayoutEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { gsap } from 'gsap'
 
@@ -88,6 +88,66 @@ const Contact = () => {
   const socialRef = useRef([])
   const footerRef = useRef(null)
   const glowRef = useRef(null)
+  const viewportFrameRef = useRef(null)
+  const stableViewportRef = useRef({ width: 0, height: 0 })
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined
+
+    const section = sectionRef.current
+
+    if (!section) return undefined
+
+    const applyStableViewportHeight = (force = false) => {
+      const width = Math.round(window.innerWidth || 0)
+      const visualHeight = Math.round(
+        window.visualViewport?.height || window.innerHeight || 0
+      )
+      const previous = stableViewportRef.current
+      const widthChanged = Math.abs(width - previous.width) > 24
+      const heightChanged = Math.abs(visualHeight - previous.height) > 140
+
+      if (force || !previous.height || widthChanged || heightChanged) {
+        stableViewportRef.current = {
+          width,
+          height: visualHeight,
+        }
+
+        section.style.setProperty('--contact-vh', `${visualHeight}px`)
+      }
+    }
+
+    const scheduleUpdate = (force = false) => {
+      const shouldForce = force === true
+
+      if (viewportFrameRef.current) {
+        window.cancelAnimationFrame(viewportFrameRef.current)
+      }
+
+      viewportFrameRef.current = window.requestAnimationFrame(() => {
+        applyStableViewportHeight(shouldForce)
+      })
+    }
+
+    scheduleUpdate(true)
+
+    const handleResize = () => scheduleUpdate(false)
+    const handleOrientation = () => window.setTimeout(() => scheduleUpdate(true), 180)
+
+    window.addEventListener('resize', handleResize)
+    window.addEventListener('orientationchange', handleOrientation)
+    window.visualViewport?.addEventListener('resize', handleResize)
+
+    return () => {
+      if (viewportFrameRef.current) {
+        window.cancelAnimationFrame(viewportFrameRef.current)
+      }
+
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('orientationchange', handleOrientation)
+      window.visualViewport?.removeEventListener('resize', handleResize)
+    }
+  }, [])
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -172,23 +232,29 @@ const Contact = () => {
         }
       )
 
-      gsap.to(logoRef.current, {
-        y: -10,
-        duration: 3.2,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      })
+      const allowIdleMotion =
+        typeof window === 'undefined' ||
+        !window.matchMedia('(max-width: 767px)').matches
 
-      gsap.to(glowRef.current, {
-        x: 26,
-        y: -18,
-        scale: 1.08,
-        duration: 4.2,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      })
+      if (allowIdleMotion) {
+        gsap.to(logoRef.current, {
+          y: -10,
+          duration: 3.2,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+        })
+
+        gsap.to(glowRef.current, {
+          x: 26,
+          y: -18,
+          scale: 1.08,
+          duration: 4.2,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+        })
+      }
     }, sectionRef)
 
     return () => ctx.revert()
@@ -256,7 +322,7 @@ const Contact = () => {
     <section
       id="contact"
       ref={sectionRef}
-      className="relative h-[100svh] max-h-[100svh] overflow-hidden bg-[#eef7f6] text-black"
+      className="relative min-h-[var(--contact-vh,100svh)] overflow-hidden bg-[#eef7f6] text-black"
     >
       <img
         src="/assets/content/clip-art/section3-bg.png"
@@ -277,7 +343,7 @@ const Contact = () => {
         className="pointer-events-none absolute right-[8%] top-[16%] z-20 h-44 w-44 rounded-full bg-green-200/55 blur-3xl sm:h-64 sm:w-64"
       />
 
-      <div className="relative z-30 mx-auto flex h-full w-full max-w-7xl flex-col px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
+      <div className="relative z-30 mx-auto flex min-h-[var(--contact-vh,100svh)] w-full max-w-7xl flex-col px-4 py-3 sm:px-6 sm:py-5 lg:px-8">
         <div className="flex shrink-0 justify-end">
           <button
             type="button"
@@ -293,7 +359,7 @@ const Contact = () => {
           </button>
         </div>
 
-        <div className="grid min-h-0 flex-1 items-center gap-4 py-3 sm:gap-6 lg:grid-cols-[0.78fr_1.22fr] lg:gap-10 lg:py-5">
+        <div className="grid flex-1 items-start gap-3 py-2 sm:gap-5 sm:py-3 lg:grid-cols-[0.78fr_1.22fr] lg:items-center lg:gap-10 lg:py-5">
           <div className="order-2 hidden lg:order-1 lg:block">
             <div
               ref={logoRef}
@@ -311,18 +377,18 @@ const Contact = () => {
 
           <div
             ref={contentRef}
-            className="order-1 flex min-h-0 flex-col gap-4 text-center lg:order-2 lg:text-left"
+            className="order-1 flex flex-col gap-3 text-center sm:gap-4 lg:order-2 lg:text-left"
           >
             <div>
               <p className="font-bitter text-[10px] font-black uppercase tracking-[0.28em] text-blue-500 sm:text-xs">
                 Contact Cape Frontier
               </p>
 
-              <h2 className="mt-2 font-frank text-4xl font-bold leading-[0.9] text-[#071f4f] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
+              <h2 className="mt-2 font-frank text-[2.35rem] font-bold leading-[0.9] text-[#071f4f] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
                 Have a question?
               </h2>
 
-              <p className="mx-auto mt-3 max-w-2xl font-bitter text-sm leading-6 text-neutral-600 sm:text-base lg:mx-0 lg:text-lg">
+              <p className="mx-auto mt-2 max-w-2xl font-bitter text-xs leading-5 text-neutral-600 sm:mt-3 sm:text-base sm:leading-6 lg:mx-0 lg:text-lg">
                 Message us about tours, pickup details, private trips, custom
                 routes, or booking support. We will help you choose the right
                 Cape Town experience.
@@ -336,17 +402,17 @@ const Contact = () => {
                   ref={(el) => {
                     cardsRef.current[index] = el
                   }}
-                  className="rounded-2xl border border-white/70 bg-white/78 p-3 text-left shadow-[0_10px_26px_rgba(7,31,79,0.06)] backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-white sm:p-4"
+                  className="rounded-2xl border border-white/70 bg-white/78 p-2.5 text-left shadow-[0_10px_26px_rgba(7,31,79,0.06)] backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-white sm:p-4"
                 >
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-400">
                     {card.label}
                   </p>
 
-                  <p className="mt-1 break-words text-sm font-bold text-[#071f4f]">
+                  <p className="mt-1 break-words text-xs font-bold text-[#071f4f] sm:text-sm">
                     {card.value}
                   </p>
 
-                  <p className="mt-1 text-xs leading-5 text-neutral-500">
+                  <p className="mt-1 hidden text-xs leading-5 text-neutral-500 sm:block">
                     {card.note}
                   </p>
                 </div>
@@ -357,7 +423,7 @@ const Contact = () => {
               <button
                 type="button"
                 onClick={openContact}
-                className="hero-gradient-bl flex w-full items-center justify-center rounded-full px-7 py-3.5 text-sm font-bold text-white shadow-[0_14px_32px_rgba(7,31,79,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_38px_rgba(7,31,79,0.24)] sm:w-fit"
+                className="hero-gradient-bl flex w-full items-center justify-center rounded-full px-6 py-3 text-sm font-bold text-white shadow-[0_14px_32px_rgba(7,31,79,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_38px_rgba(7,31,79,0.24)] sm:w-fit sm:px-7 sm:py-3.5"
               >
                 Email {CONTACT_EMAIL}
               </button>
@@ -365,7 +431,7 @@ const Contact = () => {
               <button
                 type="button"
                 onClick={() => navigate('/policies')}
-                className="flex w-full items-center justify-center rounded-full border border-blue-950/10 bg-white/82 px-7 py-3.5 text-sm font-bold text-[#071f4f] shadow-sm backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-green-200 hover:text-green-950 sm:w-fit"
+                className="flex w-full items-center justify-center rounded-full border border-blue-950/10 bg-white/82 px-6 py-3 text-sm font-bold text-[#071f4f] shadow-sm backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-green-200 hover:text-green-950 sm:w-fit sm:px-7 sm:py-3.5"
               >
                 View policies
               </button>
@@ -383,7 +449,7 @@ const Contact = () => {
                   rel={item.type === 'external' || item.type === 'share' ? 'noreferrer' : undefined}
                   onClick={(event) => handleSocialClick(item, event)}
                   aria-label={item.label}
-                  className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/78 shadow-sm backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-green-200 sm:h-11 sm:w-11"
+                  className="group flex h-9 w-9 items-center justify-center rounded-full border border-white/80 bg-white/78 shadow-sm backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-green-200 sm:h-11 sm:w-11"
                 >
                   <img
                     src={item.icon}
@@ -396,11 +462,11 @@ const Contact = () => {
           </div>
         </div>
 
-        <footer ref={footerRef} className="shrink-0 pb-2">
+        <footer ref={footerRef} className="shrink-0 pb-1 sm:pb-2">
           <div className="overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/86 shadow-[0_16px_40px_rgba(7,31,79,0.10)] backdrop-blur-md">
-            <div className="flex flex-col gap-3 p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-2.5 p-3 sm:gap-3 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="min-w-0">
-                <p className="text-sm text-neutral-600">
+                <p className="text-xs text-neutral-600 sm:text-sm">
                   © 2026{' '}
                   <span className="font-bold text-[#071f4f]">
                     Cape Frontier Travel & Tours.
@@ -414,13 +480,13 @@ const Contact = () => {
                 </p>
               </div>
 
-              <nav className="flex flex-wrap gap-2 text-xs font-bold sm:text-sm">
+              <nav className="flex flex-wrap gap-1.5 text-xs font-bold sm:gap-2 sm:text-sm">
                 {footerLinks.map((link) => (
                   <button
                     key={link.label}
                     type="button"
                     onClick={() => handleFooterLink(link)}
-                    className="rounded-full bg-[#f4fbff] px-3 py-2 text-blue-950/60 transition hover:bg-green-200 hover:text-green-950 sm:px-4"
+                    className="rounded-full bg-[#f4fbff] px-3 py-1.5 text-blue-950/60 transition hover:bg-green-200 hover:text-green-950 sm:px-4 sm:py-2"
                   >
                     {link.label}
                   </button>
@@ -428,7 +494,7 @@ const Contact = () => {
               </nav>
             </div>
 
-            <div className="flex flex-col gap-2 border-t border-black/5 bg-[#071f4f] px-4 py-3 text-xs text-white/70 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+            <div className="flex flex-col gap-1.5 border-t border-black/5 bg-[#071f4f] px-3 py-2.5 text-[11px] text-white/70 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-3 sm:text-xs">
               <span>premium cape town routes • pickup support • secure bookings</span>
               <span className="font-bold text-green-200">admin@capefrontier.co.za</span>
             </div>
