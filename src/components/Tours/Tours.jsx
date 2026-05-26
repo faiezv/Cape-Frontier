@@ -1,8 +1,7 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
-import TourBrowser from "./ToursBrowser";
 import ToursBanner from "./ToursBanner";
-import Test from './test'
+import ToursBrowser from "./ToursBrowser";
 
 
 const Tours = () => {
@@ -10,13 +9,13 @@ const Tours = () => {
 
   return (
     <div className="relative w-full overflow-x-hidden bg-white text-black">
-      <section className="relative z-10 w-full">
+      <section className="relative z-10 max-w-5xl mx-auto">
         <ToursBanner />
+
       </section>
 
-      <section className="relative z-10 w-full overflow-visible bg-blue-200">
-        <TourBrowser />
-        {/* <Test /> */}
+      <section className="relative z-10  overflow-visible bg-blue-200">
+        <ToursBrowser />
       </section>
     </div>
   );

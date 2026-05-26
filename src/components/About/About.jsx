@@ -241,7 +241,8 @@ const About = () => {
   useLayoutEffect(() => {
     const statItems = statsRef.current.filter(Boolean)
 
-    if (!statItems.length || shouldReduceMotion() || isTouchDevice()) return undefined
+    // if (!statItems.length || shouldReduceMotion() || isTouchDevice()) return undefined
+    if (!statItems.length || shouldReduceMotion()) return undefined
 
     const tl = gsap.timeline({
       repeat: -1,
@@ -422,7 +423,7 @@ const About = () => {
       <section className="relative z-20 w-full">
         <div className="mx-auto mt-2 flex w-full max-w-5xl flex-col gap-5 px-4 sm:mt-4 sm:gap-8 sm:px-6 lg:px-8">
           {/* link strip: second card hidden on mobile to reduce vertical length */}
-          <div ref={linkStripRef} className="grid w-full gap-2 md:grid-cols-2">
+          {/* <div ref={linkStripRef} className="grid w-full gap-2 md:grid-cols-2">
             {linkCards.map((text, index) => (
               <div
                 key={text}
@@ -443,7 +444,7 @@ const About = () => {
                 </button>
               </div>
             ))}
-          </div>
+          </div> */}
 
           {/* desktop/tablet feature only; mobile goes straight to journey block */}
           <div className=" md:block">

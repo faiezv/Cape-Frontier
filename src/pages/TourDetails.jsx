@@ -577,6 +577,23 @@ export default function TourDetails() {
     }, 260);
   };
 
+    useEffect(() => {
+    if (!location.hash) return
+
+    const id = location.hash.replace('#', '')
+
+    const element = document.getElementById(id)
+
+    if (!element) return
+
+    requestAnimationFrame(() => {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    })
+  }, [location])
+
   return (
     <main className="bg-white text-black">
       <style>{`
@@ -788,7 +805,7 @@ export default function TourDetails() {
 
             <IncludedExcludedGrid tour={tour} />
 
-            <ContentBlock eyebrow="Highlights" title="What makes it special">
+            <ContentBlock eyebrow="Highlights" title="Perks">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {tour.highlights?.map((item, index) => (
                   <TickCard key={index} text={getItemText(item)} />
@@ -974,7 +991,7 @@ export default function TourDetails() {
         id="booking"
         className="py-12 text-white sm:py-14 lg:py-16"
       >
-        <Booking embeddedTour={tour} />
+        <Booking embeddedTour={tour} bookingData={location.state?.bookingData} />
       </section>
 
       {/* CONTACT OPTIONS */}
