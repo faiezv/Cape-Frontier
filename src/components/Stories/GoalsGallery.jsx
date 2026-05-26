@@ -546,26 +546,19 @@ const GoalsGallery = () => {
       ============================================================ */}
       <div className="mx-auto max-w-5xl px-0">
         <div className="rounded-t-[2rem] border border-black/5 bg-white/90 p-4 shadow-[0_16px_42px_rgba(15,23,42,0.07)] backdrop-blur-md sm:p-5 md:p-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div className="min-w-0">
+          <div className="flex flex-col items-center ">
               <p className="font-bitter text-[10px] font-black uppercase tracking-[0.2em] text-green-700">
                 Cape Frontier moments
               </p>
 
-              <h2 className="mt-1 font-frank text-4xl font-bold leading-none text-black sm:text-5xl">
+              <h2 className="font-frank text-4xl font-bold leading-none text-black sm:text-5xl">
                 Gallery & Fleet
               </h2>
-
+{/* 
               <p className="mt-2 max-w-2xl font-bitter text-sm leading-relaxed text-black/50">
                 Watch real guest clips, then browse the vehicles used to support your Cape Town route.
               </p>
-            </div>
-
-            <div className="flex shrink-0 flex-wrap gap-2">
-              <span className="rounded-full bg-green-200 px-3 py-2 font-bitter text-[10px] font-black uppercase tracking-[0.14em] text-green-950">
-                Fleet ready
-              </span>
-            </div>
+            */}
           </div>
         </div>
       </div>
@@ -584,7 +577,7 @@ const GoalsGallery = () => {
         ============================================================ */}
         <div className="relative z-20 w-full p-3 md:hidden">
           <div className="text-center text-white">
-            <p className="font-bitter text-sm text-white/55">
+            <p className="font-bitter text-sm text-white/55 max-w-[60%] mx-auto">
               Tap a clip below. The playing video stays visible while you browse.
             </p>
           </div>
@@ -696,14 +689,14 @@ const GoalsGallery = () => {
         ============================================================ */}
         <div
           ref={leftPanelRef}
-          className="z-10 hidden h-fit w-full flex-col items-center justify-center px-4 py-7 font-bitter md:flex md:w-[58%] md:px-4 lg:px-5"
+          className="z-10 hidden h-fit w-full flex-col gap-20 items-center justify-center px-4 py-7 font-bitter md:flex md:w-[58%] md:px-4 lg:px-5"
         >
           <div className="flex h-full w-full flex-col items-center justify-center text-center text-white">
             <p className="gallery-left-copy max-w-md font-bitter text-sm font-bold uppercase tracking-[0.18em] text-green-200/80">
               Select a video to view
             </p>
 
-            <p className="gallery-left-copy mt-2 max-w-lg text-xs leading-relaxed text-white/42">
+            <p className="gallery-left-copy max-w-lg text-xs leading-relaxed text-white/42">
               Tap any frame to bring it into the main display.
             </p>
           </div>
@@ -887,6 +880,12 @@ const GoalsGallery = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="flex shrink-0 flex-wrap gap-2 mt-4">
+        <span className="rounded-full bg-green-200 px-3 py-2 font-bitter text-[10px] font-black uppercase tracking-[0.14em] text-green-950">
+          Fleet ready
+        </span>
       </div>
 
       {/* ============================================================

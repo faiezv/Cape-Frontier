@@ -433,7 +433,7 @@ function ToggleOption({ active, title, text, price, icon, onClick }) {
   );
 }
 
-const Booking = ({ embeddedTour }) => {
+const Booking = ({ embeddedTour, bookingData }) => {
   const nav = useNavigate();
   const location = useLocation();
 
@@ -536,6 +536,10 @@ const Booking = ({ embeddedTour }) => {
   });
 
   const [showChildrenSelector, setShowChildrenSelector] = useState(false);
+
+  // Snapshots for cancel functionality
+  const [travellerSnapshot, setTravellerSnapshot] = useState(null);
+  const [groupSnapshot, setGroupSnapshot] = useState(null);
 
   const adultCount = Math.max(Number(formData.adults || 0), 1);
   const childCount = Math.max(Number(formData.children || 0), 0);
@@ -662,6 +666,105 @@ const Booking = ({ embeddedTour }) => {
       nav(-1);
     });
   };
+
+  // ========== BOOKING DATA PREFILL ==========
+  const prevBookingDataRef = useRef();
+
+  useEffect(() => {
+    if (!bookingData) return;
+
+    const currentKey = JSON.stringify(bookingData);
+    if (prevBookingDataRef.current === currentKey) return;
+
+    const bd = bookingData;
+    const updates = {};
+
+    // Basic contact & date fields
+    if (bd.fullName !== undefined) updates.fullName = bd.fullName;
+    if (bd.mobile !== undefined) updates.mobile = bd.mobile;
+    if (bd.email !== undefined) updates.email = bd.email;
+
+    // Normalize date to YYYY-MM-DD for input[type="date"]
+    if (bd.date) {
+      let normalizedDate = bd.date;
+      const dateObj = new Date(bd.date);
+      if (!isNaN(dateObj.getTime())) {
+        normalizedDate = dateObj.toISOString().split('T')[0];
+      }
+      updates.date = normalizedDate;
+    }
+
+    // Group size
+    if (bd.adults !== undefined) updates.adults = String(bd.adults);
+    if (bd.children !== undefined) updates.children = String(bd.children);
+
+    // Pickup
+    if (bd.pickupLocation !== undefined) updates.pickupLocation = bd.pickupLocation;
+    if (bd.pickupCoords?.lat && bd.pickupCoords?.lng) {
+      updates.pickupCoords = { lat: bd.pickupCoords.lat, lng: bd.pickupCoords.lng };
+    }
+
+    // Options
+    if (bd.isPrivate !== undefined) updates.isPrivate = bd.isPrivate;
+    if (bd.isCustom !== undefined) updates.isCustom = bd.isCustom;
+    if (bd.ccParticipants !== undefined) updates.ccParticipants = bd.ccParticipants;
+
+    // Participant emails
+    if (Array.isArray(bd.participantEmails)) {
+      updates.participantEmails = bd.participantEmails;
+    }
+
+    // Adjust participants & enforce max 8 total
+    const rawAdults = updates.adults !== undefined ? Number(updates.adults) : adultCount;
+    const rawChildren = updates.children !== undefined ? Number(updates.children) : childCount;
+    let total = rawAdults + rawChildren;
+    if (total > 8) {
+      const cappedAdults = Math.min(rawAdults, 8);
+      const cappedChildren = Math.min(rawChildren, 8 - cappedAdults);
+      updates.adults = String(cappedAdults);
+      updates.children = String(cappedChildren);
+      total = cappedAdults + cappedChildren;
+    }
+    updates.participants = String(total);
+
+    // Trim participant emails if needed
+    const maxEmails = Math.max(total - 1, 0);
+    if (updates.participantEmails?.length > maxEmails) {
+      updates.participantEmails = updates.participantEmails.slice(0, maxEmails);
+      if (maxEmails === 0) updates.ccParticipants = false;
+    }
+
+    // Apply form updates
+    if (Object.keys(updates).length) {
+      setFormData((prev) => ({ ...prev, ...updates }));
+    }
+
+    // UI adjustments based on prefilled data
+    const finalChildren = updates.children !== undefined ? Number(updates.children) : childCount;
+    if (finalChildren > 0) setShowChildrenSelector(true);
+
+    if (updates.pickupCoords) {
+      setMarkerPosition(updates.pickupCoords);
+      setMapCenter(updates.pickupCoords);
+      if (updates.pickupLocation) {
+        setShowPickupPicker(false);
+        setPendingPickup(null);
+      }
+    }
+
+    if (updates.adults !== undefined || updates.children !== undefined) {
+      setShowGroupEditor(false);
+    }
+
+    // Currency
+    const preferredCurrency = bd.selectedCurrency || bd.pricingOptions?.currency;
+    if (preferredCurrency && supportedCurrencies.includes(preferredCurrency)) {
+      setCurrency(preferredCurrency);
+    }
+
+    prevBookingDataRef.current = currentKey;
+  }, [bookingData, supportedCurrencies]);
+  // ==========================================
 
   useEffect(() => {
     if (!tour) nav("/");
@@ -1328,13 +1431,13 @@ const Booking = ({ embeddedTour }) => {
             </div>
 
             <div className="max-w-5xl mx-auto flex flex-col items-center mt-4">
-                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-green-500">
-                    {isEmbedded ? "Tour request" : "Booking details"}
-                  </p>
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-green-500">
+                {isEmbedded ? "Tour request" : "Booking details"}
+              </p>
 
-                  <h2 className="mt-2 font-frank text-3xl leading-none text-black md:text-4xl">
-                    {isEmbedded ? "Complete your details" : "Secure your slot"}
-                  </h2>
+              <h2 className="mt-2 font-frank text-3xl leading-none text-black md:text-4xl">
+                {isEmbedded ? "Complete your details" : "Secure your slot"}
+              </h2>
             </div>
 
             <div
@@ -1357,84 +1460,84 @@ const Booking = ({ embeddedTour }) => {
                   }}
                 />
 
-
                 <div className="relative z-10">
-                <div className="flex flex-col items-center text-center">
-                  <div
-                    ref={priceRef}
-                    className="mt-5 flex w-full shrink-0 flex-col items-center justify-center gap-3 rounded-2xl border border-black/5 bg-white/80 px-5 py-5 text-center shadow-[0_10px_26px_rgba(0,0,0,0.035)] sm:w-fit sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-4"
-                  >
-                    <div className="px-2 py-1.5 sm:min-w-[9.5rem] sm:px-3 sm:py-2">
-                      <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400">
-                        From
+                  <div className="flex flex-col items-center text-center">
+                    <div
+                      ref={priceRef}
+                      className="mt-5 flex w-full shrink-0 flex-col items-center justify-center gap-3 rounded-2xl border border-black/5 bg-white/80 px-5 py-5 text-center shadow-[0_10px_26px_rgba(0,0,0,0.035)] sm:w-fit sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-4"
+                    >
+                      <div className="px-2 py-1.5 sm:min-w-[9.5rem] sm:px-3 sm:py-2">
+                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400">
+                          From
+                        </div>
+
+                        <div className="font-frank text-3xl font-bold leading-none text-neutral-950 md:text-4xl">
+                          {displayPrice}
+                        </div>
+
+                        <div className="mt-1 text-xs text-neutral-500">per person</div>
                       </div>
 
-                      <div className="font-frank text-3xl font-bold leading-none text-neutral-950 md:text-4xl">
-                        {displayPrice}
-                      </div>
-
-                      <div className="mt-1 text-xs text-neutral-500">per person</div>
-                    </div>
-
-                    <div className="relative py-1.5 sm:py-2">
-                      <select
-                        aria-label="Select currency"
-                        value={currency}
-                        onChange={(e) => setCurrency(e.target.value)}
-                        className="h-14 w-24 appearance-none rounded-2xl border border-black/10 bg-white px-4 pr-8 text-center text-lg font-bold text-neutral-900 outline-none transition hover:border-green-300 hover:bg-green-200 focus:border-green-400 focus:bg-green-200"
-                      >
-                        {supportedCurrencies.map((code) => (
-                          <option key={code} value={code}>
-                            {code}
-                          </option>
-                        ))}
-                      </select>
-
-                      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400">
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.4"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                      <div className="relative py-1.5 sm:py-2">
+                        <select
+                          aria-label="Select currency"
+                          value={currency}
+                          onChange={(e) => setCurrency(e.target.value)}
+                          className="h-14 w-24 appearance-none rounded-2xl border border-black/10 bg-white px-4 pr-8 text-center text-lg font-bold text-neutral-900 outline-none transition hover:border-green-300 hover:bg-green-200 focus:border-green-400 focus:bg-green-200"
                         >
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
-                      </span>
+                          {supportedCurrencies.map((code) => (
+                            <option key={code} value={code}>
+                              {code}
+                            </option>
+                          ))}
+                        </select>
+
+                        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400">
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="m6 9 6 6 6-6" />
+                          </svg>
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="mt-7 px-2 text-center">
-                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-neutral-400">
-                    Selected tour
-                  </p>
+                  <div className="mt-7 px-2 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.26em] text-neutral-400">
+                      Selected tour
+                    </p>
 
-                  <h3 className="mx-auto mt-2 max-w-5xl font-frank text-[2.85rem] font-black leading-[0.9] tracking-[-0.055em] text-neutral-950 sm:text-[3.9rem] md:text-[4.75rem] lg:text-[5.6rem]">
-                    {tour.title || tour.info}
-                  </h3>
-                </div>
+                    <h3 className="mx-auto mt-2 max-w-5xl font-frank text-[2.85rem] font-black leading-[0.9] tracking-[-0.055em] text-neutral-950 sm:text-[3.9rem] md:text-[4.75rem] lg:text-[5.6rem]">
+                      {tour.title || tour.info}
+                    </h3>
+                  </div>
 
-                <div className="mt-5 flex flex-wrap justify-center gap-2.5 sm:gap-3">
-                  {tourInfoPills.map((pill) => (
-                    <span
-                      key={`${pill.label}-${pill.value}`}
-                      className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold shadow-[0_8px_20px_rgba(0,0,0,0.035)] backdrop-blur-sm ${pill.className}`}
-                    >
-                      <span className="text-[9px] uppercase tracking-[0.18em] opacity-65">
-                        {pill.label}
+                  <div className="mt-5 flex flex-wrap justify-center gap-2.5 sm:gap-3">
+                    {tourInfoPills.map((pill) => (
+                      <span
+                        key={`${pill.label}-${pill.value}`}
+                        className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold shadow-[0_8px_20px_rgba(0,0,0,0.035)] backdrop-blur-sm ${pill.className}`}
+                      >
+                        <span className="text-[9px] uppercase tracking-[0.18em] opacity-65">
+                          {pill.label}
+                        </span>
+                        <span>{pill.value}</span>
                       </span>
-                      <span>{pill.value}</span>
-                    </span>
-                  ))}
-                </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               <form id="booking-form" onSubmit={handleSubmit} className="grid gap-5">
+                {/* Traveller Details */}
                 <div className="rounded-[1.75rem] border border-black/5 bg-white p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/80 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
                   <div className="mb-4 flex items-center gap-3">
                     <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-green-200 text-sm font-bold text-green-950 ring-1 ring-green-300">
@@ -1450,7 +1553,7 @@ const Booking = ({ embeddedTour }) => {
                     </div>
                   </div>
 
-                  {travellerDetailsComplete && (
+                  {travellerDetailsComplete && !showTravellerEditor && (
                     <div className="mb-4 rounded-2xl border border-green-200 bg-green-50 p-4">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
@@ -1464,7 +1567,15 @@ const Booking = ({ embeddedTour }) => {
 
                         <button
                           type="button"
-                          onClick={() => setShowTravellerEditor(true)}
+                          onClick={() => {
+                            setTravellerSnapshot({
+                              fullName: formData.fullName,
+                              mobile: formData.mobile,
+                              email: formData.email,
+                              date: formData.date,
+                            });
+                            setShowTravellerEditor(true);
+                          }}
                           className="w-fit rounded-full border border-green-200 bg-white px-4 py-2 text-xs font-bold text-green-800 transition hover:bg-green-100"
                         >
                           Change
@@ -1525,21 +1636,44 @@ const Booking = ({ embeddedTour }) => {
                       </BookingField>
                     </div>
 
-                    {travellerDetailsComplete && (
-                      <div className="mt-4 flex justify-center">
+                    <div className="mt-4 flex justify-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTravellerSnapshot(null);
+                          setShowTravellerEditor(false);
+                        }}
+                        className="rounded-2xl bg-green-200 px-5 py-3 text-sm font-bold text-green-950 transition hover:-translate-y-0.5 hover:bg-green-300"
+                      >
+                        Save traveller details
+                      </button>
+
+                      {showTravellerEditor && travellerSnapshot && (
                         <button
                           type="button"
-                          onClick={() => setShowTravellerEditor(false)}
-                          className="rounded-2xl bg-green-200 px-5 py-3 text-sm font-bold text-green-950 transition hover:-translate-y-0.5 hover:bg-green-300"
+                          onClick={() => {
+                            if (travellerSnapshot) {
+                              setFormData((prev) => ({
+                                ...prev,
+                                fullName: travellerSnapshot.fullName,
+                                mobile: travellerSnapshot.mobile,
+                                email: travellerSnapshot.email,
+                                date: travellerSnapshot.date,
+                              }));
+                              setTravellerSnapshot(null);
+                            }
+                            setShowTravellerEditor(false);
+                          }}
+                          className="rounded-2xl border border-red-200 bg-white px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50"
                         >
-                          Save traveller details
+                          Cancel
                         </button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-
                 </div>
 
+                {/* Private / Custom toggles */}
                 <div className="flex flex-col gap-3 lg:flex-row [&>button]:flex-1">
                   <ToggleOption
                     active={formData.isPrivate}
@@ -1560,6 +1694,7 @@ const Booking = ({ embeddedTour }) => {
                   />
                 </div>
 
+                {/* Group Size */}
                 <div className="rounded-[1.75rem] border border-black/5 bg-white p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/80 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
                   <div className="mb-4 flex items-center gap-3">
                     <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-100 text-sm font-bold text-blue-700 ring-1 ring-blue-200">
@@ -1595,13 +1730,23 @@ const Booking = ({ embeddedTour }) => {
                         </p>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => setShowGroupEditor(true)}
-                        className="w-fit rounded-full border border-green-200 bg-white px-4 py-2 text-xs font-bold text-green-800 transition hover:-translate-y-0.5 hover:bg-green-100"
-                      >
-                        Change
-                      </button>
+                      {!showGroupEditor && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setGroupSnapshot({
+                              adults: formData.adults,
+                              children: formData.children,
+                              participantEmails: [...(formData.participantEmails || [])],
+                              ccParticipants: formData.ccParticipants,
+                            });
+                            setShowGroupEditor(true);
+                          }}
+                          className="w-fit rounded-full border border-green-200 bg-white px-4 py-2 text-xs font-bold text-green-800 transition hover:-translate-y-0.5 hover:bg-green-100"
+                        >
+                          Change
+                        </button>
+                      )}
                     </div>
 
                     <div
@@ -1696,15 +1841,41 @@ const Booking = ({ embeddedTour }) => {
                         )}
                       </div>
 
-                      <div className="mt-4 flex justify-center">
+                      <div className="mt-4 flex justify-center gap-3">
                         <button
                           type="button"
-                          onClick={() => setShowGroupEditor(false)}
+                          onClick={() => {
+                            setGroupSnapshot(null);
+                            setShowGroupEditor(false);
+                          }}
                           className="inline-flex items-center gap-2 rounded-2xl border border-green-200 bg-white px-5 py-3 text-sm font-bold text-green-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-green-50"
                         >
                           <SaveIcon />
                           Confirm group details
                         </button>
+
+                        {showGroupEditor && groupSnapshot && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (groupSnapshot) {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  adults: groupSnapshot.adults,
+                                  children: groupSnapshot.children,
+                                  participantEmails: [...groupSnapshot.participantEmails],
+                                  ccParticipants: groupSnapshot.ccParticipants,
+                                }));
+                                setShowChildrenSelector(Number(groupSnapshot.children) > 0);
+                                setGroupSnapshot(null);
+                              }
+                              setShowGroupEditor(false);
+                            }}
+                            className="rounded-2xl border border-red-200 bg-white px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50"
+                          >
+                            Cancel
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1745,9 +1916,9 @@ const Booking = ({ embeddedTour }) => {
                       </div>
                     </div>
                   </div>
-
                 </div>
 
+                {/* Pickup Location */}
                 <div className="rounded-[1.75rem] border border-blue-100 bg-blue-50/45 p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/90 group-hover/right:bg-green-50/60 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
                   <div className="mb-4 flex items-center gap-3">
                     <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-sky-100 text-sm font-bold text-sky-700 ring-1 ring-sky-200">
@@ -1763,75 +1934,8 @@ const Booking = ({ embeddedTour }) => {
                     </div>
                   </div>
 
-                  <div
-                    className={`transition-all duration-500 ease-out ${
-                      formData.pickupCoords && !showPickupPicker
-                        ? "max-h-0 overflow-hidden opacity-0 pointer-events-none -mt-2"
-                        : "max-h-[560px] opacity-100"
-                    }`}
-                  >
-                    <div className="mb-4 flex flex-col gap-3 md:flex-row">
-                      <input
-                        name="pickupLocation"
-                        placeholder="Hotel, guesthouse, Airbnb, or pickup point"
-                        value={formData.pickupLocation}
-                        onChange={handlePickupInputChange}
-                        className="flex-1 rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
-                      />
-
-                      <button
-                        type="button"
-                        onClick={handleFindAddress}
-                        disabled={locationLoading}
-                        className="rounded-2xl bg-blue-600 px-5 py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {locationLoading ? "Searching..." : "Find on map"}
-                      </button>
-                    </div>
-
-                    <PickupMap
-                      center={[mapCenter.lat, mapCenter.lng]}
-                      markerPosition={markerPosition}
-                      onPick={handleMapPick}
-                    />
-
-                    {pendingPickup && (
-                      <div className="mt-3 rounded-2xl border border-blue-200 bg-white p-4 text-sm text-neutral-600 shadow-[0_14px_34px_rgba(59,130,246,0.10)]">
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                          <div className="min-w-0">
-                            <div className="font-bold text-blue-950">
-                              Confirm found pickup location
-                            </div>
-
-                            <div className="mt-1 leading-6 text-neutral-700">
-                              {pendingPickup.location}
-                            </div>
-
-                            <div className="mt-1 text-xs text-neutral-500">
-                              {pendingPickup.coords.lat.toFixed(6)},{" "}
-                              {pendingPickup.coords.lng.toFixed(6)}
-                            </div>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={handleConfirmPickupLocation}
-                            className="shrink-0 rounded-full bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:-translate-y-0.5 hover:bg-blue-700"
-                          >
-                            Confirm location
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {locationError && (
-                    <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-600">
-                      {locationError}
-                    </p>
-                  )}
-
-                  {formData.pickupCoords && (
+                  {/* Saved pickup after confirmation */}
+                  {formData.pickupCoords && !showPickupPicker && (
                     <div
                       ref={pickupFeedbackRef}
                       className="mt-3 rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-neutral-600 shadow-[0_14px_34px_rgba(34,197,94,0.10)]"
@@ -1860,13 +1964,84 @@ const Booking = ({ embeddedTour }) => {
                           type="button"
                           onClick={() => {
                             setPendingPickup(null);
+                            setMarkerPosition(null);
                             setShowPickupPicker(true);
+                            setFormData((prev) => ({
+                              ...prev,
+                              pickupLocation: "",
+                              pickupCoords: null,
+                            }));
                           }}
                           className="shrink-0 rounded-full border border-green-200 bg-white px-3 py-1.5 text-xs font-bold text-green-800 transition hover:bg-green-100"
                         >
                           Change
                         </button>
                       </div>
+                    </div>
+                  )}
+
+                  {/* Pickup editor (map + input + buttons) */}
+                  {!formData.pickupCoords && (
+                    <div
+                      className={`transition-all duration-500 ease-out ${
+                        showPickupPicker ? "max-h-[560px] opacity-100" : "max-h-0 overflow-hidden opacity-0"
+                      }`}
+                    >
+                      <div className="mb-4 flex flex-col gap-3 md:flex-row">
+                        <input
+                          name="pickupLocation"
+                          placeholder="Hotel, guesthouse, Airbnb, or pickup point"
+                          value={formData.pickupLocation}
+                          onChange={handlePickupInputChange}
+                          className="flex-1 rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
+                        />
+
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={pendingPickup ? handleConfirmPickupLocation : handleFindAddress}
+                            disabled={locationLoading || (!pendingPickup && !formData.pickupLocation.trim())}
+                            className="rounded-2xl bg-blue-600 px-5 py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {locationLoading
+                              ? "Searching..."
+                              : pendingPickup
+                              ? "Confirm"
+                              : "Find on map"}
+                          </button>
+
+                          {pendingPickup && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPendingPickup(null);
+                                setMarkerPosition(null);
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  pickupLocation: "",
+                                  pickupCoords: null,
+                                }));
+                                setLocationError("");
+                              }}
+                              className="rounded-2xl border border-red-200 bg-white px-5 py-4 font-semibold text-red-600 transition hover:-translate-y-0.5 hover:bg-red-50"
+                            >
+                              Reset
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <PickupMap
+                        center={[mapCenter.lat, mapCenter.lng]}
+                        markerPosition={markerPosition}
+                        onPick={handleMapPick}
+                      />
+
+                      {locationError && (
+                        <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-600">
+                          {locationError}
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>

@@ -14,6 +14,14 @@ export const TOUR_MODIFIERS = {
   CUSTOM: "custom",
 };
 
+export const TOUR_CATEGORIES_ICON = {
+  adrenaline: "/icons/adrenaline.svg",
+  hiking: "/icons/hiking.svg",
+  packages: "/icons/packages.svg",
+  historical: "/icons/historical.svg",
+  wineRoutes: "/icons/wine-routes.svg",
+};
+
 export const SUPPORTED_CURRENCIES = ["ZAR", "USD", "EUR", "GBP"];
 
 export const FX_RATES = {
@@ -458,7 +466,7 @@ export const tours = [
     seo: {
       title: "Tandem Paragliding in Cape Town | Cape Frontier Tours",
       description:
-        "Book a scenic tandem paragliding experience in Cape Town with views of Signal Hill, Lion’s Head, Sea Point, and the Atlantic coastline.",
+        "Book a scenic tandem paragliding experience in Cape Town with views of Signal Hill, Lion’s Head, Sea Point, and the Atlantic coastline with expert pilots and selected pickup options.",
       keywords: [
         "paragliding Cape Town",
         "Signal Hill paragliding",
@@ -488,7 +496,7 @@ export const tours = [
       "The views over Cape Town were unreal. The take-off felt smooth and the pilot made me feel completely at ease.",
 
     description:
-      "Enjoy a scenic tandem paragliding experience above Cape Town with views of the Atlantic coastline, Table Mountain, Lion’s Head, and the city below.",
+      "Enjoy a scenic tandem paragliding experience above Cape Town with views of the Atlantic coastline, Table Mountain, Lion’s Head, and the city below. This activity is guided by experienced pilots and includes a safety briefing, with selected pickup options available.",
 
     highlights: [
       { text: "Launch near Signal Hill or Lion’s Head" },
