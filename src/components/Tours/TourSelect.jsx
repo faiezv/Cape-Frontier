@@ -6,6 +6,7 @@ import tours from '../../data/tours.js'
 import 'react-datepicker/dist/react-datepicker.css'
 
 import { useNavigate } from 'react-router-dom'
+import { useLoadingNavigate } from "../useLoadingNavigate.jsx"
 
 // -----------------------------------------------------------------------------
 // data helpers (unchanged)
@@ -157,7 +158,7 @@ function TourSelect() {
   const isMobileLayout = viewportWidth < 700
   const tourOptions = useMemo(() => getTourOptions(), [])
 
-  const navigate = useNavigate()
+  const navigate = useLoadingNavigate()
 
   useEffect(() => {
     const onResize = () => setViewportWidth(window.innerWidth)
@@ -170,10 +171,10 @@ function TourSelect() {
 
   const formattedDate = date
     ? date.toLocaleDateString('en-ZA', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      })
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    })
     : 'Select date'
 
   const participants = adults + children
@@ -265,7 +266,7 @@ function TourSelect() {
       document.body.style.top = originalBodyTop;
       document.body.style.width = '';
       window.scrollTo(0, scrollY);
-      
+
       window.removeEventListener('wheel', allowScroll);
       window.removeEventListener('touchmove', allowScroll);
     };
@@ -327,43 +328,43 @@ function TourSelect() {
       duration: 0.2,
       ease: 'power2.in',
     })
-    // Change value text to feedback (green), keep preview text unchanged
-    .call(() => {
-      valueEl.innerText = feedbackText
-      valueEl.style.color = '#16a34a' // green-600
-    })
-    // Fade in feedback (only value changes, preview fades back with old content)
-    .set([valueEl, previewEl], { y: 6, opacity: 0 })
-    .to([valueEl, previewEl], {
-      opacity: 1,
-      y: 0,
-      duration: 0.25,
-      ease: 'back.out(0.6)',
-    })
-    // Hold
-    .to({}, { duration: 0.55 })
-    // Fade out feedback + preview
-    .to([valueEl, previewEl], {
-      opacity: 0,
-      y: -6,
-      duration: 0.2,
-      ease: 'power2.in',
-    })
-    // Restore updated values
-    .call(() => {
-      valueEl.innerText = updatedValue
-      valueEl.style.color = originalValueColor || ''
-      previewEl.innerText = updatedPreview
-    })
-    // Set initial position for updated values
-    .set([valueEl, previewEl], { y: 8, opacity: 0 })
-    // Fade in updated values with upward motion
-    .to([valueEl, previewEl], {
-      opacity: 1,
-      y: 0,
-      duration: 0.25,
-      ease: 'back.out(0.7)',
-    })
+      // Change value text to feedback (green), keep preview text unchanged
+      .call(() => {
+        valueEl.innerText = feedbackText
+        valueEl.style.color = '#16a34a' // green-600
+      })
+      // Fade in feedback (only value changes, preview fades back with old content)
+      .set([valueEl, previewEl], { y: 6, opacity: 0 })
+      .to([valueEl, previewEl], {
+        opacity: 1,
+        y: 0,
+        duration: 0.25,
+        ease: 'back.out(0.6)',
+      })
+      // Hold
+      .to({}, { duration: 0.55 })
+      // Fade out feedback + preview
+      .to([valueEl, previewEl], {
+        opacity: 0,
+        y: -6,
+        duration: 0.2,
+        ease: 'power2.in',
+      })
+      // Restore updated values
+      .call(() => {
+        valueEl.innerText = updatedValue
+        valueEl.style.color = originalValueColor || ''
+        previewEl.innerText = updatedPreview
+      })
+      // Set initial position for updated values
+      .set([valueEl, previewEl], { y: 8, opacity: 0 })
+      // Fade in updated values with upward motion
+      .to([valueEl, previewEl], {
+        opacity: 1,
+        y: 0,
+        duration: 0.25,
+        ease: 'back.out(0.7)',
+      })
   }
 
   const completeStepWithDelay = (stepIndex, nextStep, updatedValue, updatedPreview, targetStepIndex) => {
@@ -570,9 +571,8 @@ function TourSelect() {
         preview:
           destination && date
             ? participantsConfirmed
-              ? `${adults} ${adults === 1 ? 'adult' : 'adults'}${
-                  children ? ` • ${children} ${children === 1 ? 'child' : 'children'}` : ''
-                }`
+              ? `${adults} ${adults === 1 ? 'adult' : 'adults'}${children ? ` • ${children} ${children === 1 ? 'child' : 'children'}` : ''
+              }`
               : 'Confirm adults and children'
             : 'Destination and date required first',
         icon: './icons/guest.png',
@@ -605,9 +605,8 @@ function TourSelect() {
         label: 'Ready?',
         value: canSearch ? 'Ready to search' : 'Complete booking details',
         preview: canSearch
-          ? `${destination} • ${formattedDate} • ${adults} ${
-              adults === 1 ? 'adult' : 'adults'
-            }${children ? ` • ${children} ${children === 1 ? 'child' : 'children'}` : ''}`
+          ? `${destination} • ${formattedDate} • ${adults} ${adults === 1 ? 'adult' : 'adults'
+          }${children ? ` • ${children} ${children === 1 ? 'child' : 'children'}` : ''}`
           : 'Finish the selections to continue',
         icon: './icons/go.png',
         status: canSearch ? 'Ready' : mobileStep === 3 ? 'Current' : 'Pending',
@@ -681,15 +680,13 @@ function TourSelect() {
         <button
           type="button"
           onClick={() => setPreventSameDay(!preventSameDay)}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-            preventSameDay ? 'bg-blue-600' : 'bg-black/20'
-          }`}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${preventSameDay ? 'bg-blue-600' : 'bg-black/20'
+            }`}
           aria-label="Prevent same-day bookings"
         >
           <span
-            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-              preventSameDay ? 'translate-x-6' : 'translate-x-1'
-            }`}
+            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${preventSameDay ? 'translate-x-6' : 'translate-x-1'
+              }`}
           />
         </button>
         <span className="font-mont text-[11px] font-black uppercase tracking-[0.08em] text-black/60">
@@ -701,11 +698,10 @@ function TourSelect() {
 
   const StepProgress = () => (
     <div className="flex w-full items-center gap-2">
-      <span className={`hidden shrink-0 rounded-full px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.16em] sm:inline-flex ${
-        canSearch
+      <span className={`hidden shrink-0 rounded-full px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.16em] sm:inline-flex ${canSearch
           ? 'bg-green-100 text-green-800 ring-1 ring-green-300'
           : 'bg-blue-100 text-blue-800 ring-1 ring-blue-200'
-      }`}>
+        }`}>
         {canSearch ? 'Ready to search' : `Step ${Math.min(mobileStep + 1, 3)} of 3`}
       </span>
 
@@ -719,13 +715,12 @@ function TourSelect() {
               <button
                 type="button"
                 onClick={() => setMobileStep(Math.min(index, recommendedStep))}
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-bitter text-[11px] font-black tracking-normal transition-all duration-300 ${
-                  isDone
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-bitter text-[11px] font-black tracking-normal transition-all duration-300 ${isDone
                     ? 'bg-green-300 text-green-950 shadow-[0_0_0_3px_rgba(134,239,172,0.35)]'
                     : isActive
                       ? 'bg-blue-600 text-white shadow-[0_10px_24px_rgba(37,99,235,0.22)]'
                       : 'bg-black/7 text-black/40'
-                }`}
+                  }`}
                 aria-label={`Go to step ${stepNumber}`}
               >
                 {stepNumber}
@@ -747,11 +742,10 @@ function TourSelect() {
 
       <SameDayToggle />
 
-      <span className={`shrink-0 rounded-full px-2.5 py-1 font-bitter text-[9px] font-black uppercase tracking-[0.12em] sm:hidden ${
-        canSearch
+      <span className={`shrink-0 rounded-full px-2.5 py-1 font-bitter text-[9px] font-black uppercase tracking-[0.12em] sm:hidden ${canSearch
           ? 'bg-green-100 text-green-800 ring-1 ring-green-300'
           : 'bg-blue-100 text-blue-800 ring-1 ring-blue-200'
-      }`}>
+        }`}>
         {canSearch ? 'Ready' : 'Current'}
       </span>
 
@@ -806,9 +800,8 @@ function TourSelect() {
 
   const handleParticipantsConfirm = () => {
     const newValue = `${participants} ${participants === 1 ? 'participant' : 'participants'}`
-    const newPreview = `${adults} ${adults === 1 ? 'adult' : 'adults'}${
-      children ? ` • ${children} ${children === 1 ? 'child' : 'children'}` : ''
-    }`
+    const newPreview = `${adults} ${adults === 1 ? 'adult' : 'adults'}${children ? ` • ${children} ${children === 1 ? 'child' : 'children'}` : ''
+      }`
     setParticipantsConfirmed(true)
     completeStepWithDelay(2, 3, newValue, newPreview, 2)
   }
@@ -833,261 +826,259 @@ function TourSelect() {
   const modalNode =
     activeModal && typeof document !== 'undefined'
       ? createPortal(
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4 backdrop-blur-md"
+          onClick={close}
+        >
           <div
-            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4 backdrop-blur-md"
-            onClick={close}
-          >
-            <div
-              className={`modal-content flex max-h-[88vh] w-full flex-col overflow-hidden rounded-2xl bg-white font-mont shadow-2xl sm:max-h-[85vh] ${
-                activeModal === 'date' 
-                  ? 'max-w-md sm:max-w-lg md:max-w-xl'
-                  : activeModal === 'participants'
+            className={`modal-content flex max-h-[88vh] w-full flex-col overflow-hidden rounded-2xl bg-white font-mont shadow-2xl sm:max-h-[85vh] ${activeModal === 'date'
+                ? 'max-w-md sm:max-w-lg md:max-w-xl'
+                : activeModal === 'participants'
                   ? 'max-w-[94vw] sm:max-w-md'
                   : 'max-w-[94vw] sm:max-w-xl'
               }`}
-              onClick={(event) => event.stopPropagation()}
-              style={{ animation: 'modal-in 0.2s ease both' }}
-            >
-              <div className="flex items-center justify-end px-3 py-2 text-black sm:px-4">
-                <button
-                  type="button"
-                  onClick={close}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-black/40 transition-colors hover:bg-gray-100 hover:text-black"
-                  aria-label="Close"
+            onClick={(event) => event.stopPropagation()}
+            style={{ animation: 'modal-in 0.2s ease both' }}
+          >
+            <div className="flex items-center justify-end px-3 py-2 text-black sm:px-4">
+              <button
+                type="button"
+                onClick={close}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-black/40 transition-colors hover:bg-gray-100 hover:text-black"
+                aria-label="Close"
+              >
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  aria-hidden="true"
                 >
-                  <svg
-                    className="h-4 w-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    aria-hidden="true"
-                  >
-                    <path d="M18 6 6 18M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
-              {activeModal === 'destination' && (
-                <div className="modal-scrollable max-h-[76vh] overflow-y-auto overscroll-contain pb-2 sm:max-h-[34rem]">
-                  {tourOptions.map((tour) => {
-                    const selected = destination === tour.title
+            {activeModal === 'destination' && (
+              <div className="modal-scrollable max-h-[76vh] overflow-y-auto overscroll-contain pb-2 sm:max-h-[34rem]">
+                {tourOptions.map((tour) => {
+                  const selected = destination === tour.title
 
-                    return (
-                      <div
-                        key={tour.title}
-                        className={`mx-2 mb-1.5 rounded-2xl border transition ${
-                          selected
-                            ? 'border-green-400 bg-green-100'
-                            : 'border-black/8 bg-white hover:bg-blue-50/40'
+                  return (
+                    <div
+                      key={tour.title}
+                      className={`mx-2 mb-1.5 rounded-2xl border transition ${selected
+                          ? 'border-green-400 bg-green-100'
+                          : 'border-black/8 bg-white hover:bg-blue-50/40'
                         }`}
-                      >
-                        <div className="flex w-full items-center gap-2.5 p-2 text-left sm:p-2.5">
-                          <button
-                            type="button"
-                            onClick={() => handleDestinationSelect(tour.title)}
-                            className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
-                          >
-                            <img
-                              src={tour.image}
-                              className="h-14 w-16 shrink-0 rounded-xl object-cover sm:h-16 sm:w-20"
-                              alt=""
-                              loading="lazy"
-                              decoding="async"
-                            />
+                    >
+                      <div className="flex w-full items-center gap-2.5 p-2 text-left sm:p-2.5">
+                        <button
+                          type="button"
+                          onClick={() => handleDestinationSelect(tour.title)}
+                          className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
+                        >
+                          <img
+                            src={tour.image}
+                            className="h-14 w-16 shrink-0 rounded-xl object-cover sm:h-16 sm:w-20"
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                          />
 
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-start justify-between gap-2">
-                                <p className="line-clamp-2 font-frank text-sm font-black leading-tight text-black/82 sm:text-base">
-                                  {tour.title}
-                                </p>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="line-clamp-2 font-frank text-sm font-black leading-tight text-black/82 sm:text-base">
+                                {tour.title}
+                              </p>
 
-                                {selected && (
-                                  <svg
-                                    className="h-4 w-4 shrink-0 text-green-700"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2.5"
-                                    aria-hidden="true"
-                                  >
-                                    <polyline points="20 6 9 17 4 12" />
-                                  </svg>
-                                )}
-                              </div>
-
-                              <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                                <span className="line-clamp-1 rounded-full bg-black/[0.04] px-2 py-0.5 font-mont text-[10px] text-black/55">
-                                  {tour.location}
-                                </span>
-
-                                {tour.duration && (
-                                  <span className="rounded-full bg-blue-50 px-2 py-0.5 font-mont text-[10px] text-blue-800">
-                                    {tour.duration}
-                                  </span>
-                                )}
-
-                                {tour.price && (
-                                  <span className="rounded-full bg-green-100 px-2 py-0.5 font-bitter text-[10px] font-black text-green-800">
-                                    From {tour.price}
-                                  </span>
-                                )}
-                              </div>
+                              {selected && (
+                                <svg
+                                  className="h-4 w-4 shrink-0 text-green-700"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2.5"
+                                  aria-hidden="true"
+                                >
+                                  <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                              )}
                             </div>
-                          </button>
 
-                          <a
-                            href={tour.link}
-                            onClick={(event) => event.stopPropagation()}
-                            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1.5 font-bitter text-[9px] font-black uppercase tracking-[0.1em] text-blue-800 transition hover:bg-blue-200"
+                            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                              <span className="line-clamp-1 rounded-full bg-black/[0.04] px-2 py-0.5 font-mont text-[10px] text-black/55">
+                                {tour.location}
+                              </span>
+
+                              {tour.duration && (
+                                <span className="rounded-full bg-blue-50 px-2 py-0.5 font-mont text-[10px] text-blue-800">
+                                  {tour.duration}
+                                </span>
+                              )}
+
+                              {tour.price && (
+                                <span className="rounded-full bg-green-100 px-2 py-0.5 font-bitter text-[10px] font-black text-green-800">
+                                  From {tour.price}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </button>
+
+                        <a
+                          href={tour.link}
+                          onClick={(event) => event.stopPropagation()}
+                          className="inline-flex shrink-0 items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1.5 font-bitter text-[9px] font-black uppercase tracking-[0.1em] text-blue-800 transition hover:bg-blue-200"
+                        >
+                          Details
+                          <svg
+                            className="h-3 w-3"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
                           >
-                            Details
-                            <svg
-                              className="h-3 w-3"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2.4"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                            >
-                              <path d="M7 17 17 7" />
-                              <path d="M9 7h8v8" />
-                            </svg>
-                          </a>
-                        </div>
+                            <path d="M7 17 17 7" />
+                            <path d="M9 7h8v8" />
+                          </svg>
+                        </a>
                       </div>
-                    )
-                  })}
-                </div>
-              )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
 
-              {activeModal === 'date' && (
-                <div className="flex justify-center p-4 pb-6 sm:p-6 md:p-8">
-                  <div className="datepicker-large">
-                    <DatePicker
-                      selected={date}
-                      onChange={handleDateSelect}
-                      minDate={new Date()}
-                      renderDayContents={renderDayContents}
-                      filterDate={(dateObj) => {
-                        if (preventSameDay) {
-                          const today = new Date()
-                          return dateObj.toDateString() !== today.toDateString()
-                        }
-                        return true
-                      }}
-                      inline
+            {activeModal === 'date' && (
+              <div className="flex justify-center p-4 pb-6 sm:p-6 md:p-8">
+                <div className="datepicker-large">
+                  <DatePicker
+                    selected={date}
+                    onChange={handleDateSelect}
+                    minDate={new Date()}
+                    renderDayContents={renderDayContents}
+                    filterDate={(dateObj) => {
+                      if (preventSameDay) {
+                        const today = new Date()
+                        return dateObj.toDateString() !== today.toDateString()
+                      }
+                      return true
+                    }}
+                    inline
+                  />
+                </div>
+              </div>
+            )}
+
+            {activeModal === 'participants' && (
+              <div className="px-4 pb-5 pt-2 text-black sm:px-6 sm:pb-6">
+                <div className="mb-4 flex justify-center">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-blue-50 shadow-md ring-1 ring-blue-200">
+                    <img
+                      src="./icons/guest.png"
+                      className="h-10 w-auto"
+                      alt="Guests"
+                      aria-hidden="true"
                     />
                   </div>
                 </div>
-              )}
 
-              {activeModal === 'participants' && (
-                <div className="px-4 pb-5 pt-2 text-black sm:px-6 sm:pb-6">
-                  <div className="mb-4 flex justify-center">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-blue-50 shadow-md ring-1 ring-blue-200">
-                      <img
-                        src="./icons/guest.png"
-                        className="h-10 w-auto"
-                        alt="Guests"
-                        aria-hidden="true"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid gap-3">
-                    <div className="flex items-center justify-between gap-4 rounded-2xl border border-black/8 bg-black/[0.02] px-4 py-3">
-                      <div>
-                        <p className="font-bitter text-sm font-black uppercase tracking-[0.12em]">
-                          Adults
-                        </p>
-                        <p className="font-mont text-xs text-black/40">Ages 13+</p>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAdults((previous) => Math.max(1, previous - 1))
-                            setParticipantsConfirmed(false)
-                          }}
-                          className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black disabled:opacity-30"
-                          disabled={adults === 1}
-                        >
-                          −
-                        </button>
-
-                        <span className="w-7 text-center font-mont text-base">{adults}</span>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAdults((previous) => Math.min(20, previous + 1))
-                            setParticipantsConfirmed(false)
-                          }}
-                          className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black"
-                        >
-                          +
-                        </button>
-                      </div>
+                <div className="grid gap-3">
+                  <div className="flex items-center justify-between gap-4 rounded-2xl border border-black/8 bg-black/[0.02] px-4 py-3">
+                    <div>
+                      <p className="font-bitter text-sm font-black uppercase tracking-[0.12em]">
+                        Adults
+                      </p>
+                      <p className="font-mont text-xs text-black/40">Ages 13+</p>
                     </div>
 
-                    <div className="flex items-center justify-between gap-4 rounded-2xl border border-black/8 bg-black/[0.02] px-4 py-3">
-                      <div>
-                        <p className="font-bitter text-sm font-black uppercase tracking-[0.12em]">
-                          Children
-                        </p>
-                        <p className="font-mont text-xs text-black/40">Ages 0–12</p>
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAdults((previous) => Math.max(1, previous - 1))
+                          setParticipantsConfirmed(false)
+                        }}
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black disabled:opacity-30"
+                        disabled={adults === 1}
+                      >
+                        −
+                      </button>
 
-                      <div className="flex items-center gap-3">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setChildren((previous) => Math.max(0, previous - 1))
-                            setParticipantsConfirmed(false)
-                          }}
-                          className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black disabled:opacity-30"
-                          disabled={children === 0}
-                        >
-                          −
-                        </button>
+                      <span className="w-7 text-center font-mont text-base">{adults}</span>
 
-                        <span className="w-7 text-center font-mont text-base">{children}</span>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setChildren((previous) => Math.min(20, previous + 1))
-                            setParticipantsConfirmed(false)
-                          }}
-                          className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black"
-                        >
-                          +
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAdults((previous) => Math.min(20, previous + 1))
+                          setParticipantsConfirmed(false)
+                        }}
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black"
+                      >
+                        +
+                      </button>
                     </div>
                   </div>
 
-                  <div className="mt-4 rounded-2xl bg-green-50 px-4 py-3 font-mont text-xs text-green-800 ring-1 ring-green-200">
-                    Total guests: <span className="font-bold">{participants}</span>
-                  </div>
+                  <div className="flex items-center justify-between gap-4 rounded-2xl border border-black/8 bg-black/[0.02] px-4 py-3">
+                    <div>
+                      <p className="font-bitter text-sm font-black uppercase tracking-[0.12em]">
+                        Children
+                      </p>
+                      <p className="font-mont text-xs text-black/40">Ages 0–12</p>
+                    </div>
 
-                  <button
-                    type="button"
-                    onClick={handleParticipantsConfirm}
-                    className="mt-4 w-full rounded-xl bg-black py-3 font-bitter text-sm font-black uppercase tracking-[0.12em] text-white transition-colors hover:bg-black/80"
-                  >
-                    Confirm guests
-                  </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setChildren((previous) => Math.max(0, previous - 1))
+                          setParticipantsConfirmed(false)
+                        }}
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black disabled:opacity-30"
+                        disabled={children === 0}
+                      >
+                        −
+                      </button>
+
+                      <span className="w-7 text-center font-mont text-base">{children}</span>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setChildren((previous) => Math.min(20, previous + 1))
+                          setParticipantsConfirmed(false)
+                        }}
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
-          </div>,
-          document.body
-        )
+
+                <div className="mt-4 rounded-2xl bg-green-50 px-4 py-3 font-mont text-xs text-green-800 ring-1 ring-green-200">
+                  Total guests: <span className="font-bold">{participants}</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleParticipantsConfirm}
+                  className="mt-4 w-full rounded-xl bg-black py-3 font-bitter text-sm font-black uppercase tracking-[0.12em] text-white transition-colors hover:bg-black/80"
+                >
+                  Confirm guests
+                </button>
+              </div>
+            )}
+          </div>
+        </div>,
+        document.body
+      )
       : null
 
   return (
@@ -1159,11 +1150,10 @@ function TourSelect() {
               <button
                 type="button"
                 onClick={handleMobileContinue}
-                className={`flex min-w-[9.5rem] items-center justify-center gap-2 rounded-2xl px-5 py-3 font-bitter text-sm font-black uppercase tracking-[0.08em] text-white transition ${
-                  canSearch && mobileStep >= 2
+                className={`flex min-w-[9.5rem] items-center justify-center gap-2 rounded-2xl px-5 py-3 font-bitter text-sm font-black uppercase tracking-[0.08em] text-white transition ${canSearch && mobileStep >= 2
                     ? searchButtonClass(canSearch, searchAttempted)
                     : 'bg-[#020817] hover:bg-black shadow-[0_14px_30px_rgba(0,0,0,0.18)]'
-                }`}
+                  }`}
               >
                 <span>{canSearch && mobileStep >= 2 ? 'Search' : 'Continue'}</span>
                 <img
@@ -1185,16 +1175,14 @@ function TourSelect() {
                 }}
                 type="button"
                 onClick={card.onClick}
-                className={`group flex min-w-0 items-center gap-3 border-black/8 bg-white px-4 py-4 text-left transition-all duration-300 hover:bg-blue-50/35 sm:px-5 sm:py-5 min-[700px]:min-h-[92px] min-[700px]:px-3 min-[900px]:px-5 ${
-                  index < 2
+                className={`group flex min-w-0 items-center gap-3 border-black/8 bg-white px-4 py-4 text-left transition-all duration-300 hover:bg-blue-50/35 sm:px-5 sm:py-5 min-[700px]:min-h-[92px] min-[700px]:px-3 min-[900px]:px-5 ${index < 2
                     ? 'border-b min-[700px]:border-b-0 min-[700px]:border-r'
                     : 'border-b min-[700px]:border-b-0 min-[700px]:border-r'
-                }`}
+                  }`}
               >
                 <div
-                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-colors duration-300 group-hover:scale-105 ${
-                    card.complete ? 'bg-green-100 ring-1 ring-green-200' : 'bg-black/[0.04]'
-                  }`}
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-colors duration-300 group-hover:scale-105 ${card.complete ? 'bg-green-100 ring-1 ring-green-200' : 'bg-black/[0.04]'
+                    }`}
                 >
                   <img src={card.icon} className="h-6 w-auto" alt="" aria-hidden="true" />
                 </div>

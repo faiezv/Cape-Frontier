@@ -4,6 +4,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
+import { useLoadingNavigate } from "./useLoadingNavigate.jsx";
+
 gsap.registerPlugin(ScrollTrigger)
 
 const navItems = [
@@ -186,8 +188,9 @@ const megaMenus = {
 }
 
 const Navbar = () => {
-  const navigate = useNavigate()
+  const navigate = useLoadingNavigate()
   const location = useLocation()
+
 
   const isCheckout = location.pathname === '/checkout'
   const isBooking = location.pathname === '/booking'
@@ -533,7 +536,7 @@ const Navbar = () => {
         ref={navbarRef}
         onMouseLeave={scheduleCloseMega}
         onMouseEnter={keepMegaOpen}
-        className="fixed inset-x-0 top-0 z-[99990] w-screen max-w-[100dvw] overflow-x-clip border-white/10 
+        className="fixed inset-x-0 top-0 z-9990 w-screen max-w-[100dvw] overflow-x-clip border-white/10 
         bg-[linear-gradient(180deg,rgba(8,43,138,0.78)_0%,rgba(8,43,138,0.50)_100%) 
         bg-non hero-gradient
          text-white backdrop-blur-xl"
@@ -666,7 +669,7 @@ const Navbar = () => {
       {activeMegaData &&
         typeof document !== 'undefined' &&
         createPortal(
-          <div className="pointer-events-none fixed inset-0 z-[99970] bg-black/30 backdrop-blur-[2px] md:block" />,
+          <div className="pointer-events-none fixed inset-0 z-9970 bg-black/30 backdrop-blur-[2px] md:block" />,
           document.body
         )}
 
@@ -677,7 +680,7 @@ const Navbar = () => {
             ref={megaPanelRef}
             onMouseEnter={keepMegaOpen}
             onMouseLeave={scheduleCloseMega}
-            className="fixed left-0 right-0 top-[4rem] z-[99980] hidden max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-y border-black/5 bg-white text-black shadow-[0_18px_45px_rgba(0,0,0,0.10)] md:block"
+            className="fixed left-0 right-0 top-[4rem] z-9980 hidden max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-y border-black/5 bg-white text-black shadow-[0_18px_45px_rgba(0,0,0,0.10)] md:block"
           >
             <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
               <div className="grid gap-5 lg:grid-cols-[0.68fr_1.32fr]">
@@ -776,7 +779,7 @@ const Navbar = () => {
         typeof document !== 'undefined' &&
         createPortal(
           <div
-            className="fixed inset-0 z-[99999] sm:hidden"
+            className="fixed inset-0 z-9980 sm:hidden"
             onClick={() => setMenuOpen(false)}
             onPointerDown={(event) => event.stopPropagation()}
             onTouchStart={(event) => event.stopPropagation()}

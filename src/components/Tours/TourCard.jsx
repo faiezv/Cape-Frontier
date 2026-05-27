@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useLoadingNavigate } from "../useLoadingNavigate.jsx"
 import {
   CTA_LABELS,
   SUPPORTED_CURRENCIES,
@@ -23,7 +23,7 @@ import {
 } from "./Helpers.jsx";
 
 export default function TourCard({ tour, cardHeight }) {
-  const navigate = useNavigate();
+  const navigate = useLoadingNavigate();
 
   const [currency, setCurrency] = useState(
     () => tour?.baseCurrency || SUPPORTED_CURRENCIES[0] || "ZAR"
