@@ -12,6 +12,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { tours } from "../data/tours";
 import Booking from "./Booking";
 import ContactPlatforms from "/src/components/ContactPlatforms.jsx";
+import { useLoadingNavigate } from "/src/components/useLoadingNavigate.jsx";
 
 gsap.registerPlugin(ScrollToPlugin, ScrollTrigger);
 
@@ -165,7 +166,7 @@ const RouteIcon = ({ className = "h-4 w-4" }) => (
 
 export default function TourDetails() {
   const { slug } = useParams();
-  const navigate = useNavigate();
+  const navigate = useLoadingNavigate();
   const location = useLocation();
 
   const mobileBookingRef = useRef(null);
@@ -577,7 +578,7 @@ export default function TourDetails() {
     }, 260);
   };
 
-    useEffect(() => {
+  useEffect(() => {
     if (!location.hash) return
 
     const id = location.hash.replace('#', '')
@@ -706,126 +707,123 @@ export default function TourDetails() {
         ref={desktopContentSectionRef}
         className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 pt-12 pb-12 sm:px-5 lg:px-5 lg:pt-20 lg:pb-14 lg:grid-cols-[1.32fr_0.68fr] xl:gap-10"
       >
-          <div ref={contentColumnRef} className="space-y-9">
-            <ContentBlock eyebrow="Overview" title="About this experience">
-              <p className="font-bitter leading-relaxed text-neutral-600">
-                {tour.description}
-              </p>
-            </ContentBlock>
+        <div ref={contentColumnRef} className="space-y-9">
+          <ContentBlock eyebrow="Overview" title="About this experience">
+            <p className="font-bitter leading-relaxed text-neutral-600">
+              {tour.description}
+            </p>
+          </ContentBlock>
 
-            <ContentBlock eyebrow="Gallery" title="Tour photos">
-              {galleryImagesForLayout.length > 0 ? (
-                <>
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                    {galleryImagesForLayout.map((image, index) => (
-                      <button
-                        key={`${image}-${index}`}
-                        type="button"
-                        className={`group relative overflow-hidden rounded-[1.25rem] bg-blue-50 ${
-                          index === 0 ? "sm:col-span-2 xl:col-span-2" : ""
+          <ContentBlock eyebrow="Gallery" title="Tour photos">
+            {galleryImagesForLayout.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  {galleryImagesForLayout.map((image, index) => (
+                    <button
+                      key={`${image}-${index}`}
+                      type="button"
+                      className={`group relative overflow-hidden rounded-[1.25rem] bg-blue-50 ${index === 0 ? "sm:col-span-2 xl:col-span-2" : ""
                         }`}
+                    >
+                      <img
+                        src={image}
+                        alt={`${tour.title} gallery image ${index + 1}`}
+                        loading={index < 3 ? "eager" : "lazy"}
+                        decoding="async"
+                        onLoad={() => ScrollTrigger.refresh()}
+                        className={`w-full object-cover transition duration-500 group-hover:scale-[1.04] ${index === 0 ? "h-56 md:h-72" : "h-40"
+                          }`}
+                      />
+                    </button>
+                  ))}
+
+                  {((isCompactLayout && hasMoreMobileGalleryImages) || (!isCompactLayout && hasHiddenGalleryImages && !showAllGalleryImages)) && (
+                    <button
+                      type="button"
+                      onClick={isCompactLayout ? showMoreMobileGalleryImages : toggleGalleryImages}
+                      className="group flex h-40 flex-col items-center justify-center rounded-[1.25rem] border border-blue-100 bg-blue-50/85 p-4 text-center transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-100"
+                    >
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bitter text-lg font-bold text-blue-700 shadow-sm">
+                        +
+                      </span>
+                      <span className="mt-3 font-bitter text-sm font-bold text-neutral-950">
+                        Click to see more
+                      </span>
+                      <span className="mt-1 font-bitter text-xs text-blue-600">
+                        {isCompactLayout
+                          ? `${Math.min(3, mobileHiddenGalleryCount)} more photos`
+                          : `${hiddenGalleryCount} more photos`}
+                      </span>
+                    </button>
+                  )}
+                </div>
+
+                {!isCompactLayout && hasHiddenGalleryImages && (
+                  <div
+                    className={`grid grid-cols-1 gap-3 overflow-hidden transition-[max-height,opacity,margin] duration-700 ease-out sm:grid-cols-2 xl:grid-cols-3 ${showAllGalleryImages
+                      ? "mt-3 max-h-[2600px] opacity-100"
+                      : "mt-0 max-h-0 opacity-0"
+                      }`}
+                  >
+                    {extraGalleryImages.map((image, index) => (
+                      <button
+                        key={`${image}-extra-${index}`}
+                        type="button"
+                        className="group overflow-hidden rounded-[1.25rem] bg-blue-50"
                       >
                         <img
                           src={image}
-                          alt={`${tour.title} gallery image ${index + 1}`}
-                          loading={index < 3 ? "eager" : "lazy"}
+                          alt={`${tour.title} extra gallery image ${index + 9}`}
+                          loading="lazy"
                           decoding="async"
                           onLoad={() => ScrollTrigger.refresh()}
-                          className={`w-full object-cover transition duration-500 group-hover:scale-[1.04] ${
-                            index === 0 ? "h-56 md:h-72" : "h-40"
-                          }`}
+                          className="h-40 w-full object-cover transition duration-500 group-hover:scale-[1.04]"
                         />
                       </button>
                     ))}
-
-                    {((isCompactLayout && hasMoreMobileGalleryImages) || (!isCompactLayout && hasHiddenGalleryImages && !showAllGalleryImages)) && (
-                      <button
-                        type="button"
-                        onClick={isCompactLayout ? showMoreMobileGalleryImages : toggleGalleryImages}
-                        className="group flex h-40 flex-col items-center justify-center rounded-[1.25rem] border border-blue-100 bg-blue-50/85 p-4 text-center transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-100"
-                      >
-                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bitter text-lg font-bold text-blue-700 shadow-sm">
-                          +
-                        </span>
-                        <span className="mt-3 font-bitter text-sm font-bold text-neutral-950">
-                          Click to see more
-                        </span>
-                        <span className="mt-1 font-bitter text-xs text-blue-600">
-                          {isCompactLayout
-                            ? `${Math.min(3, mobileHiddenGalleryCount)} more photos`
-                            : `${hiddenGalleryCount} more photos`}
-                        </span>
-                      </button>
-                    )}
                   </div>
+                )}
 
-                  {!isCompactLayout && hasHiddenGalleryImages && (
-                    <div
-                      className={`grid grid-cols-1 gap-3 overflow-hidden transition-[max-height,opacity,margin] duration-700 ease-out sm:grid-cols-2 xl:grid-cols-3 ${
-                        showAllGalleryImages
-                          ? "mt-3 max-h-[2600px] opacity-100"
-                          : "mt-0 max-h-0 opacity-0"
-                      }`}
-                    >
-                      {extraGalleryImages.map((image, index) => (
-                        <button
-                          key={`${image}-extra-${index}`}
-                          type="button"
-                          className="group overflow-hidden rounded-[1.25rem] bg-blue-50"
-                        >
-                          <img
-                            src={image}
-                            alt={`${tour.title} extra gallery image ${index + 9}`}
-                            loading="lazy"
-                            decoding="async"
-                            onLoad={() => ScrollTrigger.refresh()}
-                            className="h-40 w-full object-cover transition duration-500 group-hover:scale-[1.04]"
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {!isCompactLayout && showAllGalleryImages && hasHiddenGalleryImages && (
-                    <button
-                      type="button"
-                      onClick={toggleGalleryImages}
-                      className="mt-4 inline-flex rounded-full border border-blue-100 bg-white px-4 py-2 font-bitter text-xs font-bold text-blue-700 transition hover:bg-blue-50"
-                    >
-                      Collapse photos
-                    </button>
-                  )}
-                </>
-              ) : (
-                <div className="rounded-[1.25rem] border border-blue-100 bg-blue-50/70 p-6 font-bitter text-sm text-neutral-500">
-                  Gallery images coming soon.
-                </div>
-              )}
-            </ContentBlock>
-
-            <IncludedExcludedGrid tour={tour} />
-
-            <ContentBlock eyebrow="Highlights" title="Perks">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {tour.highlights?.map((item, index) => (
-                  <TickCard key={index} text={getItemText(item)} />
-                ))}
+                {!isCompactLayout && showAllGalleryImages && hasHiddenGalleryImages && (
+                  <button
+                    type="button"
+                    onClick={toggleGalleryImages}
+                    className="mt-4 inline-flex rounded-full border border-blue-100 bg-white px-4 py-2 font-bitter text-xs font-bold text-blue-700 transition hover:bg-blue-50"
+                  >
+                    Collapse photos
+                  </button>
+                )}
+              </>
+            ) : (
+              <div className="rounded-[1.25rem] border border-blue-100 bg-blue-50/70 p-6 font-bitter text-sm text-neutral-500">
+                Gallery images coming soon.
               </div>
-            </ContentBlock>
-          </div>
+            )}
+          </ContentBlock>
 
-          <aside className="hidden h-fit lg:block lg:pt-0">
-            <div ref={readyCardRef} className="space-y-4">
-              <button
-                type="button"
-                onClick={goBackToPreviousScroll}
-                className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50/80 px-4 py-2 font-bitter text-xs font-bold text-blue-700 transition hover:border-blue-200 hover:bg-blue-100"
-              >
-                <span aria-hidden="true">←</span>
-                Back to tours
-              </button>
+          <IncludedExcludedGrid tour={tour} />
 
-              <div className="rounded-[1.35rem] border border-blue-100 bg-blue-50/70 p-5 shadow-[0_18px_50px_rgba(37,99,235,0.08)]"
+          <ContentBlock eyebrow="Highlights" title="Perks">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {tour.highlights?.map((item, index) => (
+                <TickCard key={index} text={getItemText(item)} />
+              ))}
+            </div>
+          </ContentBlock>
+        </div>
+
+        <aside className="hidden h-fit lg:block lg:pt-0">
+          <div ref={readyCardRef} className="space-y-4">
+            <button
+              type="button"
+              onClick={goBackToPreviousScroll}
+              className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50/80 px-4 py-2 font-bitter text-xs font-bold text-blue-700 transition hover:border-blue-200 hover:bg-blue-100"
+            >
+              <span aria-hidden="true">←</span>
+              Back to tours
+            </button>
+
+            <div className="rounded-[1.35rem] border border-blue-100 bg-blue-50/70 p-5 shadow-[0_18px_50px_rgba(37,99,235,0.08)]"
             >
               <span className="inline-flex rounded-full bg-green-200 px-3 py-1 font-bitter text-[10px] font-bold uppercase tracking-[0.14em] text-green-950">
                 current tour
@@ -865,10 +863,10 @@ export default function TourDetails() {
                   </div>
                 </div>
               )}
-              </div>
             </div>
-          </aside>
-        </section>
+          </div>
+        </aside>
+      </section>
 
       {/* ITINERARY */}
       <section
@@ -1001,33 +999,33 @@ export default function TourDetails() {
 
       {/* NEED TO KNOW + FAQ */}
       <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-12 sm:px-5 lg:px-5 lg:py-14 lg:grid-cols-2">
-          <ContentBlock eyebrow="Before you go" title="Need to know">
-            <div className="grid grid-cols-1 gap-3">
-              {tour.needToKnow?.map((item, index) => (
-                <TickCard key={index} text={getItemText(item)} />
-              ))}
-            </div>
-          </ContentBlock>
+        <ContentBlock eyebrow="Before you go" title="Need to know">
+          <div className="grid grid-cols-1 gap-3">
+            {tour.needToKnow?.map((item, index) => (
+              <TickCard key={index} text={getItemText(item)} />
+            ))}
+          </div>
+        </ContentBlock>
 
-          <ContentBlock eyebrow="Questions" title="FAQ">
-            <div className="grid grid-cols-1 gap-3">
-              {tour.faqs?.map((faq, index) => (
-                <div
-                  key={index}
-                  className="rounded-[1.25rem] border border-blue-100 bg-blue-50/65 p-5"
-                >
-                  <p className="font-bitter font-semibold text-neutral-900">
-                    {faq.question}
-                  </p>
+        <ContentBlock eyebrow="Questions" title="FAQ">
+          <div className="grid grid-cols-1 gap-3">
+            {tour.faqs?.map((faq, index) => (
+              <div
+                key={index}
+                className="rounded-[1.25rem] border border-blue-100 bg-blue-50/65 p-5"
+              >
+                <p className="font-bitter font-semibold text-neutral-900">
+                  {faq.question}
+                </p>
 
-                  <p className="mt-2 font-bitter text-sm leading-relaxed text-neutral-600">
-                    {faq.answer}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </ContentBlock>
-        </section>
+                <p className="mt-2 font-bitter text-sm leading-relaxed text-neutral-600">
+                  {faq.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+        </ContentBlock>
+      </section>
     </main>
   );
 }
@@ -1288,11 +1286,10 @@ function CompactLineItem({ text, variant = "tick" }) {
   return (
     <div className="flex gap-2 rounded-[0.9rem] border border-blue-100 bg-white p-3">
       <span
-        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-bitter text-xs font-bold ${
-          variant === "plain"
-            ? "bg-blue-50 text-blue-500"
-            : "bg-green-200 text-green-950"
-        }`}
+        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-bitter text-xs font-bold ${variant === "plain"
+          ? "bg-blue-50 text-blue-500"
+          : "bg-green-200 text-green-950"
+          }`}
       >
         {variant === "plain" ? "—" : "✓"}
       </span>
@@ -1729,15 +1726,13 @@ function ItineraryImageFrame({ stop, index }) {
           loading="lazy"
           decoding="async"
           onLoad={() => ScrollTrigger.refresh()}
-          className={`w-full rounded-[1.35rem] border border-blue-100 bg-neutral-100 object-cover shadow-[0_18px_45px_rgba(0,0,0,0.10)] ${
-            isPickupStop ? "h-[338px]" : "h-[224px]"
-          }`}
+          className={`w-full rounded-[1.35rem] border border-blue-100 bg-neutral-100 object-cover shadow-[0_18px_45px_rgba(0,0,0,0.10)] ${isPickupStop ? "h-[338px]" : "h-[224px]"
+            }`}
         />
       ) : (
         <div
-          className={`flex items-center justify-center rounded-[1.35rem] border border-blue-100 bg-neutral-100 font-bitter text-sm text-neutral-400 shadow-[0_18px_45px_rgba(0,0,0,0.10)] ${
-            isPickupStop ? "h-[338px]" : "h-[224px]"
-          }`}
+          className={`flex items-center justify-center rounded-[1.35rem] border border-blue-100 bg-neutral-100 font-bitter text-sm text-neutral-400 shadow-[0_18px_45px_rgba(0,0,0,0.10)] ${isPickupStop ? "h-[338px]" : "h-[224px]"
+            }`}
         >
           Stop image coming soon
         </div>

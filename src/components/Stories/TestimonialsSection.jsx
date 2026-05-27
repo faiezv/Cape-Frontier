@@ -1,6 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import reviews from "../../data/reviews.js";
-import FloatingTooltip from "../FloatingTooltip.jsx";
 
 const StarRating = ({ rating = 5, size = "w-5 h-5" }) => {
   const filledStars = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
@@ -174,14 +173,9 @@ const TestimonialsSection = () => {
   }, [activeTopReviewIndex, isMobileReviews]);
 
   return (
-    <div className="w-full px-4 py-5 font-bitter md:py-8">
+    <div className="w-full px-4 py-5 font-bitter md:py-">
       <div className="mx-auto max-w-5xl">
-        <FloatingTooltip
-          text="See more"
-          position="top"
-          followCursor={true}
-          className="w-full"
-        >
+          {/* top reviews */}
           <div
             ref={topTrackRef}
             className="mb-7 flex h-[30.5rem] snap-x snap-mandatory items-center gap-3 overflow-x-auto pb-3 [-ms-overflow-style:none] [scrollbar-width:none] md:mb-10 md:grid md:h-auto md:grid-cols-3 md:items-stretch md:gap-4 md:overflow-visible md:pb-0 [&::-webkit-scrollbar]:hidden"
@@ -259,7 +253,7 @@ const TestimonialsSection = () => {
               />
             ))}
           </div>
-
+          {/* bottom reviews */}
           <div className="hidden grid-cols-4 gap-3 lg:grid">
             {bottomReviews.map((review) => (
               <div
@@ -292,9 +286,8 @@ const TestimonialsSection = () => {
               </div>
             ))}
           </div>
-        </FloatingTooltip>
 
-        <div className="mb-10 mt-5 flex w-full items-center justify-center text-white md:mb-12 md:mt-7 lg:mb-20 lg:mt-8">
+        <div className="mb-10 mt-5 flex w-full items-center justify-center text-white md:mb-4 md:mt-7 lg:mb- lg:mt-8">
           <button
             type="button"
             className="hero-gradient z-20 flex items-center justify-center gap-12 rounded-full p-2 px-4 transition hover:scale-[1.02]"

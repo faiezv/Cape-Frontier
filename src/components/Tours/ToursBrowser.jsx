@@ -17,7 +17,6 @@ import tours, {
 } from "../../data/tours.js";
 
 import TourCard from "./TourCard.jsx";
-
 import FixedCategoryNav from "./FixedCategoryNav.jsx";
 
 gsap.registerPlugin(
@@ -581,10 +580,6 @@ useLayoutEffect(() => {
             )}
           </div>
         </div>
-
-        {/* -------------------------------- */}
-        {/* FINAL RELEASE */}
-        {/* -------------------------------- */}
 
 
         <div className="scroll-end h-px w-full" />

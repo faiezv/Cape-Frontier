@@ -545,7 +545,7 @@ const GoalsGallery = () => {
           SHARED GALLERY + FLEET TITLE
       ============================================================ */}
       <div className="mx-auto max-w-5xl px-0">
-        <div className="rounded-t-[2rem] border border-black/5 bg-white/90 p-4 shadow-[0_16px_42px_rgba(15,23,42,0.07)] backdrop-blur-md sm:p-5 md:p-6">
+        <div className="rounded-t-[2rem] border border-black/5 bg-white/90 p-4 shadow-[0_16px_42px_rgba(15,23,42,0.07)] backdrop-blur-md sm:p-5 md:px-6">
           <div className="flex flex-col items-center ">
               <p className="font-bitter text-[10px] font-black uppercase tracking-[0.2em] text-green-700">
                 Cape Frontier moments

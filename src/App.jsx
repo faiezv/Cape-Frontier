@@ -1,18 +1,20 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
-
-/////////////// PAGES ////////////////////////////
-import ScrollToTop from './components/ScrollToTop.jsx'
-import Navbar from './components/Navbar.jsx'
-import AnimatedRoutes from './components/AnimatedRoutes.jsx'
 
 gsap.registerPlugin(ScrollTrigger)
 
 ScrollTrigger.config({
   ignoreMobileResize: true,
 })
+
+
+/////////////// PAGES ////////////////////////////
+import ScrollToTop from './components/ScrollToTop.jsx'
+import Navbar from './components/Navbar.jsx'
+import LoadingBar from '../src/components/LoadingBar.jsx'
+import AnimatedRoutes from './components/AnimatedRoutes.jsx'
 
 const App = () => {
   useEffect(() => {
@@ -73,9 +75,11 @@ const App = () => {
 
   return (
     <div className="relative min-w-full bg-white">
-      <ScrollToTop />
-      <Navbar />
-      <AnimatedRoutes />
+      <LoadingBar>
+          <ScrollToTop />
+          <Navbar />
+          <AnimatedRoutes />
+      </LoadingBar>
     </div>
   )
 }

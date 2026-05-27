@@ -453,13 +453,14 @@ const Stories = () => {
       ============================================================ */}
       <section className="relative z-30 mx-auto w-full pt-8">
         <img
-          src="/assets/content/clip-art/section2-bg.png"
+          src="/assets/content/clip-art/section1-bg.png"
           className="absolute inset-0 -z-10 h-full w-full object-cover opacity-100"
           alt=""
           aria-hidden="true"
         />
 
-        <div className="absolute top-0 z-0 h-1/5 w-full bg-white" />
+        {/* white backround offset */}
+        <div className="absolute top-0 z-0 h-1/5 md:h-1/8  w-full bg-white" />
 
         <TestimonialsSection />
 
