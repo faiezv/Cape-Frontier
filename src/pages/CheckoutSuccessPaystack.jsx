@@ -23,7 +23,6 @@ const normalizeEmails = (emails) => {
   return emails.map((email) => String(email || "").trim()).filter(Boolean);
 };
 
-
 const getStoredCheckout = () => {
   try {
     const raw = sessionStorage.getItem("lastCheckout");
@@ -171,6 +170,14 @@ const CheckoutSuccessPaystack = () => {
 
   const [countdown, setCountdown] = useState(300);
 
+  // PayFast uses m_payment_id and pf_payment_id
+  const searchParams = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search]
+  );
+  const mPaymentId = searchParams.get("m_payment_id");
+  const pfPaymentId = searchParams.get("pf_payment_id");
+
   const initialCheckout = useMemo(() => {
     if (location.state?.bookingDetails) {
       return {
@@ -182,36 +189,24 @@ const CheckoutSuccessPaystack = () => {
         notes: location.state.notes,
         checkoutStops: location.state.checkoutStops || [],
         bookingReference: location.state.bookingReference,
-        paystackReference: location.state.paystackReference,
+        payfastReference: location.state.payfastReference,
         emailPayload: location.state.emailPayload || null,
-        paymentProvider: "paystack",
+        paymentProvider: "payfast",
       };
     }
 
     return getStoredCheckout();
   }, [location.state]);
 
-  const searchParams = useMemo(
-    () => new URLSearchParams(location.search),
-    [location.search]
-  );
-
-  const paystackReference =
-    searchParams.get("reference") ||
-    searchParams.get("trxref") ||
-    location.state?.paystackReference ||
-    initialCheckout?.paystackReference ||
-    "";
-
   const [storedCheckout, setStoredCheckoutState] = useState(initialCheckout);
 
   const [paymentStatus, setPaymentStatus] = useState(
-    paystackReference ? "verifying" : "success"
+    mPaymentId ? "verifying" : "success"
   );
 
   const [paymentMessage, setPaymentMessage] = useState(
-    paystackReference
-      ? "Verifying your Paystack payment before finalising the booking."
+    mPaymentId
+      ? "Verifying your PayFast payment before finalising the booking."
       : "Your booking details were received."
   );
 
@@ -245,6 +240,7 @@ const CheckoutSuccessPaystack = () => {
     storedCheckout?.bookingReference ||
     storedCheckout?.emailPayload?.bookingReference ||
     storedCheckout?.emailPayload?.bookingRef ||
+    mPaymentId ||
     "Pending confirmation";
 
   const customerEmail =
@@ -300,137 +296,161 @@ const CheckoutSuccessPaystack = () => {
     }
   }, []);
 
+  // PayFast verification (replaces Paystack verification)
   useEffect(() => {
-    if (!paystackReference || verifyStartedRef.current) return;
+    if (!mPaymentId || verifyStartedRef.current) return;
 
     verifyStartedRef.current = true;
-
     let cancelled = false;
+    let pollInterval;
 
     const verifyAndSendBookingEmail = async () => {
       try {
         setPaymentStatus("verifying");
-        setPaymentMessage("Verifying your Paystack payment before finalising the booking.");
+        setPaymentMessage("Verifying your PayFast payment before finalising the booking.");
 
-        const verifyRes = await fetch(
-          `/api/paystack-verify?reference=${encodeURIComponent(paystackReference)}`
-        );
-
-        const verifyData = await verifyRes.json();
-
-        if (!verifyRes.ok) {
-          throw new Error(verifyData.error || "Could not verify Paystack payment.");
-        }
-
-        if (!verifyData.paid) {
-          throw new Error(
-            `Payment was not successful yet. Current status: ${
-              verifyData.status || "unknown"
-            }.`
-          );
-        }
-
-        if (cancelled) return;
-
-        const currentCheckout = storedCheckout || getStoredCheckout() || {};
-
-        const finalBookingReference =
-          currentCheckout.bookingReference ||
-          currentCheckout.emailPayload?.bookingReference ||
-          currentCheckout.emailPayload?.bookingRef ||
-          verifyData.metadata?.bookingReference ||
-          paystackReference;
-
-        const emailPayload = {
-          ...(currentCheckout.emailPayload || {}),
-          bookingReference: finalBookingReference,
-          bookingRef: finalBookingReference,
-          paymentId: paystackReference,
-          paymentProvider: "paystack",
-          paystackReference,
-          paystackStatus: verifyData.status,
-          paystackChannel: verifyData.channel,
-          paystackGatewayResponse: verifyData.gatewayResponse,
-          tourStops:
-            currentCheckout.checkoutStops ||
-            currentCheckout.emailPayload?.tourStops ||
-            currentCheckout.emailPayload?.stops ||
-            [],
-          stops:
-            currentCheckout.checkoutStops ||
-            currentCheckout.emailPayload?.stops ||
-            currentCheckout.emailPayload?.tourStops ||
-            [],
-        };
-
-        const updatedCheckout = {
-          ...currentCheckout,
-          bookingReference: finalBookingReference,
-          paystackReference,
-          verifiedPayment: verifyData,
-          emailPayload,
-          paymentProvider: "paystack",
-        };
-
-        setStoredCheckout(updatedCheckout);
-        setStoredCheckoutState(updatedCheckout);
-
-        const emailSentKey = `cape-frontier-email-sent:${paystackReference}`;
-
-        if (sessionStorage.getItem(emailSentKey)) {
-          setEmailStatus("sent");
-        } else if (
-          emailPayload.customerEmail &&
-          emailPayload.customerName &&
-          emailPayload.tourTitle &&
-          emailPayload.date
-        ) {
-          setEmailStatus("sending");
-
-          const emailRes = await fetch("/api/send-booking-email", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(emailPayload),
-          });
-
-          let emailData = null;
-
+        // Poll the check-booking-status endpoint (updated by webhook)
+        const checkStatus = async () => {
           try {
-            emailData = await emailRes.json();
-          } catch {
-            emailData = null;
+            const res = await fetch(`/api/check-booking-status?reference=${mPaymentId}`);
+            const data = await res.json();
+            if (data.status === "paid") {
+              clearInterval(pollInterval);
+              if (!cancelled) await onPaymentConfirmed(data);
+            } else if (data.status === "failed") {
+              clearInterval(pollInterval);
+              if (!cancelled) onPaymentFailed();
+            }
+          } catch (err) {
+            console.error("Poll error:", err);
           }
+        };
 
-          if (!emailRes.ok) {
-            console.error("Booking email failed:", emailData);
-            setEmailStatus("failed");
-          } else {
-            sessionStorage.setItem(emailSentKey, "true");
+        // Manual fallback after 6 seconds (calls /api/payfast-verify)
+        const manualFallback = async () => {
+          if (cancelled) return;
+          try {
+            const fallbackRes = await fetch(`/api/payfast-verify?reference=${mPaymentId}&pf_payment_id=${pfPaymentId || ""}`);
+            const fallbackData = await fallbackRes.json();
+            if (fallbackData.status === "paid") {
+              clearInterval(pollInterval);
+              if (!cancelled) await onPaymentConfirmed(fallbackData);
+            }
+          } catch (err) {
+            console.error("Fallback error:", err);
+          }
+        };
+
+        const onPaymentConfirmed = async (verifyData) => {
+          const currentCheckout = storedCheckout || getStoredCheckout() || {};
+
+          const finalBookingReference =
+            currentCheckout.bookingReference ||
+            currentCheckout.emailPayload?.bookingReference ||
+            currentCheckout.emailPayload?.bookingRef ||
+            mPaymentId;
+
+          const emailPayload = {
+            ...(currentCheckout.emailPayload || {}),
+            bookingReference: finalBookingReference,
+            bookingRef: finalBookingReference,
+            paymentId: pfPaymentId || mPaymentId,
+            paymentProvider: "payfast",
+            payfastPaymentId: pfPaymentId,
+            payfastStatus: verifyData.status || "COMPLETE",
+            tourStops:
+              currentCheckout.checkoutStops ||
+              currentCheckout.emailPayload?.tourStops ||
+              currentCheckout.emailPayload?.stops ||
+              [],
+            stops:
+              currentCheckout.checkoutStops ||
+              currentCheckout.emailPayload?.stops ||
+              currentCheckout.emailPayload?.tourStops ||
+              [],
+          };
+
+          const updatedCheckout = {
+            ...currentCheckout,
+            bookingReference: finalBookingReference,
+            payfastPaymentId: pfPaymentId,
+            verifiedPayment: verifyData,
+            emailPayload,
+            paymentProvider: "payfast",
+          };
+
+          setStoredCheckout(updatedCheckout);
+          setStoredCheckoutState(updatedCheckout);
+
+          const emailSentKey = `cape-frontier-email-sent:${mPaymentId}`;
+
+          if (sessionStorage.getItem(emailSentKey)) {
             setEmailStatus("sent");
+          } else if (
+            emailPayload.customerEmail &&
+            emailPayload.customerName &&
+            emailPayload.tourTitle &&
+            emailPayload.date
+          ) {
+            setEmailStatus("sending");
 
-            const emailedCheckout = {
-              ...updatedCheckout,
-              emailSent: true,
-              emailSentAt: new Date().toISOString(),
-            };
+            const emailRes = await fetch("/api/send-booking-email", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(emailPayload),
+            });
 
-            setStoredCheckout(emailedCheckout);
-            setStoredCheckoutState(emailedCheckout);
+            let emailData = null;
+
+            try {
+              emailData = await emailRes.json();
+            } catch {
+              emailData = null;
+            }
+
+            if (!emailRes.ok) {
+              console.error("Booking email failed:", emailData);
+              setEmailStatus("failed");
+            } else {
+              sessionStorage.setItem(emailSentKey, "true");
+              setEmailStatus("sent");
+
+              const emailedCheckout = {
+                ...updatedCheckout,
+                emailSent: true,
+                emailSentAt: new Date().toISOString(),
+              };
+
+              setStoredCheckout(emailedCheckout);
+              setStoredCheckoutState(emailedCheckout);
+            }
+          } else {
+            console.warn("Booking email payload is incomplete:", emailPayload);
+            setEmailStatus("failed");
           }
-        } else {
-          console.warn("Booking email payload is incomplete:", emailPayload);
-          setEmailStatus("failed");
-        }
 
-        setPaymentStatus("success");
-        setPaymentMessage(
-          "Payment verified. Cape Frontier will confirm final pickup and vehicle details via WhatsApp."
-        );
+          setPaymentStatus("success");
+          setPaymentMessage(
+            "Payment verified. Cape Frontier will confirm final pickup and vehicle details via WhatsApp."
+          );
+        };
+
+        const onPaymentFailed = () => {
+          setPaymentStatus("error");
+          setPaymentMessage(
+            "Payment verification failed. Please contact Cape Frontier with your payment reference."
+          );
+          setEmailStatus("idle");
+        };
+
+        // Start polling every 3 seconds
+        pollInterval = setInterval(checkStatus, 3000);
+        checkStatus(); // immediate first check
+        setTimeout(manualFallback, 6000);
       } catch (error) {
-        console.error("Paystack verification error:", error);
-
+        console.error("PayFast verification error:", error);
         if (!cancelled) {
           setPaymentStatus("error");
           setPaymentMessage(
@@ -446,8 +466,9 @@ const CheckoutSuccessPaystack = () => {
 
     return () => {
       cancelled = true;
+      if (pollInterval) clearInterval(pollInterval);
     };
-  }, [paystackReference]);
+  }, [mPaymentId, pfPaymentId, storedCheckout]);
 
   useLayoutEffect(() => {
     if (!pageRef.current) return;
@@ -590,6 +611,7 @@ const CheckoutSuccessPaystack = () => {
     return `${mins}:${String(secs).padStart(2, "0")}`;
   };
 
+  // The JSX is identical to the Paystack version – only the verification logic above changed
   return (
     <div
       ref={pageRef}
@@ -786,7 +808,7 @@ const CheckoutSuccessPaystack = () => {
                   <Pill tone={emailStatus === "failed" ? "neutral" : "blue"}>
                     {emailStatusLabel}
                   </Pill>
-                  <Pill tone="dark">Vehicle confirmed later</Pill>
+                  <Pill tone="dark">Vehicle confirmed latedr</Pill>
                 </div>
               </div>
             </div>

@@ -12,9 +12,13 @@ import './index.css'
 // PAGES
 import Home from './pages/Home.jsx'
 import TourDetails from './pages/TourDetails'
-import CheckoutPaystack from './pages/CheckoutPaystack';
-import CheckoutPaystackSuccess from './pages/CheckoutSuccessPaystack';
 import Policies from './pages/Policies.jsx'
+
+import CheckoutPaystack from './pages/CheckoutPaystack';
+import CheckoutSuccessPaystack from './pages/CheckoutSuccessPaystack';
+import CheckoutPayfast from './pages/CheckoutPayfast.jsx';
+import CheckoutSuccessPayfast from './pages/CheckoutSuccessPayfast.jsx';
+import CheckoutCancelPayfast from './pages/CheckoutCancelPayfast.jsx'
 
 import PageNotFound from './pages/PageNotFound.jsx'
 
@@ -29,8 +33,11 @@ const router = createBrowserRouter([
 
       { path: 'tours/:slug', element: <TourDetails/> },
       { path: 'policies', element: <Policies/> },
-      { path: 'checkout', element: <CheckoutPaystack/> },
-      { path: 'success', element: <CheckoutPaystackSuccess/> },
+      // { path: 'checkout', element: <CheckoutPaystack/> },
+      { path: 'checkout', element: <CheckoutPayfast/> },
+      { path: 'success', element: <CheckoutSuccessPayfast/> },
+      // { path: 'success', element: <CheckoutSuccessPaystack/> },
+      { path: 'cancel;', element: <CheckoutCancelPayfast/> },
 
     ]
   },
