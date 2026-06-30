@@ -6,24 +6,24 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 const policies = [
-  {
-    id: "booking-policy",
-    eyebrow: "Booking policy",
-    title: "Customers book for their own group",
-    summary:
-      "Customers are booking their own party size, not empty seats in a shared vehicle.",
-    points: [
-      "Customers book for their own group only. They are not selecting empty seats in a shared vehicle.",
-      "The number of participants selected at checkout must match the number of guests in the customer’s own party.",
-      "Price tiers are based on the customer’s own booking group size.",
-      "Lower per-person rates only apply when the customer books and pays for that full number of participants.",
-      "Total booking price = selected tier price per person × selected number of participants.",
-      "Example: if a customer selects 7 participants, they are booking and paying for 7 people, not 1 person using the 7-person discounted rate.",
-      "If fewer guests arrive than booked, the original booking total still applies.",
-      "Cape Frontier may use a smaller vehicle for smaller groups.",
-      "Separate groups on the same tour/day may be combined operationally, but each group keeps its own separate booking price based on their own selected participant count.",
-    ],
-  },
+  // {
+  //   id: "booking-policy",
+  //   eyebrow: "Booking policy",
+  //   title: "Customers book for their own group",
+  //   summary:
+  //     "Customers are booking their own party size, not empty seats in a shared vehicle.",
+  //   points: [
+  //     "Customers book for their own group only. They are not selecting empty seats in a shared vehicle.",
+  //     "The number of participants selected at checkout must match the number of guests in the customer’s own party.",
+  //     "Price tiers are based on the customer’s own booking group size.",
+  //     "Lower per-person rates only apply when the customer books and pays for that full number of participants.",
+  //     "Total booking price = selected tier price per person × selected number of participants.",
+  //     "Example: if a customer selects 7 participants, they are booking and paying for 7 people, not 1 person using the 7-person discounted rate.",
+  //     "If fewer guests arrive than booked, the original booking total still applies.",
+  //     "Cape Frontier may use a smaller vehicle for smaller groups.",
+  //     "Separate groups on the same tour/day may be combined operationally, but each group keeps its own separate booking price based on their own selected participant count.",
+  //   ],
+  // },
   {
     id: "pickup-policy",
     eyebrow: "Pickup policy",
@@ -86,19 +86,19 @@ const policies = [
       "Same-day or last-minute rescheduling still needs final confirmation from Cape Frontier.",
     ],
   },
-  {
-    id: "vehicle-policy",
-    eyebrow: "Availability / vehicle policy",
-    title: "Vehicles are arranged operationally",
-    summary:
-      "Customers do not select the vehicle. Cape Frontier decides the vehicle based on group size and operational needs.",
-    points: [
-      "Cape Frontier uses an on-demand vehicle hiring setup.",
-      "Customers do not select the vehicle.",
-      "Vehicle size/details are decided by Cape Frontier based on group size and operational needs.",
-      "Two separate parties booking the same tour on the same day is not automatically a problem because Cape Frontier can combine groups operationally or arrange vehicles as needed.",
-    ],
-  },
+  // {
+  //   id: "vehicle-policy",
+  //   eyebrow: "Availability / vehicle policy",
+  //   title: "Vehicles are arranged operationally",
+  //   summary:
+  //     "Customers do not select the vehicle. Cape Frontier decides the vehicle based on group size and operational needs.",
+  //   points: [
+  //     "Cape Frontier uses an on-demand vehicle hiring setup.",
+  //     "Customers do not select the vehicle.",
+  //     "Vehicle size/details are decided by Cape Frontier based on group size and operational needs.",
+  //     "Two separate parties booking the same tour on the same day is not automatically a problem because Cape Frontier can combine groups operationally or arrange vehicles as needed.",
+  //   ],
+  // },
   {
     id: "still-to-confirm",
     eyebrow: "Still needs confirmation",
@@ -282,11 +282,10 @@ const Policies = () => {
                       key={policy.id}
                       type="button"
                       onClick={() => goToPolicy(policy.id)}
-                      className={`rounded-[1.25rem] border p-3 text-left transition ${
-                        active
+                      className={`rounded-[1.25rem] border p-3 text-left transition ${active
                           ? "border-green-300 bg-green-200 text-green-950"
                           : "border-black/5 bg-neutral-50 text-neutral-650 hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_10px_24px_rgba(0,0,0,0.06)]"
-                      }`}
+                        }`}
                     >
                       <p className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-55">
                         0{index + 1}
@@ -320,11 +319,10 @@ const Policies = () => {
                 key={policy.id}
                 type="button"
                 onClick={() => goToPolicy(policy.id)}
-                className={`rounded-2xl px-3 py-3 text-left text-sm font-semibold transition ${
-                  policy.id === activeHash
+                className={`rounded-2xl px-3 py-3 text-left text-sm font-semibold transition ${policy.id === activeHash
                     ? "bg-blue-400 text-white"
                     : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-950"
-                }`}
+                  }`}
               >
                 {policy.eyebrow}
               </button>

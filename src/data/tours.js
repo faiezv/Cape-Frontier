@@ -641,138 +641,137 @@ export const tours = [
     tags: ["Adventure", "Scenic", "Air", "Half Day"],
   },
 
-  {
-    id: 4,
-    type: TOUR_TYPES.ADRENALINE,
-    category: TOUR_MODIFIERS.HALF_DAY,
-
-    title: "Snorkelling",
-    slug: "snorkelling",
-    canonicalPath: "/tours/snorkelling",
-
-    seo: {
-      title: "Guided Snorkelling in Cape Town | Cape Frontier Tours",
-      description:
-        "Request a guided Cape Town snorkelling experience with beginner-friendly support, coastal scenery, and selected pickup options.",
-      keywords: [
-        "snorkelling Cape Town",
-        "guided snorkelling Cape Town",
-        "Cape Town ocean tour",
-      ],
-    },
-
-    workflow: defaultWorkflow,
-
-    image: getCoverImage("adrenaline/snorkelling"),
-    images: getTourImages("adrenaline/snorkelling", 3),
-
-    location: "Cape Town Coastline",
-    duration: "2 - 3 hours",
-
-    priceBase: 950,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
-
-    rating: 4.6,
-    stars: 4,
-    mainReviewerName: "Sophie Martin",
-    mainReviewerCountry: "FR",
-    reviewYear: 2025,
-    otherReviews: 27,
-    mainReview:
-      "A calm but exciting ocean experience. The guide was patient and the water life was beautiful to see up close.",
-
-    description:
-      "Explore Cape Town’s coastal waters with a guided snorkelling experience. Ideal for ocean lovers who want a relaxed but memorable marine activity.",
-
-    highlights: [
-      { text: "Guided coastal snorkelling" },
-      { text: "Marine life viewing" },
-      { text: "Beginner-friendly guidance" },
-    ],
-
-    included: [
-      { text: "Safety briefing" },
-      { text: "Snorkelling equipment" },
-      { text: "Guided ocean session" },
-    ],
-
-    excluded: [
-      { text: "Swimwear and towel" },
-      { text: "Transport unless selected" },
-      { text: "Meals unless confirmed" },
-    ],
-
-    pickupOptions: [
-      "Cape Town CBD",
-      "Sea Point",
-      "Camps Bay",
-      "Meet at activity point",
-      "Custom pickup on request",
-    ],
-
-    stops: [
-      {
-        id: "coastline",
-        name: "Cape Town Coastline",
-        time: "Flexible",
-        duration: "2 - 3 hours",
-        note: "Final location depends on ocean conditions",
-        description:
-          "The guide selects a suitable coastal area according to weather, visibility, and ocean conditions.",
-        exactLocation: mapLocation({
-          label: "Cape Town Coastline",
-          address: "Cape Town, South Africa",
-          query: "Cape Town coastline snorkelling",
-        }),
-        images: getTourImages("adrenaline/snorkelling", 3),
-        touristComments: [
-          {
-            name: "Sophie",
-            country: "FR",
-            text: "It was relaxed, beautiful, and beginner-friendly from start to finish.",
-          },
-        ],
-      },
-    ],
-
-    groupDiscount: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      rules: [{ minPeople: 5, discountPercent: 10 }],
-    },
-
-    needToKnow: [
-      { text: "Ocean conditions may affect availability" },
-      { text: "Bring swimwear and a towel" },
-      { text: "Basic swimming ability recommended" },
-      { text: "Final location depends on visibility and conditions" },
-    ],
-
-    cancellationPolicy: {
-      summary: "Ocean visibility and weather can affect the tour.",
-      items: [
-        { text: "Location may be adjusted based on conditions" },
-        { text: "Unsafe ocean conditions may require rescheduling" },
-        { text: "Final cancellation rules must be confirmed with the operator" },
-      ],
-    },
-
-    faqs: [
-      {
-        question: "Is the snorkelling location fixed?",
-        answer:
-          "The final spot can change depending on ocean conditions and visibility.",
-      },
-      {
-        question: "Do I need to be experienced?",
-        answer:
-          "No advanced experience is required, but basic swimming ability is recommended.",
-      },
-    ],
-
-    tags: ["Ocean", "Wildlife", "Beginner Friendly", "Half Day"],
-  },
+  // { id: 4,
+  //   type: TOUR_TYPES.ADRENALINE,
+  //   category: TOUR_MODIFIERS.HALF_DAY,
+  //
+  //   title: "Snorkelling",
+  //   slug: "snorkelling",
+  //   canonicalPath: "/tours/snorkelling",
+  //
+  //   seo: {
+  //     title: "Guided Snorkelling in Cape Town | Cape Frontier Tours",
+  //     description:
+  //       "Request a guided Cape Town snorkelling experience with beginner-friendly support, coastal scenery, and selected pickup options.",
+  //     keywords: [
+  //       "snorkelling Cape Town",
+  //       "guided snorkelling Cape Town",
+  //       "Cape Town ocean tour",
+  //     ],
+  //   },
+  //
+  //   workflow: defaultWorkflow,
+  //
+  //   image: getCoverImage("adrenaline/snorkelling"),
+  //   images: getTourImages("adrenaline/snorkelling", 3),
+  //
+  //   location: "Cape Town Coastline",
+  //   duration: "2 - 3 hours",
+  //
+  //   priceBase: 950,
+  //   baseCurrency: "ZAR",
+  //   supportedCurrencies: SUPPORTED_CURRENCIES,
+  //
+  //   rating: 4.6,
+  //   stars: 4,
+  //   mainReviewerName: "Sophie Martin",
+  //   mainReviewerCountry: "FR",
+  //   reviewYear: 2025,
+  //   otherReviews: 27,
+  //   mainReview:
+  //     "A calm but exciting ocean experience. The guide was patient and the water life was beautiful to see up close.",
+  //
+  //   description:
+  //     "Explore Cape Town’s coastal waters with a guided snorkelling experience. Ideal for ocean lovers who want a relaxed but memorable marine activity.",
+  //
+  //   highlights: [
+  //     { text: "Guided coastal snorkelling" },
+  //     { text: "Marine life viewing" },
+  //     { text: "Beginner-friendly guidance" },
+  //   ],
+  //
+  //   included: [
+  //     { text: "Safety briefing" },
+  //     { text: "Snorkelling equipment" },
+  //     { text: "Guided ocean session" },
+  //   ],
+  //
+  //   excluded: [
+  //     { text: "Swimwear and towel" },
+  //     { text: "Transport unless selected" },
+  //     { text: "Meals unless confirmed" },
+  //   ],
+  //
+  //   pickupOptions: [
+  //     "Cape Town CBD",
+  //     "Sea Point",
+  //     "Camps Bay",
+  //     "Meet at activity point",
+  //     "Custom pickup on request",
+  //   ],
+  //
+  //   stops: [
+  //     {
+  //       id: "coastline",
+  //       name: "Cape Town Coastline",
+  //       time: "Flexible",
+  //       duration: "2 - 3 hours",
+  //       note: "Final location depends on ocean conditions",
+  //       description:
+  //         "The guide selects a suitable coastal area according to weather, visibility, and ocean conditions.",
+  //       exactLocation: mapLocation({
+  //         label: "Cape Town Coastline",
+  //         address: "Cape Town, South Africa",
+  //         query: "Cape Town coastline snorkelling",
+  //       }),
+  //       images: getTourImages("adrenaline/snorkelling", 3),
+  //       touristComments: [
+  //         {
+  //           name: "Sophie",
+  //           country: "FR",
+  //           text: "It was relaxed, beautiful, and beginner-friendly from start to finish.",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  //
+  //   groupDiscount: {
+  //     enabled: true,
+  //     icon: "/icons/savemore.png",
+  //     rules: [{ minPeople: 5, discountPercent: 10 }],
+  //   },
+  //
+  //   needToKnow: [
+  //     { text: "Ocean conditions may affect availability" },
+  //     { text: "Bring swimwear and a towel" },
+  //     { text: "Basic swimming ability recommended" },
+  //     { text: "Final location depends on visibility and conditions" },
+  //   ],
+  //
+  //   cancellationPolicy: {
+  //     summary: "Ocean visibility and weather can affect the tour.",
+  //     items: [
+  //       { text: "Location may be adjusted based on conditions" },
+  //       { text: "Unsafe ocean conditions may require rescheduling" },
+  //       { text: "Final cancellation rules must be confirmed with the operator" },
+  //     ],
+  //   },
+  //
+  //   faqs: [
+  //     {
+  //       question: "Is the snorkelling location fixed?",
+  //       answer:
+  //         "The final spot can change depending on ocean conditions and visibility.",
+  //     },
+  //     {
+  //       question: "Do I need to be experienced?",
+  //       answer:
+  //         "No advanced experience is required, but basic swimming ability is recommended.",
+  //     },
+  //   ],
+  //
+  //   tags: ["Ocean", "Wildlife", "Beginner Friendly", "Half Day"],
+  // },
 
   {
     id: 5,
@@ -1296,164 +1295,6 @@ export const tours = [
     tags: ["Historical", "Culture", "Community", "Half Day", "Shared"],
   },
 
-  {
-    id: 8,
-    type: TOUR_TYPES.HISTORICAL,
-    category: TOUR_MODIFIERS.HALF_DAY,
-
-    title: "Robben Island Tour",
-    slug: "robben-island-tour",
-    canonicalPath: "/tours/robben-island-tour",
-
-    seo: {
-      title: "Robben Island Tour | Cape Town Historical Experience",
-      description:
-        "Request a Robben Island historical tour with ferry planning, museum context, pickup options, and Cape Frontier trip support.",
-      keywords: [
-        "Robben Island tour",
-        "Cape Town historical tour",
-        "Robben Island ferry tour",
-      ],
-    },
-
-    workflow: defaultWorkflow,
-
-    image: getCoverImage("historical/robben-island"),
-    images: getTourImages("historical/robben-island", 3),
-
-    location: "Robben Island, Cape Town",
-    duration: "Half Day",
-
-    priceBase: 1990,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
-
-    pricing: {
-      categories: [
-        { category: "adults", pricePerPerson: 1990 },
-        { category: "children under 12", pricePerPerson: 995 },
-        { category: "children under 5", pricePerPerson: 0 },
-      ],
-      groupDiscount: {
-        enabled: false,
-        icon: "/icons/savemore.png",
-        rules: [],
-      },
-    },
-
-
-    rating: 4.8,
-    stars: 5,
-    mainReviewerName: "Thomas Reed",
-    mainReviewerCountry: "US",
-    reviewYear: 2025,
-    otherReviews: 52,
-    mainReview:
-      "Powerful, emotional and educational. A must-do historical experience in Cape Town.",
-
-    description:
-      "A historical tour focused on Robben Island, its prison history, South Africa’s struggle history, and its significance as one of Cape Town’s most important heritage experiences.",
-
-    highlights: [
-      { text: "Important South African heritage site" },
-      { text: "Museum and prison history" },
-      { text: "Ferry-based island experience" },
-    ],
-
-    included: [
-      { text: "Trip planning support" },
-      { text: "Selected pickup options available" },
-      { text: "Guided historical experience" },
-    ],
-
-    excluded: [
-      { text: "Ferry ticket unless confirmed" },
-      { text: "Meals and personal expenses" },
-      { text: "Optional extras not listed in the booking" },
-    ],
-
-    pickupOptions: [
-      "Cape Town CBD",
-      "Sea Point",
-      "Camps Bay",
-      "V&A Waterfront",
-      "Meet at ferry departure point",
-      "Custom pickup on request",
-    ],
-
-    stops: [
-      {
-        id: "waterfront",
-        name: "V&A Waterfront Ferry Area",
-        time: "Flexible",
-        duration: "30 min",
-        note: "Ferry departure point",
-        description:
-          "Meet near the ferry departure area or arrange pickup before the Robben Island experience.",
-        exactLocation: mapLocation({
-          label: "Nelson Mandela Gateway",
-          address: "V&A Waterfront, Cape Town, South Africa",
-          query: "Nelson Mandela Gateway V&A Waterfront Cape Town",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "robben-island",
-        name: "Robben Island",
-        time: "Ferry dependent",
-        duration: "3 - 4 hours",
-        note: "Museum and historical island experience",
-        description:
-          "Visit Robben Island for a powerful historical experience focused on South African heritage and the island’s prison history.",
-        exactLocation: mapLocation({
-          label: "Robben Island",
-          address: "Robben Island, Cape Town, South Africa",
-          query: "Robben Island Cape Town",
-        }),
-        images: getTourImages("historical/robben-island", 3),
-        touristComments: [
-          {
-            name: "Thomas",
-            country: "US",
-            text: "It was emotional, educational, and one of the most important parts of our Cape Town visit.",
-          },
-        ],
-      },
-    ],
-
-
-    needToKnow: [
-      { text: "Ferry schedule and weather may affect availability" },
-      { text: "Advance booking is recommended" },
-      { text: "Ticket inclusion must be confirmed with the client" },
-      { text: "Bring identification if required for booking" },
-    ],
-
-    cancellationPolicy: {
-      summary: "Ferry schedules and weather can affect the tour.",
-      items: [
-        { text: "Ferry cancellation may require rescheduling" },
-        { text: "Advance booking is strongly recommended" },
-        { text: "Ticket refund rules depend on the supplier" },
-      ],
-    },
-
-    faqs: [
-      {
-        question: "Is the ferry ticket included?",
-        answer:
-          "This must be confirmed with the client/operator before final publishing.",
-      },
-      {
-        question: "Can weather affect the tour?",
-        answer:
-          "Yes. Ferry-based tours can be affected by weather and sea conditions.",
-      },
-    ],
-
-    tags: ["Historical", "Heritage", "Museum", "Half Day"],
-  },
 
   {
     id: 9,
@@ -2178,7 +2019,7 @@ export const tours = [
 
   {
     id: 12,
-    type: TOUR_TYPES.ADRENALINE,
+    type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.FULL_DAY,
 
     title: "Gun Range + Cape Point Full‑Day Tour",
@@ -2403,7 +2244,7 @@ export const tours = [
 
   {
     id: 13,
-    type: TOUR_TYPES.ADRENALINE,
+    type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.HALF_DAY,
 
     title: "Gun Range + Cape Town City Tour",
@@ -2654,7 +2495,7 @@ export const tours = [
 
   {
     id: 14,
-    type: TOUR_TYPES.ADRENALINE,
+    type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.FULL_DAY,
 
     title: "Gun Range + Horse Riding",
@@ -2877,7 +2718,7 @@ export const tours = [
 
   {
     id: 15,
-    type: TOUR_TYPES.ADRENALINE,
+    type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.FULL_DAY,
 
     title: "Gun Range + Quad Biking Adventure",
@@ -3084,7 +2925,7 @@ export const tours = [
 
   {
     id: 16,
-    type: TOUR_TYPES.ADRENALINE,
+    type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.FULL_DAY,
 
     title: "Gun Range + Wine Tasting (Constantia/Stellenbosch)",
