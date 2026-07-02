@@ -6,112 +6,115 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 const policies = [
-  // {
-  //   id: "booking-policy",
-  //   eyebrow: "Booking policy",
-  //   title: "Customers book for their own group",
-  //   summary:
-  //     "Customers are booking their own party size, not empty seats in a shared vehicle.",
-  //   points: [
-  //     "Customers book for their own group only. They are not selecting empty seats in a shared vehicle.",
-  //     "The number of participants selected at checkout must match the number of guests in the customer’s own party.",
-  //     "Price tiers are based on the customer’s own booking group size.",
-  //     "Lower per-person rates only apply when the customer books and pays for that full number of participants.",
-  //     "Total booking price = selected tier price per person × selected number of participants.",
-  //     "Example: if a customer selects 7 participants, they are booking and paying for 7 people, not 1 person using the 7-person discounted rate.",
-  //     "If fewer guests arrive than booked, the original booking total still applies.",
-  //     "Cape Frontier may use a smaller vehicle for smaller groups.",
-  //     "Separate groups on the same tour/day may be combined operationally, but each group keeps its own separate booking price based on their own selected participant count.",
-  //   ],
-  // },
   {
-    id: "pickup-policy",
-    eyebrow: "Pickup policy",
-    title: "Pickup is included unless stated otherwise",
+    id: "pickup-window",
+    eyebrow: "Pick-Up Window",
+    title: "Pick-Up Window",
     summary:
-      "Customers choose their pickup location, usually their accommodation, and Cape Frontier confirms it manually.",
+      "Customers should be ready during the specified pickup window.",
     points: [
-      "Pickup is included in the tour pricing unless stated otherwise.",
-      "Customers choose their own pickup location, usually their accommodation.",
-      "Far pickup areas currently do not cost extra unless Cape Frontier later decides otherwise.",
-      "Pickup location should be confirmed manually after booking.",
+      'Your driver may arrive anytime within a 10–15 minute pickup window.',
+      "Please be ready outside your accommodation before the start of your pickup window.",
     ],
   },
+
   {
-    id: "payment-policy",
-    eyebrow: "Payment policy",
-    title: "Pay-now booking flow",
+    id: "waiting-time-limit",
+    eyebrow: "Waiting Time Limit",
+    title: "Waiting Time Limit",
     summary:
-      "Customers pay online first, then receive operational confirmation for pickup, vehicle, and final arrangements.",
+      "Drivers can only wait for a limited amount of time before continuing.",
     points: [
-      "Cape Frontier currently uses a pay-now booking flow.",
-      "Customer selects tour → fills booking form → goes to checkout → pays online → receives confirmation.",
-      "Booking confirmation is manual/operational after payment, especially for pickup details, vehicle details, and final arrangements.",
+      "Our drivers will wait for a maximum of 10–15 minutes.",
+      "After the waiting period has expired, the booking will be treated as a no-show and the tour will continue.",
     ],
   },
+
   {
-    id: "private-tour-policy",
-    eyebrow: "Private tour policy",
-    title: "Private tours are quoted with an extra fee",
+    id: "no-show-policy",
+    eyebrow: "No-Show Policy",
+    title: "No-Show Policy",
     summary:
-      "Private tours are booked per vehicle and may exclude external entrance or activity fees.",
+      "Failure to arrive for pickup may result in forfeiture of the booking.",
     points: [
-      "Private tours have an additional fee.",
-      "Private tours are booked per vehicle.",
-      "SANParks, entrance fees, venue fees, or activity fees are excluded unless clearly stated otherwise.",
+      "If the guest is not present at the agreed pickup time and cannot be reached via WhatsApp or phone call, the booking will be considered a no-show.",
+      "No refund will be issued unless a valid reason is accepted by Cape Frontier.",
+      "Where appropriate, a partial refund may be considered at Cape Frontier's discretion.",
     ],
   },
+
   {
-    id: "cancellation-policy",
-    eyebrow: "Cancellation policy",
-    title: "Refunds depend on cancellation timing",
+    id: "shared-vs-private-transfers",
+    eyebrow: "Shared vs Private Transfers",
+    title: "Shared vs Private Transfers",
     summary:
-      "The refund amount depends on when the customer cancels and whether the cancellation is weather-related.",
+      "Pickup times may vary depending on the type of transfer booked.",
     points: [
-      "Cancellation within 24 hours after booking allows a full refund.",
-      "Cancellation 2–3 days before the trip has a 20% penalty.",
-      "Cancellation within 24 hours before the trip has no refund.",
-      "Weather-related cancellations allow either a refund or reschedule, depending on availability.",
+      "Shared tours may include multiple pickups.",
+      "Pickup times can vary depending on traffic, route planning, and other guests.",
+      "Private tours generally have more direct pickup arrangements.",
     ],
   },
+
   {
-    id: "reschedule-policy",
-    eyebrow: "Reschedule policy",
-    title: "Rescheduling depends on availability",
+    id: "communication-requirement",
+    eyebrow: "Communication Requirement",
+    title: "Communication Requirement",
     summary:
-      "Cape Frontier may allow rescheduling, but same-day or last-minute changes still need manual confirmation.",
+      "Guests must remain reachable on the morning of the tour.",
     points: [
-      "Rescheduling is allowed depending on availability.",
-      "Weather-related rescheduling is allowed where possible.",
-      "Same-day or last-minute rescheduling still needs final confirmation from Cape Frontier.",
+      "Guests must be contactable via WhatsApp, SMS, or phone call on the morning of the tour.",
+      "Please ensure your provided contact number is active.",
     ],
   },
-  // {
-  //   id: "vehicle-policy",
-  //   eyebrow: "Availability / vehicle policy",
-  //   title: "Vehicles are arranged operationally",
-  //   summary:
-  //     "Customers do not select the vehicle. Cape Frontier decides the vehicle based on group size and operational needs.",
-  //   points: [
-  //     "Cape Frontier uses an on-demand vehicle hiring setup.",
-  //     "Customers do not select the vehicle.",
-  //     "Vehicle size/details are decided by Cape Frontier based on group size and operational needs.",
-  //     "Two separate parties booking the same tour on the same day is not automatically a problem because Cape Frontier can combine groups operationally or arrange vehicles as needed.",
-  //   ],
-  // },
+
   {
-    id: "still-to-confirm",
-    eyebrow: "Still needs confirmation",
-    title: "Items still awaiting final confirmation",
+    id: "vehicle-identification",
+    eyebrow: "Vehicle Identification",
+    title: "Vehicle Identification",
     summary:
-      "These items should remain provisional until Nadeem confirms the final operating rules.",
+      "You'll receive information to help identify your driver and vehicle.",
     points: [
-      "Child pricing still needs confirmation.",
-      "Same-day booking policy still needs confirmation.",
-      "Minimum advance booking time still needs confirmation.",
-      "Private tour exact fee still needs confirmation.",
-      "Whether far pickup areas should ever carry an extra charge still needs confirmation.",
-      "All policies are still provisional until Nadeem confirms them.",
+      "Cape Frontier will provide vehicle identification details where applicable.",
+      "This may include the driver's name, vehicle registration number, or Cape Frontier branding.",
+    ],
+  },
+
+  {
+    id: "special-conditions",
+    eyebrow: "Special Conditions",
+    title: "Special Conditions",
+    summary:
+      "Certain tours require stricter pickup times.",
+    points: [
+      "Sunrise tours, early-morning hikes, and airport pickups may require stricter timing.",
+      "Guests should be ready earlier where instructed.",
+    ],
+  },
+
+  {
+    id: "accessibility-notes",
+    eyebrow: "Accessibility Notes",
+    title: "Accessibility Notes",
+    summary:
+      "Some pickup locations may require alternative meeting points.",
+    points: [
+      "Certain accommodations may have restricted vehicle access.",
+      "Examples include narrow streets, gated communities, and security-controlled properties.",
+      "Where necessary, Cape Frontier will provide an alternative nearby pickup location.",
+    ],
+  },
+
+  {
+    id: "weather-safety-adjustments",
+    eyebrow: "Weather & Safety Adjustments",
+    title: "Weather or Safety Adjustments",
+    summary:
+      "Pickup times may change if operational conditions require it.",
+    points: [
+      "Pickup times may be adjusted due to severe weather.",
+      "Road closures, public safety concerns, or other operational issues may also affect pickup schedules.",
+      "Guests will be notified as soon as reasonably possible of any changes.",
     ],
   },
 ];
@@ -283,8 +286,8 @@ const Policies = () => {
                       type="button"
                       onClick={() => goToPolicy(policy.id)}
                       className={`rounded-[1.25rem] border p-3 text-left transition ${active
-                          ? "border-green-300 bg-green-200 text-green-950"
-                          : "border-black/5 bg-neutral-50 text-neutral-650 hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_10px_24px_rgba(0,0,0,0.06)]"
+                        ? "border-green-300 bg-green-200 text-green-950"
+                        : "border-black/5 bg-neutral-50 text-neutral-650 hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_10px_24px_rgba(0,0,0,0.06)]"
                         }`}
                     >
                       <p className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-55">
@@ -320,8 +323,8 @@ const Policies = () => {
                 type="button"
                 onClick={() => goToPolicy(policy.id)}
                 className={`rounded-2xl px-3 py-3 text-left text-sm font-semibold transition ${policy.id === activeHash
-                    ? "bg-blue-400 text-white"
-                    : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-950"
+                  ? "bg-blue-400 text-white"
+                  : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-950"
                   }`}
               >
                 {policy.eyebrow}

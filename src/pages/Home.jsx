@@ -8,6 +8,7 @@ import About from '../components/About/About.jsx'
 import Stories from '../components/Stories/Stories.jsx'
 import Tours from '../components/Tours/Tours.jsx'
 import Contact from '../components/Contact.jsx'
+import TourSelect from '../components/Tours/TourSelect.jsx'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -27,6 +28,7 @@ const Home = () => {
   const pageRef = useRef(null)
   const heroRef = useRef(null)
   const aboutRef = useRef(null)
+  const tourSelectRef = useRef(null)
 
   useEffect(() => {
     const scrollTarget = location.state?.scrollTo
@@ -155,6 +157,25 @@ const Home = () => {
         ScrollTrigger.refresh(true)
       }
 
+      // TourSelect hide/show on scroll direction
+      gsap.set(tourSelectRef.current, {
+        y: 0,
+      })
+
+      ScrollTrigger.create({
+        start: 0,
+        end: "max",
+
+        onUpdate: (self) => {
+          gsap.to(tourSelectRef.current, {
+            y: self.direction === 1 ? -64 : 0, // mt-12 = 48px
+            duration: 0.25,
+            ease: "power2.out",
+            overwrite: "auto",
+          })
+        },
+      })
+
       const refreshOne = window.setTimeout(refresh, 80)
       const refreshTwo = window.setTimeout(refresh, 320)
       const refreshThree = window.setTimeout(refresh, 900)
@@ -162,7 +183,7 @@ const Home = () => {
       window.addEventListener('load', refresh, { once: true })
 
       if (document.fonts?.ready) {
-        document.fonts.ready.then(refresh).catch(() => {})
+        document.fonts.ready.then(refresh).catch(() => { })
       }
 
       return () => {
@@ -179,8 +200,14 @@ const Home = () => {
   return (
     <div
       ref={pageRef}
-      className="flex flex-col overflow-x-hidden bg-white text-white"
+      className="relative flex flex-col overflow-x-hidden bg-white text-white"
     >
+      <section className="fixed z-25 w-full overflow-x-hidden overflow-y-visible mt-18">
+        <div ref={tourSelectRef} className="mx-auto max-w-5xl">
+          <TourSelect />
+        </div>
+      </section>
+
       <section
         id="home"
         ref={heroRef}
@@ -197,18 +224,18 @@ const Home = () => {
         <About />
       </section>
 
-      <section id="stories" className="relative z-20">
+      <section id="stories" className="relative z-26">
         <Stories />
       </section>
 
-      <section id="tours" className="relative z-20">
+      <section id="tours" className="relative z-26">
         <Tours />
       </section>
 
       <section id="contact" className="relative z-20">
         <Contact />
       </section>
-    </div>
+    </div >
   )
 }
 

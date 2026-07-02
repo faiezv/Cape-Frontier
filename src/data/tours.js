@@ -3360,7 +3360,7 @@ export const tours = [
     location: "Cape Town & Cape Peninsula, South Africa",
     duration: "8 - 9 hours",
 
-    priceBase: 11560,
+    priceBase: 5780,
     minPeople: 1,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,

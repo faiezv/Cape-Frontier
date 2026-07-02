@@ -125,21 +125,42 @@ const getTourOptions = () => {
 // -----------------------------------------------------------------------------
 const useScrollLock = (locked) => {
   useEffect(() => {
-    if (!locked) return;
+    if (!locked) {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
 
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    const originalOverflowHtml = document.documentElement.style.overflow;
-    const originalOverflowBody = document.body.style.overflow;
-    const originalPaddingRight = document.body.style.paddingRight;
+      if (window.lenis) {
+        window.lenis.start();
+      }
+
+      return;
+    }
+
+    const scrollbarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+
+    const htmlOverflow = document.documentElement.style.overflow;
+    const bodyOverflow = document.body.style.overflow;
+    const bodyPadding = document.body.style.paddingRight;
 
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     document.body.style.paddingRight = `${scrollbarWidth}px`;
 
+    // Stop Lenis
+    if (window.lenis) {
+      window.lenis.stop();
+    }
+
     return () => {
-      document.documentElement.style.overflow = originalOverflowHtml;
-      document.body.style.overflow = originalOverflowBody;
-      document.body.style.paddingRight = originalPaddingRight;
+      document.documentElement.style.overflow = htmlOverflow;
+      document.body.style.overflow = bodyOverflow;
+      document.body.style.paddingRight = bodyPadding;
+
+      if (window.lenis) {
+        window.lenis.start();
+      }
     };
   }, [locked]);
 };
@@ -164,6 +185,46 @@ function TourSelect() {
   const [searchError, setSearchError] = useState(null)
   const [preventSameDay, setPreventSameDay] = useState(false)
 
+  // ----- NEW: banner visibility state -----
+  const [showBanner, setShowBanner] = useState(true)
+  const lastScrollY = useRef(0)
+  const bannerVisible = useRef(true)
+
+  // ----- NEW: scroll detection effect -----
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+
+      // Always show at top
+      if (currentScrollY <= 0) {
+        setShowBanner(true)
+        bannerVisible.current = true
+      }
+      // Hide after scrolling down past 200px
+      else if (
+        currentScrollY > 200 &&
+        currentScrollY > lastScrollY.current &&
+        bannerVisible.current
+      ) {
+        setShowBanner(false)
+        bannerVisible.current = false
+      }
+      // Show when scrolling up
+      else if (
+        currentScrollY < lastScrollY.current &&
+        !bannerVisible.current
+      ) {
+        setShowBanner(true)
+        bannerVisible.current = true
+      }
+
+      lastScrollY.current = currentScrollY
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   const mobileCardRef = useRef(null)
   const desktopTileRefs = useRef({})
   const errorBarRef = useRef(null)
@@ -171,7 +232,7 @@ function TourSelect() {
   // Refs for animated text elements (mobile)
   const mobileValueTextRef = useRef(null)
   const mobilePreviewTextRef = useRef(null)
-  const mobileIconRef = useRef(null) // ← new ref for icon container
+  const mobileIconRef = useRef(null)
 
   // Refs for desktop tiles (value and preview per tile)
   const desktopValueRefs = useRef({})
@@ -180,6 +241,10 @@ function TourSelect() {
   // Refs for progress line animation
   const line1Ref = useRef(null)
   const line2Ref = useRef(null)
+
+  // Refs for the Travel & Tours title
+  const titleRef = useRef(null)
+  const titleShineRef = useRef(null)
 
   const isMobileLayout = viewportWidth < 700
   const tourOptions = useMemo(() => getTourOptions(), [])
@@ -275,7 +340,7 @@ function TourSelect() {
     if (isMobileLayout) {
       valueEl = mobileValueTextRef.current
       previewEl = mobilePreviewTextRef.current
-      iconEl = mobileIconRef.current   // grab the circle
+      iconEl = mobileIconRef.current
     } else {
       valueEl = desktopValueRefs.current[targetStepIndex]
       previewEl = desktopPreviewRefs.current[targetStepIndex]
@@ -300,8 +365,14 @@ function TourSelect() {
 
     const tl = gsap.timeline({
       onComplete: () => {
-        setJustCompletedStep(null)
-        if (isMobileLayout) setMobileStep(Math.min(nextStep, 2))
+        // Hold the glow before switching
+        gsap.delayedCall(0.7, () => {
+          setJustCompletedStep(null)
+
+          if (isMobileLayout) {
+            setMobileStep(Math.min(nextStep, 2))
+          }
+        })
       },
     })
 
@@ -347,26 +418,6 @@ function TourSelect() {
     if (iconEl) {
       const originalBg = window.getComputedStyle(iconEl).backgroundColor
 
-      tl.to(
-        iconEl,
-        {
-          scale: 1.18,
-          backgroundColor: '#86efac', // green-300
-          duration: 0.25,
-          ease: 'back.out(1.5)',
-        },
-        0 // start at the very beginning
-      )
-        .to(
-          iconEl,
-          {
-            scale: 1,
-            backgroundColor: originalBg,
-            duration: 0.45,
-            ease: 'power2.inOut',
-          },
-          '>+0.5' // wait after the pop
-        )
     }
   }
 
@@ -533,9 +584,23 @@ function TourSelect() {
   const currentCard = cards[Math.min(mobileStep, 2)] || cards[0]
 
   const iconShellClass = (complete, isCurrent, isJustCompleted) => {
-    if (isJustCompleted) return 'bg-green-300 text-green-950'
-    if (complete) return 'bg-green-100 ring-1 ring-green-200'
-    if (isCurrent) return 'bg-blue-50 ring-1 ring-blue-100'
+    if (isJustCompleted) {
+      return `
+      bg-green-400
+      ring-4 ring-green-300
+      shadow-[0_0_18px_rgba(34,197,94,0.85)]
+      scale-110
+    `
+    }
+
+    if (complete) {
+      return 'bg-green-100 ring-1 ring-green-200'
+    }
+
+    if (isCurrent) {
+      return 'bg-blue-50 ring-1 ring-blue-100'
+    }
+
     return 'bg-black/[0.04]'
   }
 
@@ -663,6 +728,44 @@ function TourSelect() {
     return () => clearTimeout(timer);
   }, [searchError, activeModal, hasDetails, canSearch]);
 
+  // --- Shine animation for the Travel & Tours title (moved from Hero) ---
+  useLayoutEffect(() => {
+    if (titleShineRef.current) {
+      gsap.fromTo(
+        titleShineRef.current,
+        { xPercent: -220 },
+        {
+          xPercent: 720,
+          duration: 1.15,
+          repeat: -1,
+          repeatDelay: 2.2,
+          ease: 'power2.inOut',
+        }
+      )
+    }
+  }, [])
+
+  // --- Entrance animation for the title (moved from Hero) ---
+  useLayoutEffect(() => {
+    if (titleRef.current) {
+      gsap.fromTo(
+        titleRef.current,
+        {
+          y: 10,
+          opacity: 0,
+          scale: 0.985,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.55,
+          ease: 'power2.out',
+        }
+      )
+    }
+  }, [])
+
   const renderDayContents = (day, dateObj) => {
     const isToday = dateObj && new Date().toDateString() === dateObj.toDateString()
     const isDisabled = preventSameDay && isToday
@@ -690,7 +793,12 @@ function TourSelect() {
         </div>
 
         {activeModal === 'destination' && (
-          <div className="modal-scrollable max-h-[76vh] overflow-y-auto overscroll-contain pb-2 sm:max-h-[34rem]">
+          <div
+            className="modal-scrollable max-h-[76vh] overflow-y-auto overscroll-contain touch-pan-y pb-2 sm:max-h-[34rem]"
+            onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            data-lenis-prevent
+          >
             {tourOptions.map((tour) => {
               const selected = destination === tour.title
               return (
@@ -786,13 +894,15 @@ function TourSelect() {
 
   return (
     <>
-      <div className="relative mx-auto w-full max-w-5xl overflow-visible rounded-[26px] border border-black/8 bg-white/92 p-3 shadow-[0_18px_50px_rgba(15,23,42,0.10)] sm:rounded-[28px] sm:p-4">
-        <div className="mb-3 px-1">
+      <div className="relative mx-auto w-full max-w-5xl overflow-visible rounded-[26px] border border-black/8 -white/92 p-3 shadow-[0_18px_50px_rgba(15,23,42,0.10)] sm:rounded-[28px] sm:p-4">
+
+
+        <div className="mb-3 px-4">
           <StepProgress />
         </div>
 
         {isMobileLayout ? (
-          <div className="rounded-[22px] bg-white">
+          <div className="rounded-[22px]  p-2">
             <button
               ref={mobileCardRef}
               type="button"
@@ -801,7 +911,7 @@ function TourSelect() {
               style={{ height: '128px' }}
             >
               <div
-                ref={mobileIconRef} 
+                ref={mobileIconRef}
                 className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full transition-colors duration-300 ${iconShellClass(currentCard.complete, currentCard.status === 'Current', justCompletedStep === mobileStep)}`}
               >
                 <img src={currentCard.icon} className="h-7 w-auto" alt="" aria-hidden="true" />
@@ -821,12 +931,12 @@ function TourSelect() {
               </div>
             </button>
 
-            <div className="mt-4 flex items-center justify-between gap-3">
+            <div className="m-2 flex items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={() => setMobileStep((prev) => Math.max(0, prev - 1))}
                 disabled={mobileStep === 0}
-                className="rounded-2xl border border-black/10 px-5 py-3 font-bitter text-sm font-black text-black/45 transition hover:bg-black/[0.03] disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-2xl border border-black/10 bg-white px-5 py-3 font-bitter text-sm font-black text-black/45 transition hover:bg-black/[0.03] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Back
               </button>
@@ -839,6 +949,41 @@ function TourSelect() {
                 <img src={canSearch && mobileStep >= 2 ? './icons/go.png' : './icons/topRightArrow.png'} className="h-4 w-auto" alt="" aria-hidden="true" />
               </button>
             </div>
+
+            {/* ===== BANNER WRAPPER (scroll hide/show) ===== */}
+            <div className="overflow-hidden">
+              <div
+                className={`mt-3 flex w-full max-w-5xl flex-wrap items-center justify-between gap-2 rounded-2xl order border-white/16 g-white px- py-2 shadow-[0_10px_30px_rgba(0,0,0,0.06)] backdrop-blur-sm sm:flex-nowrap sm:px- sm:py-2.5 transition-all duration-300 ${showBanner
+                  ? 'translate-y-0 opacity-100'
+                  : '-translate-y-full opacity-0 pointer-events-none'
+                  }`}
+              >
+                {/* Travel & Tours title */}
+                <div
+                  ref={titleRef}
+                  className="relative overflow-hidden rounded-2xl px-3 py-1 sm:px-4 sm:py-1.5 bg-blue-800 border border-white"
+                >
+                  <span
+                    ref={titleShineRef}
+                    className="pointer-events-none absolute inset-y-0 left-[-48%] w-[30%] skew-x-[-20deg] 
+                bg-white bg[linear-gradient(90deg,transparent,rgba(0,45,203,0.18),transparent)]"
+                    aria-hidden="true"
+                  />
+                  <span className="relative bg-blu z-10 font-lobster text-base font-extrabold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.04)] sm:text-lg md:text-xl">
+                    Travel &amp; Tours
+                  </span>
+                </div>
+
+                {/* Save more badge */}
+                <div className="flex w-fit lg:w-fit items-center gap-2 rounded-2xl border border-green-300/80 bg-green-100/95 px-3 py-1.5 sm:px-4 sm:py-2">
+                  <img src="./icons/savemore.png" className="h-4 w-4 shrink-0 object-contain sm:h-5 sm:w-5" alt="" aria-hidden="true" />
+                  <p className="whitespace-nowrap font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-green-900 sm:text-[11px] sm:tracking-[0.1em]">
+                    Save more when you book as a group
+                  </p>
+                </div>
+              </div>
+            </div>
+            {/* ===== END BANNER ===== */}
           </div>
         ) : (
           <div className="grid max-w-full overflow-hidden rounded-[22px] border border-black/8 bg-white min-[700px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_190px] min-[1100px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_220px]">
@@ -875,11 +1020,6 @@ function TourSelect() {
             </div>
           </div>
         )}
-      </div>
-
-      <div className="mt-2 flex w-fit max-w-5xl items-center gap-2 rounded-2xl border border-green-300/80 bg-green-100/95 px-3 py-2">
-        <img src="./icons/savemore.png" className="h-5 w-5 shrink-0 object-contain" alt="" aria-hidden="true" />
-        <p className="truncate font-bitter text-[11px] font-black uppercase tracking-[0.1em] text-green-900">Save more when you book as a group</p>
       </div>
 
       {searchError && (
