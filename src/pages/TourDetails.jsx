@@ -64,21 +64,32 @@ const formatTimeWithPeriod = (value = "") => {
 const getAllTourGalleryImages = (tour) => {
   if (!tour) return [];
 
+  let destinationImages = [];
+
+  if (Array.isArray(tour.destinationGalleries)) {
+    destinationImages = tour.destinationGalleries.flatMap(
+      (destination) => destination.images || []
+    );
+  } else if (
+    tour.destinationGalleries &&
+    typeof tour.destinationGalleries === "object"
+  ) {
+    destinationImages = Object.values(tour.destinationGalleries).flat();
+  }
+
   return [
     tour.image,
     ...(tour.images || []),
-    ...((tour.destinationGalleries || []).flatMap(
-      (destination) => destination.images || []
-    )),
-    // Exclude the pickup and return stops by their ids, then collect images from all other stops
+    ...destinationImages,
     ...(tour.stops || [])
-      .filter(stop => stop.id !== 'pickup' && stop.id !== 'return')
+      .filter(
+        (stop) => stop.id !== "pickup" && stop.id !== "return"
+      )
       .flatMap((stop) => stop.images || []),
   ]
     .filter(Boolean)
     .filter((src, index, array) => array.indexOf(src) === index);
 };
-
 
 const formatBadgeLabel = (value = "") =>
   String(value)

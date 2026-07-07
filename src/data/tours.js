@@ -4455,28 +4455,31 @@ export const tours = [
 
 ];
 
-
 export const getAllTourGalleryImages = (tour) => {
   if (!tour) return [];
 
-  // Defensive: ensure these are arrays
-  const images = Array.isArray(tour.images) ? tour.images : [];
-  const destinationGalleries = Array.isArray(tour.destinationGalleries) 
-    ? tour.destinationGalleries 
-    : [];
-  const stops = Array.isArray(tour.stops) ? tour.stops : [];
+  let destinationImages = [];
+
+  if (Array.isArray(tour.destinationGalleries)) {
+    destinationImages = tour.destinationGalleries.flatMap(
+      (destination) => destination.images || []
+    );
+  } else if (
+    tour.destinationGalleries &&
+    typeof tour.destinationGalleries === "object"
+  ) {
+    destinationImages = Object.values(tour.destinationGalleries).flat();
+  }
 
   return [
     tour.image,
-    ...images,
-    // Safely flatMap destinationGalleries
-    ...destinationGalleries.flatMap(
-      (destination) => Array.isArray(destination?.images) ? destination.images : []
-    ),
-    // Exclude pickup and return stops
-    ...stops
-      .filter(stop => stop?.id !== 'pickup' && stop?.id !== 'return')
-      .flatMap((stop) => Array.isArray(stop?.images) ? stop.images : []),
+    ...(tour.images || []),
+    ...destinationImages,
+    ...(tour.stops || [])
+      .filter(
+        (stop) => stop.id !== "pickup" && stop.id !== "return"
+      )
+      .flatMap((stop) => stop.images || []),
   ]
     .filter(Boolean)
     .filter((src, index, array) => array.indexOf(src) === index);
