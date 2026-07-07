@@ -67,9 +67,9 @@ const getAllTourGalleryImages = (tour) => {
   return [
     tour.image,
     ...(tour.images || []),
-    ...(tour.destinationGalleries || []).flatMap(
+    ...((tour.destinationGalleries || []).flatMap(
       (destination) => destination.images || []
-    ),
+    )),
     // Exclude the pickup and return stops by their ids, then collect images from all other stops
     ...(tour.stops || [])
       .filter(stop => stop.id !== 'pickup' && stop.id !== 'return')

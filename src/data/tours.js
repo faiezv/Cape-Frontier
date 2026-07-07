@@ -4455,17 +4455,31 @@ export const tours = [
 
 ];
 
+
 export const getAllTourGalleryImages = (tour) => {
   if (!tour) return [];
 
+  // Defensive: ensure these are arrays
+  const images = Array.isArray(tour.images) ? tour.images : [];
+  const destinationGalleries = Array.isArray(tour.destinationGalleries) 
+    ? tour.destinationGalleries 
+    : [];
+  const stops = Array.isArray(tour.stops) ? tour.stops : [];
+
   return [
     tour.image,
-    ...(tour.images || []),
-    ...(tour.destinationGalleries || []).flatMap(
-      (destination) => destination.images || []
+    ...images,
+    // Safely flatMap destinationGalleries
+    ...destinationGalleries.flatMap(
+      (destination) => Array.isArray(destination?.images) ? destination.images : []
     ),
-    ...(tour.stops || []).flatMap((stop) => stop.images || []),
-  ].filter(Boolean).filter((src, index, array) => array.indexOf(src) === index);
+    // Exclude pickup and return stops
+    ...stops
+      .filter(stop => stop?.id !== 'pickup' && stop?.id !== 'return')
+      .flatMap((stop) => Array.isArray(stop?.images) ? stop.images : []),
+  ]
+    .filter(Boolean)
+    .filter((src, index, array) => array.indexOf(src) === index);
 };
 
 export const getTourBySlug = (slug) =>
