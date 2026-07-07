@@ -168,7 +168,7 @@ const Home = () => {
 
         onUpdate: (self) => {
           gsap.to(tourSelectRef.current, {
-            y: self.direction === 1 ? -64 : 0, // mt-12 = 48px
+            y: self.direction === 1 ? -20 : 0, // mt-12 = 48px
             duration: 0.25,
             ease: "power2.out",
             overwrite: "auto",
@@ -232,7 +232,7 @@ const Home = () => {
         <Tours />
       </section>
 
-      <section id="contact" className="relative z-20">
+      <section id="contact" className="relative z-26">
         <Contact />
       </section>
     </div >

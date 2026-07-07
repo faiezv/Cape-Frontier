@@ -894,7 +894,7 @@ function TourSelect() {
 
   return (
     <>
-      <div className="relative mx-auto w-full max-w-5xl overflow-visible rounded-[26px] border border-black/8 -white/92 p-3 shadow-[0_18px_50px_rgba(15,23,42,0.10)] sm:rounded-[28px] sm:p-4">
+      <div className="relative mx-auto w-full max-w-5xl overflow-visible rounded-[26px] border border-black/0 -white/92 p-3 shadow-[0_18px_50px_rgba(15,23,42,0.10)] sm:rounded-[28px] sm:p-4">
 
 
         <div className="mb-3 px-4">

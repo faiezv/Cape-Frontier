@@ -14,7 +14,7 @@ const Tours = () => {
 
       </section>
 
-      <section className="relative z-10  overflow-visible bg-blue-200">
+      <section className="relative z-10  overflow-visibl bg-blue-200">
         <ToursBrowser />
       </section>
     </div>

@@ -544,6 +544,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
   const adultCount = Math.max(Number(formData.adults || 0), 1);
   const childCount = Math.max(Number(formData.children || 0), 0);
   const participantCount = Math.max(adultCount + childCount, 1);
+  const minParticipants = Math.min(tour?.minPeople ?? 1, 8);
   const maxParticipantEmails = Math.max(participantCount - 1, 0);
   const maxAdults = Math.max(1, 8 - childCount);
   const maxChildren = Math.max(0, 8 - adultCount);
@@ -734,8 +735,18 @@ const Booking = ({ embeddedTour, bookingData }) => {
       if (maxEmails === 0) updates.ccParticipants = false;
     }
 
-    // Apply form updates
+    // Apply form updates    // Enforce minParticipants before applying
     if (Object.keys(updates).length) {
+      let finalAdults = Number(updates.adults ?? formData.adults ?? 1);
+      let finalChildren = Number(updates.children ?? formData.children ?? 0);
+      let total = finalAdults + finalChildren;
+      if (total < minParticipants) {
+        const needed = minParticipants - total;
+        finalAdults = Math.min(finalAdults + needed, 8);
+        finalChildren = Math.min(finalChildren, 8 - finalAdults);
+        updates.adults = String(finalAdults);
+        updates.children = String(finalChildren);
+      }
       setFormData((prev) => ({ ...prev, ...updates }));
     }
 
@@ -765,6 +776,37 @@ const Booking = ({ embeddedTour, bookingData }) => {
     prevBookingDataRef.current = currentKey;
   }, [bookingData, supportedCurrencies]);
   // ==========================================
+
+  const defaultInitializedRef = useRef(false);
+
+  useEffect(() => {
+    // Reset the flag when the tour changes
+    defaultInitializedRef.current = false;
+  }, [tour]);
+
+  useEffect(() => {
+    if (!tour || bookingData) return; // If bookingData is present, it takes precedence
+    if (defaultInitializedRef.current) return;
+
+    const currentAdults = Number(formData.adults || 1);
+    const currentChildren = Number(formData.children || 0);
+    const total = currentAdults + currentChildren;
+
+    if (total < minParticipants) {
+      const needed = minParticipants - total;
+      // Add to adults first (capped at 8)
+      const newAdults = Math.min(currentAdults + needed, 8);
+      const newChildren = Math.min(currentChildren, 8 - newAdults);
+      setFormData(prev => ({
+        ...prev,
+        adults: String(newAdults),
+        children: String(newChildren),
+        participants: String(newAdults + newChildren),
+      }));
+    }
+
+    defaultInitializedRef.current = true;
+  }, [tour, bookingData, minParticipants, formData.adults, formData.children]);
 
   useEffect(() => {
     if (!tour) nav("/");
@@ -985,24 +1027,36 @@ const Booking = ({ embeddedTour, bookingData }) => {
     });
   };
 
+  
   const adjustGuestCount = (type, delta) => {
-    setShowGroupEditor(true);
-
     setFormData((prev) => {
-      let nextAdults = Math.max(Number(prev.adults || 1), 1);
-      let nextChildren = Math.max(Number(prev.children || 0), 0);
+      let nextAdults = Number(prev.adults || 1);
+      let nextChildren = Number(prev.children || 0);
+      let total = nextAdults + nextChildren;
+
+      // Block decrease if new total would be below min
+      if (delta < 0 && total - 1 < minParticipants) return prev;
 
       if (type === "adults") {
-        nextAdults = Math.min(Math.max(nextAdults + delta, 1), Math.max(1, 8 - nextChildren));
+        nextAdults = Math.min(Math.max(nextAdults + delta, 1), 8 - nextChildren);
+      } else if (type === "children") {
+        nextChildren = Math.min(Math.max(nextChildren + delta, 0), 8 - nextAdults);
       }
 
-      if (type === "children") {
-        nextChildren = Math.min(Math.max(nextChildren + delta, 0), Math.max(0, 8 - nextAdults));
-        setShowChildrenSelector(nextChildren > 0);
+      // After adjustment, ensure total >= minParticipants
+      let newTotal = nextAdults + nextChildren;
+      if (newTotal < minParticipants) {
+        const needed = minParticipants - newTotal;
+        const canAddToAdults = Math.min(needed, 8 - nextAdults);
+        nextAdults += canAddToAdults;
+        nextChildren += needed - canAddToAdults;
+        nextChildren = Math.min(nextChildren, 8 - nextAdults); // safety
       }
 
-      const nextParticipantCount = Math.max(nextAdults + nextChildren, 1);
+      const nextParticipantCount = nextAdults + nextChildren;
       const maxEmails = Math.max(nextParticipantCount - 1, 0);
+
+      setShowChildrenSelector(nextChildren > 0);
 
       return {
         ...prev,
@@ -1183,6 +1237,11 @@ const Booking = ({ embeddedTour, bookingData }) => {
 
     if (invalidParticipantEmail) {
       alert(`Please check this participant email: ${invalidParticipantEmail}`);
+      return;
+    }
+
+    if (participantCount < minParticipants) {
+      alert(`At least ${minParticipants} participant${minParticipants > 1 ? 's' : ''} are required for this tour.`);
       return;
     }
 
@@ -1705,7 +1764,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
                         Group size
                       </h3>
                       <p className="mt-1 text-xs text-neutral-500">
-                        Select the number of guests in your own party.
+                        Select the number of guests in your own party. 
                       </p>
                     </div>
                   </div>
@@ -1720,7 +1779,8 @@ const Booking = ({ embeddedTour, bookingData }) => {
                           {participantCount} total
                         </p>
                         <p className="mt-1 text-xs leading-5 text-neutral-500">
-                          {adultCount} adult{adultCount === 1 ? "" : "s"}
+<b>{tour.minPeople} guests minimum. </b>
+                          {adultCount} adult{adultCount === 1 ? "" : "s"} - 
                           {childCount > 0
                             ? ` · ${childCount} child${childCount === 1 ? "" : "ren"}`
                             : ""}
@@ -1758,13 +1818,13 @@ const Booking = ({ embeddedTour, bookingData }) => {
                     >
                       <div className="grid gap-3 sm:grid-cols-2">
                         <GuestStepper
-                          label="Adults"
-                          value={adultCount}
-                          hint="Adults in your own booking group."
-                          onDecrease={() => adjustGuestCount("adults", -1)}
-                          onIncrease={() => adjustGuestCount("adults", 1)}
-                          decreaseDisabled={adultCount <= 1}
-                          increaseDisabled={adultCount + childCount >= 8}
+                            label="Adults"
+                            value={adultCount}
+                            hint="Adults in your own booking group."
+                            onDecrease={() => adjustGuestCount("adults", -1)}
+                            onIncrease={() => adjustGuestCount("adults", 1)}
+                            decreaseDisabled={adultCount <= 1 || (adultCount - 1 + childCount) < minParticipants}
+                            increaseDisabled={adultCount + childCount >= 8}
                         />
 
                         <GuestStepper
@@ -1773,11 +1833,13 @@ const Booking = ({ embeddedTour, bookingData }) => {
                           hint="Optional. Leave at 0 when there are no children."
                           onDecrease={() => adjustGuestCount("children", -1)}
                           onIncrease={() => adjustGuestCount("children", 1)}
-                          decreaseDisabled={childCount <= 0}
+                          decreaseDisabled={childCount <= 0 || (adultCount + childCount - 1) < minParticipants}
                           increaseDisabled={adultCount + childCount >= 8}
                           inactive={childCount === 0}
                         />
                       </div>
+
+                      
 
                       <div className="mt-4 rounded-2xl border border-black/5 bg-white p-4">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

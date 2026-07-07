@@ -70,11 +70,15 @@ const getAllTourGalleryImages = (tour) => {
     ...(tour.destinationGalleries || []).flatMap(
       (destination) => destination.images || []
     ),
-    ...(tour.stops || []).flatMap((stop) => stop.images || []),
+    // Exclude the pickup and return stops by their ids, then collect images from all other stops
+    ...(tour.stops || [])
+      .filter(stop => stop.id !== 'pickup' && stop.id !== 'return')
+      .flatMap((stop) => stop.images || []),
   ]
     .filter(Boolean)
     .filter((src, index, array) => array.indexOf(src) === index);
 };
+
 
 const formatBadgeLabel = (value = "") =>
   String(value)
@@ -731,7 +735,7 @@ export default function TourDetails() {
                         loading={index < 3 ? "eager" : "lazy"}
                         decoding="async"
                         onLoad={() => ScrollTrigger.refresh()}
-                        className={`w-full object-cover transition duration-500 group-hover:scale-[1.04] ${index === 0 ? "h-56 md:h-72" : "h-40"
+                        className={`w-full object-fill transition duration-500 group-hover:scale-[1.04] ${index === 0 ? "h-56 md:h-72" : "h-40"
                           }`}
                       />
                     </button>

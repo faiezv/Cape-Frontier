@@ -22,7 +22,7 @@ import {
   getSupportedCurrencies,
 } from "./Helpers.jsx";
 
-export default function TourCard({ tour, cardHeight }) {
+export default function TourCard({ tour, cardHeight, isMobile }) {
   const navigate = useLoadingNavigate();
 
   const [currency, setCurrency] = useState(
@@ -36,32 +36,32 @@ export default function TourCard({ tour, cardHeight }) {
   const supportedCurrencies = getSupportedCurrencies(tour);
 
   useEffect(() => {
-  if (!mobileInfoOpen) return;
+    if (!mobileInfoOpen) return;
 
-  let lastScrollY = window.scrollY;
+    let lastScrollY = window.scrollY;
 
-  const handleScroll = () => {
-    const currentScrollY = window.scrollY;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
 
-    // only close once actual scrolling happens
-    if (Math.abs(currentScrollY - lastScrollY) > 4) {
-      setMobileInfoOpen(null);
-    }
+      // only close once actual scrolling happens
+      if (Math.abs(currentScrollY - lastScrollY) > 4) {
+        setMobileInfoOpen(null);
+      }
 
-    lastScrollY = currentScrollY;
-  };
+      lastScrollY = currentScrollY;
+    };
 
-  window.addEventListener("scroll", handleScroll, {
-    passive: true,
-  });
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
 
-  return () => {
-    window.removeEventListener(
-      "scroll",
-      handleScroll
-    );
-  };
-}, [mobileInfoOpen]);
+    return () => {
+      window.removeEventListener(
+        "scroll",
+        handleScroll
+      );
+    };
+  }, [mobileInfoOpen]);
 
   useEffect(() => {
     if (!supportedCurrencies.includes(currency)) {
@@ -311,11 +311,10 @@ export default function TourCard({ tour, cardHeight }) {
 
               {/* MOBILE INFO PANEL */}
               <div
-                className={`overflow-hidden transition-all duration-300 sm:hidden ${
-                  mobileInfoOpen
-                    ? "max-h-24 opacity-100"
-                    : "max-h-0 opacity-0"
-                }`}
+                className={`overflow-hidden transition-all duration-300 sm:hidden ${mobileInfoOpen
+                  ? "max-h-24 opacity-100"
+                  : "max-h-0 opacity-0"
+                  }`}
               >
                 <div className="rounded-2xl border border-green-100 bg-green-50/60 px-3 py-3">
                   <p className="font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-neutral-400">
@@ -328,9 +327,9 @@ export default function TourCard({ tour, cardHeight }) {
                     {mobileInfoOpen === "location"
                       ? locationText
                       : toText(
-                          tour?.duration,
-                          "Flexible"
-                        )}
+                        tour?.duration,
+                        "Flexible"
+                      )}
                   </p>
                 </div>
               </div>
@@ -405,88 +404,146 @@ export default function TourCard({ tour, cardHeight }) {
               </div>
 
               {/* REVIEW */}
-              <div
-                data-card-stagger-item
-                className="cf-card-review"
-              >
-                <button
-                  type="button"
-                  onClick={() =>
-                    setReviewOpen((value) => !value)
-                  }
-                  className="w-full rounded-2xl border border-green-100 bg-green-50/70 px-3 py-2.5 text-left transition-colors duration-300 hover:border-green-300 hover:bg-green-200 sm:rounded-3xl sm:px-5 sm:py-4"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <StarRating count={tour?.stars || 5} />
+              <div data-card-stagger-item className="cf-card-review">
+                {isMobile ? (
+                  // --------------------------------------
+                  // MOBILE: collapsed / expanded state
+                  // --------------------------------------
+                  !reviewOpen ? (
+                    // ---- Collapsed view (stars + name in one line) ----
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setReviewOpen(true)}
+                      onKeyDown={(e) => e.key === 'Enter' && setReviewOpen(true)}
+                      className="flex w-full items-center justify-between rounded-2xl border border-green-100 bg-green-50/70 px-3 py-2.5 transition-colors duration-300 hover:border-green-300 hover:bg-green-200 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <StarRating count={tour?.stars || 5} />
+                        <span className="text-sm font-semibold text-neutral-800">
+                          {Number(tour?.rating || 4.8).toFixed(1)}
+                        </span>
+                        <span className="truncate text-xs text-neutral-500">
+                          Reviewed by {toText(tour?.mainReviewerName, 'Traveller')}
+                        </span>
+                      </div>
+                      <span className="ml-2 shrink-0 text-xs text-neutral-500">
+                        Read review
+                      </span>
+                    </div>
+                  ) : (
+                    // ---- Expanded view (full review, as on desktop) ----
+                    <button
+                      type="button"
+                      onClick={() => setReviewOpen(false)}
+                      className="w-full rounded-2xl border border-green-100 bg-green-50/70 px-3 py-2.5 text-left transition-colors duration-300 hover:border-green-300 hover:bg-green-200 sm:rounded-3xl sm:px-5 sm:py-4"
+                    >
+                      {/* --- same content as the original button --- */}
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <StarRating count={tour?.stars || 5} />
+                          <span className="text-sm font-semibold text-neutral-800">
+                            {Number(tour?.rating || 4.8).toFixed(1)}
+                          </span>
+                        </div>
+                        <span className="font-bitter text-xs text-neutral-500">
+                          Close review
+                        </span>
+                      </div>
 
-                      <span className="text-sm font-semibold text-neutral-800">
-                        {Number(tour?.rating || 4.8).toFixed(1)}
+                      <p
+                        className={`mt-1.5 font-bitter text-xs italic leading-relaxed text-neutral-600 transition-all duration-300 sm:mt-3 sm:text-sm line-clamp-3`}
+                      >
+                        “{toText(tour?.mainReview, 'A highly rated Cape Town experience.')}”
+                      </p>
+
+                      <div className="mt-2 flex items-center justify-between gap-2 sm:mt-4 sm:gap-3">
+                        <p className="truncate font-bitter text-xs text-neutral-500">
+                          Reviewed by{' '}
+                          <span className="text-neutral-700">
+                            {toText(tour?.mainReviewerName, 'Traveller')}
+                          </span>
+                          {tour?.mainReviewerCountry ? ` · ${tour.mainReviewerCountry}` : ''}
+                        </p>
+
+                        <div className="flex shrink-0 items-center gap-2">
+                          <span className="grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-green-100 text-[10px] font-bold text-green-800 shadow-sm">
+                            {getReviewInitials(tour)}
+                          </span>
+                          <span className="whitespace-nowrap font-bitter text-xs text-neutral-600">
+                            +{tour?.otherReviews || 0}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  )
+                ) : (
+                  // --------------------------------------
+                  // DESKTOP: keep original behaviour (toggle on click)
+                  // --------------------------------------
+                  <button
+                    type="button"
+                    onClick={() => setReviewOpen((value) => !value)}
+                    className="w-full rounded-2xl border border-green-100 bg-green-50/70 px-3 py-2.5 text-left transition-colors duration-300 hover:border-green-300 hover:bg-green-200 sm:rounded-3xl sm:px-5 sm:py-4"
+                  >
+                    {/* --- same original button content as before --- */}
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <StarRating count={tour?.stars || 5} />
+                        <span className="text-sm font-semibold text-neutral-800">
+                          {Number(tour?.rating || 4.8).toFixed(1)}
+                        </span>
+                      </div>
+                      <span className="font-bitter text-xs text-neutral-500">
+                        {reviewOpen ? 'Close review' : 'Read review'}
                       </span>
                     </div>
 
-                    <span className="font-bitter text-xs text-neutral-500">
-                      {reviewOpen
-                        ? "Close review"
-                        : "Read review"}
-                    </span>
-                  </div>
-
-                  <p
-                    className={`mt-1.5 font-bitter text-xs italic leading-relaxed text-neutral-600 transition-all duration-300 sm:mt-3 sm:text-sm ${
-                      reviewOpen
-                        ? "line-clamp-3"
-                        : "line-clamp-2"
-                    }`}
-                  >
-                    “
-                    {toText(
-                      tour?.mainReview,
-                      "A highly rated Cape Town experience."
-                    )}
-                    ”
-                  </p>
-
-                  <div className="mt-2 flex items-center justify-between gap-2 sm:mt-4 sm:gap-3">
-                    <p className="truncate font-bitter text-xs text-neutral-500">
-                      Reviewed by{" "}
-                      <span className="text-neutral-700">
-                        {toText(
-                          tour?.mainReviewerName,
-                          "Traveller"
-                        )}
-                      </span>
-
-                      {tour?.mainReviewerCountry
-                        ? ` · ${tour.mainReviewerCountry}`
-                        : ""}
+                    <p
+                      className={`mt-1.5 font-bitter text-xs italic leading-relaxed text-neutral-600 transition-all duration-300 sm:mt-3 sm:text-sm ${reviewOpen ? 'line-clamp-3' : 'line-clamp-2'
+                        }`}
+                    >
+                      “{toText(tour?.mainReview, 'A highly rated Cape Town experience.')}”
                     </p>
 
-                    <div className="flex shrink-0 items-center gap-2">
-                      <span className="grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-green-100 text-[10px] font-bold text-green-800 shadow-sm">
-                        {getReviewInitials(tour)}
-                      </span>
+                    <div className="mt-2 flex items-center justify-between gap-2 sm:mt-4 sm:gap-3">
+                      <p className="truncate font-bitter text-xs text-neutral-500">
+                        Reviewed by{' '}
+                        <span className="text-neutral-700">
+                          {toText(tour?.mainReviewerName, 'Traveller')}
+                        </span>
+                        {tour?.mainReviewerCountry ? ` · ${tour.mainReviewerCountry}` : ''}
+                      </p>
 
-                      <span className="whitespace-nowrap font-bitter text-xs text-neutral-600">
-                        +{tour?.otherReviews || 0}
-                      </span>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <span className="grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-green-100 text-[10px] font-bold text-green-800 shadow-sm">
+                          {getReviewInitials(tour)}
+                        </span>
+                        <span className="whitespace-nowrap font-bitter text-xs text-neutral-600">
+                          +{tour?.otherReviews || 0}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </button>
-              </div>
-
-              {/* EXTRA INFO */}
-              <div className="cf-mobile-info grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <div className="rounded-2xl bg-green-200/80 px-3 py-2 font-bitter text-xs font-semibold leading-snug text-green-950">
-                  {getBestGroupDiscount(tour)}
-                </div>
-
-                {getPickupSummary(tour) && (
-                  <div className="rounded-2xl bg-neutral-100 px-3 py-2 font-bitter text-xs font-semibold leading-snug text-neutral-700">
-                    {getPickupSummary(tour)}
-                  </div>
+                  </button>
                 )}
               </div>
+
+
+              {/* EXTRA INFO */}
+              {!isMobile && (
+
+                <div className="cf-mobile-info grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <div className="rounded-2xl bg-green-200/80 px-3 py-2 font-bitter text-xs font-semibold leading-snug text-green-950">
+                    {getBestGroupDiscount(tour)}
+                  </div>
+
+                  {getPickupSummary(tour) && (
+                    <div className="rounded-2xl bg-neutral-100 px-3 py-2 font-bitter text-xs font-semibold leading-snug text-neutral-700">
+                      {getPickupSummary(tour)}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* FOOTER */}
