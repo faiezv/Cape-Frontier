@@ -114,7 +114,7 @@ export default function ToursBrowser() {
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       // 1. Kill all previous triggers to avoid build-up
-      ScrollTrigger.getAll().forEach((st) => st.kill());
+      // ScrollTrigger.getAll().forEach((st) => st.kill());
 
       const wrappers = gsap.utils.toArray(
         containerRef.current.querySelectorAll(".tour-trigger")

@@ -1240,10 +1240,10 @@ const Booking = ({ embeddedTour, bookingData }) => {
       return;
     }
 
-    if (participantCount < minParticipants) {
-      alert(`At least ${minParticipants} participant${minParticipants > 1 ? 's' : ''} are required for this tour.`);
-      return;
-    }
+    // if (participantCount < minParticipants) {
+    //   alert(`At least ${minParticipants} participant${minParticipants > 1 ? 's' : ''} are required for this tour.`);
+    //   return;
+    // }
 
     nav("/checkout", {
       state: {
