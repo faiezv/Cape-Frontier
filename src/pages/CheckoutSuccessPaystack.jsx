@@ -2,13 +2,11 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "re
 import { useLocation, useNavigate } from "react-router-dom";
 import gsap from "gsap";
 
+// ---------- Helpers (unchanged) ----------
 const formatDate = (dateValue) => {
   if (!dateValue) return "Date to be confirmed";
-
   const date = new Date(dateValue);
-
   if (Number.isNaN(date.getTime())) return dateValue;
-
   return new Intl.DateTimeFormat("en-ZA", {
     weekday: "short",
     day: "2-digit",
@@ -19,7 +17,6 @@ const formatDate = (dateValue) => {
 
 const normalizeEmails = (emails) => {
   if (!Array.isArray(emails)) return [];
-
   return emails.map((email) => String(email || "").trim()).filter(Boolean);
 };
 
@@ -73,6 +70,7 @@ const getPickupTime = (bookingDetails) => {
   );
 };
 
+// ---------- UI sub-components (unchanged) ----------
 const Pill = ({ children, tone = "neutral" }) => {
   const tones = {
     neutral: "bg-white/80 text-slate-600 border-white/70",
@@ -80,7 +78,6 @@ const Pill = ({ children, tone = "neutral" }) => {
     blue: "bg-blue-100 text-blue-700 border-blue-200/70",
     dark: "bg-[#071f4f] text-white border-[#071f4f]",
   };
-
   return (
     <span
       className={`inline-flex w-fit items-center rounded-full border px-3 py-1.5 text-xs font-bold ${tones[tone] || tones.neutral}`}
@@ -97,7 +94,6 @@ const DetailCard = ({ label, value, note, tone = "white" }) => {
     green: "bg-green-50 text-slate-900",
     dark: "bg-[#071f4f] text-white",
   };
-
   return (
     <div
       className={`rounded-[1.35rem] p-4 shadow-[0_12px_30px_rgba(7,31,79,0.06)] ${tones[tone] || tones.white}`}
@@ -109,7 +105,6 @@ const DetailCard = ({ label, value, note, tone = "white" }) => {
       >
         {label}
       </p>
-
       <p
         className={`mt-2 break-words font-frank text-2xl font-bold leading-none ${
           tone === "dark" ? "text-white" : "text-[#071f4f]"
@@ -117,7 +112,6 @@ const DetailCard = ({ label, value, note, tone = "white" }) => {
       >
         {value}
       </p>
-
       {note && (
         <p
           className={`mt-2 text-xs leading-5 ${
@@ -148,15 +142,16 @@ const EmailChip = ({ email }) => (
         <circle cx="12" cy="7" r="4" />
       </svg>
     </span>
-
     <span className="truncate">{email}</span>
   </span>
 );
 
+// ========== MAIN COMPONENT ==========
 const CheckoutSuccessPaystack = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Refs for animations (unchanged)
   const pageRef = useRef(null);
   const heroRef = useRef(null);
   const badgeRef = useRef(null);
@@ -166,18 +161,17 @@ const CheckoutSuccessPaystack = () => {
   const ctaRowRef = useRef(null);
   const glowLeftRef = useRef(null);
   const glowRightRef = useRef(null);
-  const verifyStartedRef = useRef(false);
 
   const [countdown, setCountdown] = useState(300);
 
-  // PayFast uses m_payment_id and pf_payment_id
+  // ---------- Paystack reference ----------
   const searchParams = useMemo(
     () => new URLSearchParams(location.search),
     [location.search]
   );
-  const mPaymentId = searchParams.get("m_payment_id");
-  const pfPaymentId = searchParams.get("pf_payment_id");
+  const reference = searchParams.get("reference") || searchParams.get("trxref");
 
+  // Initial checkout data from router state or sessionStorage
   const initialCheckout = useMemo(() => {
     if (location.state?.bookingDetails) {
       return {
@@ -189,31 +183,36 @@ const CheckoutSuccessPaystack = () => {
         notes: location.state.notes,
         checkoutStops: location.state.checkoutStops || [],
         bookingReference: location.state.bookingReference,
-        payfastReference: location.state.payfastReference,
         emailPayload: location.state.emailPayload || null,
-        paymentProvider: "payfast",
+        paymentProvider: "paystack",
       };
     }
-
     return getStoredCheckout();
   }, [location.state]);
 
   const [storedCheckout, setStoredCheckoutState] = useState(initialCheckout);
 
+  // ---------- REF to avoid dependency loop ----------
+  // Always holds the latest checkout data without causing re-renders of the effect
+  const storedCheckoutRef = useRef(storedCheckout);
+  useEffect(() => {
+    storedCheckoutRef.current = storedCheckout;
+  }, [storedCheckout]);
+
+  // Payment status
   const [paymentStatus, setPaymentStatus] = useState(
-    mPaymentId ? "verifying" : "success"
+    reference ? "verifying" : "error"
   );
-
   const [paymentMessage, setPaymentMessage] = useState(
-    mPaymentId
-      ? "Verifying your PayFast payment before finalising the booking."
-      : "Your booking details were received."
+    reference
+      ? "Verifying your Paystack payment before finalising the booking."
+      : "No payment reference found. Please contact support."
   );
 
-  const [emailStatus, setEmailStatus] = useState(
-    storedCheckout?.emailSent ? "sent" : "idle"
-  );
+  // Email status
+  const [emailStatus, setEmailStatus] = useState("idle");
 
+  // ---------- Derived data (unchanged) ----------
   const tour = location.state?.tour || storedCheckout?.tour || null;
   const bookingDetails =
     location.state?.bookingDetails || storedCheckout?.bookingDetails || null;
@@ -240,7 +239,7 @@ const CheckoutSuccessPaystack = () => {
     storedCheckout?.bookingReference ||
     storedCheckout?.emailPayload?.bookingReference ||
     storedCheckout?.emailPayload?.bookingRef ||
-    mPaymentId ||
+    reference ||
     "Pending confirmation";
 
   const customerEmail =
@@ -262,7 +261,9 @@ const CheckoutSuccessPaystack = () => {
     bookingDetails || storedCheckout?.emailPayload
   );
 
-  const pickupTime = getPickupTime(bookingDetails || storedCheckout?.emailPayload);
+  const pickupTime = getPickupTime(
+    bookingDetails || storedCheckout?.emailPayload
+  );
 
   const isPrivate = Boolean(
     bookingDetails?.isPrivate ||
@@ -287,192 +288,139 @@ const CheckoutSuccessPaystack = () => {
   const isVerifyingPayment = paymentStatus === "verifying";
   const isPaymentError = paymentStatus === "error";
 
+  // Scroll to top on mount (unchanged)
   useEffect(() => {
     window.scrollTo(0, 0);
-
     if (window.lenis) {
       window.lenis.scrollTo(0, { immediate: true, force: true });
       window.lenis.start();
     }
   }, []);
 
-  // PayFast verification (replaces Paystack verification)
+  // ---------- Paystack verification + email ----------
   useEffect(() => {
-    if (!mPaymentId || verifyStartedRef.current) return;
-
-    verifyStartedRef.current = true;
+    if (!reference) return; // no reference, stay in error state
     let cancelled = false;
-    let pollInterval;
 
-    const verifyAndSendBookingEmail = async () => {
+    const verifyAndSendEmail = async () => {
       try {
         setPaymentStatus("verifying");
-        setPaymentMessage("Verifying your PayFast payment before finalising the booking.");
+        setPaymentMessage("Verifying your Paystack payment...");
 
-        // Poll the check-booking-status endpoint (updated by webhook)
-        const checkStatus = async () => {
-          try {
-            const res = await fetch(`/api/check-booking-status?reference=${mPaymentId}`);
-            const data = await res.json();
-            if (data.status === "paid") {
-              clearInterval(pollInterval);
-              if (!cancelled) await onPaymentConfirmed(data);
-            } else if (data.status === "failed") {
-              clearInterval(pollInterval);
-              if (!cancelled) onPaymentFailed();
-            }
-          } catch (err) {
-            console.error("Poll error:", err);
-          }
-        };
+        // Call your paystack-verify API endpoint
+        const res = await fetch(`/api/paystack-verify?reference=${reference}`);
+        const data = await res.json();
 
-        // Manual fallback after 6 seconds (calls /api/payfast-verify)
-        const manualFallback = async () => {
-          if (cancelled) return;
-          try {
-            const fallbackRes = await fetch(`/api/payfast-verify?reference=${mPaymentId}&pf_payment_id=${pfPaymentId || ""}`);
-            const fallbackData = await fallbackRes.json();
-            if (fallbackData.status === "paid") {
-              clearInterval(pollInterval);
-              if (!cancelled) await onPaymentConfirmed(fallbackData);
-            }
-          } catch (err) {
-            console.error("Fallback error:", err);
-          }
-        };
-
-        const onPaymentConfirmed = async (verifyData) => {
-          const currentCheckout = storedCheckout || getStoredCheckout() || {};
-
-          const finalBookingReference =
-            currentCheckout.bookingReference ||
-            currentCheckout.emailPayload?.bookingReference ||
-            currentCheckout.emailPayload?.bookingRef ||
-            mPaymentId;
-
-          const emailPayload = {
-            ...(currentCheckout.emailPayload || {}),
-            bookingReference: finalBookingReference,
-            bookingRef: finalBookingReference,
-            paymentId: pfPaymentId || mPaymentId,
-            paymentProvider: "payfast",
-            payfastPaymentId: pfPaymentId,
-            payfastStatus: verifyData.status || "COMPLETE",
-            tourStops:
-              currentCheckout.checkoutStops ||
-              currentCheckout.emailPayload?.tourStops ||
-              currentCheckout.emailPayload?.stops ||
-              [],
-            stops:
-              currentCheckout.checkoutStops ||
-              currentCheckout.emailPayload?.stops ||
-              currentCheckout.emailPayload?.tourStops ||
-              [],
-          };
-
-          const updatedCheckout = {
-            ...currentCheckout,
-            bookingReference: finalBookingReference,
-            payfastPaymentId: pfPaymentId,
-            verifiedPayment: verifyData,
-            emailPayload,
-            paymentProvider: "payfast",
-          };
-
-          setStoredCheckout(updatedCheckout);
-          setStoredCheckoutState(updatedCheckout);
-
-          const emailSentKey = `cape-frontier-email-sent:${mPaymentId}`;
-
-          if (sessionStorage.getItem(emailSentKey)) {
-            setEmailStatus("sent");
-          } else if (
-            emailPayload.customerEmail &&
-            emailPayload.customerName &&
-            emailPayload.tourTitle &&
-            emailPayload.date
-          ) {
-            setEmailStatus("sending");
-
-            const emailRes = await fetch("/api/send-booking-email", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(emailPayload),
-            });
-
-            let emailData = null;
-
-            try {
-              emailData = await emailRes.json();
-            } catch {
-              emailData = null;
-            }
-
-            if (!emailRes.ok) {
-              console.error("Booking email failed:", emailData);
-              setEmailStatus("failed");
-            } else {
-              sessionStorage.setItem(emailSentKey, "true");
-              setEmailStatus("sent");
-
-              const emailedCheckout = {
-                ...updatedCheckout,
-                emailSent: true,
-                emailSentAt: new Date().toISOString(),
-              };
-
-              setStoredCheckout(emailedCheckout);
-              setStoredCheckoutState(emailedCheckout);
-            }
-          } else {
-            console.warn("Booking email payload is incomplete:", emailPayload);
-            setEmailStatus("failed");
-          }
-
-          setPaymentStatus("success");
-          setPaymentMessage(
-            "Payment verified. Cape Frontier will confirm final pickup and vehicle details via WhatsApp."
-          );
-        };
-
-        const onPaymentFailed = () => {
-          setPaymentStatus("error");
-          setPaymentMessage(
-            "Payment verification failed. Please contact Cape Frontier with your payment reference."
-          );
-          setEmailStatus("idle");
-        };
-
-        // Start polling every 3 seconds
-        pollInterval = setInterval(checkStatus, 3000);
-        checkStatus(); // immediate first check
-        setTimeout(manualFallback, 6000);
-      } catch (error) {
-        console.error("PayFast verification error:", error);
-        if (!cancelled) {
-          setPaymentStatus("error");
-          setPaymentMessage(
-            error.message ||
-              "Payment verification failed. Please contact Cape Frontier with your payment reference."
-          );
-          setEmailStatus("idle");
+        if (!data.status) {
+          throw new Error(data.message || "Payment not successful");
         }
+
+        if (cancelled) return;
+
+        // Payment confirmed
+        setPaymentStatus("success");
+        setPaymentMessage(
+          "Payment verified. Cape Frontier will confirm final pickup and vehicle details via WhatsApp."
+        );
+
+        // Build final checkout data using the REF, not the state variable
+        const currentCheckout = storedCheckoutRef.current || getStoredCheckout() || {};
+        const finalBookingReference =
+          currentCheckout.bookingReference ||
+          currentCheckout.emailPayload?.bookingReference ||
+          reference;
+
+        const emailPayload = {
+          ...(currentCheckout.emailPayload || {}),
+          bookingReference: finalBookingReference,
+          bookingRef: finalBookingReference,
+          paymentId: reference,
+          paymentProvider: "paystack",
+          paystackReference: reference,
+        };
+
+        const updatedCheckout = {
+          ...currentCheckout,
+          bookingReference: finalBookingReference,
+          verifiedPayment: data,
+          emailPayload,
+          paymentProvider: "paystack",
+        };
+
+        setStoredCheckout(updatedCheckout);  // updates state but will NOT re-run this effect
+        setStoredCheckoutState(updatedCheckout);
+
+        // Send booking email
+        await sendBookingEmail(emailPayload, reference);
+      } catch (error) {
+        if (cancelled) return;
+        console.error("Paystack verification error:", error);
+        setPaymentStatus("error");
+        setPaymentMessage(
+          error.message ||
+            "Payment verification failed. Please contact Cape Frontier with your reference."
+        );
+        setEmailStatus("failed"); // leave "pending" state
       }
     };
 
-    verifyAndSendBookingEmail();
+    const sendBookingEmail = async (payload, paystackRef) => {
+      const emailSentKey = `cape-frontier-email-sent:${paystackRef}`;
+      if (sessionStorage.getItem(emailSentKey)) {
+        setEmailStatus("sent");
+        return;
+      }
+
+      if (
+        payload.customerEmail &&
+        payload.customerName &&
+        payload.tourTitle &&
+        payload.date
+      ) {
+        setEmailStatus("sending");
+        try {
+          const emailRes = await fetch("/api/send-booking-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (!emailRes.ok) {
+            throw new Error("Email API returned an error");
+          }
+
+          sessionStorage.setItem(emailSentKey, "true");
+          setEmailStatus("sent");
+
+          // Update checkout to reflect email sent
+          const emailedCheckout = {
+            ...storedCheckoutRef.current,
+            emailSent: true,
+            emailSentAt: new Date().toISOString(),
+          };
+          setStoredCheckout(emailedCheckout);
+          setStoredCheckoutState(emailedCheckout);
+        } catch (emailError) {
+          console.error("Booking email failed:", emailError);
+          setEmailStatus("failed");
+        }
+      } else {
+        console.warn("Incomplete email payload:", payload);
+        setEmailStatus("failed");
+      }
+    };
+
+    verifyAndSendEmail();
 
     return () => {
       cancelled = true;
-      if (pollInterval) clearInterval(pollInterval);
     };
-  }, [mPaymentId, pfPaymentId, storedCheckout]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reference]); // Only reference; storedCheckout is accessed via ref
 
+  // ---------- Animations (unchanged) ----------
   useLayoutEffect(() => {
     if (!pageRef.current) return;
-
     const ctx = gsap.context(() => {
       const animatedItems = [
         badgeRef.current,
@@ -482,31 +430,13 @@ const CheckoutSuccessPaystack = () => {
         ctaRowRef.current,
       ].filter(Boolean);
 
-      gsap.set(animatedItems, {
-        opacity: 0,
-        y: 22,
-        filter: "blur(5px)",
-      });
-
+      gsap.set(animatedItems, { opacity: 0, y: 22, filter: "blur(5px)" });
       if (badgeRef.current) {
-        gsap.set(badgeRef.current, {
-          scale: 0.72,
-          y: -14,
-          filter: "blur(4px)",
-        });
+        gsap.set(badgeRef.current, { scale: 0.72, y: -14, filter: "blur(4px)" });
       }
 
-      const tl = gsap.timeline({
-        defaults: {
-          ease: "power3.out",
-        },
-      });
-
-      tl.fromTo(
-        heroRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.35 }
-      )
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      tl.fromTo(heroRef.current, { opacity: 0 }, { opacity: 1, duration: 0.35 })
         .to(badgeRef.current, {
           opacity: 1,
           scale: 1,
@@ -515,46 +445,10 @@ const CheckoutSuccessPaystack = () => {
           duration: 0.62,
           ease: "back.out(1.75)",
         })
-        .to(
-          titleRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            filter: "blur(0px)",
-            duration: 0.58,
-          },
-          "-=0.34"
-        )
-        .to(
-          subtitleRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            filter: "blur(0px)",
-            duration: 0.48,
-          },
-          "-=0.34"
-        )
-        .to(
-          firstScreenCardsRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            filter: "blur(0px)",
-            duration: 0.58,
-          },
-          "-=0.26"
-        )
-        .to(
-          ctaRowRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            filter: "blur(0px)",
-            duration: 0.42,
-          },
-          "-=0.2"
-        );
+        .to(titleRef.current, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.58 }, "-=0.34")
+        .to(subtitleRef.current, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.48 }, "-=0.34")
+        .to(firstScreenCardsRef.current, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.58 }, "-=0.26")
+        .to(ctaRowRef.current, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.42 }, "-=0.2");
 
       gsap.to(glowLeftRef.current, {
         x: 18,
@@ -565,7 +459,6 @@ const CheckoutSuccessPaystack = () => {
         yoyo: true,
         ease: "sine.inOut",
       });
-
       gsap.to(glowRightRef.current, {
         x: -18,
         y: 18,
@@ -575,7 +468,6 @@ const CheckoutSuccessPaystack = () => {
         yoyo: true,
         ease: "sine.inOut",
       });
-
       gsap.to(badgeRef.current, {
         y: -4,
         duration: 2.4,
@@ -584,10 +476,10 @@ const CheckoutSuccessPaystack = () => {
         ease: "sine.inOut",
       });
     }, pageRef);
-
     return () => ctx.revert();
   }, []);
 
+  // Countdown timer (unchanged)
   useEffect(() => {
     const timer = setInterval(() => {
       setCountdown((prev) => {
@@ -596,22 +488,19 @@ const CheckoutSuccessPaystack = () => {
           navigate("/");
           return 0;
         }
-
         return prev - 1;
       });
     }, 1000);
-
     return () => clearInterval(timer);
   }, [navigate]);
 
   const formatCountdown = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-
     return `${mins}:${String(secs).padStart(2, "0")}`;
   };
 
-  // The JSX is identical to the Paystack version – only the verification logic above changed
+  // ---------- JSX (unchanged) ----------
   return (
     <div
       ref={pageRef}
@@ -622,14 +511,12 @@ const CheckoutSuccessPaystack = () => {
         alt=""
         className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-10"
       />
-
       <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(232,246,255,0.88)_48%,rgba(220,252,231,0.9)_100%)]" />
 
       <div
         ref={glowLeftRef}
         className="pointer-events-none absolute left-[6%] top-[12%] h-52 w-52 rounded-full bg-green-200/55 blur-3xl md:h-72 md:w-72"
       />
-
       <div
         ref={glowRightRef}
         className="pointer-events-none absolute right-[7%] top-[15%] h-56 w-56 rounded-full bg-blue-400/20 blur-3xl md:h-80 md:w-80"
@@ -693,7 +580,6 @@ const CheckoutSuccessPaystack = () => {
                   >
                     Print receipt
                   </button>
-
                   <button
                     onClick={() => navigate("/")}
                     className="hero-gradient-bl rounded-full px-6 py-3 font-frank text-sm font-bold text-white shadow-[0_14px_34px_rgba(7,31,79,0.18)] transition hover:-translate-y-0.5"
@@ -715,7 +601,6 @@ const CheckoutSuccessPaystack = () => {
                   <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">
                     Customer confirmation
                   </p>
-
                   <h2 className="mt-2 font-frank text-3xl font-bold leading-none">
                     {emailStatus === "sent"
                       ? "Email sent to customer."
@@ -725,7 +610,6 @@ const CheckoutSuccessPaystack = () => {
                           ? "Email needs manual follow-up."
                           : "Email pending."}
                   </h2>
-
                   <p className="mt-3 break-words text-sm font-semibold leading-6 text-white/72">
                     {emailStatus === "sent"
                       ? "Confirmation details have been sent to "
@@ -736,7 +620,6 @@ const CheckoutSuccessPaystack = () => {
                           : "Email confirmation will be sent to "}
                     <span className="text-green-200">{customerEmail}</span>.
                   </p>
-
                   {ccParticipantEmails.length > 0 && (
                     <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-4">
                       {ccParticipantEmails.map((email) => (
@@ -752,21 +635,18 @@ const CheckoutSuccessPaystack = () => {
                     value={bookingReference}
                     note="Save this reference for support."
                   />
-
                   <DetailCard
                     label="Amount paid"
                     value={totalAmountLabel || "Paid"}
                     note={selectedCurrency}
                     tone="green"
                   />
-
                   <DetailCard
                     label="Pickup time"
                     value={pickupTime}
                     note="Final timing is manually confirmed."
                     tone="dark"
                   />
-
                   <DetailCard
                     label="Trip date"
                     value={formatDate(bookingDetails?.date)}
@@ -784,16 +664,13 @@ const CheckoutSuccessPaystack = () => {
                         className="h-5 w-5 object-contain"
                       />
                     </span>
-
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                         Pickup location
                       </p>
-
-                      <p className="mt-1 text-sm font-bold  text-slate-900">
+                      <p className="mt-1 text-sm font-bold text-slate-900">
                         {pickupLocation}
                       </p>
-
                       <p className="mt-1 text-xs leading-5 text-slate-500">
                         Vehicle is confirmed after purchase and selected based on group
                         size, route, luggage, availability, and operations.
@@ -808,13 +685,12 @@ const CheckoutSuccessPaystack = () => {
                   <Pill tone={emailStatus === "failed" ? "neutral" : "blue"}>
                     {emailStatusLabel}
                   </Pill>
-                  <Pill tone="dark">Vehicle confirmed latedr</Pill>
+                  <Pill tone="dark">Vehicle confirmed later</Pill>
                 </div>
               </div>
             </div>
           </div>
         </section>
-
       </div>
     </div>
   );
