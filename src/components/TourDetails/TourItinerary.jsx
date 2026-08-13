@@ -69,6 +69,8 @@ const resolveTourImage = (imagePath) => {
   return matchingKey ? tourImageAssets[matchingKey] : null;
 };
 
+// import {resolveTourImage} from "../../utils/ImageLoader"
+
 /* ============================================================
    ACTIVITY ICONS
 ============================================================ */
@@ -1153,7 +1155,7 @@ function DayCard({
           {day.activities?.map((activity, index) => (
             <img
               key={activity.id ?? index}
-              src={`/src/assets/${activity.image}`}  // try this
+              src={resolveTourImage(activity.image)}  // try this
               alt={activity.name ?? "Activity"}
               className="h-12 w-12 flex-shrink-0 bg-red-400 object-cover"
             />
