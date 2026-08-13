@@ -1,6 +1,8 @@
 // The form should calculate a live price, but the final amount must be recalculated again on the server before creating the Stripe payment. 
 // Do not trust only the frontend price.
 
+import CheckoutSummary from '../components/CheckoutSummary';
+
 import React, {
   useEffect,
   useLayoutEffect,
@@ -1489,7 +1491,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
               </div>
             </div>
 
-            <div className="max-w-5xl mx-auto flex flex-col items-center mt-4">
+            {/* <div className="max-w-5xl mx-auto flex flex-col items-center mt-4">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-green-500">
                 {isEmbedded ? "Tour request" : "Booking details"}
               </p>
@@ -1497,6 +1499,336 @@ const Booking = ({ embeddedTour, bookingData }) => {
               <h2 className="mt-2 font-frank text-3xl leading-none text-black md:text-4xl">
                 {isEmbedded ? "Complete your details" : "Secure your slot"}
               </h2>
+            </div> */}
+
+            <div
+              ref={rightRef}
+              className={`group/right ${
+                isEmbedded
+                  ? "p-3 sm:p-5 md:p-6 lg:p-7"
+                  : "p-4 sm:p-5 md:p-7 lg:p-8"
+              }`}
+            >
+              {/* TOUR SUMMARY */}
+              <div
+                className="
+                  relative isolate overflow-hidden
+                  rounded-[2rem] sm:rounded-[2.5rem]
+                  border border-black/5
+                  px-4 py-6
+                  sm:px-6 sm:py-8
+                  md:px-8 md:py-10
+                  transition-all duration-500
+                  group-hover/right:border-blue-200
+                "
+              >
+                {/* BACKGROUND IMAGE */}
+                <img
+                  src={tour.image || fallbackImage}
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  decoding="async"
+                  className="
+                    pointer-events-none
+                    absolute inset-0
+                    h-full w-full
+                    object-cover
+                    opacity-55
+                    transition-transform duration-700
+                    group-hover/right:scale-[1.03]
+                  "
+                  onError={(e) => {
+                    e.currentTarget.src = fallbackImage;
+                  }}
+                />
+
+                {/* IMAGE CONTRAST OVERLAY */}
+                <div
+                  className="
+                    pointer-events-none
+                    absolute inset-0
+                    bg-gradient-to-b
+                    from-black/55
+                    via-black/35
+                    to-white/85
+                  "
+                />
+
+                {/* CONTENT */}
+                <div className="relative z-10">
+                  {/* EYEBROW */}
+                  <div className="text-center">
+                    <p
+                      className="
+                        text-[9px] font-black uppercase
+                        tracking-[0.22em]
+                        text-white/75
+                        sm:text-[10px]
+                        sm:tracking-[0.26em]
+                      "
+                    >
+                      Selected tour
+                    </p>
+
+                    {/* TITLE */}
+                    <h3
+                      className="
+                        mx-auto mt-2
+                        max-w-4xl
+                        font-frank font-bold
+                        leading-[0.9]
+                        tracking-[-0.04em]
+                        text-white
+                        text-[clamp(2rem,8vw,5.6rem)]
+                      "
+                    >
+                      {tour.title || tour.info}
+                    </h3>
+                  </div>
+
+                  {/* PILLS */}
+                  {tourInfoPills?.length > 0 && (
+                    <div
+                      className="
+                        mx-auto mt-5
+                        flex max-w-3xl
+                        flex-wrap justify-center
+                        gap-2
+                        sm:mt-6 sm:gap-2.5
+                      "
+                    >
+                      {tourInfoPills.map((pill) => (
+                        <span
+                          key={`${pill.label}-${pill.value}`}
+                          className={`
+                            inline-flex
+                            min-h-9
+                            items-center
+                            gap-1.5
+                            rounded-full
+                            border
+                            px-3 py-1.5
+                            text-[11px]
+                            font-bold
+                            shadow-[0_8px_20px_rgba(0,0,0,0.05)]
+                            backdrop-blur-md
+                            sm:min-h-10
+                            sm:gap-2
+                            sm:px-4
+                            sm:py-2
+                            sm:text-xs
+                            ${pill.className}
+                          `}
+                        >
+                          <span
+                            className="
+                              text-[8px]
+                              font-black
+                              uppercase
+                              tracking-[0.16em]
+                              opacity-65
+                              sm:text-[9px]
+                              sm:tracking-[0.18em]
+                            "
+                          >
+                            {pill.label}
+                          </span>
+
+                          <span className="whitespace-nowrap">
+                            {pill.value}
+                          </span>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* PRICE AREA */}
+                  <div className="mt-6 flex justify-center sm:mt-8">
+                    <div
+                      ref={priceRef}
+                      className="
+                        flex w-full
+                        max-w-md
+                        flex-col
+                        overflow-hidden
+                        rounded-[1.5rem]
+                        border border-black/5
+                        bg-white/90
+                        shadow-[0_14px_40px_rgba(0,0,0,0.08)]
+                        backdrop-blur-xl
+
+                        sm:max-w-fit
+                        sm:flex-row
+                        sm:items-stretch
+                      "
+                    >
+                      {/* PRICE */}
+                      <div
+                        className="
+                          flex
+                          min-w-0
+                          flex-1
+                          flex-col
+                          items-center
+                          justify-center
+                          px-5 py-4
+                          text-center
+
+                          sm:min-w-[10rem]
+                          sm:px-6
+                          sm:py-4
+                        "
+                      >
+                        <div
+                          className="
+                            text-[9px]
+                            font-black
+                            uppercase
+                            tracking-[0.2em]
+                            text-neutral-400
+                            sm:text-[10px]
+                          "
+                        >
+                          From
+                        </div>
+
+                        <div
+                          className="
+                            mt-1
+                            max-w-full
+                            truncate
+                            font-frank
+                            text-3xl
+                            font-bold
+                            leading-none
+                            tracking-tight
+                            text-neutral-950
+                            sm:text-4xl
+                          "
+                        >
+                          {displayPrice}
+                        </div>
+
+                        <div
+                          className="
+                            mt-1
+                            text-[11px]
+                            font-medium
+                            text-neutral-500
+                            sm:text-xs
+                          "
+                        >
+                          per person
+                        </div>
+                      </div>
+
+                      {/* DIVIDER */}
+                      <div
+                        className="
+                          mx-5
+                          h-px
+                          bg-black/5
+
+                          sm:mx-0
+                          sm:my-4
+                          sm:h-auto
+                          sm:w-px
+                        "
+                      />
+
+                      {/* CURRENCY */}
+                      <div
+                        className="
+                          flex
+                          items-center
+                          justify-center
+                          px-4 py-3
+
+                          sm:px-4
+                          sm:py-4
+                        "
+                      >
+                        <div className="relative">
+                          <label htmlFor="tour-currency" className="sr-only">
+                            Select currency
+                          </label>
+
+                          <select
+                            id="tour-currency"
+                            aria-label="Select currency"
+                            value={currency}
+                            onChange={(e) => setCurrency(e.target.value)}
+                            className="
+                              h-12
+                              w-full
+                              min-w-[7rem]
+                              cursor-pointer
+                              appearance-none
+                              rounded-xl
+                              border
+                              border-black/10
+                              bg-neutral-50
+                              px-4
+                              pr-9
+                              text-center
+                              text-sm
+                              font-black
+                              text-neutral-900
+                              outline-none
+                              transition-all
+                              duration-200
+
+                              hover:border-green-300
+                              hover:bg-green-50
+
+                              focus:border-green-400
+                              focus:bg-green-50
+                              focus:ring-2
+                              focus:ring-green-400/20
+
+                              sm:h-14
+                              sm:w-24
+                            "
+                          >
+                            {supportedCurrencies.map((code) => (
+                              <option key={code} value={code}>
+                                {code}
+                              </option>
+                            ))}
+                          </select>
+
+                          {/* SELECT ARROW */}
+                          <span
+                            className="
+                              pointer-events-none
+                              absolute
+                              right-3
+                              top-1/2
+                              -translate-y-1/2
+                              text-neutral-400
+                            "
+                            aria-hidden="true"
+                          >
+                            <svg
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.4"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="m6 9 6 6 6-6" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div
@@ -1507,94 +1839,8 @@ const Booking = ({ embeddedTour, bookingData }) => {
                   : "p-5 hover:from-white hover:via-green-49/70 hover:to-blue-50/60 md:p-7 lg:p-8"
               }`}
             >
-              <div className="relative mb-6 overflow-hidden rounded-t-4xl border border-black/5 p-4 transition-all duration-500 group-hover/right:border-blue-200 sm:p-5">
-                <img
-                  src={tour.image || fallbackImage}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  className="pointer-events-none absolute inset-0 h-full w-full object-fit opacity-10  blur-[0px]"
-                  onError={(e) => {
-                    e.currentTarget.src = fallbackImage;
-                  }}
-                />
 
-                <div className="relative z-10">
-                  <div className="flex flex-col items-center text-center">
-                    <div
-                      ref={priceRef}
-                      className="mt-5 flex w-full shrink-0 flex-col items-center justify-center gap-3 rounded-2xl border border-black/5 bg-white/80 px-5 py-5 text-center shadow-[0_10px_26px_rgba(0,0,0,0.035)] sm:w-fit sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-4"
-                    >
-                      <div className="px-2 py-1.5 sm:min-w-[9.5rem] sm:px-3 sm:py-2">
-                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400">
-                          From
-                        </div>
-
-                        <div className="font-frank text-3xl font-bold leading-none text-neutral-950 md:text-4xl">
-                          {displayPrice}
-                        </div>
-
-                        <div className="mt-1 text-xs text-neutral-500">per person</div>
-                      </div>
-
-                      <div className="relative py-1.5 sm:py-2">
-                        <select
-                          aria-label="Select currency"
-                          value={currency}
-                          onChange={(e) => setCurrency(e.target.value)}
-                          className="h-14 w-24 appearance-none rounded-2xl border border-black/10 bg-white px-4 pr-8 text-center text-lg font-bold text-neutral-900 outline-none transition hover:border-green-300 hover:bg-green-200 focus:border-green-400 focus:bg-green-200"
-                        >
-                          {supportedCurrencies.map((code) => (
-                            <option key={code} value={code}>
-                              {code}
-                            </option>
-                          ))}
-                        </select>
-
-                        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400">
-                          <svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.4"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="m6 9 6 6 6-6" />
-                          </svg>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-7 px-2 text-center">
-                    <p className="text-[10px] font-black uppercase tracking-[0.26em] text-neutral-400">
-                      Selected tour
-                    </p>
-
-                    <h3 className="mx-auto mt-2 max-w-5xl font-frank text-[2.85rem] font-black leading-[0.9] tracking-[-0.055em] text-neutral-950 sm:text-[3.9rem] md:text-[4.75rem] lg:text-[5.6rem]">
-                      {tour.title || tour.info}
-                    </h3>
-                  </div>
-
-                  <div className="mt-5 flex flex-wrap justify-center gap-2.5 sm:gap-3">
-                    {tourInfoPills.map((pill) => (
-                      <span
-                        key={`${pill.label}-${pill.value}`}
-                        className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold shadow-[0_8px_20px_rgba(0,0,0,0.035)] backdrop-blur-sm ${pill.className}`}
-                      >
-                        <span className="text-[9px] uppercase tracking-[0.18em] opacity-65">
-                          {pill.label}
-                        </span>
-                        <span>{pill.value}</span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
+              {/* BOOKING FORM */}
               <form id="booking-form" onSubmit={handleSubmit} className="grid gap-5">
                 {/* Traveller Details */}
                 <div className="rounded-[1.75rem] border border-black/5 bg-white p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/80 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
@@ -1732,26 +1978,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
                   </div>
                 </div>
 
-                {/* Private / Custom toggles */}
-                <div className="flex flex-col gap-3 lg:flex-row [&>button]:flex-1">
-                  <ToggleOption
-                    active={formData.isPrivate}
-                    title="Private tour"
-                    text="Book this as a private vehicle-based experience."
-                    price={`+ ${displayPrivateFee}`}
-                    icon="P"
-                    onClick={() => handleToggleOption("isPrivate")}
-                  />
 
-                  <ToggleOption
-                    active={formData.isCustom}
-                    title="Custom trip"
-                    text="Request custom planning, route timing, or special adjustments."
-                    price={`+ ${displayCustomFee}`}
-                    icon="C"
-                    onClick={() => handleToggleOption("isCustom")}
-                  />
-                </div>
 
                 {/* Group Size */}
                 <div className="rounded-[1.75rem] border border-black/5 bg-white p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/80 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
@@ -2110,159 +2337,52 @@ const Booking = ({ embeddedTour, bookingData }) => {
               </form>
             </div>
           </div>
+                    
+          <div
+            className="border-t border-black/5 bg-white/92 px-4 py-4 md:px-8 md:py-5"
+          >
+            <div>
+                {/* Private / Custom toggles */}
+                <div className="flex flex-col gap-3 lg:flex-row [&>button]:flex-1">
+                  <ToggleOption
+                    active={formData.isPrivate}
+                    title="Private tour"
+                    text="Book this as a private vehicle-based experience."
+                    price={`+ ${displayPrivateFee}`}
+                    icon="P"
+                    onClick={() => handleToggleOption("isPrivate")}
+                  />
 
+                  <ToggleOption
+                    active={formData.isCustom}
+                    title="Custom trip"
+                    text="Request custom planning, route timing, or special adjustments."
+                    price={`+ ${displayCustomFee}`}
+                    icon="C"
+                    onClick={() => handleToggleOption("isCustom")}
+                  />
+                  </div>
+            </div>
+          </div>
+          {/* CHECKOUT SUMMARY */}
           <div
             ref={checkoutRef}
             className="border-t border-black/5 bg-white/92 px-4 py-4 md:px-8 md:py-5"
           >
-            <div className="grid items-stretch gap-3 lg:grid-cols-[1fr_auto]">
-              <div className="rounded-2xl border border-black/10 bg-white p-4 text-neutral-950 shadow-[0_12px_30px_rgba(0,0,0,0.05)]">
-                <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-500">
-                      Checkout summary
-                    </p>
-
-                    <div className="mt-1 font-frank text-3xl font-bold leading-none text-neutral-950">
-                      {displayTotal}
-                    </div>
-
-                    <p className="mt-2 text-xs leading-5 text-neutral-500">
-                      {currency} estimate · final amount is recalculated securely at checkout.
-                    </p>
-                  </div>
-
-                  <div className="grid gap-2 sm:grid-cols-2 xl:min-w-[31rem]">
-                    <div className="rounded-2xl bg-neutral-50 p-3">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-400">
-                        Tour
-                      </p>
-                      <p className="mt-1 line-clamp-1 text-sm font-bold text-neutral-900">
-                        {tour.title || tour.info}
-                      </p>
-                    </div>
-
-                    <div className={`rounded-2xl p-3 transition ${contactDetailsComplete ? "bg-neutral-50" : "bg-neutral-100 opacity-55"}`}>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-400">
-                        Traveller
-                      </p>
-                      <p className={`mt-1 line-clamp-1 text-sm font-bold ${contactDetailsComplete ? "text-neutral-900" : "text-neutral-400"}`}>
-                        {contactDetailsComplete ? formData.fullName : "Details not completed"}
-                      </p>
-                    </div>
-
-                    <div className={`rounded-2xl p-3 transition ${dateDetailsComplete ? "bg-neutral-50" : "bg-neutral-100 opacity-55"}`}>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-400">
-                        Date
-                      </p>
-                      <p className={`mt-1 text-sm font-bold ${dateDetailsComplete ? "text-neutral-900" : "text-neutral-400"}`}>
-                        {formData.date || "Select date"}
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl bg-neutral-50 p-3">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-400">
-                        Guests
-                      </p>
-                      <p className="mt-1 text-sm font-bold text-neutral-900">
-                        {adultCount} adult{adultCount === 1 ? "" : "s"}
-                        {childCount > 0 ? ` · ${childCount} child${childCount === 1 ? "" : "ren"}` : ""}
-                      </p>
-                    </div>
-
-                    <div className={`rounded-2xl p-3 transition sm:col-span-2 ${pickupDetailsComplete ? "bg-neutral-50" : "bg-neutral-100 opacity-55"}`}>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-400">
-                        Pickup
-                      </p>
-                      <p className={`mt-1 line-clamp-1 text-sm font-bold ${pickupDetailsComplete ? "text-neutral-900" : "text-neutral-400"}`}>
-                        {formData.pickupLocation || "Choose pickup location"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 rounded-2xl border border-black/5 bg-stone-50 p-3">
-                  <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-5">
-                    <div className="rounded-xl bg-white p-3">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">
-                        Tour subtotal
-                      </p>
-                      <p className="mt-1 text-sm font-bold text-neutral-900">
-                        {displayPrice} × {participantCount} = {displayBaseSubtotal}
-                      </p>
-                    </div>
-
-                    <div className={`rounded-xl bg-white p-3 transition ${groupDiscountPercent > 0 ? "" : "opacity-55"}`}>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">
-                        Group discount
-                      </p>
-                      <p className={`mt-1 text-sm font-bold ${groupDiscountPercent > 0 ? "text-green-700" : "text-neutral-400"}`}>
-                        {groupDiscountPercent > 0
-                          ? `-${displayGroupDiscountAmount} · ${groupDiscountPercent}% off`
-                          : `No discount for ${participantCount} guest${participantCount === 1 ? "" : "s"}`}
-                      </p>
-                    </div>
-
-                    <div className="rounded-xl bg-white p-3">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">
-                        Tour total
-                      </p>
-                      <p className="mt-1 text-sm font-bold text-neutral-900">
-                        {displayDiscountedTourSubtotal}
-                      </p>
-                    </div>
-
-                    <div className={`rounded-xl bg-white p-3 transition ${formData.isPrivate ? "" : "opacity-55"}`}>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">
-                        Private tour fee
-                      </p>
-                      <p className={`mt-1 text-sm font-bold ${formData.isPrivate ? "text-green-700" : "text-neutral-400"}`}>
-                        {formData.isPrivate ? displayActivePrivateFee : "Not added"}
-                      </p>
-                    </div>
-
-                    <div className={`rounded-xl bg-white p-3 transition ${formData.isCustom ? "" : "opacity-55"}`}>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">
-                        Custom trip fee
-                      </p>
-                      <p className={`mt-1 text-sm font-bold ${formData.isCustom ? "text-blue-700" : "text-neutral-400"}`}>
-                        {formData.isCustom ? displayActiveCustomFee : "Not added"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-3 flex flex-col gap-2 rounded-xl bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="text-sm font-bold text-neutral-900">
-                        Secure checkout is next.
-                      </p>
-                      <p className="mt-1 text-xs leading-5 text-neutral-500">
-                        Payment opens after this form. Pickup and vehicle details are manually confirmed after payment.
-                      </p>
-                    </div>
-
-                    <div className="hidden flex-wrap gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500 sm:flex">
-                      <span className="rounded-full bg-neutral-50 px-3 py-1">Terms</span>
-                      <span className="rounded-full bg-neutral-50 px-3 py-1">Privacy</span>
-                      <span className="rounded-full bg-green-200 px-3 py-1 text-green-950">
-                        Powered by Stripe
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                form="booking-form"
-                className={`hero-gradient flex w-full items-center justify-center gap-3 rounded-2xl px-8 py-4 text-base font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl lg:flex-col lg:gap-2 ${
-                  isEmbedded ? "min-h-[4.6rem] lg:min-h-[8.75rem] lg:w-[15rem]" : "min-h-[5.5rem] lg:min-h-[9rem] lg:w-[15rem]"
-                }`}
-              >
-                <CheckoutCartIcon className="h-7 w-7 lg:h-10 lg:w-10" />
-                <span>Continue to checkout</span>
-              </button>
-            </div>
+          {/* Inside the component: */}
+            <CheckoutSummary
+              tour={tour}
+              adultCount={adultCount}
+              childCount={childCount}
+              formData={formData}
+              contactDetailsComplete={contactDetailsComplete}
+              dateDetailsComplete={dateDetailsComplete}
+              pickupDetailsComplete={pickupDetailsComplete}
+              isEmbedded={isEmbedded}
+              CheckoutCartIcon={CheckoutCartIcon}
+              checkoutRef={checkoutRef}
+            />
+            
           </div>
         </div>
 

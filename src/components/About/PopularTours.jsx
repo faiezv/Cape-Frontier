@@ -1,11 +1,12 @@
-import { forwardRef, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { forwardRef, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-import tours from '../../data/tours.js'
+import tours from '../../data/tours.js';
+import { resolveTourImage } from '../../utils/ImageLoader'; // adjust path as needed
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
 // ============================================================
 // 1. CATEGORY FALLBACKS + DATA HELPERS
@@ -38,37 +39,36 @@ const CATEGORY_META = {
     slug: 'packages',
     hasNewTour: true,
     description: 'Cape Peninsula routes, scenic stops and full-day highlights.',
-    image: '/images/tours/packages/peninsula-tour-1/cape-point/1.webp',
+    image: '/images/tours/packages/1.webp',
   },
-}
+};
 
 const FALLBACK_CATEGORIES = [
   CATEGORY_META.packages,
   CATEGORY_META.adrenaline,
   CATEGORY_META.hiking,
   CATEGORY_META.historical,
-
 ].map((category, index) => ({
   id: index + 1,
   count: 0,
   ...category,
-}))
+}));
 
 const normalizeSlug = (value = '') =>
   String(value)
     .trim()
     .toLowerCase()
     .replace(/_/g, '-')
-    .replace(/\s+/g, '-')
+    .replace(/\s+/g, '-');
 
 const getCategoryKey = (tour = {}) => {
-  const rawType = normalizeSlug(tour.type || tour.category || tour.collection || tour.group)
-  const rawTitle = normalizeSlug(tour.title || tour.name || '')
-  const searchText = `${rawType} ${rawTitle}`
+  const rawType = normalizeSlug(tour.type || tour.category || tour.collection || tour.group);
+  const rawTitle = normalizeSlug(tour.title || tour.name || '');
+  const searchText = `${rawType} ${rawTitle}`;
 
-  if (searchText.includes('wine') || searchText.includes('winery')) return 'packages'
-  if (searchText.includes('adrenaline') || searchText.includes('adventure')) return 'adrenaline'
-  if (searchText.includes('hiking') || searchText.includes('hike')) return 'hiking'
+  if (searchText.includes('wine') || searchText.includes('winery')) return 'packages';
+  if (searchText.includes('adrenaline') || searchText.includes('adventure')) return 'adrenaline';
+  if (searchText.includes('hiking') || searchText.includes('hike')) return 'hiking';
   if (
     searchText.includes('historical') ||
     searchText.includes('history') ||
@@ -76,12 +76,12 @@ const getCategoryKey = (tour = {}) => {
     searchText.includes('robben') ||
     searchText.includes('langa')
   ) {
-    return 'historical'
+    return 'historical';
   }
-  if (searchText.includes('package') || searchText.includes('peninsula')) return 'packages'
+  if (searchText.includes('package') || searchText.includes('peninsula')) return 'packages';
 
-  return CATEGORY_META[rawType] ? rawType : 'packages'
-}
+  return CATEGORY_META[rawType] ? rawType : 'packages';
+};
 
 const getTourImage = (tour = {}) =>
   tour.image ||
@@ -90,14 +90,14 @@ const getTourImage = (tour = {}) =>
   tour.images?.[0] ||
   tour.gallery?.[0] ||
   tour.stops?.find?.((stop) => stop?.images?.[0])?.images?.[0] ||
-  null
+  null;
 
 const buildCategoriesFromTours = () => {
-  if (!Array.isArray(tours) || tours.length === 0) return FALLBACK_CATEGORIES
+  if (!Array.isArray(tours) || tours.length === 0) return FALLBACK_CATEGORIES;
 
   const grouped = tours.reduce((acc, tour) => {
-    const key = getCategoryKey(tour)
-    const meta = CATEGORY_META[key] || CATEGORY_META.packages
+    const key = getCategoryKey(tour);
+    const meta = CATEGORY_META[key] || CATEGORY_META.packages;
 
     if (!acc[key]) {
       acc[key] = {
@@ -105,145 +105,133 @@ const buildCategoriesFromTours = () => {
         ...meta,
         count: 0,
         image: getTourImage(tour) || meta.image,
-      }
+      };
     }
 
-    acc[key].count += 1
+    acc[key].count += 1;
 
-    const image = getTourImage(tour)
+    const image = getTourImage(tour);
     if (image && (!acc[key].image || acc[key].image === meta.image)) {
-      acc[key].image = image
+      acc[key].image = image;
     }
 
-    return acc
-  }, {})
+    return acc;
+  }, {});
 
-  const preferredOrder = ['packages', 'adrenaline', 'hiking', 'historical']
+  const preferredOrder = ['packages', 'adrenaline', 'hiking', 'historical'];
   const ordered = preferredOrder
     .filter((key) => grouped[key])
     .map((key, index) => ({
       ...grouped[key],
       id: index + 1,
-    }))
+    }));
 
-  return ordered.length ? ordered : FALLBACK_CATEGORIES
-}
+  return ordered.length ? ordered : FALLBACK_CATEGORIES;
+};
 
 const useTouchLayout = () => {
   const [isTouchLayout, setIsTouchLayout] = useState(() => {
-    if (typeof window === 'undefined') return false
-
-    return window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches
-  })
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches;
+  });
 
   useEffect(() => {
     const update = () => {
-      setIsTouchLayout(window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches)
-    }
-
-    update()
-    window.addEventListener('resize', update)
-    window.addEventListener('orientationchange', update)
-
+      setIsTouchLayout(window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches);
+    };
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('orientationchange', update);
     return () => {
-      window.removeEventListener('resize', update)
-      window.removeEventListener('orientationchange', update)
-    }
-  }, [])
+      window.removeEventListener('resize', update);
+      window.removeEventListener('orientationchange', update);
+    };
+  }, []);
 
-  return isTouchLayout
-}
+  return isTouchLayout;
+};
 
 // ============================================================
 // 2. MAIN COMPONENT
 // ============================================================
 
 export default function PopularTours() {
-  const categories = useMemo(() => buildCategoriesFromTours(), [])
+  const categories = useMemo(() => buildCategoriesFromTours(), []);
 
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [desktopPage, setDesktopPage] = useState(0)
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [desktopPage, setDesktopPage] = useState(0);
 
-  const sectionRef = useRef(null)
-  const shellRef = useRef(null)
-  const eyebrowMaskRef = useRef(null)
-  const eyebrowRef = useRef(null)
-  const titleRef = useRef(null)
-  const copyRef = useRef(null)
-  const gridRef = useRef(null)
-  const mobileMainRef = useRef(null)
-  const mobileThumbRefs = useRef([])
-  const touchStartRef = useRef({ x: 0, y: 0 })
+  const sectionRef = useRef(null);
+  const shellRef = useRef(null);
+  const eyebrowMaskRef = useRef(null);
+  const eyebrowRef = useRef(null);
+  const titleRef = useRef(null);
+  const copyRef = useRef(null);
+  const gridRef = useRef(null);
+  const mobileMainRef = useRef(null);
+  const mobileThumbRefs = useRef([]);
+  const touchStartRef = useRef({ x: 0, y: 0 });
 
-  const isTouchLayout = useTouchLayout()
+  const isTouchLayout = useTouchLayout();
   const reduceMotion =
-    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const totalCategories = categories.length
-  const desktopItemsPerPage = 4
-  const desktopPageCount = Math.max(1, Math.ceil(totalCategories / desktopItemsPerPage))
-  const desktopStart = desktopPage * desktopItemsPerPage
-  const desktopCategories = categories.slice(desktopStart, desktopStart + desktopItemsPerPage)
+  const totalCategories = categories.length;
+  const desktopItemsPerPage = 4;
+  const desktopPageCount = Math.max(1, Math.ceil(totalCategories / desktopItemsPerPage));
+  const desktopStart = desktopPage * desktopItemsPerPage;
+  const desktopCategories = categories.slice(desktopStart, desktopStart + desktopItemsPerPage);
 
-  const activeCategory = categories[activeIndex] || categories[0]
-  const isPrevDisabled = desktopPage === 0
-  const isNextDisabled = desktopPage >= desktopPageCount - 1
+  const activeCategory = categories[activeIndex] || categories[0];
+  const isPrevDisabled = desktopPage === 0;
+  const isNextDisabled = desktopPage >= desktopPageCount - 1;
 
   const setActiveSafely = (nextIndex) => {
-    if (!totalCategories) return
-    setActiveIndex((nextIndex + totalCategories) % totalCategories)
-  }
+    if (!totalCategories) return;
+    setActiveIndex((nextIndex + totalCategories) % totalCategories);
+  };
 
   const handlePrevious = () => {
-    setDesktopPage((current) => Math.max(current - 1, 0))
-  }
+    setDesktopPage((current) => Math.max(current - 1, 0));
+  };
 
   const handleNext = () => {
-    setDesktopPage((current) => Math.min(current + 1, desktopPageCount - 1))
-  }
+    setDesktopPage((current) => Math.min(current + 1, desktopPageCount - 1));
+  };
 
   const handleMobilePrevious = () => {
-    setActiveSafely(activeIndex - 1)
-  }
+    setActiveSafely(activeIndex - 1);
+  };
 
   const handleMobileNext = () => {
-    setActiveSafely(activeIndex + 1)
-  }
+    setActiveSafely(activeIndex + 1);
+  };
 
   const handleTouchStart = (event) => {
-    const touch = event.touches[0]
-
-    touchStartRef.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-    }
-  }
+    const touch = event.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  };
 
   const handleTouchEnd = (event) => {
-    const touch = event.changedTouches[0]
-    const deltaX = touch.clientX - touchStartRef.current.x
-    const deltaY = touch.clientY - touchStartRef.current.y
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = touch.clientY - touchStartRef.current.y;
+    if (Math.abs(deltaX) < 40) return;
+    if (Math.abs(deltaY) > Math.abs(deltaX)) return;
+    if (deltaX < 0) handleMobileNext();
+    else handleMobilePrevious();
+  };
 
-    if (Math.abs(deltaX) < 40) return
-    if (Math.abs(deltaY) > Math.abs(deltaX)) return
-
-    if (deltaX < 0) handleMobileNext()
-    else handleMobilePrevious()
-  }
-
-  // Desktop/larger screen animation:
-  // - enter is a normal reveal
-  // - exit translates cards first, then fades them away in a stagger
-  // - reversible, so scrolling back into the section reveals it again
+  // ----- GSAP Animations (unchanged) -----
   useLayoutEffect(() => {
-    if (reduceMotion || isTouchLayout) return undefined
+    if (reduceMotion || isTouchLayout) return undefined;
 
     const ctx = gsap.context(() => {
-      const cards = gsap.utils.toArray('.popular-tour-card')
-      const cardImages = gsap.utils.toArray('.popular-tour-card img')
-      const navButtons = gsap.utils.toArray('.popular-tour-nav')
-      const dots = gsap.utils.toArray('.popular-tour-dot')
-      const headerItems = [eyebrowRef.current, titleRef.current, copyRef.current].filter(Boolean)
+      const cards = gsap.utils.toArray('.popular-tour-card');
+      const cardImages = gsap.utils.toArray('.popular-tour-card img');
+      const navButtons = gsap.utils.toArray('.popular-tour-nav');
+      const dots = gsap.utils.toArray('.popular-tour-dot');
+      const headerItems = [eyebrowRef.current, titleRef.current, copyRef.current].filter(Boolean);
 
       gsap.set(shellRef.current, {
         autoAlpha: 0,
@@ -252,22 +240,22 @@ export default function PopularTours() {
         clipPath: 'ellipse(54% 22% at 50% 0%)',
         transformOrigin: 'top center',
         willChange: 'transform, opacity, clip-path',
-      })
+      });
 
-      gsap.set(eyebrowMaskRef.current, { overflow: 'hidden' })
+      gsap.set(eyebrowMaskRef.current, { overflow: 'hidden' });
 
       gsap.set(eyebrowRef.current, {
         autoAlpha: 1,
         y: 42,
         scale: 0.96,
         willChange: 'transform',
-      })
+      });
 
       gsap.set([titleRef.current, copyRef.current], {
         autoAlpha: 0,
         y: 22,
         willChange: 'transform, opacity',
-      })
+      });
 
       gsap.set(cards, {
         autoAlpha: 0,
@@ -277,26 +265,26 @@ export default function PopularTours() {
         transformPerspective: 900,
         transformOrigin: 'center bottom',
         willChange: 'transform, opacity',
-      })
+      });
 
       gsap.set(cardImages, {
         scale: 1.16,
         yPercent: -2,
         transformOrigin: 'center center',
         willChange: 'transform',
-      })
+      });
 
       gsap.set(navButtons, {
         autoAlpha: 0,
         scale: 0.86,
         willChange: 'transform, opacity',
-      })
+      });
 
       gsap.set(dots, {
         autoAlpha: 0,
         y: 8,
         willChange: 'transform, opacity',
-      })
+      });
 
       const killActiveTweens = () => {
         gsap.killTweensOf([
@@ -308,16 +296,13 @@ export default function PopularTours() {
           ...cardImages,
           ...navButtons,
           ...dots,
-        ])
-      }
+        ]);
+      };
 
       const playEnter = () => {
-        killActiveTweens()
-
+        killActiveTweens();
         gsap
-          .timeline({
-            defaults: { ease: 'power2.out' },
-          })
+          .timeline({ defaults: { ease: 'power2.out' } })
           .to(shellRef.current, {
             autoAlpha: 1,
             y: 0,
@@ -351,26 +336,20 @@ export default function PopularTours() {
             0.36
           )
           .to(navButtons, { autoAlpha: 1, scale: 1, stagger: 0.06, duration: 0.22 }, 0.66)
-          .to(dots, { autoAlpha: 1, y: 0, stagger: 0.05, duration: 0.22 }, 0.7)
-      }
+          .to(dots, { autoAlpha: 1, y: 0, stagger: 0.05, duration: 0.22 }, 0.7);
+      };
 
       const playExit = () => {
-        killActiveTweens()
-
+        killActiveTweens();
         gsap
-          .timeline({
-            defaults: { ease: 'power2.inOut' },
-          })
+          .timeline({ defaults: { ease: 'power2.inOut' } })
           .to(
             cards,
             {
               y: -28,
               scale: 0.985,
               rotateX: 4,
-              stagger: {
-                each: 0.045,
-                from: 'start',
-              },
+              stagger: { each: 0.045, from: 'start' },
               duration: 0.26,
             },
             0
@@ -379,10 +358,7 @@ export default function PopularTours() {
             cards,
             {
               autoAlpha: 0,
-              stagger: {
-                each: 0.045,
-                from: 'start',
-              },
+              stagger: { each: 0.045, from: 'start' },
               duration: 0.2,
             },
             0.18
@@ -400,10 +376,9 @@ export default function PopularTours() {
               duration: 0.26,
             },
             0.36
-          )
-      }
+          );
+      };
 
-      // main animation er and exitent
       const trigger = ScrollTrigger.create({
         trigger: sectionRef.current,
         start: 'top 82%',
@@ -413,44 +388,29 @@ export default function PopularTours() {
         onEnterBack: playEnter,
         onLeave: playExit,
         onLeaveBack: playExit,
-      })
+      });
 
-      return () => trigger.kill()
-    }, sectionRef)
+      return () => trigger.kill();
+    }, sectionRef);
 
-    return () => ctx.revert()
-  }, [desktopPage, isTouchLayout, reduceMotion])
+    return () => ctx.revert();
+  }, [desktopPage, isTouchLayout, reduceMotion]);
 
-  // Mobile/touch animation:
-  // - fade in when the section enters
-  // - fade out only when it exits
-  // - reversible on scroll back
+  // Mobile fade in/out
   useLayoutEffect(() => {
-    if (reduceMotion || !isTouchLayout) return undefined
+    if (reduceMotion || !isTouchLayout) return undefined;
 
     const ctx = gsap.context(() => {
-      gsap.set(shellRef.current, {
-        autoAlpha: 0,
-        willChange: 'opacity',
-      })
+      gsap.set(shellRef.current, { autoAlpha: 0, willChange: 'opacity' });
 
       const fadeIn = () => {
-        gsap.killTweensOf(shellRef.current)
-        gsap.to(shellRef.current, {
-          autoAlpha: 1,
-          duration: 0.28,
-          ease: 'power2.out',
-        })
-      }
-
+        gsap.killTweensOf(shellRef.current);
+        gsap.to(shellRef.current, { autoAlpha: 1, duration: 0.28, ease: 'power2.out' });
+      };
       const fadeOut = () => {
-        gsap.killTweensOf(shellRef.current)
-        gsap.to(shellRef.current, {
-          autoAlpha: 0,
-          duration: 0.22,
-          ease: 'power2.inOut',
-        })
-      }
+        gsap.killTweensOf(shellRef.current);
+        gsap.to(shellRef.current, { autoAlpha: 0, duration: 0.22, ease: 'power2.inOut' });
+      };
 
       const trigger = ScrollTrigger.create({
         trigger: sectionRef.current,
@@ -461,21 +421,20 @@ export default function PopularTours() {
         onEnterBack: fadeIn,
         onLeave: fadeOut,
         onLeaveBack: fadeOut,
-      })
+      });
 
-      return () => trigger.kill()
-    }, sectionRef)
+      return () => trigger.kill();
+    }, sectionRef);
 
-    return () => ctx.revert()
-  }, [isTouchLayout, reduceMotion])
+    return () => ctx.revert();
+  }, [isTouchLayout, reduceMotion]);
 
-  // Mobile active card transition.
+  // Mobile active card transition
   useLayoutEffect(() => {
-    if (!isTouchLayout || !mobileMainRef.current || reduceMotion) return undefined
+    if (!isTouchLayout || !mobileMainRef.current || reduceMotion) return undefined;
 
     const ctx = gsap.context(() => {
-      gsap.killTweensOf(mobileMainRef.current)
-
+      gsap.killTweensOf(mobileMainRef.current);
       gsap.fromTo(
         mobileMainRef.current,
         {
@@ -492,31 +451,22 @@ export default function PopularTours() {
           duration: 0.32,
           ease: 'power3.out',
         }
-      )
+      );
 
-      const thumbs = mobileThumbRefs.current.filter(Boolean)
-
+      const thumbs = mobileThumbRefs.current.filter(Boolean);
       if (thumbs.length) {
         gsap.fromTo(
           thumbs,
-          {
-            autoAlpha: 0,
-            y: 8,
-          },
-          {
-            autoAlpha: 1,
-            y: 0,
-            stagger: 0.035,
-            duration: 0.22,
-            ease: 'power2.out',
-          }
-        )
+          { autoAlpha: 0, y: 8 },
+          { autoAlpha: 1, y: 0, stagger: 0.035, duration: 0.22, ease: 'power2.out' }
+        );
       }
-    }, sectionRef)
+    }, sectionRef);
 
-    return () => ctx.revert()
-  }, [activeIndex, isTouchLayout, reduceMotion])
+    return () => ctx.revert();
+  }, [activeIndex, isTouchLayout, reduceMotion]);
 
+  // ----- JSX with resolved images -----
   return (
     <section
       ref={sectionRef}
@@ -529,7 +479,7 @@ export default function PopularTours() {
       >
         <div className="pointer-events-none absolute inset-x-6 top-5 h-24 rounded-full bg-green-200/25 blur-3xl md:inset-x-8 md:top-6 md:h-28" />
 
-        {/* Section Header */}
+        {/* Header */}
         <div className="relative z-10 text-center font-bitter">
           <div className="flex flex-col items-center">
             <div ref={eyebrowMaskRef} className="relative overflow-hidden px-2 py-2">
@@ -540,14 +490,12 @@ export default function PopularTours() {
                 Curated Experiences
               </span>
             </div>
-
             <h2
               ref={titleRef}
               className="mt-1 font-frank text-3xl font-semibold text-black sm:text-4xl md:mt-2 md:text-5xl"
             >
               Popular Tours
             </h2>
-
             <p
               ref={copyRef}
               className="my-3 max-w-md font-mont text-sm font-light leading-tight text-black/70 sm:my-4 sm:text-base"
@@ -557,7 +505,7 @@ export default function PopularTours() {
           </div>
         </div>
 
-        {/* Mobile compact active-card layout */}
+        {/* Mobile layout */}
         <div
           className="relative z-10 -mx-4 mt-3 md:hidden"
           onTouchStart={handleTouchStart}
@@ -565,7 +513,10 @@ export default function PopularTours() {
         >
           <MobileCategoryCard
             ref={mobileMainRef}
-            category={activeCategory}
+            category={{
+              ...activeCategory,
+              image: resolveTourImage(activeCategory.image),
+            }}
             currentIndex={activeIndex}
             total={totalCategories}
             onPrevious={handleMobilePrevious}
@@ -574,13 +525,13 @@ export default function PopularTours() {
 
           <div className="mx-4 mt-3 grid grid-cols-4 gap-2">
             {categories.slice(0, 4).map((category, index) => {
-              const isActive = activeIndex === index
-
+              const isActive = activeIndex === index;
+              const resolvedImg = resolveTourImage(category.image);
               return (
                 <button
                   key={category.slug}
                   ref={(el) => {
-                    mobileThumbRefs.current[index] = el
+                    mobileThumbRefs.current[index] = el;
                   }}
                   type="button"
                   onClick={() => setActiveSafely(index)}
@@ -592,20 +543,18 @@ export default function PopularTours() {
                   aria-label={`Show ${category.name}`}
                 >
                   <img
-                    src={category.image}
+                    src={resolvedImg}
                     alt=""
                     loading="lazy"
                     decoding="async"
                     className="absolute inset-0 h-full w-full object-cover"
                   />
-
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-
                   <span className="absolute bottom-1.5 left-1.5 right-1.5 truncate font-bitter text-[9px] font-black uppercase tracking-[0.08em] text-white">
                     {category.name}
                   </span>
                 </button>
-              )
+              );
             })}
           </div>
 
@@ -619,10 +568,9 @@ export default function PopularTours() {
                 Browse more categories
                 <ChevronRight className="h-4 w-4" />
               </button>
-
               <div className="mt-2 flex items-center justify-center gap-2 rounded-2xl border border-blue-100 bg-blue-50 px-3 py-2">
                 <img
-                  src="./icons/info.png"
+                  src="/icons/info.png"
                   className="h-4 w-4 shrink-0 object-contain"
                   alt=""
                   aria-hidden="true"
@@ -639,7 +587,13 @@ export default function PopularTours() {
         <div ref={gridRef} className="relative z-10 mt-4 hidden md:block">
           <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
             {desktopCategories.map((category) => (
-              <CategoryCard key={category.slug} category={category} />
+              <CategoryCard
+                key={category.slug}
+                category={{
+                  ...category,
+                  image: resolveTourImage(category.image),
+                }}
+              />
             ))}
           </div>
 
@@ -658,7 +612,6 @@ export default function PopularTours() {
               >
                 <ChevronLeft className="h-5 w-5 text-black/80" />
               </button>
-
               <button
                 type="button"
                 onClick={handleNext}
@@ -679,8 +632,7 @@ export default function PopularTours() {
         {desktopPageCount > 1 && (
           <div className="relative z-10 mt-8 hidden justify-center gap-2 md:flex">
             {Array.from({ length: desktopPageCount }).map((_, index) => {
-              const isActive = index === desktopPage
-
+              const isActive = index === desktopPage;
               return (
                 <button
                   key={index}
@@ -691,13 +643,13 @@ export default function PopularTours() {
                   }`}
                   aria-label={`Go to page ${index + 1}`}
                 />
-              )
+              );
             })}
           </div>
         )}
       </div>
     </section>
-  )
+  );
 }
 
 // ============================================================
@@ -705,17 +657,10 @@ export default function PopularTours() {
 // ============================================================
 
 const MobileCategoryCard = forwardRef(function MobileCategoryCard(
-  {
-    category,
-    currentIndex,
-    total,
-    onPrevious,
-    onNext,
-  },
+  { category, currentIndex, total, onPrevious, onNext },
   ref
 ) {
-  const { name, hasNewTour, description, image } = category
-
+  const { name, hasNewTour, description, image } = category;
   return (
     <article
       ref={ref}
@@ -728,15 +673,12 @@ const MobileCategoryCard = forwardRef(function MobileCategoryCard(
         decoding="async"
         className="absolute inset-0 h-full w-full object-cover"
       />
-
       <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/25 to-blue-950/90" />
-
       <div className="relative z-10 flex min-h-[23rem] flex-col justify-end px-5 py-5">
         <div className="mb-auto flex items-start justify-between gap-3">
           <span className="rounded-full border border-white/15 bg-white/12 px-3 py-1 font-bitter text-[10px] font-black uppercase tracking-[0.14em] text-white backdrop-blur-sm">
             {currentIndex + 1} / {total}
           </span>
-
           <div className="flex max-w-[58%] flex-wrap justify-end gap-1.5">
             {hasNewTour && (
               <span className="rounded-full bg-red-500 px-3 py-1 font-bitter text-[9px] font-black uppercase tracking-[0.12em] text-white shadow-lg">
@@ -745,17 +687,11 @@ const MobileCategoryCard = forwardRef(function MobileCategoryCard(
             )}
           </div>
         </div>
-
         <h3 className="font-bitter text-3xl font-black uppercase tracking-wide text-white drop-shadow-sm">
           {name}
         </h3>
-
         <div className="my-3 h-px w-12 bg-green-200/80" />
-
-        <p className="max-w-[90%] font-mont text-sm leading-snug text-white/82">
-          {description}
-        </p>
-
+        <p className="max-w-[90%] font-mont text-sm leading-snug text-white/82">{description}</p>
         <div className="mt-5 flex items-center gap-2">
           <button
             type="button"
@@ -765,7 +701,6 @@ const MobileCategoryCard = forwardRef(function MobileCategoryCard(
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
-
           <button
             type="button"
             onClick={onNext}
@@ -774,7 +709,6 @@ const MobileCategoryCard = forwardRef(function MobileCategoryCard(
           >
             <ChevronRight className="h-5 w-5" />
           </button>
-
           <a
             href="#featured-tours"
             className="ml-auto rounded-full bg-green-200 px-4 py-3 font-bitter text-xs font-black uppercase tracking-[0.12em] text-green-950"
@@ -784,16 +718,15 @@ const MobileCategoryCard = forwardRef(function MobileCategoryCard(
         </div>
       </div>
     </article>
-  )
-})
+  );
+});
 
 // ============================================================
 // 4. DESKTOP CATEGORY CARD COMPONENT
 // ============================================================
 
 function CategoryCard({ category }) {
-  const { name, hasNewTour, description, image } = category
-
+  const { name, hasNewTour, description, image } = category;
   return (
     <article className="popular-tour-card group relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] bg-black">
       <div className="absolute inset-0 overflow-hidden rounded-[2rem]">
@@ -804,10 +737,8 @@ function CategoryCard({ category }) {
           decoding="async"
           className="absolute inset-0 block h-full min-h-full w-full min-w-full object-cover transition-transform duration-700 ease-out will-change-transform group-hover:scale-110"
         />
-
         <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/10 to-blue-950/85 transition-opacity duration-500 group-hover:opacity-90" />
       </div>
-
       <div className="relative z-10 flex h-full flex-col items-center justify-end p-6 text-center">
         <div className="mb-auto flex w-full items-start justify-end gap-2">
           {hasNewTour && (
@@ -816,21 +747,17 @@ function CategoryCard({ category }) {
             </div>
           )}
         </div>
-
         <h3 className="font-bitter text-2xl font-bold uppercase tracking-wide text-white drop-shadow-sm">
           {name}
         </h3>
-
         <div className="my-3 h-px w-8 bg-white/50 transition-all duration-500 group-hover:w-14 group-hover:bg-green-200" />
-
         <p className="max-w-[88%] translate-y-3 font-mont text-xs font-light leading-tight text-white/80 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100 md:text-sm">
           {description}
         </p>
       </div>
-
       <div className="absolute bottom-4 left-4 z-20 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
         <div className="h-px w-8 bg-green-200/80" />
       </div>
     </article>
-  )
+  );
 }

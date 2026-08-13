@@ -2,12 +2,15 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import DatePicker from 'react-datepicker'
 import gsap from 'gsap'
+
+import { resolveTourImage } from '../../utils/ImageLoader.js';
 import tours from '../../data/tours.js'
 import 'react-datepicker/dist/react-datepicker.css'
 
 import { useNavigate } from 'react-router-dom'
 import { useLoadingNavigate } from "../useLoadingNavigate.jsx"
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
 
 // -----------------------------------------------------------------------------
 // data helpers (unchanged)
@@ -29,17 +32,27 @@ const getTourTitle = (tour) => {
 }
 
 const getTourImage = (tour) => {
-  if (typeof tour === 'string') return './images/content/random/1.webp'
+  // Fallback for string tours (like FALLBACK_TOURS)
+  if (typeof tour === 'string') {
+    return fallbackUrl; // you can import a fallback directly
+  }
 
-  return (
+  // Extract the image path from the tour data
+  let imagePath =
     tour?.image ||
     tour?.img ||
     tour?.cover ||
-    tour?.gallery?.[0] ||
-    tour?.images?.[0] ||
-    './images/content/random/1.webp'
-  )
-}
+    (tour?.gallery && tour.gallery[0]) ||
+    (tour?.images && tour.images[0]);
+
+  // If the tour has an imageFolder but no specific file, try "1.webp"
+  if (!imagePath && tour.imageFolder) {
+    imagePath = `/src/assets/images/tours/${tour.imageFolder}/1.webp`;
+  }
+
+  return resolveTourImage(imagePath);
+};
+
 
 const getTourLocation = (tour) => {
   if (typeof tour === 'string') return 'Cape Town, South Africa'

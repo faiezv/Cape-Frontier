@@ -242,7 +242,6 @@ const VehicleOptionCard = ({ vehicle }) => (
   </div>
 );
 
-
 const RevealButton = ({ active, title, detail, onClick }) => (
   <button
     type="button"
@@ -292,7 +291,6 @@ const RevealPanel = ({ open, children }) => {
     </div>
   );
 };
-
 
 const generateBookingReference = () => {
   const random = Math.random().toString(36).slice(2, 10).toUpperCase();
@@ -501,7 +499,6 @@ const CheckoutForm = ({
               {totalAmountLabel}
             </p>
           </div>
-
         </div>
 
         <p className="mt-3 text-xs leading-5 text-slate-500">
@@ -637,11 +634,6 @@ const CheckoutPaystack = () => {
 
     if (Math.abs(deltaY) < 1) return;
 
-    /*
-      The payment panel is manually pinned on desktop. This handler keeps wheel
-      scrolling smooth when the cursor is over the pinned payment card, without
-      trapping the page scroll.
-    */
     event.preventDefault();
     event.stopPropagation();
 
@@ -750,7 +742,7 @@ const CheckoutPaystack = () => {
   /*
     Manual GSAP pin for the payment column.
     This avoids ScrollTrigger's built-in pin mechanics, which can fail in this
-    project because of transformed smooth-scroll wrappers, grid layout, and Stripe
+    project because of transformed smooth-scroll wrappers, grid layout, and Paystack
     iframes. We use GSAP to set the payment column to relative / fixed / absolute
     based on scroll position. This has proven more reliable than CSS sticky here.
   */
@@ -1188,7 +1180,6 @@ const CheckoutPaystack = () => {
     );
   }
 
-
   return (
     <div
       ref={pageRef}
@@ -1230,10 +1221,12 @@ const CheckoutPaystack = () => {
           </div>
 
           <div ref={checkoutGridRef} className="grid overflow-visible gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.82fr)] lg:items-start lg:gap-6">
+            {/* LEFT COLUMN – unchanged */}
             <section
               ref={leftRef}
               className="order-2 overflow-hidden rounded-[1.65rem] bg-white/92 shadow-[0_20px_60px_rgba(7,31,79,0.08)] lg:order-1 lg:rounded-[2rem]"
             >
+              {/* ... (same as before, exactly as provided) ... */}
               <div className="relative min-h-[190px] overflow-hidden bg-slate-900 sm:min-h-[230px] md:min-h-[290px]">
                 <img
                   src={tour.image}
@@ -1264,7 +1257,7 @@ const CheckoutPaystack = () => {
 
               <div className="space-y-4 p-4 md:p-6 lg:p-7">
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-[1.5rem] bg-[#071f4f] p-4 text-white shadow-[0_16px_38px_rgba(7,31,79,0.16)] sm:p-5">
+                  {/* <div className="rounded-[1.5rem] bg-[#071f4f] p-4 text-white shadow-[0_16px_38px_rgba(7,31,79,0.16)] sm:p-5">
                     <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">
                       Pickup
                     </p>
@@ -1290,11 +1283,11 @@ const CheckoutPaystack = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
-                  <div className="rounded-[1.5rem] bg-white p-4 shadow-[0_14px_34px_rgba(7,31,79,0.05)] sm:p-5">
+                  {/* <div className="rounded-[1.5rem] bg-white p-4 shadow-[0_14px_34px_rgba(7,31,79,0.05)] sm:p-5">
                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                      Main participant
+                      Main participants
                     </p>
 
                     <p className="mt-2 font-frank text-2xl leading-none text-slate-950">
@@ -1316,7 +1309,7 @@ const CheckoutPaystack = () => {
                         ))}
                       </div>
                     )}
-                  </div>
+                  </div> */}
                 </div>
 
                 {Object.values(openPanels).some(Boolean) && (
@@ -1362,6 +1355,7 @@ const CheckoutPaystack = () => {
                   />
                 </div>
 
+                {/* Panels (same as before) */}
                 <RevealPanel open={openPanels.trip}>
                   <div className="grid gap-4 lg:grid-cols-[1fr_0.8fr]">
                     <div className="rounded-[1.5rem] bg-stone-50 p-5">
@@ -1655,6 +1649,7 @@ const CheckoutPaystack = () => {
               </div>
             </section>
 
+            {/* RIGHT COLUMN – UPDATED with header */}
             <div ref={rightColumnRef} className="order-1 relative min-h-[1px] w-full self-start lg:order-2">
               <div ref={rightPinRef} className="relative h-fit w-full">
                 <aside
@@ -1662,6 +1657,38 @@ const CheckoutPaystack = () => {
                   onWheel={handlePaymentPanelWheel}
                   className="h-fit max-h-[calc(100svh-1rem)] overflow-visible rounded-[1.5rem] border border-white/75 bg-white/95 shadow-[0_20px_56px_rgba(7,31,79,0.085)] backdrop-blur-xl lg:rounded-[2rem]"
                 >
+                  {/* --- NEW HEADER: Pickup + Main Participant --- */}
+                  <div className="border-b border-slate-100/90 bg-white/80 px-4 py-3 sm:px-5 sm:py-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#071f4f]/10">
+                          <svg className="h-4 w-4 text-[#071f4f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </span>
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Pickup</p>
+                          <p className="text-sm font-bold leading-none text-slate-900">{pickupTimeLabel}</p>
+                          <p className="text-xs text-slate-500">{bookingDetails.date || "Date TBC"}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#071f4f]/10">
+                          <svg className="h-4 w-4 text-[#071f4f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Main participant</p>
+                          <p className="truncate text-sm font-bold leading-none text-slate-900">{bookingDetails.fullName || "Not provided"}</p>
+                          <p className="truncate text-xs text-slate-500">{bookingDetails.email || "No email"}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* --- PAYMENT FORM (unchanged) --- */}
                   <div
                     onPointerDown={() => setPaymentCompact(true)}
                     onMouseEnter={() => setPaymentCompact(true)}
@@ -1669,15 +1696,6 @@ const CheckoutPaystack = () => {
                     className="space-y-3 overflow-visible p-3 pb-5 sm:p-4 sm:pb-6 md:p-5 md:pb-7"
                   >
                     <div className="flex items-center justify-center gap-3 px-1">
-                      {/* <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#071f4f]/55">
-                          Final step
-                        </p>
-                        <h2 className="mt-1 font-frank text-2xl font-black leading-none text-[#071f4f]">
-                          Secure payment
-                        </h2>
-                      </div> */}
-
                       <img
                         src="/icons/paystack-logo.svg"
                         alt="Paystack"

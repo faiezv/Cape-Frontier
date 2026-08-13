@@ -153,7 +153,7 @@ function ToursBanner() {
       <div className="mt-7 grid items-stretch gap-4 md:mt-9 lg:grid-cols-[0.9fr_1.1fr]">
         <figure className="cf-tours-intro-item relative hidden min-h-[330px] overflow-hidden rounded-[2rem] bg-[#071f4f] shadow-[0_24px_70px_rgba(7,31,79,0.12)] md:block">
           <img
-            src="/images/content/random/7.webp"
+            src="/src/assets/images/content/random/7.webp"
             alt="Cape Frontier scenic tour preview"
             className="absolute inset-0 h-full w-full object-cover"
             loading="lazy"

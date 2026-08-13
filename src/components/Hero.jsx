@@ -6,12 +6,11 @@ import TourSelect from './Tours/TourSelect.jsx'
 gsap.registerPlugin(ScrollTrigger)
 
 const slides = [
-  { image: './images/content/random/kaap.png', location: 'Bo-Kaap, Cape Town' },
-  { image: './images/content/random/1.webp', location: 'Bo-Kaap, Cape Town' },
-  { image: './images/content/random/2.webp', location: 'Camps Bay' },
-  { image: './images/content/random/3.webp', location: 'Cape Point' },
-  { image: './images/content/random/4.webp', location: 'Cape Winelands' },
-  { image: './images/content/random/5.webp', location: 'Bo-Kaap, Cape Town' },
+  { image: '/src/assets/images/content/hero/kaap.png', location: 'Bo-Kaap, Cape Town' },
+  { image: '/src/assets/images/tours/adrenaline/cobra/1.webp', location: 'Cobra Sundowner, Cape Town' },
+  { image: '/src/assets/images/content/hero/1.webp', location: 'Simon\'s Town, Cape Town' },
+  { image: '/src/assets/images/tours/adrenaline/cobra/2.webp', location: 'Cobra Sundowner, Cape Town' },
+  { image: '/src/assets/images/content/hero/landing.webp', location: 'Cape Town' },
 ]
 
 const trustItems = [

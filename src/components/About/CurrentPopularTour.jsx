@@ -4,7 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const promotedTour = "./images/tours/hiking/platteklip/1.webp"
+const promotedTour = "src/assets/images/tours/hiking/platteklip/1.webp"
 
 const ClassicTourBanner = () => {
   const bannerRef = useRef(null)
