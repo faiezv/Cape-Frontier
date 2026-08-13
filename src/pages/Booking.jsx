@@ -1276,6 +1276,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
       },
     });
   };
+  
 
   if (!tour) return null;
 
@@ -1389,7 +1390,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
                       }`}
                     >
                       <img
-                        src={img}
+                        src={resolveImage(img)}
                         alt={`${tour.title || tour.info} ${index + 1}`}
                         className="h-full w-full object-cover"
                         onError={handleImageError}
