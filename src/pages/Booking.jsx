@@ -3,6 +3,7 @@
 
 import CheckoutSummary from '../components/CheckoutSummary';
 
+
 import React, {
   useEffect,
   useLayoutEffect,
@@ -13,6 +14,7 @@ import React, {
 import { useLocation, useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import allTours from "../data/tours.js";
+import { resolveImage } from '../utils/ImageLoader';
 
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -1334,7 +1336,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
               <div className="relative h-[380px] overflow-hidden md:h-[460px] lg:h-[680px]">
                 <img
                   ref={activeImageRef}
-                  src={activeImageSrc}
+                  src={resolveImage(activeImageSrc)}
                   alt={tour.title || tour.info}
                   className="h-full w-full object-cover"
                   onError={handleImageError}
