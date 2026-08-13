@@ -13,7 +13,7 @@ import { tours } from "../data/tours";
 import Booking from "./Booking";
 import ContactPlatforms from "/src/components/ContactPlatforms.jsx";
 import { useLoadingNavigate } from "/src/components/useLoadingNavigate.jsx";
-import { resolveImage } from "../utils/ImageLoader";
+import { resolveTourImage as resolveImage } from "../utils/ImageLoader";
 
 // Shared
 import TourHero from "../components/TourDetails/TourHero";
