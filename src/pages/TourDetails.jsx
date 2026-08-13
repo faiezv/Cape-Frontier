@@ -13,6 +13,7 @@ import { tours } from "../data/tours";
 import Booking from "./Booking";
 import ContactPlatforms from "/src/components/ContactPlatforms.jsx";
 import { useLoadingNavigate } from "/src/components/useLoadingNavigate.jsx";
+import { resolveImage } from "../utils/ImageLoader";
 
 // Shared
 import TourHero from "../components/TourDetails/TourHero";
@@ -1305,7 +1306,7 @@ function RelatedTourCard({ tour, onClick }) {
       className="group flex w-full items-center gap-3 rounded-[1rem] border border-blue-100 bg-white p-2 text-left transition hover:-translate-y-0.5 hover:border-blue-200"
     >
       <img
-        src={tour.image}
+        src={resolveImage(tour.image)}
         alt=""
         className="h-14 w-16 shrink-0 rounded-[0.8rem] object-cover"
         loading="lazy"
@@ -1589,7 +1590,7 @@ function ItineraryImageFrame({ stop, index }) {
 
       {mainImage ? (
         <img
-          src={mainImage}
+          src={resolveImage(mainImage)}
           alt={`${stop.name} main`}
           loading="lazy"
           decoding="async"
@@ -1642,7 +1643,7 @@ function MobileItineraryCarousel({ stops }) {
             >
               {mainImage ? (
                 <img
-                  src={mainImage}
+                  src={resolveImgae(mainImage)}
                   alt={`${stop.name} preview`}
                   loading="lazy"
                   decoding="async"
