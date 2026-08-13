@@ -1,5 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import reviews from "../../data/reviews.js";
+import { resolveImage } from "../../utils/ImageLoader.js";
+import goIcon from "/public/icons/go.png";
 
 const StarRating = ({ rating = 5, size = "w-5 h-5" }) => {
   const filledStars = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
@@ -46,7 +48,7 @@ const ReviewMeta = ({ review }) => {
     <div className="mt-auto flex items-center justify-between border-t border-green-300/50 pt-3">
       <div className="flex min-w-0 items-center gap-3">
         <img
-          src={review.avatar}
+          src={resolveImage(review.avatar)}
           alt={review.name}
           className="h-9 w-9 shrink-0 rounded-full border-2 border-white object-cover shadow-sm lg:h-10 lg:w-10"
           loading="lazy"
@@ -203,7 +205,7 @@ const TestimonialsSection = () => {
                 </div>
 
                 <div className="relative h-40 overflow-hidden md:h-48">
-                  <TourReviewImage src={review.img} alt={review.tour} />
+                  <TourReviewImage src={resolveImage(review.img)} alt={review.tour} />
 
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10" />
 
@@ -296,7 +298,7 @@ const TestimonialsSection = () => {
               See <b>all reviews</b>
             </p>
 
-            <img src="/icons/go.png" alt="" />
+            <img src={goIcon} alt="" />
           </button>
         </div>
       </div>

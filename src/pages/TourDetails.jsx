@@ -14,6 +14,30 @@ import Booking from "./Booking";
 import ContactPlatforms from "/src/components/ContactPlatforms.jsx";
 import { useLoadingNavigate } from "/src/components/useLoadingNavigate.jsx";
 
+// Shared
+import TourHero from "../components/TourDetails/TourHero";
+import TourQuickInfo from "../components/TourDetails/TourQuickInfo";
+import TourPricing from "../components/TourDetails/TourPricing";  
+import AdditionalPricing from "../components/TourDetails/TourAdditionalPricing";
+import TourGroupPricing from "../components/TourDetails/TourGroupPricing";
+import TourGallery from "../components/TourDetails/TourGallery";
+import TourIncludedExcluded from "../components/TourDetails/TourIncludedExcluded";
+import TourHighlights from "../components/TourDetails/TourHighlights";
+import TourRequirements from "../components/TourDetails/TourRequirements";
+import Arrangements from "../components/TourDetails/Arrangements";
+import TourWeatherPolicy from "../components/TourDetails/TourWeatherPolicy";
+import TourCancellationPolicy from "../components/TourDetails/TourCancellationPolicy"
+import TourSafetyPolicy from "../components/TourDetails/TourSafetyPolicy";
+
+// Cobra
+import VehicleDetails from "../components/TourDetails/VehicleDetails";
+import RouteInformation from "../components/TourDetails/RouteInformation";
+import SecurityAndLiability from "../components/TourDetails/SecurityAndLiability";
+
+// Multi-Day
+import TourItinerary from "../components/TourDetails/TourItinerary";
+import TourFAQ from "../components/TourDetails/TourFAQ";
+
 gsap.registerPlugin(ScrollToPlugin, ScrollTrigger);
 
 const PIN_TOP_OFFSET = 96;
@@ -628,205 +652,124 @@ export default function TourDetails() {
         }
       `}</style>
       {/* HERO */}
-      <section className="relative min-h-[68svh] overflow-hidden bg-black text-white sm:min-h-[70svh] lg:min-h-[88vh]">
-        <img
-          src={tour.image}
-          alt={tour.title}
-          className="absolute inset-0 h-full w-full object-cover object-center"
-          fetchPriority="high"
-          decoding="async"
-        />
+      <TourHero tour={tour} />
 
-        <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.92),rgba(0,0,0,0.52),rgba(0,0,0,0.16))]" />
+      {/* QUICK INFO BAR*/}
+      <TourQuickInfo 
+        tour={tour}
+        formatMoney={formatMoney} 
+        formatCompactMoney={formatCompactMoney} 
+        getShortLocation={getShortLocation} 
+        PriceIcon={PriceIcon} MapPinIcon={MapPinIcon} DurationIcon={DurationIcon} RatingIcon={RatingIcon} />
 
-        <div className="relative z-10 mx-auto flex min-h-[68svh] max-w-6xl items-end justify-center px-4 pb-14 pt-24 text-center sm:min-h-[70svh] sm:px-5 sm:pb-14 lg:min-h-[88vh] lg:items-center lg:py-16">
-          <div className="flex max-w-4xl flex-col items-center justify-center">
-            <div className="mb-4 flex flex-wrap justify-center gap-2 lg:mb-5">
-              {heroBadges.map((badge, index) => (
-                <span
-                  key={badge}
-                  className={
-                    index === 0
-                      ? "rounded-full bg-green-200 px-3 py-1.5 font-bitter text-[11px] font-semibold text-green-950 lg:px-4 lg:text-xs"
-                      : "rounded-full border border-white/20 bg-white/15 px-3 py-1.5 font-bitter text-[11px] backdrop-blur-md lg:px-4 lg:text-xs"
-                  }
-                >
-                  {badge}
-                </span>
-              ))}
-            </div>
-
-            <h1 className="max-w-[22rem] font-frank text-[2.45rem] font-bold leading-[0.92] sm:max-w-3xl sm:text-5xl md:text-6xl lg:text-7xl">
-              {tour.title}
-            </h1>
-
-            <p className="mt-4 max-w-[22rem] font-bitter text-sm leading-relaxed text-white/75 sm:max-w-xl md:text-base lg:max-w-2xl">
-              {tour.description}
-            </p>
-
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3 lg:mt-8">
-              <button
-                onClick={scrollToBooking}
-                className="hero-gradient rounded-full px-6 py-3 font-bitter text-sm font-semibold text-white shadow-lg transition-all active:scale-95 lg:px-7"
-              >
-                <span className="sm:hidden">Book</span>
-                <span className="hidden sm:inline">Book this tour</span>
-              </button>
-
-              <button
-                onClick={scrollToItinerary}
-                className="hidden rounded-full border border-white/20 bg-white/10 px-7 py-3 font-bitter text-sm font-semibold backdrop-blur-md transition-all hover:bg-white/20 md:inline-flex"
-              >
-                View route
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* QUICK INFO */}
-      <section className="relative z-20 mx-auto -mt-7 max-w-6xl px-4 lg:-mt-10 lg:px-5">
-        <div className="grid grid-cols-2 gap-2 rounded-[1rem] border border-blue-100 bg-blue-50/90 p-2 shadow-[0_18px_60px_rgba(37,99,235,0.12)] backdrop-blur sm:grid-cols-4 lg:gap-3 lg:rounded-[1.35rem] lg:bg-white lg:p-4">
-          <InfoCard
-            icon={<PriceIcon />}
-            label="From"
-            value={`${formatMoney(tour.priceBase)} pp`}
-            mobileValue={`${formatCompactMoney(tour.priceBase)} pp`}
-          />
-
-          <InfoCard
-            icon={<MapPinIcon />}
-            label="Location"
-            value={tour.location}
-            mobileValue={getShortLocation(tour.location)}
-          />
-
-          <InfoCard
-            icon={<DurationIcon />}
-            label="Duration"
-            value={tour.duration}
-            mobileValue={tour.duration}
-          />
-
-          <InfoCard
-            icon={<RatingIcon />}
-            label="Rating"
-            value={`${tour.rating} / 5`}
-            mobileValue={`${tour.rating}`}
-          />
-        </div>
-      </section>
-
-      {/* TOUR CONTENT */}
+      {/* TOUR CONTENT: PRICING,  */}
       <section
         ref={desktopContentSectionRef}
         className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 pt-12 pb-12 sm:px-5 lg:px-5 lg:pt-20 lg:pb-14 lg:grid-cols-[1.32fr_0.68fr] xl:gap-10"
       >
         <div ref={contentColumnRef} className="space-y-9">
-          <ContentBlock eyebrow="Overview" title="About this experience">
-            <p className="font-bitter leading-relaxed text-neutral-600">
-              {tour.description}
-            </p>
-          </ContentBlock>
+          {/* PRICING */}
+          <ContentBlock eyebrow="Pricing" title="Tour Pricing">
+            {/* BASE PRICE */}
+            <TourPricing pricing={tour.pricing} />
+            
+            {/* ADDIOTNAL PRICING */}
+            {tour.additionalPricing?.length > 0 && (
+              <AdditionalPricing
+                pricing={tour.additionalPricing}
+              />
+            )}
 
-          <ContentBlock eyebrow="Gallery" title="Tour photos">
-            {galleryImagesForLayout.length > 0 ? (
-              <>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                  {galleryImagesForLayout.map((image, index) => (
-                    <button
-                      key={`${image}-${index}`}
-                      type="button"
-                      className={`group relative overflow-hidden rounded-[1.25rem] bg-blue-50 ${index === 0 ? "sm:col-span-2 xl:col-span-2" : ""
-                        }`}
-                    >
-                      <img
-                        src={image}
-                        alt={`${tour.title} gallery image ${index + 1}`}
-                        loading={index < 3 ? "eager" : "lazy"}
-                        decoding="async"
-                        onLoad={() => ScrollTrigger.refresh()}
-                        className={`w-full object-fill transition duration-500 group-hover:scale-[1.04] ${index === 0 ? "h-56 md:h-72" : "h-40"
-                          }`}
-                      />
-                    </button>
-                  ))}
-
-                  {((isCompactLayout && hasMoreMobileGalleryImages) || (!isCompactLayout && hasHiddenGalleryImages && !showAllGalleryImages)) && (
-                    <button
-                      type="button"
-                      onClick={isCompactLayout ? showMoreMobileGalleryImages : toggleGalleryImages}
-                      className="group flex h-40 flex-col items-center justify-center rounded-[1.25rem] border border-blue-100 bg-blue-50/85 p-4 text-center transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-100"
-                    >
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bitter text-lg font-bold text-blue-700 shadow-sm">
-                        +
-                      </span>
-                      <span className="mt-3 font-bitter text-sm font-bold text-neutral-950">
-                        Click to see more
-                      </span>
-                      <span className="mt-1 font-bitter text-xs text-blue-600">
-                        {isCompactLayout
-                          ? `${Math.min(3, mobileHiddenGalleryCount)} more photos`
-                          : `${hiddenGalleryCount} more photos`}
-                      </span>
-                    </button>
-                  )}
-                </div>
-
-                {!isCompactLayout && hasHiddenGalleryImages && (
-                  <div
-                    className={`grid grid-cols-1 gap-3 overflow-hidden transition-[max-height,opacity,margin] duration-700 ease-out sm:grid-cols-2 xl:grid-cols-3 ${showAllGalleryImages
-                      ? "mt-3 max-h-[2600px] opacity-100"
-                      : "mt-0 max-h-0 opacity-0"
-                      }`}
-                  >
-                    {extraGalleryImages.map((image, index) => (
-                      <button
-                        key={`${image}-extra-${index}`}
-                        type="button"
-                        className="group overflow-hidden rounded-[1.25rem] bg-blue-50"
-                      >
-                        <img
-                          src={image}
-                          alt={`${tour.title} extra gallery image ${index + 9}`}
-                          loading="lazy"
-                          decoding="async"
-                          onLoad={() => ScrollTrigger.refresh()}
-                          className="h-40 w-full object-cover transition duration-500 group-hover:scale-[1.04]"
-                        />
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {!isCompactLayout && showAllGalleryImages && hasHiddenGalleryImages && (
-                  <button
-                    type="button"
-                    onClick={toggleGalleryImages}
-                    className="mt-4 inline-flex rounded-full border border-blue-100 bg-white px-4 py-2 font-bitter text-xs font-bold text-blue-700 transition hover:bg-blue-50"
-                  >
-                    Collapse photos
-                  </button>
-                )}
-              </>
-            ) : (
-              <div className="rounded-[1.25rem] border border-blue-100 bg-blue-50/70 p-6 font-bitter text-sm text-neutral-500">
-                Gallery images coming soon.
-              </div>
+            {/* GROUP PRICE */}
+            {tour.groupPricing?.enabled && (
+              <TourGroupPricing groupPricing={tour.groupPricing} />
             )}
           </ContentBlock>
+          
 
-          <IncludedExcludedGrid tour={tour} />
+          {/* DESCRIPTION */}
+          <ContentBlock eyebrow="Overview" title="About this experience">
+            <p className="font-bitter text-lg text-black">
+              {tour.description}
+            </p>
 
-          <ContentBlock eyebrow="Highlights" title="Perks">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {tour.highlights?.map((item, index) => (
-                <TickCard key={index} text={getItemText(item)} />
-              ))}
-            </div>
           </ContentBlock>
+
+          {/* GALLERY */}
+          <TourGallery tour={tour} imageFolder={tour.imageFolder} />
+
+          {/* INCLUDED AND EXCLUDED */}
+          <TourIncludedExcluded tour={tour} />
+
+          {/* HIGHLIGHTS */}
+          {tour.highlights && (
+            <TourHighlights highlights={tour.highlights} />
+          )}
+            
+          {/* REQUIREMENTS */}
+          {tour.requirements?.length > 0 && (
+            <TourRequirements requirements={tour.requirements} />
+          )}
+
+          {/* ARRANGEMENTS */}
+          {tour.arrangements && (
+            <Arrangements arrangements={tour.arrangements} />
+          )}
+          
+          {/* WEATHER POLICY */}
+          {tour.weatherPolicy && (
+            <TourWeatherPolicy weather={tour.weatherPolicy} />
+          )}
+
+          {/* CANCELLATION POLICY */}
+          {tour.cancellationPolicy && (
+            <TourCancellationPolicy
+              policy={tour.cancellationPolicy}
+            />
+          )}
+
+         {/* SAFETY POLICY */}
+          {tour.safetyPolicy &&
+            <TourSafetyPolicy safety={tour.safetyPolicy} />
+          }
+
+
+          {/* ----------------- COBRA ------------------ */}
+          {/* COBRA SPECIFIC */}
+          {tour.vehicle && (
+            <VehicleDetails vehicle={tour.vehicle} />
+          )}
+
+          {/* COBRA SPECIFIC */}
+          {tour.routeInformation && (
+            <RouteInformation route={tour.routeInformation} />
+          )}
+
+          {/* COBRA SPECIFIC */}
+          {tour.securityAndLiability && (
+            <SecurityAndLiability
+              security={tour.securityAndLiability}
+            />
+          )}
+          {/* ------------------------------------------- */}
+
+          {/* NEED TO KNOW + FAQ */}
+          <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-12 sm:px-5 lg:px-5 lg:py-14 lg:grid-cols-2">
+            <ContentBlock eyebrow="Before you book..." title="Need to know">
+              <div className="grid grid-cols-1 gap-3">
+                {tour.needToKnow?.map((item, index) => (
+                  <TickCard key={index} text={getItemText(item)} />
+                ))}
+              </div>
+            </ContentBlock>
+            
+            <TourFAQ faqs={tour.faqs} />
+            
+          </section>
         </div>
 
+        {/* ================================================================================================== */}
+        {/* SIDEBAR */}
         <aside className="hidden h-fit lg:block lg:pt-0">
           <div ref={readyCardRef} className="space-y-4">
             <button
@@ -883,117 +826,130 @@ export default function TourDetails() {
         </aside>
       </section>
 
-      {/* ITINERARY */}
-      <section
-        ref={itinerarySectionRef}
-        id="itinerary"
-        className="overflow-hidden border-y border-blue-100 bg-blue-50/45"
-      >
-        <div
-          ref={itineraryPinRef}
-          className="mx-auto max-w-6xl px-4 py-10 lg:px-5 lg:py-10"
+      {/* STOPS / ITINERARY */}
+      {tour.stops?.length > 0 ? (
+        /* =========================================================
+          STANDARD TOUR — STOP-BY-STOP ITINERARY
+          ========================================================= */
+        <section
+          ref={itinerarySectionRef}
+          id="itinerary"
+          className="overflow-hidden border-y border-blue-100 bg-blue-50/45"
         >
-          <div className="relative z-30 flex flex-col gap-5 rounded-[1.25rem] bg-blue-50/85 p-4 lg:flex-row lg:items-end lg:justify-between lg:gap-6 lg:p-5">
-            <div className="max-w-2xl">
-              <span className="font-bitter text-[11px] uppercase tracking-[0.24em] text-blue-600">
-                Full Itinerary
-              </span>
+          <div
+            ref={itineraryPinRef}
+            className="mx-auto max-w-6xl px-4 py-10 lg:px-5 lg:py-10"
+          >
+            <div className="relative z-30 flex flex-col gap-5 rounded-[1.25rem] bg-blue-50/85 p-4 lg:flex-row lg:items-end lg:justify-between lg:gap-6 lg:p-5">
+              <div className="max-w-2xl">
+                <span className="font-bitter text-[11px] uppercase tracking-[0.24em] text-blue-600">
+                  Full Itinerary
+                </span>
 
-              <h2 className="mt-2 font-frank text-3xl font-bold leading-none sm:text-4xl lg:text-5xl">
-                Your route, stop by stop
-              </h2>
+                <h2 className="mt-2 font-frank text-3xl font-bold leading-none sm:text-4xl lg:text-5xl">
+                  Your route, stop by stop
+                </h2>
 
-              <p className="mt-3 font-bitter text-sm leading-relaxed text-neutral-600 lg:hidden">
-                Compact route preview. Open a stop only when you need more
-                detail.
-              </p>
+                <p className="mt-3 font-bitter text-sm leading-relaxed text-neutral-600 lg:hidden">
+                  Compact route preview. Open a stop only when you need more
+                  detail.
+                </p>
 
-              <p className="mt-4 hidden font-bitter leading-relaxed text-neutral-600 lg:block">
-                Scroll through the route while each stop detail and image snaps
-                into the same focused frame.
-              </p>
+                <p className="mt-4 hidden font-bitter leading-relaxed text-neutral-600 lg:block">
+                  Scroll through the route while each stop detail and image snaps
+                  into the same focused frame.
+                </p>
+              </div>
+
+              <div className="hidden rounded-full border border-blue-100 bg-white px-4 py-2 font-bitter text-xs font-semibold text-neutral-500 shadow-[0_12px_30px_rgba(37,99,235,0.06)] lg:block">
+                snap through {tour.stops.length} stops
+              </div>
             </div>
 
-            <div className="hidden rounded-full border border-blue-100 bg-white px-4 py-2 font-bitter text-xs font-semibold text-neutral-500 shadow-[0_12px_30px_rgba(37,99,235,0.06)] lg:block">
-              snap through {tour.stops?.length || 0} stops
-            </div>
-          </div>
-
-          {/* Desktop pinned animation */}
-          <div className="hidden lg:grid lg:grid-cols-[0.96fr_1.04fr] lg:items-start lg:gap-8">
-            <div className="relative min-h-[460px] overflow-hidden rounded-[1.5rem] border border-blue-100 bg-white p-7 shadow-[0_20px_65px_rgba(37,99,235,0.08)] lg:min-h-[500px] lg:p-8">
-              {tour.stops?.map((stop, index) => (
-                <div
-                  key={`${stop.id || stop.name}-text-${index}`}
-                  ref={(el) => {
-                    itineraryTextRefs.current[index] = el;
-                  }}
-                  className="relative"
-                >
-                  <ItineraryTextFrame
-                    stop={stop}
-                    index={index}
-                    activeTime={tour.stops?.[activeItineraryIndex]?.time}
-                  />
-                </div>
-              ))}
-
-            </div>
-
-            <div className="space-y-4">
-              <div className="relative min-h-[460px] overflow-hidden rounded-[1.5rem] lg:min-h-[500px]">
-                {tour.stops?.map((stop, index) => (
+            {/* DESKTOP */}
+            <div className="hidden lg:grid lg:grid-cols-[0.96fr_1.04fr] lg:items-start lg:gap-8">
+              {/* STOP INFORMATION */}
+              <div className="relative min-h-[460px] overflow-hidden rounded-[1.5rem] border border-blue-100 bg-white p-7 shadow-[0_20px_65px_rgba(37,99,235,0.08)] lg:min-h-[500px] lg:p-8">
+                {tour.stops.map((stop, index) => (
                   <div
-                    key={`${stop.id || stop.name}-image-${index}`}
+                    key={`${stop.id || stop.name}-text-${index}`}
                     ref={(el) => {
-                      itineraryImageRefs.current[index] = el;
+                      itineraryTextRefs.current[index] = el;
                     }}
                     className="relative"
                   >
-                    <ItineraryImageFrame stop={stop} index={index} />
+                    <ItineraryTextFrame
+                      stop={stop}
+                      index={index}
+                      activeTime={tour.stops[activeItineraryIndex]?.time}
+                    />
                   </div>
                 ))}
               </div>
 
-              <div className="short-screen-route-skip justify-center">
-                <button
-                  type="button"
-                  onClick={scrollToBooking}
-                  className="hero-gradient inline-flex items-center justify-center rounded-full px-7 py-3 font-bitter text-sm font-semibold text-white shadow-[0_14px_34px_rgba(0,0,0,0.14)] transition hover:-translate-y-0.5 active:scale-95"
-                >
-                  Skip to booking form
-                </button>
+              {/* STOP IMAGES */}
+              <div className="space-y-4">
+                <div className="relative min-h-[460px] overflow-hidden rounded-[1.5rem] lg:min-h-[500px]">
+                  {tour.stops.map((stop, index) => (
+                    <div
+                      key={`${stop.id || stop.name}-image-${index}`}
+                      ref={(el) => {
+                        itineraryImageRefs.current[index] = el;
+                      }}
+                      className="relative"
+                    >
+                      <ItineraryImageFrame
+                        stop={stop}
+                        index={index}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="short-screen-route-skip justify-center">
+                  <button
+                    type="button"
+                    onClick={scrollToBooking}
+                    className="hero-gradient inline-flex items-center justify-center rounded-full px-7 py-3 font-bitter text-sm font-semibold text-white shadow-[0_14px_34px_rgba(0,0,0,0.14)] transition hover:-translate-y-0.5 active:scale-95"
+                  >
+                    Skip to booking form
+                  </button>
+                </div>
               </div>
             </div>
+
+            {/* DESKTOP BOOKING BUTTON */}
+            <div className="normal-route-skip relative z-40 mt-6 hidden justify-center lg:flex">
+              <button
+                type="button"
+                onClick={scrollToBooking}
+                className="hero-gradient inline-flex items-center justify-center rounded-full px-7 py-3 font-bitter text-sm font-semibold text-white shadow-[0_14px_34px_rgba(0,0,0,0.14)] transition hover:-translate-y-0.5 active:scale-95"
+              >
+                Skip to booking form
+              </button>
+            </div>
+
+            {/* MOBILE / TABLET */}
+            <div className="mt-8 lg:hidden">
+              <MobileItineraryCarousel stops={tour.stops} />
+            </div>
+
+            <div className="mt-6 lg:hidden">
+              <MobileRequestCard
+                tour={tour}
+                relatedTours={relatedTours}
+                scrollToBooking={scrollToBooking}
+                navigate={navigate}
+              />
+            </div>
           </div>
-
-          <div className="normal-route-skip relative z-40 mt-6 hidden justify-center lg:flex">
-            <button
-              type="button"
-              onClick={scrollToBooking}
-              className="hero-gradient inline-flex items-center justify-center rounded-full px-7 py-3 font-bitter text-sm font-semibold text-white shadow-[0_14px_34px_rgba(0,0,0,0.14)] transition hover:-translate-y-0.5 active:scale-95"
-            >
-              Skip to booking form
-            </button>
-          </div>
-
-          {/* Mobile/tablet full route swipe - renders every stop */}
-          <div className="mt-8 lg:hidden">
-            <MobileItineraryCarousel stops={tour.stops || []} />
-          </div>
-
-          <div className="mt-6 lg:hidden">
-            <MobileRequestCard
-              tour={tour}
-              relatedTours={relatedTours}
-              scrollToBooking={scrollToBooking}
-              navigate={navigate}
-            />
-          </div>
-
-
-        </div>
-      </section>
+        </section>
+      ) : tour.itinerary ? (
+        /* =========================================================
+          MULTI-DAY TOUR — FULL ITINERARY
+          ========================================================= */
+        <TourItinerary itinerary={tour.itinerary} />
+      ) : null}
 
       {/* BOOKING FORM AT BOTTOM */}
       <section
@@ -1012,35 +968,6 @@ export default function TourDetails() {
         <ContactPlatforms />
       </section>
 
-      {/* NEED TO KNOW + FAQ */}
-      <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-12 sm:px-5 lg:px-5 lg:py-14 lg:grid-cols-2">
-        <ContentBlock eyebrow="Before you go" title="Need to know">
-          <div className="grid grid-cols-1 gap-3">
-            {tour.needToKnow?.map((item, index) => (
-              <TickCard key={index} text={getItemText(item)} />
-            ))}
-          </div>
-        </ContentBlock>
-
-        <ContentBlock eyebrow="Questions" title="FAQ">
-          <div className="grid grid-cols-1 gap-3">
-            {tour.faqs?.map((faq, index) => (
-              <div
-                key={index}
-                className="rounded-[1.25rem] border border-blue-100 bg-blue-50/65 p-5"
-              >
-                <p className="font-bitter font-semibold text-neutral-900">
-                  {faq.question}
-                </p>
-
-                <p className="mt-2 font-bitter text-sm leading-relaxed text-neutral-600">
-                  {faq.answer}
-                </p>
-              </div>
-            ))}
-          </div>
-        </ContentBlock>
-      </section>
     </main>
   );
 }
@@ -1096,28 +1023,6 @@ function RatingIcon() {
   );
 }
 
-function InfoCard({ label, value, icon, mobileValue }) {
-  return (
-    <div className="rounded-[0.9rem] border border-blue-100 bg-white/78 p-2 shadow-[0_8px_22px_rgba(37,99,235,0.05)] lg:rounded-[1.1rem] lg:p-4">
-      <div className="flex h-full min-h-[3.1rem] items-center gap-2 lg:min-h-[3.6rem] lg:gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-700 shadow-sm lg:h-10 lg:w-10">
-          {icon}
-        </span>
-
-        <div className="min-w-0 flex-1">
-          <span className="block truncate font-bitter text-[9px] uppercase tracking-[0.14em] text-blue-400 sm:text-[10px] lg:text-[11px]">
-            {label}
-          </span>
-
-          <p className="mt-0.5 truncate font-bitter text-[11px] font-semibold leading-snug text-neutral-900 sm:text-xs lg:text-base">
-            <span className="lg:hidden">{mobileValue || value}</span>
-            <span className="hidden lg:inline">{value}</span>
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function MobileTripEssentials({ tour, galleryImages, scrollToBooking }) {
   const visibleGallery = galleryImages.slice(0, 4);
@@ -1319,11 +1224,11 @@ function CompactLineItem({ text, variant = "tick" }) {
 function ContentBlock({ eyebrow, title, children }) {
   return (
     <section>
-      <span className="font-bitter text-[11px] uppercase tracking-[0.24em] text-blue-600">
+      <span className="font-bitter text-sm font-bold uppercase tracking-[0.12em] text-blue-600">
         {eyebrow}
       </span>
 
-      <h2 className="mt-2 font-frank text-4xl font-bold leading-none md:text-5xl">
+      <h2 className="mt-2 font-bitter text-nuetral-950 text-2xl font-bold leading-none md:text-4xl">
         {title}
       </h2>
 
@@ -1332,58 +1237,6 @@ function ContentBlock({ eyebrow, title, children }) {
   );
 }
 
-function IncludedExcludedGrid({ tour }) {
-  const included = tour.included || [];
-  const excluded = tour.excluded || [];
-
-  if (!included.length && !excluded.length) return null;
-
-  return (
-    <ContentBlock eyebrow="Trip clarity" title="Included and not included">
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div className="rounded-[1.25rem] border border-green-200 bg-green-50/80 p-4">
-          <div className="mb-3 flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-200 font-bitter text-sm font-bold text-green-950">
-              ✓
-            </span>
-            <p className="font-bitter text-sm font-bold text-green-950">
-              Included
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            {included.slice(0, 6).map((item, index) => (
-              <CompactLineItem key={index} text={getItemText(item)} />
-            ))}
-          </div>
-        </div>
-
-        {excluded.length > 0 && (
-          <div className="rounded-[1.25rem] border border-blue-100 bg-blue-50/80 p-4">
-            <div className="mb-3 flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white font-bitter text-sm font-bold text-blue-600">
-                —
-              </span>
-              <p className="font-bitter text-sm font-bold text-neutral-900">
-                Not included
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              {excluded.slice(0, 6).map((item, index) => (
-                <CompactLineItem
-                  key={index}
-                  text={getItemText(item)}
-                  variant="plain"
-                />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </ContentBlock>
-  );
-}
 
 function TickCard({ text }) {
   return (

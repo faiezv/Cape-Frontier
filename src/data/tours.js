@@ -9,6 +9,7 @@ export const TOUR_TYPES = {
 export const TOUR_MODIFIERS = {
   HALF_DAY: "half-day",
   FULL_DAY: "full-day",
+  MULTI_DAY: "multi-day",
   PRIVATE: "private",
   PACKAGE: "package",
   CUSTOM: "custom",
@@ -46,32 +47,36 @@ export const CTA_LABELS = {
   bookingForm: "Complete Trip Request",
 };
 
-
 const normalizeImageIndexes = (imageIndexes = 3) => {
   if (Array.isArray(imageIndexes)) return imageIndexes;
 
   return Array.from({ length: imageIndexes }, (_, index) => index + 1);
 };
 
-
 const getTourImages = (folder, imageIndexes = 3) =>
   normalizeImageIndexes(imageIndexes).map(
-    (imageNumber) => `/images/tours/${folder}/${imageNumber}.webp`
+    (imageNumber) => `/src/assets/images/tours/${folder}/${imageNumber}.webp`,
   );
 
 const PICKUP_IMAGES = getTourImages("shared/pickup", 3);
-const getCoverImage = (folder) => `/images/tours/${folder}/1.webp`;
+const getCoverImage = (folder) => `/src/assets/images/tours/${folder}/1.webp`;
 
-
-const getDestinationImages = (baseFolder, destinationFolder, imageIndexes = 3) =>
-  getTourImages(`${baseFolder}/${destinationFolder}`, imageIndexes);
+const getDestinationImages = (
+  baseFolder,
+  destinationFolder,
+  imageIndexes = 3,
+) => getTourImages(`${baseFolder}/${destinationFolder}`, imageIndexes);
 
 const packageGallery = (baseFolder, stopFolders, imageIndexes = 3) =>
   stopFolders.flatMap((folder) =>
-    getDestinationImages(baseFolder, folder, imageIndexes)
+    getDestinationImages(baseFolder, folder, imageIndexes),
   );
 
-const packageDestinationGalleries = (baseFolder, stopFolders, imageIndexes = 3) =>
+const packageDestinationGalleries = (
+  baseFolder,
+  stopFolders,
+  imageIndexes = 3,
+) =>
   stopFolders.map((folder) => ({
     folder,
     cover: getCoverImage(`${baseFolder}/${folder}`),
@@ -80,7 +85,7 @@ const packageDestinationGalleries = (baseFolder, stopFolders, imageIndexes = 3) 
 
 const getGoogleMapsSearchUrl = (query) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    query
+    query,
   )}`;
 
 const mapLocation = ({ label, address, query }) => ({
@@ -143,31 +148,50 @@ const STELLENBOSCH_WINE_DESTINATIONS = [
   "tokara",
 ];
 
+/*
+adrenaline - shark, gun-range, paragliding, 2hr-cobra, 
+hiking - 
+historical - 
+packages - 
+*/
+
 export const tours = [
+  // =========================================== ADRENALINE
+  // HALF_DAY
+  //Shark-cage-diving
   {
-    id: 1,
+    id: 1, // New tour ID to be assigned (e.g., 20)
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.HALF_DAY,
 
-    title: "Shark Cage Diving",
-    slug: "shark-cage-diving",
-    canonicalPath: "/tours/shark-cage-diving",
+    title: "Shark Cage Diving – Gansbaai",
+    slug: "shark-cage-diving-gansbaai",
+    canonicalPath: "/tours/shark-cage-diving-gansbaai",
 
     seo: {
-      title: "Shark Cage Diving from Cape Town | Cape Frontier Tours",
+      title: "Shark Cage Diving in Gansbaai | Cape Frontier Tours",
       description:
-        "Book a guided shark cage diving experience near Gansbaai with pickup options, a safety briefing, ocean scenery, and a full Cape Frontier trip request flow.",
+        "Experience one of South Africa's most thrilling ocean encounters — Shark Cage Diving in Gansbaai, the global hotspot for Great White Sharks. This all‑inclusive adventure includes hotel pick‑up and drop‑off in Cape Town, professional crew, and a safe, unforgettable dive experience.",
       keywords: [
+        "shark cage diving Gansbaai",
+        "great white shark diving South Africa",
+        "Gansbaai shark diving",
+        "Cape Town shark diving tour",
         "shark cage diving Cape Town",
-        "Gansbaai shark cage diving",
-        "Cape Town ocean adventure",
       ],
     },
 
     workflow: defaultWorkflow,
 
-    image: getCoverImage("adrenaline/shark-cage-diving"),
-    images: getTourImages("adrenaline/shark-cage-diving", 3),
+    image: "/src/assets/images/tours/adrenaline/shark-cage-diving/1.webp",
+    images: [
+      "/src/assets/images/tours/adrenaline/shark-cage-diving/1.webp",
+      "/src/assets/images/tours/adrenaline/shark-cage-diving/2.webp",
+      "/src/assets/images/tours/adrenaline/shark-cage-diving/3.webp",
+    ],
+    imageFolder: "adrenaline/shark-cage-diving-gansbaai",
+
+    videos: [],
 
     location: "Gansbaai, South Africa",
     duration: "4 - 5 hours",
@@ -179,21 +203,24 @@ export const tours = [
 
     pricing: [
       {
-        category: "Adults",
+        category: "Adults (2–5 pax)",
         pricePerPerson: 4900,
-        note: "Minimum two participants."
+        note: "Minimum two participants required.",
       },
+
       {
-        category: "Children under 12.",
+        category: "Children under 12",
         pricePerPerson: 2400,
         note: "",
       },
       {
-        category: "Children under 5.",
+        category: "Children under 5",
         pricePerPerson: 0,
-        note: "Free for children under 5 years old. Must be accompanied by an adult.",
+        note: "Free of charge for children under 5 years old.",
       },
     ],
+
+    additionalPricing: [],
 
     groupPricing: {
       enabled: true,
@@ -202,97 +229,504 @@ export const tours = [
         {
           minPeople: 6,
           maxPeople: 10,
-          perPeson: 4750,
-          label: "6-10 Guests",
+          perPerson: 4750,
+          label: "6–10 Guests",
           note: "Private vehicle • All-inclusive",
         },
       ],
     },
 
-    rating: 4.7,
-    stars: 4,
-    mainReviewerName: "Olivia Red",
-    mainReviewerCountry: "AU",
-    reviewYear: 2025,
-    otherReviews: 32,
-    mainReview:
-      "An exhilarating experience that combines safety and excitement. The expert instructors made me feel comfortable throughout.",
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
 
     description:
-      "Embark on a thrilling half-day adventure from Cape Town to Gansbaai, the Great White Shark capital. Experience the ocean from a close-up perspective with expert crew, a clear safety briefing, and memorable coastal scenery.",
+      "Experience one of South Africa's most thrilling ocean encounters — Shark Cage Diving in Gansbaai, the global hotspot for Great White Sharks. This all‑inclusive adventure includes hotel pick‑up and drop‑off in Cape Town, professional crew, and a safe, unforgettable dive experience.",
 
     highlights: [
-      { text: "Close-up marine wildlife experience with Marine Dynamics." },
-      { text: "Guided by experienced safety crew" },
-      { text: "Unforgettable ocean photography moments" },
+      { text: "Close‑up shark encounters" },
+      { text: "Safe steel cage with professional supervision" },
+      { text: "Scenic drive through the Overberg region" },
+      { text: "Marine biologist briefing" },
+      { text: "Optional photo & video packages" },
     ],
 
     included: [
+      { text: "Reliable driver transport with passenger liability" },
+      { text: "Light breakfast / lunch" },
+      { text: "Bottled water" },
       { text: "Safety briefing and equipment" },
-      { text: "Light refreshments" },
-      { text: "Selected pickup options available" },
+      { text: "Professional crew and supervision" },
     ],
 
     excluded: [
-      { text: "Personal swimwear and towels" },
-      { text: "Professional photo or video package unless arranged" },
-      { text: "Meals not specifically confirmed in the booking" },
+      {
+        text: "Tour photos and videos (available on request – operator charge)",
+      },
+      { text: "Personal purchases" },
     ],
 
-    pickupOptions: DEFAULT_PICKUP_OPTIONS,
+    pickupOptions: [
+      "Cape Town CBD",
+      "Sea Point",
+      "Camps Bay",
+      "V&A Waterfront",
+      "Custom pickup on request",
+    ],
+
+    requirements: [],
+
+    arrangements: {
+      availability: "",
+      duration: "",
+      operatingTime: "",
+      departure: "",
+      return: "",
+      location: "",
+      clothing: [],
+      thingsToBring: [
+        "Warm jacket",
+        "Swimwear (optional)",
+        "Sunscreen",
+        "Motion-sickness tablets (if needed)",
+        "Camera",
+      ],
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "Weather-dependent activity. Ocean conditions may affect departure times.",
+      items: [
+        { text: "Weather can affect departure times" },
+        { text: "Final departure time is confirmed close to the date" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Weather-dependent activity. Final cancellation terms to be confirmed.",
+      items: [
+        { text: "Ocean conditions may affect timing or availability" },
+        { text: "Rescheduling may be offered if conditions are unsuitable" },
+        { text: "Refund rules must be confirmed with the operator" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "All dives are conducted by certified professionals with full compliance to South African marine safety regulations.",
+      items: [],
+    },
+
+    stops: [
+      {
+        id: "hotel-pickup",
+        name: "Hotel Pickup",
+        time: "07:00 – 07:15",
+        duration: "15 min",
+        note: "Pickup from selected Cape Town hotels",
+        description:
+          "Your day begins with a convenient pickup from your selected Cape Town hotel before departing for Gansbaai.",
+        exactLocation: mapLocation({
+          label: "Cape Town Hotel Pickup Area",
+          address: "Cape Town, South Africa",
+          query: "Cape Town South Africa",
+        }),
+        images: getCoverImage("adrenaline/shark-cage-diving"),
+        touristComments: [],
+      },
+      {
+        id: "drive-to-gansbaai",
+        name: "Scenic Drive to Gansbaai",
+        time: "07:15 – 09:30",
+        duration: "2 hr 15 min",
+        note: "Journey along the Overberg region",
+        description:
+          "Relax during the scenic drive from Cape Town to Gansbaai Harbour while your guide shares information about the coastline and marine wildlife.",
+        exactLocation: mapLocation({
+          label: "Gansbaai",
+          address: "Gansbaai, Western Cape, South Africa",
+          query: "Gansbaai Western Cape",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "arrival-briefing",
+        name: "Arrival & Safety Briefing",
+        time: "09:45",
+        duration: "30 min",
+        note: "Light breakfast snack included",
+        description:
+          "Arrive at Gansbaai Harbour, enjoy a light breakfast snack, complete check-in, receive your safety briefing, and get fitted with diving equipment.",
+        exactLocation: mapLocation({
+          label: "Gansbaai Harbour",
+          address: "Gansbaai, Western Cape, South Africa",
+          query: "Gansbaai Harbour Western Cape",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "shark-diving",
+        name: "Shark Cage Diving",
+        time: "10:15 – 13:15",
+        duration: "3 hours",
+        note: "Main ocean experience",
+        description:
+          "Board the vessel and experience an unforgettable shark cage diving adventure with experienced guides while enjoying spectacular views of the coastline.",
+        exactLocation: mapLocation({
+          label: "Gansbaai Harbour",
+          address: "Gansbaai, Western Cape, South Africa",
+          query: "Gansbaai Harbour Western Cape",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "debrief",
+        name: "Hot Drinks & Debrief",
+        time: "13:30",
+        duration: "30 min",
+        note: "Relax after your adventure",
+        description:
+          "Warm up with complimentary hot drinks or a light meal while the crew shares highlights from the trip before the return journey.",
+        exactLocation: mapLocation({
+          label: "Gansbaai Harbour",
+          address: "Gansbaai, Western Cape, South Africa",
+          query: "Gansbaai Harbour Western Cape",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "return-drive",
+        name: "Return Journey",
+        time: "14:00 – 16:30",
+        duration: "2 hr 30 min",
+        note: "Transfer back to Cape Town",
+        description:
+          "Depart Gansbaai and enjoy the scenic drive back to Cape Town.",
+        exactLocation: mapLocation({
+          label: "Cape Town",
+          address: "Cape Town, South Africa",
+          query: "Cape Town South Africa",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "hotel-dropoff",
+        name: "Hotel Drop-off",
+        time: "16:30 – 16:45",
+        duration: "15 min",
+        note: "End of tour",
+        description:
+          "Arrive back in Cape Town and be dropped off at your original hotel, marking the end of your adventure.",
+        exactLocation: mapLocation({
+          label: "Cape Town Hotel Drop-off",
+          address: "Cape Town, South Africa",
+          query: "Cape Town South Africa",
+        }),
+        images: [],
+        touristComments: [],
+      },
+    ],
+
+    // routeInformation: {
+    //   title: "",
+    //   description: "",
+    //   items: [],
+    // },
+
+    // vehicle: {
+    //   name: "",
+    //   class: "",
+    //   doors: null,
+    //   seats: null,
+    //   fuel: "",
+    //   gearbox: "",
+    //   engine: "",
+    //   specifications: [],
+    // },
+
+    // securityAndLiability: {
+    //   heading: "",
+    //   cardPreAuthorisation: {
+    //     amount: null,
+    //     currency: "",
+    //     description: "",
+    //     release: "",
+    //   },
+    //   cashDeposit: {
+    //     amountZAR: null,
+    //     alternativeAmountUSD: null,
+    //     paymentMethod: "",
+    //     paidAt: "",
+    //     refundPolicy: "",
+    //   },
+    // },
+
+    needToKnow: [{ text: "No diving experience required" }],
+
+    faqs: [],
+
+    tags: ["Adventure", "Wildlife", "Ocean", "Half Day", "Shark Diving"],
+  },
+  // Gun-Range
+  {
+    id: null, // New tour ID to be assigned (e.g., 21)
+    type: TOUR_TYPES.ADRENALINE,
+    category: TOUR_MODIFIERS.HALF_DAY,
+
+    title: "Shooting Experience Packages",
+    slug: "shooting-experience-packages",
+    canonicalPath: "/tours/shooting-experience-packages",
+
+    seo: {
+      title: "Shooting Experience Packages in Cape Town | Cape Frontier Tours",
+      description:
+        "Experience a thrilling outdoor shooting session at one of Cape Town's accredited licensed gun ranges. Perfect for beginners and experienced shooters, this activity includes full safety instruction, professional supervision, and a variety of firearm options.",
+      keywords: [
+        "shooting experience Cape Town",
+        "gun range Cape Town",
+        "firearm experience South Africa",
+        "shooting packages Cape Town",
+        "adrenaline shooting tour",
+        "AK-47 experience Cape Town",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "/src/assets/images/tours/adrenaline/gun-range/1.webp",
+    images: [
+      "/src/assets/images/tours/adrenaline/gun-range/1.webp",
+      "/src/assets/images/tours/adrenaline/gun-range/2.webp",
+      "/src/assets/images/tours/adrenaline/gun-range/3.webp",
+    ],
+    imageFolder: "adrenaline/shooting-experience",
+
+    videos: [],
+
+    location: "Cape Town, South Africa",
+    duration: "2 - 3 hours",
+
+    priceBase: 2000,
+    minPeople: 1,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "2‑Gun Speed Shoot",
+        pricePerPerson: 2000,
+        note: "30 rounds (15 + 15) • Fast, beginner-friendly, high-adrenaline",
+      },
+      {
+        category: "3‑Gun Zombie Package",
+        pricePerPerson: 3000,
+        note: "35 rounds (15 + 15 + 5) • AK‑47 experience, mixed firearm types, cinematic feel",
+      },
+      {
+        category: "John Wick 2‑Gun Experience",
+        pricePerPerson: 3400,
+        note: "100 rounds (50 + 50) • Training-style session, shot timer competition, premium action-movie vibe",
+      },
+      {
+        category: "Sicario 5‑Gun Elite Experience",
+        pricePerPerson: 3950,
+        note: "55 rounds (15 + 5 + 10 + 10 + 15) • Full tactical variety, 5 iconic firearms, ultimate bucket-list experience",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Photo & Video Package",
+        price: null,
+        unit: "per booking",
+        currency: "ZAR",
+        note: "Available on request",
+      },
+      {
+        category: "Group Competitions",
+        price: null,
+        unit: "per booking",
+        currency: "ZAR",
+        note: "Available on request",
+      },
+      {
+        category: "Extended Ammunition",
+        price: null,
+        unit: "per round",
+        currency: "ZAR",
+        note: "Available on request",
+      },
+    ],
+
+    groupPricing: {
+      enabled: false,
+      icon: "",
+      tiers: [],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "Experience a thrilling outdoor shooting session at one of Cape Town's accredited licensed gun ranges. Perfect for beginners and experienced shooters, this activity includes full safety instruction, professional supervision, and a variety of firearm options.",
+
+    highlights: [
+      { text: "Accredited licensed gun range in Cape Town" },
+      { text: "Full safety briefing and professional supervision" },
+      { text: "Choice of 4 exciting shooting packages" },
+      {
+        text: "Variety of firearms including handguns, shotguns, carbines, and rifles",
+      },
+      { text: "Suitable for beginners and experienced shooters" },
+      { text: "Training-style sessions with shot timer competition available" },
+    ],
+
+    included: [
+      { text: "Accredited shooting instructor" },
+      { text: "Full safety briefing" },
+      { text: "All firearms and ammunition" },
+      { text: "Safety gear" },
+      { text: "Hotel pickup and drop-off" },
+      { text: "Bottled water" },
+      { text: "Safe and reliable driver" },
+    ],
+
+    excluded: [
+      { text: "Photo and video package" },
+      { text: "Group competitions" },
+      { text: "Extended ammunition" },
+      { text: "Breakfast" },
+      { text: "Lunch" },
+      { text: "Personal purchases" },
+    ],
+
+    pickupOptions: [
+      "Cape Town CBD",
+      "Sea Point",
+      "Camps Bay",
+      "V&A Waterfront",
+      "Custom pickup on request",
+    ],
+
+    requirements: [
+      { text: "Minimum age: 18 years" },
+      { text: "Valid ID or passport required" },
+      { text: "No alcohol before shooting" },
+      { text: "All minors strictly prohibited from handling firearms" },
+    ],
+
+    arrangements: {
+      availability: "Available all year",
+      duration: "2 - 3 hours",
+      operatingTime: "Flexible time slots available after booking",
+      departure: "Flexible",
+      return: "Flexible",
+      location: "Cape Town, South Africa",
+
+      clothing: ["Comfortable clothing", "Closed shoes"],
+
+      thingsToBring: ["Valid ID or passport", "Camera (optional)"],
+
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "All weather conditions – outdoor range operates in safe conditions only.",
+      items: [
+        { text: "Range operates in safe weather conditions" },
+        { text: "Weather may affect availability" },
+        { text: "Final timing confirmed after booking" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Cancellations must be made at least 2 days before the scheduled experience. Refunds will be subject to our discretion.",
+      items: [
+        {
+          text: "Cancellations must be made at least 2 days before scheduled date",
+        },
+        { text: "Refunds are subject to our discretion" },
+        { text: "Late arrivals may reduce activity time" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience.",
+      items: [
+        { text: "All safety regulations must be followed at all times" },
+        {
+          text: "Instructors are not liable for any injuries, damages, or legal consequences resulting from the use of firearms",
+        },
+        { text: "Be vigilant and observant during the safety briefing" },
+        {
+          text: "All participants must comply with legal requirements for firearms training",
+        },
+        { text: "Age restrictions and eligibility criteria apply" },
+      ],
+    },
 
     stops: [
       {
         id: "pickup",
-        name: "Pickup / Meeting Point",
-        time: "06:30",
-        duration: "35 min",
-        note: "Selected Cape Town pickup areas or custom pickup by request",
+        name: "Hotel Pickup / Meeting Point",
+        time: "Flexible",
+        duration: "30 min",
+        note: "Selected pickup areas available",
         description:
-          "Start the morning from your selected pickup area before travelling towards the Gansbaai coast.",
+          "Begin your experience with a convenient pickup from your selected Cape Town hotel before travelling to the accredited gun range.",
         exactLocation: mapLocation({
-          label: "Cape Town CBD Pickup Area",
-          address: "Cape Town City Centre, Cape Town, South Africa",
-          query: "Cape Town City Centre",
+          label: "Cape Town Pickup Area",
+          address: "Cape Town, South Africa",
+          query: "Cape Town South Africa",
         }),
-        images: getTourImages("shared/pickup", 1),
+        images: [],
         touristComments: [],
       },
       {
-        id: "gansbaai",
-        name: "Gansbaai",
-        time: "09:00",
-        duration: "4 - 5 hours",
-        note: "Main shark cage diving departure area",
+        id: "shooting-range",
+        name: "Accredited Shooting Range",
+        time: "Flexible",
+        duration: "2 - 3 hours",
+        note: "Full safety briefing and shooting experience",
         description:
-          "Arrive at the coastal departure area for the safety briefing, equipment preparation, and ocean-based shark cage diving experience.",
+          "Arrive at the accredited gun range, receive your full safety briefing, and enjoy your selected shooting package under the supervision of professional instructors.",
         exactLocation: mapLocation({
-          label: "Gansbaai Harbour Area",
-          address: "Gansbaai, Western Cape, South Africa",
-          query: "Gansbaai Harbour Western Cape",
+          label: "Accredited Shooting Range",
+          address: "Cape Town, South Africa",
+          query: "Cape Town Gun Range",
         }),
-        images: getTourImages("adrenaline/shark-cage-diving", 3),
-        touristComments: [
-          {
-            name: "Olivia",
-            country: "AU",
-            text: "The crew made everything feel safe, clear, and exciting from the moment we arrived.",
-          },
-          {
-            name: "Daniel",
-            country: "UK",
-            text: "The ocean views and guided setup made the day feel unforgettable.",
-          },
-        ],
+        images: [],
+        touristComments: [],
       },
       {
-        id: "return",
-        name: "Return to Cape Town",
-        time: "14:30",
-        duration: "2 hours",
-        note: "Return transfer after the activity",
+        id: "dropoff",
+        name: "Hotel Drop-off",
+        time: "Flexible",
+        duration: "30 min",
+        note: "End of experience",
         description:
-          "After the experience, return towards Cape Town with drop-off at the selected area.",
+          "After completing your shooting experience, relax during the return transfer to your original Cape Town hotel.",
         exactLocation: mapLocation({
           label: "Cape Town Drop-off Area",
           address: "Cape Town, South Africa",
@@ -303,256 +737,155 @@ export const tours = [
       },
     ],
 
-    needToKnow: [
-      { text: "Weather can affect departure times" },
-      { text: "Bring warm clothing and a towel" },
-      { text: "No diving experience required" },
-      { text: "Final departure time is confirmed close to the date" },
-    ],
-
-    cancellationPolicy: {
-      summary: "Weather-dependent activity. Final cancellation terms to be confirmed.",
-      items: [
-        { text: "Ocean conditions may affect timing or availability" },
-        { text: "Rescheduling may be offered if conditions are unsuitable" },
-        { text: "Refund rules must be confirmed with the operator" },
-      ],
+    routeInformation: {
+      title: "",
+      description: "",
+      items: [],
     },
+
+    vehicle: {
+      name: "",
+      class: "",
+      doors: null,
+      seats: null,
+      fuel: "",
+      gearbox: "",
+      engine: "",
+      specifications: [],
+    },
+
+    securityAndLiability: {
+      heading: "",
+      cardPreAuthorisation: {
+        amount: null,
+        currency: "",
+        description: "",
+        release: "",
+      },
+      cashDeposit: {
+        amountZAR: null,
+        alternativeAmountUSD: null,
+        paymentMethod: "",
+        paidAt: "",
+        refundPolicy: "",
+      },
+    },
+
+    needToKnow: [
+      { text: "Minimum age: 18 years" },
+      { text: "Valid ID or passport required" },
+      { text: "No alcohol before shooting" },
+      { text: "All minors strictly prohibited from handling firearms" },
+      { text: "Booking must be made in advance" },
+      { text: "Time slots available after booking" },
+    ],
 
     faqs: [
       {
-        question: "Who is Marine Dynamics?",
-        answer: "Marine Dynamics is a reputable tour operator specializing in marine adventures and wildlife experiences.",
-      },
-      {
-        question: "Do I need diving experience?",
-        answer: "No. The experience is guided and includes a safety briefing.",
-      },
-      {
-        question: "Can the time change?",
+        question: "What shooting packages are available?",
         answer:
-          "Yes. Ocean and weather conditions can affect the final departure time.",
+          "We offer four packages: 2-Gun Speed Shoot (R2,000), 3-Gun Zombie Package (R3,000), John Wick 2-Gun Experience (R3,400), and Sicario 5-Gun Elite Experience (R3,950).",
+      },
+      {
+        question: "Do I need shooting experience?",
+        answer:
+          "No. This experience is designed for beginners and includes full safety instruction and professional supervision.",
+      },
+      {
+        question: "What is the minimum age?",
+        answer:
+          "The minimum age to participate is 18 years. All minors are strictly prohibited from handling firearms.",
+      },
+      {
+        question: "What should I bring?",
+        answer:
+          "Bring your valid ID or passport. Comfortable clothing and closed shoes are recommended.",
+      },
+      {
+        question: "Is transport included?",
+        answer: "Yes. Hotel pickup and drop-off are included in all packages.",
       },
     ],
 
-    tags: ["Adventure", "Wildlife", "Ocean", "Half Day"],
+    tags: [
+      "Adrenaline",
+      "Shooting",
+      "Gun Range",
+      "Half Day",
+      "Adventure",
+      "Cape Town",
+    ],
   },
-
+  // Paragliding
   {
-    id: 2,
+    id: null, // New tour ID to be assigned (e.g., 22)
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.HALF_DAY,
 
-    title: "Gun Range Experience",
-    slug: "gun-range-experience",
-    canonicalPath: "/tours/gun-range-experience",
+    title: "Paragliding Experience – Cape Town",
+    slug: "paragliding-experience-cape-town",
+    canonicalPath: "/tours/paragliding-experience-cape-town",
 
     seo: {
-      title: "Guided Range Experience in Cape Town | Cape Frontier Tours",
+      title: "Paragliding Experience in Cape Town | Cape Frontier Tours",
       description:
-        "Request a professionally supervised Cape Town range experience with safety briefing, instructor support, and selected pickup options. Venue details are shared after confirmation.",
-      keywords: [
-        "Cape Town range experience",
-        "guided range activity Cape Town",
-        "adrenaline tours Cape Town",
-      ],
-    },
-
-    workflow: defaultWorkflow,
-
-    image: getCoverImage("adrenaline/gun-range"),
-    images: getTourImages("adrenaline/gun-range", 3),
-
-    location: "Cape Town, South Africa",
-    duration: "2 - 3 hours",
-
-    priceBase: 3000,
-    minPeople: 1,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
-
-    pricing: [
-      {
-        category: "Adults",
-        pricePerPerson: 3000,
-      },
-      {
-        category: "Children",
-        pricePerPerson: null,
-        note: "Not suitable for children. Age and eligibility rules apply.",
-      },
-    ],
-
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 1,
-          maxPeople: 2,
-          perPerson: 3000, 
-          label: "3-6 Guests",
-          note: "Private vehicle • All-inclusive",
-        },
-        {
-          minPeople: 3,
-          maxPeople: 6,
-          perPerson: 2900, 
-          label: "3-6 Guests",
-          note: "Private vehicle • All-inclusive",
-        },
-      ],
-    },
-
-
-    rating: 4.8,
-    stars: 5,
-    mainReviewerName: "James Carter",
-    mainReviewerCountry: "UK",
-    reviewYear: 2025,
-    otherReviews: 41,
-    mainReview:
-      "Very professional setup. The instructors explained everything clearly and made the experience feel safe and controlled.",
-
-    description:
-      "A controlled and professionally supervised range experience designed for eligible visitors, with instructor guidance, venue checks, and a full safety briefing.",
-
-    highlights: [
-      { text: "Professionally supervised activity" },
-      { text: "Strict safety-controlled environment" },
-      { text: "Instructor-led from start to finish" },
-    ],
-
-    included: [
-      { text: "Safety briefing" },
-      { text: "Guided range session" },
-      { text: "Pickup available on request" },
-    ],
-
-    excluded: [
-      { text: "Items not approved by the venue" },
-      { text: "Personal expenses" },
-      { text: "Extra activity upgrades unless confirmed" },
-    ],
-
-    pickupOptions: DEFAULT_PICKUP_OPTIONS,
-
-    stops: [
-      {
-        id: "pickup",
-        name: "Pickup / Meeting Point",
-        time: "09:00",
-        duration: "30 min",
-        note: "Selected pickup area or confirmed meeting point",
-        description:
-          "Meet your guide or arrange selected pickup before travelling to the approved activity venue.",
-        exactLocation: mapLocation({
-          label: "Cape Town Pickup Area",
-          address: "Cape Town, South Africa",
-          query: "Cape Town South Africa",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "activity-venue",
-        name: "Approved Activity Venue",
-        time: "10:00",
-        duration: "2 - 3 hours",
-        note: "Exact venue shared after confirmed booking and eligibility checks",
-        description:
-          "The guided activity takes place at an approved venue with professional supervision and strict safety controls.",
-        exactLocation: {
-          label: "Venue shared after confirmation",
-          address: "Cape Town, South Africa",
-          googleMapsUrl: null,
-        },
-        images: getTourImages("adrenaline/gun-range", 3),
-        touristComments: [
-          {
-            name: "James",
-            country: "UK",
-            text: "The instructors were calm, professional, and clear about every safety step.",
-          },
-        ],
-      },
-    ],
-
-
-    needToKnow: [
-      { text: "Valid identification may be required" },
-      { text: "All venue safety rules must be followed" },
-      { text: "Eligibility and age rules may apply" },
-      { text: "Exact venue details are shared after confirmation" },
-    ],
-
-    cancellationPolicy: {
-      summary: "Eligibility, venue rules, and supplier availability apply.",
-      items: [
-        { text: "Late arrival may reduce activity time" },
-        { text: "Participants must meet venue requirements" },
-        { text: "Final cancellation rules must be confirmed with the supplier" },
-      ],
-    },
-
-    faqs: [
-      {
-        question: "Is the venue shown publicly?",
-        answer:
-          "The exact approved venue is shared after booking confirmation and required checks.",
-      },
-      {
-        question: "Are there safety rules?",
-        answer:
-          "Yes. All participants must follow the venue rules and instructor guidance throughout the activity.",
-      },
-    ],
-
-    tags: ["Adrenaline", "Guided", "Controlled", "Half Day"],
-  },
-
-  {
-    id: 3,
-    type: TOUR_TYPES.ADRENALINE,
-    category: TOUR_MODIFIERS.HALF_DAY,
-
-    title: "Paragliding",
-    slug: "paragliding",
-    canonicalPath: "/tours/paragliding",
-
-    seo: {
-      title: "Tandem Paragliding in Cape Town | Cape Frontier Tours",
-      description:
-        "Book a scenic tandem paragliding experience in Cape Town with views of Signal Hill, Lion’s Head, Sea Point, and the Atlantic coastline with expert pilots and selected pickup options.",
+        "Experience one of Cape Town's most iconic adventures — a scenic tandem paragliding flight over the Atlantic coastline. Fly with licensed pilots and enjoy breathtaking views of Sea Point, the Twelve Apostles, and the city bowl.",
       keywords: [
         "paragliding Cape Town",
+        "tandem paragliding Cape Town",
         "Signal Hill paragliding",
-        "Cape Town tandem flight",
+        "Lion's Head paragliding",
+        "Cape Town adventure",
+        "scenic flight Cape Town",
+        "paragliding experience South Africa",
       ],
     },
 
     workflow: defaultWorkflow,
 
-    image: getCoverImage("adrenaline/paragliding"),
-    images: getTourImages("adrenaline/paragliding", 3),
+    image: "/src/assets/images/tours/adrenaline/paragliding/1.webp",
+    images: [
+      "/src/assets/images/tours/adrenaline/paragliding/1.webp",
+      "/src/assets/images/tours/adrenaline/paragliding/2.webp",
+      "/src/assets/images/tours/adrenaline/paragliding/3.webp",
+    ],
+    imageFolder: "adrenaline/paragliding-cape-town",
 
-    location: "Signal Hill, Cape Town",
+    videos: [],
+
+    location: "Signal Hill or Lion's Head, Cape Town (weather dependent)",
     duration: "1 - 2 hours",
 
-    priceBase: 3400,
+    priceBase: 3200,
     minPeople: 1,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
-        category: "Adults",
-        pricePerPerson: 3400,
+        category: "1 Adult",
+        pricePerPerson: 3200,
+        note: "All-inclusive per person",
       },
       {
-        category: "Children",
-        pricePerPerson: null,
-        note: "This tour is not suitable for children under the age of 18. Age and eligibility rules apply.",
+        category: "2+ Adults",
+        pricePerPerson: 3000,
+        note: "All-inclusive per person",
+      },
+      {
+        category: "Children (5–17 years)",
+        pricePerPerson: 2900,
+        note: "All-inclusive per child",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Aerial Photos & Videos",
+        price: null,
+        unit: "per flight",
+        currency: "ZAR",
+        note: "Paid directly to pilot after landing. GoPro footage and photos available.",
       },
     ],
 
@@ -562,81 +895,176 @@ export const tours = [
       tiers: [
         {
           minPeople: 2,
-          perPerson: 3100,
-          label: '', note: '',
-        }
-      ]
+          perPerson: 3000,
+          label: "2+ Guests",
+          note: "All-inclusive",
+        },
+      ],
     },
 
-    rating: 4.9,
-    stars: 5,
-    mainReviewerName: "Mia Thompson",
-    mainReviewerCountry: "US",
-    reviewYear: 2025,
-    otherReviews: 58,
-    mainReview:
-      "The views over Cape Town were unreal. The take-off felt smooth and the pilot made me feel completely at ease.",
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
 
     description:
-      "Enjoy a scenic tandem paragliding experience above Cape Town with views of the Atlantic coastline, Table Mountain, Lion’s Head, and the city below. This activity is guided by experienced pilots and includes a safety briefing, with selected pickup options available.",
+      "Experience one of Cape Town's most iconic adventures — a scenic tandem paragliding flight over the Atlantic coastline. Guests enjoy breathtaking views of Sea Point, the Twelve Apostles, and the city bowl while flying with a licensed and accredited tandem paragliding operator.",
 
     highlights: [
-      { text: "Launch near Signal Hill or Lion’s Head" },
-      { text: "Beautiful aerial views of Cape Town" },
-      { text: "Tandem flight with experienced pilot" },
+      { text: "Scenic tandem flight over Cape Town's Atlantic coastline" },
+      { text: "Professional, licensed pilots with years of experience" },
+      { text: "Safety briefing before take‑off" },
+      { text: "Flexible timing based on weather conditions" },
+      {
+        text: "Incredible aerial photos & videos available as an optional extra",
+      },
     ],
 
     included: [
+      { text: "Professional reliable transport" },
+      { text: "Hotel pick-up" },
+      { text: "Bottled water" },
+      { text: "Meeting guest at landing zone (Sea Point Promenade, etc.)" },
+      { text: "Hotel drop-off" },
+      { text: "Licensed and accredited tandem paragliding pilot" },
       { text: "Safety briefing" },
-      { text: "Tandem paragliding flight" },
-      { text: "Experienced pilot" },
     ],
 
     excluded: [
-      { text: "Photos or videos unless arranged" },
-      { text: "Transport unless selected" },
-      { text: "Personal expenses" },
+      {
+        text: "Aerial photos & videos (optional add-on paid directly to pilot after landing)",
+      },
+      { text: "Breakfast" },
+      { text: "Lunch" },
+      { text: "Personal purchases" },
     ],
 
     pickupOptions: [
       "Cape Town CBD",
       "Sea Point",
       "Camps Bay",
-      "Meet at launch point",
+      "V&A Waterfront",
+      "Meet at launch point (Signal Hill or Lion's Head)",
       "Custom pickup on request",
     ],
+
+    requirements: [
+      { text: "Minimum age: 5 years old" },
+      { text: "Minimum weight: 20 kg" },
+      { text: "Maximum weight: 110 kg" },
+      {
+        text: "Children under 18 require a parent/guardian to sign consent forms",
+      },
+    ],
+
+    arrangements: {
+      availability: "Available all year (weather dependent)",
+      duration: "1 - 2 hours",
+      operatingTime:
+        "Flexible (confirmed on the morning of the flight based on weather)",
+      departure: "Flexible",
+      return: "Flexible",
+      location:
+        "Signal Hill or Lion's Head (confirmed on the morning of the flight)",
+
+      clothing: [
+        "Comfortable clothing",
+        "Closed shoes",
+        "Warm jacket (weather dependent)",
+      ],
+
+      thingsToBring: ["Camera (optional)", "Sunscreen", "Sunglasses"],
+
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "Paragliding is weather-dependent. If conditions are unsafe, the operator may delay the flight, change the launch site, reschedule, or cancel with refund.",
+      items: [
+        {
+          text: "Weather conditions determine the final launch site (Signal Hill or Lion's Head)",
+        },
+        { text: "Flight may be delayed if conditions are unsafe" },
+        { text: "Rescheduling is offered if conditions are unsuitable" },
+        {
+          text: "Full refund provided if cancellation is necessary due to weather",
+        },
+        { text: "Safety always comes first" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Weather-dependent activity. Final cancellation terms must be confirmed with the operator.",
+      items: [
+        { text: "Cancellation terms are confirmed upon booking" },
+        { text: "Weather may result in rescheduling or full refund" },
+        {
+          text: "Final cancellation policy must be confirmed with the operator",
+        },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Your flight is conducted by a licensed tandem paragliding operator in Cape Town. All pilots are certified, insured, and trained according to South African paragliding regulations.",
+      items: [
+        {
+          text: "All pilots are certified, insured, and trained according to South African paragliding regulations",
+        },
+        {
+          text: "Guests complete indemnity forms directly with the pilot before take‑off",
+        },
+        { text: "Safety briefing is provided before take-off" },
+      ],
+    },
 
     stops: [
       {
         id: "launch-point",
-        name: "Signal Hill Launch Area",
-        time: "Flexible",
+        name: "Launch Point (Signal Hill or Lion's Head)",
+        time: "Confirmed on the morning of the flight",
         duration: "30 min briefing",
-        note: "Common launch location depending on conditions",
+        note: "Launch site varies based on weather conditions",
         description:
-          "Meet at the confirmed launch point for a weather check, safety briefing, and preparation with the tandem pilot.",
+          "Meet your pilot at the designated launch site (Signal Hill or Lion's Head), chosen on the day based on wind and safety conditions. Receive your safety briefing, complete indemnity forms, and prepare for take-off.",
         exactLocation: mapLocation({
-          label: "Signal Hill Viewpoint",
-          address: "Signal Hill, Cape Town, South Africa",
-          query: "Signal Hill Viewpoint Cape Town",
+          label: "Paragliding Launch Site",
+          address: "Cape Town, South Africa",
+          query: "Paragliding Cape Town Launch Site",
         }),
-        images: getTourImages("adrenaline/paragliding", 2),
-        touristComments: [
-          {
-            name: "Mia",
-            country: "US",
-            text: "Seeing the city from above was the best Cape Town memory of my trip.",
-          },
-        ],
+        images: [],
+        touristComments: [],
       },
       {
-        id: "landing-area",
-        name: "Sea Point Landing Area",
-        time: "After flight",
-        duration: "15 min",
-        note: "Common landing area depending on wind",
+        id: "flight",
+        name: "Scenic Tandem Flight",
+        time: "Flexible",
+        duration: "1 - 2 hours",
+        note: "Flight duration varies",
         description:
-          "Land near the coast and enjoy the final views over Sea Point and the Atlantic edge.",
+          "Enjoy a breathtaking tandem paragliding flight over Cape Town's Atlantic coastline with views of Sea Point, the Twelve Apostles, and the city bowl.",
+        exactLocation: mapLocation({
+          label: "Cape Town Coastline",
+          address: "Cape Town, South Africa",
+          query: "Cape Town Coastline",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "landing-zone",
+        name: "Landing Zone (Sea Point Promenade)",
+        time: "Flexible",
+        duration: "15 min",
+        note: "Meeting guest at landing zone",
+        description:
+          "Land near the coast at Sea Point Promenade and enjoy the final views over the Atlantic coastline. Your guide will meet you at the landing zone.",
         exactLocation: mapLocation({
           label: "Sea Point Promenade",
           address: "Sea Point, Cape Town, South Africa",
@@ -647,185 +1075,4058 @@ export const tours = [
       },
     ],
 
+    routeInformation: {
+      title: "",
+      description: "",
+      items: [],
+    },
+
+    vehicle: {
+      name: "",
+      class: "",
+      doors: null,
+      seats: null,
+      fuel: "",
+      gearbox: "",
+      engine: "",
+      specifications: [],
+    },
+
+    securityAndLiability: {
+      heading: "",
+      cardPreAuthorisation: {
+        amount: null,
+        currency: "",
+        description: "",
+        release: "",
+      },
+      cashDeposit: {
+        amountZAR: null,
+        alternativeAmountUSD: null,
+        paymentMethod: "",
+        paidAt: "",
+        refundPolicy: "",
+      },
+    },
 
     needToKnow: [
-      { text: "Weather and wind dependent" },
-      { text: "Wear comfortable clothes and closed shoes" },
-      { text: "Flight time may vary by conditions" },
-      { text: "Final launch point is confirmed on the day" },
+      { text: "Minimum age: 5 years old" },
+      { text: "Minimum weight: 20 kg" },
+      { text: "Maximum weight: 110 kg" },
+      {
+        text: "Children under 18 require a parent/guardian to sign consent forms",
+      },
+      { text: "No experience required — beginners welcome" },
+      {
+        text: "Exact launch location is confirmed on the morning of the flight based on weather",
+      },
+      { text: "Time to be confirmed upon booking" },
     ],
-
-    cancellationPolicy: {
-      summary: "Wind and weather conditions can affect availability.",
-      items: [
-        { text: "Flight time may be adjusted for safe conditions" },
-        { text: "Rescheduling may be offered if conditions are unsuitable" },
-        { text: "Final supplier cancellation rules must be confirmed" },
-      ],
-    },
 
     faqs: [
       {
-        question: "Is paragliding weather dependent?",
+        question: "Do I need paragliding experience?",
         answer:
-          "Yes. Wind and weather conditions decide the final launch time and location.",
+          "No. This is a tandem flight with a licensed pilot. No experience is required — beginners are welcome.",
       },
       {
-        question: "Where does the flight start?",
+        question: "What is the minimum age?",
         answer:
-          "Signal Hill is a common launch area, but the final launch point is confirmed according to conditions.",
+          "The minimum age is 5 years old. Children under 18 require a parent/guardian to sign consent forms.",
+      },
+      {
+        question: "Where do we fly from?",
+        answer:
+          "The launch site is either Signal Hill or Lion's Head, depending on wind and weather conditions. The exact location is confirmed on the morning of the flight.",
+      },
+      {
+        question: "Is the flight weather dependent?",
+        answer:
+          "Yes. Paragliding is weather-dependent. If conditions are unsafe, the operator may delay, change the launch site, reschedule, or cancel with a full refund.",
+      },
+      {
+        question: "Are photos and videos included?",
+        answer:
+          "No. Photos and videos are an optional add-on. Pilots offer high-quality GoPro footage and photos, paid directly to the pilot after landing.",
+      },
+      {
+        question: "Is transport included?",
+        answer:
+          "Yes. Professional reliable transport with hotel pickup and drop-off is included.",
       },
     ],
 
-    tags: ["Adventure", "Scenic", "Air", "Half Day"],
+    tags: [
+      "Adventure",
+      "Paragliding",
+      "Scenic",
+      "Air",
+      "Half Day",
+      "Cape Town",
+      "Tandem Flight",
+    ],
+  },
+  // Cobra (2hr)
+  {
+    id: 4,
+    type: TOUR_TYPES.ADRENALINE,
+    category: TOUR_MODIFIERS.HALF_DAY,
+
+    title: "Cobra Sundowner Self‑Drive",
+    slug: "cobra-sundowner",
+    canonicalPath: "/tours/cobra-sundowner",
+
+    seo: {
+      title: "Cobra Sundowner Self-Drive in Cape Town | Cape Frontier Tours",
+      description:
+        "Enjoy a 2-hour sunset self-drive in an official Backdraft Racing Cobra along Cape Town's coastline. Drive a modern classic V8 with automatic transmission, 35 km included mileage, and one free passenger.",
+      keywords: [
+        "Cobra self-drive Cape Town",
+        "Cobra sunset drive Cape Town",
+        "Backdraft Racing Cobra Cape Town",
+        "V8 Cobra Cape Town",
+        "sunset drive Cape Town",
+        "classic car experience Cape Town",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: getCoverImage("adrenaline/cobra"),
+    images: getTourImages("adrenaline/cobra", 3),
+    imageFolder: "adrenaline/cobra",
+
+    videos: [
+      "/videos/tours/adrenaline/cobra/Vid 1.mp4",
+      "/videos/tours/adrenaline/cobra/Vid 3.mp4",
+      "/videos/tours/adrenaline/cobra/Vid 4.mp4",
+      "/videos/tours/adrenaline/cobra/VID 5.mp4",
+      "/videos/tours/adrenaline/cobra/WhatsApp Video 2026-07-31 at 08.45.48.mp4",
+    ],
+
+    location: "Foreshore, Cape Town, 8001",
+    duration: "2 hours",
+
+    priceBase: 2900,
+    minPeople: 1,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "Sunset Drive",
+        pricePerPerson: 2900,
+        note: "2-hour self-drive experience.",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Additional Mileage",
+        price: 20,
+        unit: "per km",
+        currency: "ZAR",
+      },
+      {
+        category: "Extra Driver",
+        price: 500,
+        unit: "per booking",
+        currency: "ZAR",
+      },
+    ],
+
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        {
+          minPeople: 2,
+          perPerson: 3000,
+          label: "",
+          note: "",
+        },
+      ],
+    },
+
+    rating: 4.9,
+    stars: 5,
+    mainReviewerName: "Mia Thompson",
+    mainReviewerCountry: "US",
+    reviewYear: 2025,
+    otherReviews: 58,
+    mainReview:
+      "A spectacular way to experience Cape Town at sunset. Driving the Cobra along the coastline made the evening unforgettable.",
+
+    description:
+      "A sunset drive along Cape Town's coastline is one of the most unforgettable ways to end the day — and nothing compares to experiencing it from behind the wheel of a Cobra. Enjoy the freedom of an open-top V8 as the Atlantic horizon turns gold. Not sure where to go? We'll guide you in planning the perfect sunset route.",
+
+    included: [
+      { text: "Pick up at hotel." },
+      { text: "Drop off at site." },
+      { text: "35 km free mileage." },
+      { text: "Pick up at site." },
+      { text: "Drop off at hotel." },
+      { text: "One free passenger may join the drive." },
+    ],
+
+    excluded: [
+      { text: "Fuel." },
+      { text: "Additional kilometres at R20.00 per km." },
+      {
+        text: "Chapman's Peak Drive (Noordhoek ↔ Hout Bay) is excluded due to safety restrictions.",
+      },
+    ],
+
+    highlights: [
+      {
+        text: "2-hour sunset self-drive along Cape Town's coastline.",
+      },
+      {
+        text: "Drive an official Backdraft Racing Cobra.",
+      },
+      {
+        text: "Experience a factory-built modern classic with a V8 engine.",
+      },
+      {
+        text: "Enjoy an open-top driving experience as the Atlantic horizon turns gold.",
+      },
+      {
+        text: "One free passenger may join the drive.",
+      },
+      {
+        text: "35 km of free mileage included.",
+      },
+      {
+        text: "Route guidance available to help plan the perfect sunset drive.",
+      },
+    ],
+
+    pickupOptions: ["Hotel pickup", "Foreshore, Cape Town", "Site pickup"],
+
+    requirements: [
+      {
+        text: "Minimum age: 23 years.",
+      },
+      {
+        text: "Valid driver's licence required.",
+      },
+    ],
+
+    arrangements: {
+      availability: "Available all year",
+      duration: "2 hours",
+      operatingTime: "17h00 - 19h00",
+      departure: "17h00",
+      return: "19h15",
+      location: "Foreshore, Cape Town, 8001",
+
+      clothing: ["Comfortable clothing", "Closed shoes", "Warm jacket"],
+
+      thingsToBring: [
+        "Valid driver's licence",
+        "Credit card for deposit",
+        "Credit card for toll roads",
+      ],
+
+      passengerPolicy: "One free passenger may join the drive.",
+
+      sunsetNote: "Sunset times vary seasonally.",
+    },
+
+    weatherPolicy: {
+      summary: "The Cobra Sundowner operates in safe weather conditions.",
+      items: [
+        {
+          text: "The experience operates subject to safe weather conditions.",
+        },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "The experience operates subject to safe weather conditions and the supplier's rental agreement.",
+      items: [
+        {
+          text: "The drive operates only in safe weather conditions.",
+        },
+        {
+          text: "The final supplier cancellation and rescheduling rules must be confirmed.",
+        },
+        {
+          text: "Security and liability amounts are subject to the vehicle inspection and rental agreement.",
+        },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "The vehicle must be operated responsibly and in accordance with the rental agreement and applicable safety requirements.",
+      items: [
+        {
+          text: "A valid driver's licence is required.",
+        },
+        {
+          text: "The minimum driver age is 23 years.",
+        },
+        {
+          text: "Chapman's Peak Drive (Noordhoek ↔ Hout Bay) is excluded due to safety restrictions.",
+        },
+        {
+          text: "A temporary R15,000 card holding fee covers insurance excess, vehicle damage, fines, recovery costs, or rental agreement breaches.",
+        },
+      ],
+    },
+
+    stops: [
+      {
+        id: "foreshore-departure",
+        name: "Foreshore Departure",
+        time: "17h00",
+        duration: "2 hours",
+        note: "Departure from the Foreshore, Cape Town.",
+        description:
+          "Collect the Cobra and begin your sunset self-drive experience. The route can be planned with guidance to suit the evening.",
+        exactLocation: mapLocation({
+          label: "Foreshore, Cape Town",
+          address: "Foreshore, Cape Town, 8001, South Africa",
+          query: "Foreshore Cape Town",
+        }),
+        images: getTourImages("adrenaline/cobra"),
+        touristComments: [],
+      },
+      {
+        id: "foreshore-return",
+        name: "Return",
+        time: "19h15",
+        duration: "15 min",
+        note: "Return after the sunset drive.",
+        description:
+          "Return the Cobra after the drive. The advertised driving experience runs from 17h00 to 19h00, with return scheduled for 19h15.",
+        exactLocation: mapLocation({
+          label: "Foreshore, Cape Town",
+          address: "Foreshore, Cape Town, 8001, South Africa",
+          query: "Foreshore Cape Town",
+        }),
+        images: getTourImages("shared/return", 1),
+        touristComments: [],
+      },
+    ],
+
+    routeInformation: {
+      title: "Cape Town Coastal Sunset Route",
+
+      description:
+        "Enjoy a scenic sunset drive along Cape Town's coastline. We can guide you in planning the perfect sunset route.",
+
+      items: [
+        "Chapman's Peak Drive (Noordhoek ↔ Hout Bay) is excluded due to safety restrictions.",
+      ],
+    },
+
+    vehicle: {
+      name: "Official Backdraft Racing Cobra",
+      class: "Modern Classic",
+      doors: 2,
+      seats: 2,
+      fuel: "Petrol",
+      gearbox: "Automatic",
+      engine: "V8",
+
+      specifications: [
+        { text: "Factory built" },
+        { text: "V8" },
+        { text: "Automatic transmission" },
+        { text: "Power steering" },
+        { text: "Modern brakes" },
+      ],
+    },
+
+    securityAndLiability: {
+      heading: "Security & Liability Holding Fee",
+
+      cardPreAuthorisation: {
+        amount: 15000,
+        currency: "ZAR",
+        description:
+          "A temporary holding fee covering insurance excess, vehicle damage, fines, recovery costs, or rental agreement breaches.",
+        release:
+          "Any unused amount is released after inspection and fine clearance.",
+      },
+
+      cashDeposit: {
+        amountZAR: 20000,
+        alternativeAmountUSD: 1200,
+        paymentMethod: "Cash",
+        paidAt: "Venue",
+        refundPolicy:
+          "Cash deposits may only be refunded from 08h30 the following day.",
+      },
+    },
+
+    needToKnow: [
+      {
+        text: "Minimum age: 23 years.",
+      },
+      {
+        text: "A valid driver's licence is required.",
+      },
+      {
+        text: "Bring a credit card for the security/liability holding fee and toll roads.",
+      },
+      {
+        text: "Comfortable clothing, closed shoes, and a warm jacket are recommended.",
+      },
+      {
+        text: "The vehicle operates in safe weather conditions.",
+      },
+      {
+        text: "One free passenger may join the drive.",
+      },
+      {
+        text: "35 km free mileage is included.",
+      },
+      {
+        text: "Additional mileage costs R20.00 per km.",
+      },
+      {
+        text: "Fuel must be replenished on return.",
+      },
+      {
+        text: "An extra driver costs R500.",
+      },
+      {
+        text: "Chapman's Peak Drive (Noordhoek ↔ Hout Bay) is excluded due to safety restrictions.",
+      },
+      {
+        text: "Sunset times vary seasonally.",
+      },
+    ],
+
+    faqs: [
+      {
+        question: "How long is the Cobra Sundowner?",
+        answer:
+          "The sunset drive is 2 hours, from 17h00 to 19h00, with return scheduled for 19h15.",
+      },
+      {
+        question: "Who drives the Cobra?",
+        answer:
+          "The experience is a self-drive experience. The customer drives the official Backdraft Racing Cobra.",
+      },
+      {
+        question: "What vehicle will I drive?",
+        answer:
+          "You will drive an official Backdraft Racing Cobra, a factory-built modern classic with a V8 petrol engine, automatic gearbox, power steering, and modern brakes.",
+      },
+      {
+        question: "How many people can the Cobra accommodate?",
+        answer:
+          "The Cobra has two seats. One free passenger may join the driver.",
+      },
+      {
+        question: "How much mileage is included?",
+        answer:
+          "The experience includes 35 km of free mileage. Additional mileage is charged at R20.00 per kilometre.",
+      },
+      {
+        question: "Is fuel included?",
+        answer: "No. Fuel must be replenished on return.",
+      },
+      {
+        question: "Can I add another driver?",
+        answer: "Yes. An extra driver can be added for R500.",
+      },
+      {
+        question: "What is the security deposit?",
+        answer:
+          "A R15,000 amount is pre-authorised on the card as a temporary holding fee. It covers matters such as insurance excess, vehicle damage, fines, recovery costs, or rental agreement breaches. Any unused amount is released after inspection and fine clearance.",
+      },
+      {
+        question: "Can I pay the deposit in cash?",
+        answer:
+          "Yes. The cash deposit is R20,000 or $1,200. It is paid at the venue and may only be refunded from 08h30 the following day.",
+      },
+      {
+        question: "Can I drive along Chapman's Peak?",
+        answer:
+          "No. Chapman's Peak Drive between Noordhoek and Hout Bay is excluded due to safety restrictions.",
+      },
+      {
+        question: "What are the age requirements?",
+        answer:
+          "The minimum driver age is 23 years, and a valid driver's licence is required.",
+      },
+      {
+        question: "What should I wear?",
+        answer:
+          "Wear comfortable clothing, closed shoes, and bring a warm jacket.",
+      },
+      {
+        question: "What should I bring?",
+        answer:
+          "Bring your valid driver's licence, a credit card for the deposit, and a credit card for toll roads.",
+      },
+      {
+        question: "What happens if the weather is unsuitable?",
+        answer:
+          "The experience operates in safe weather conditions. Final arrangements are subject to the supplier's safety requirements.",
+      },
+      {
+        question: "Can you help plan the route?",
+        answer:
+          "Yes. If you're not sure where to go, the team can guide you in planning the perfect sunset route.",
+      },
+    ],
+
+    tags: [
+      "Adventure",
+      "Self-Drive",
+      "Classic Car",
+      "V8",
+      "Sunset",
+      "Coastline",
+      "Half Day",
+    ],
+  },
+  // Cobra (24hr)
+  {
+    id: null, // New tour ID to be assigned (e.g., 23)
+    type: TOUR_TYPES.ADRENALINE,
+    category: TOUR_MODIFIERS.FULL_DAY,
+
+    title: "24‑Hour Self‑Drive Cobra Experience",
+    slug: "24-hour-self-drive-cobra-experience",
+    canonicalPath: "/tours/24-hour-self-drive-cobra-experience",
+
+    seo: {
+      title:
+        "24‑Hour Self‑Drive Cobra Experience in Cape Town | Cape Frontier Tours",
+      description:
+        "Experience Cape Town on your own schedule with our 24‑hour Cobra rental — the perfect blend of freedom, style, and classic motoring excitement. Explore Cape Point, Boulders Beach, and more at your own pace.",
+      keywords: [
+        "Cobra rental Cape Town",
+        "self-drive Cobra Cape Town",
+        "classic car rental Cape Town",
+        "Cobra experience South Africa",
+        "24-hour car rental Cape Town",
+        "Backdraft Racing Cobra",
+        "Cape Town road trip",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "/src/assets/images/tours/adrenaline/cobra/3.webp",
+    images: [
+      "/src/assets/images/tours/adrenaline/cobra/1.webp",
+      "/src/assets/images/tours/adrenaline/cobra/2.webp",
+      "/src/assets/images/tours/adrenaline/cobra/3.webp",
+    ],
+    imageFolder: "adrenaline/cobra",
+
+    videos: [],
+
+    location: "Foreshore, Cape Town, 8001",
+    duration: "24 hours (Collect 08:30 • Return Next Day 08:30)",
+
+    priceBase: 6400,
+    minPeople: 1,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "24‑Hour Self‑Drive Cobra",
+        pricePerPerson: 6400,
+        note: "Includes one free passenger. 24-hour rental: 08:30 – 08:30.",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Extra Driver",
+        price: 500,
+        unit: "per booking",
+        currency: "ZAR",
+        note: "",
+      },
+      {
+        category: "Additional Mileage",
+        price: 20,
+        unit: "per km",
+        currency: "ZAR",
+        note: "For mileage over 130 km",
+      },
+    ],
+
+    groupPricing: {
+      enabled: false,
+      icon: "",
+      tiers: [],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "Since Carroll Shelby introduced the first Cobra in 1962, this iconic machine has captured the imagination of drivers worldwide. If touring the Cape Peninsula in a bus or standard rental car doesn't excite you, elevate your adventure — drive a Cobra and make the journey part of the experience. This popular 24‑hour option allows you to explore Cape Point and all the top highlights at your own pace.",
+
+    highlights: [
+      { text: "24-hour self-drive Cobra experience" },
+      { text: "Factory-built modern classic with V8 engine" },
+      { text: "Automatic transmission with power steering" },
+      { text: "130 km free mileage included" },
+      { text: "One free passenger included" },
+      { text: "Flexible itinerary — explore at your own pace" },
+      {
+        text: "Scenic stops including Scarborough Beach, Boulders Beach, and Cape Point",
+      },
+      {
+        text: "Customised itinerary loaded onto your smartphone or GPS at pick-up",
+      },
+    ],
+
+    included: [
+      { text: "Hotel pickup" },
+      { text: "Drop-off at site (Foreshore, Cape Town)" },
+      { text: "130 km free mileage" },
+      { text: "Pick-up at site" },
+      { text: "Hotel drop-off" },
+      { text: "Vehicle orientation and safety briefing" },
+      { text: "Personalised itinerary loaded onto smartphone or GPS" },
+    ],
+
+    excluded: [
+      { text: "Fuel (must be replenished on return)" },
+      { text: "Additional mileage at R20.00 per km" },
+      {
+        text: "Chapman's Peak Drive (Noordhoek → Hout Bay) — excluded due to safety restrictions",
+      },
+      { text: "Personal purchases" },
+    ],
+
+    pickupOptions: [
+      "Cape Town CBD",
+      "Sea Point",
+      "Camps Bay",
+      "V&A Waterfront",
+      "Foreshore, Cape Town (collection point)",
+      "Custom pickup on request",
+    ],
+
+    requirements: [
+      { text: "Minimum age: 23 years" },
+      { text: "Valid driver's license required" },
+    ],
+
+    arrangements: {
+      availability: "All year round",
+      duration: "24 hours",
+      operatingTime: "08:30 – 08:30",
+      departure: "08:30",
+      return: "08:30 (next day)",
+      location: "Foreshore, Cape Town, 8001",
+
+      clothing: ["Comfortable clothing", "Closed shoes", "Warm jacket"],
+
+      thingsToBring: [
+        "Valid driver's license",
+        "Credit card for deposit",
+        "Cash for toll roads",
+      ],
+
+      passengerPolicy: "One free passenger may join the driver.",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "Operates in safe weather conditions. Vehicle rental is weather-dependent for safety.",
+      items: [
+        { text: "Operates in safe weather conditions" },
+        { text: "Final weather confirmation provided before collection" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "T's & C's apply. Security deposit and rental terms must be confirmed with the operator.",
+      items: [
+        { text: "T's & C's apply" },
+        { text: "Cancellation terms must be confirmed with the operator" },
+        { text: "Security deposit terms apply" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "The vehicle must be operated responsibly and in accordance with the rental agreement and applicable safety requirements.",
+      items: [
+        { text: "A valid driver's license is required" },
+        { text: "The minimum driver age is 23 years" },
+        {
+          text: "Chapman's Peak Drive (Noordhoek ↔ Hout Bay) is excluded due to safety restrictions",
+        },
+        { text: "Fuel must be replenished on return" },
+        {
+          text: "Please arrive 30 minutes early for paperwork, safety briefing, and full orientation",
+        },
+      ],
+    },
+
+    stops: [
+      {
+        id: "collection",
+        name: "Collection & Orientation",
+        time: "08:30",
+        duration: "30 min",
+        note: "Paperwork, safety briefing, and orientation",
+        description:
+          "Please arrive 30 minutes early for paperwork, a safety briefing, and a full orientation on your Cobra. Your personalised itinerary will be loaded onto your smartphone or GPS at pick-up.",
+        exactLocation: mapLocation({
+          label: "Foreshore, Cape Town",
+          address: "Foreshore, Cape Town, 8001, South Africa",
+          query: "Foreshore Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "self-drive-route",
+        name: "Self-Drive Route",
+        time: "Flexible",
+        duration: "24 hours",
+        note: "Explore at your own pace",
+        description:
+          "Enjoy legendary roads and scenic stops including Scarborough Beach, Boulders Beach Penguin Colony, and Cape Point. Not sure where to go? We'll help you plan the perfect route and load your personalised itinerary directly onto your smartphone or GPS at pick‑up.",
+        exactLocation: mapLocation({
+          label: "Cape Peninsula Route",
+          address: "Cape Peninsula, South Africa",
+          query: "Cape Peninsula South Africa",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "return",
+        name: "Vehicle Return",
+        time: "08:30 (next day)",
+        duration: "15 min",
+        note: "Return after 24 hours",
+        description:
+          "Return the Cobra to the Foreshore location. Vehicle inspection and fine clearance will be completed before the security deposit is released.",
+        exactLocation: mapLocation({
+          label: "Foreshore, Cape Town",
+          address: "Foreshore, Cape Town, 8001, South Africa",
+          query: "Foreshore Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+    ],
+
+    routeInformation: {
+      title: "Recommended Self-Drive Route",
+
+      description:
+        "Enjoy a scenic self-drive route along the Cape Peninsula at your own pace. We'll help you plan the perfect route and load your personalised itinerary directly onto your smartphone or GPS at pick-up.",
+
+      items: [
+        "Chapman's Peak Drive (Noordhoek → Hout Bay) is excluded due to safety restrictions",
+        "Scarborough Beach",
+        "Boulders Beach Penguin Colony",
+        "Cape Point",
+        "Cape of Good Hope",
+      ],
+    },
+
+    vehicle: {
+      name: "Official Backdraft Racing Cobra",
+      class: "Modern Classic",
+      doors: 2,
+      seats: 2,
+      fuel: "Petrol",
+      gearbox: "Automatic",
+      engine: "V8",
+
+      specifications: [
+        { text: "Factory built" },
+        { text: "V8 engine" },
+        { text: "Automatic transmission" },
+        { text: "Power steering" },
+        { text: "Modern brakes" },
+      ],
+    },
+
+    securityAndLiability: {
+      heading: "Security & Liability Holding Fee",
+
+      cardPreAuthorisation: {
+        amount: 15000,
+        currency: "ZAR",
+        description:
+          "A temporary holding fee covering insurance excess, vehicle damage, traffic fines, recovery costs, or breaches of the rental agreement.",
+        release:
+          "Any unused portion is released after inspection and fine clearance.",
+      },
+
+      cashDeposit: {
+        amountZAR: 20000,
+        alternativeAmountUSD: 1200,
+        paymentMethod: "Cash",
+        paidAt: "Venue",
+        refundPolicy:
+          "Cash deposits for sunset/sundowner hires may only be returned from 08:30 the following day.",
+      },
+    },
+
+    needToKnow: [
+      { text: "Minimum age: 23 years" },
+      { text: "A valid driver's license is required" },
+      {
+        text: "Please arrive 30 minutes early for paperwork, safety briefing, and full orientation",
+      },
+      { text: "Rental duration: 08:30 – 08:30 (24 hours)" },
+      { text: "130 km free mileage included" },
+      { text: "Additional mileage: R20.00 per km" },
+      { text: "Fuel must be replenished on return" },
+      { text: "Extra driver fee: R500" },
+      { text: "One free passenger may join the driver" },
+      {
+        text: "R15,000 security deposit (card pre-authorisation) or R20,000 cash deposit",
+      },
+      {
+        text: "Chapman's Peak Drive (Noordhoek ↔ Hout Bay) is excluded due to safety restrictions",
+      },
+      { text: "T's & C's apply" },
+    ],
+
+    faqs: [
+      {
+        question: "How long is the rental?",
+        answer: "The rental is 24 hours, from 08:30 to 08:30 the next day.",
+      },
+      {
+        question: "Who drives the Cobra?",
+        answer:
+          "This is a self-drive experience. The customer drives the official Backdraft Racing Cobra.",
+      },
+      {
+        question: "What vehicle will I drive?",
+        answer:
+          "You will drive an official Backdraft Racing Cobra, a factory-built modern classic with a V8 petrol engine, automatic gearbox, power steering, and modern brakes.",
+      },
+      {
+        question: "How many people can the Cobra accommodate?",
+        answer:
+          "The Cobra has two seats. One free passenger may join the driver.",
+      },
+      {
+        question: "How much mileage is included?",
+        answer:
+          "The experience includes 130 km of free mileage. Additional mileage is charged at R20.00 per kilometre.",
+      },
+      {
+        question: "Is fuel included?",
+        answer: "No. Fuel must be replenished on return.",
+      },
+      {
+        question: "Can I add another driver?",
+        answer: "Yes. An extra driver can be added for R500.",
+      },
+      {
+        question: "What is the security deposit?",
+        answer:
+          "A R15,000 amount is pre-authorised on the card as a temporary holding fee. It covers insurance excess, vehicle damage, fines, recovery costs, or rental agreement breaches. Any unused amount is released after inspection and fine clearance.",
+      },
+      {
+        question: "Can I pay the deposit in cash?",
+        answer:
+          "Yes. The cash deposit is R20,000 or $1,200. Cash deposits for sunset/sundowner hires may only be returned from 08:30 the following day.",
+      },
+      {
+        question: "Can I drive along Chapman's Peak?",
+        answer:
+          "No. Chapman's Peak Drive between Noordhoek and Hout Bay is excluded due to safety restrictions.",
+      },
+      {
+        question: "What are the age requirements?",
+        answer:
+          "The minimum driver age is 23 years, and a valid driver's license is required.",
+      },
+      {
+        question: "Can you help plan the route?",
+        answer:
+          "Yes. If you're not sure where to go, the team can help you plan the perfect route and load your personalised itinerary directly onto your smartphone or GPS at pick-up.",
+      },
+    ],
+
+    tags: [
+      "Adventure",
+      "Self-Drive",
+      "Classic Car",
+      "V8",
+      "Cobra",
+      "24-Hour Rental",
+      "Cape Peninsula",
+      "Road Trip",
+      "Cape Town",
+    ],
+  },
+  // Cobra (Full day)
+  {
+    id: null, // New tour ID to be assigned (e.g., 24)
+    type: TOUR_TYPES.ADRENALINE,
+    category: TOUR_MODIFIERS.FULL_DAY,
+
+    title: "Full Day Self‑Drive Cobra Experience",
+    slug: "full-day-self-drive-cobra-experience",
+    canonicalPath: "/tours/full-day-self-drive-cobra-experience",
+
+    seo: {
+      title:
+        "Full Day Self‑Drive Cobra Experience in Cape Town | Cape Frontier Tours",
+      description:
+        "Slip into the low‑slung seat of a classic Cobra and let Cape Town's most iconic roads unfold in front of you. A head‑turning, wind‑in‑your‑hair, open‑top adrenaline moment wrapped in pure luxury.",
+      keywords: [
+        "Cobra self-drive Cape Town",
+        "full day Cobra rental Cape Town",
+        "classic car experience Cape Town",
+        "Backdraft Racing Cobra",
+        "Cape Town road trip",
+        "Cobra hire Cape Town",
+        "luxury car rental Cape Town",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "/src/assets/images/tours/adrenaline/cobra/2.webp",
+    images: [
+      "/src/assets/images/tours/adrenaline/cobra/1.webp",
+      "/src/assets/images/tours/adrenaline/cobra/2.webp",
+      "/src/assets/images/tours/adrenaline/cobra/3.webp",
+    ],
+    imageFolder: "adrenaline/cobra",
+
+    videos: [],
+
+    location: "Foreshore, Cape Town, 8001",
+    duration: "8 hours (08:30 – 16:30)",
+
+    priceBase: 4500,
+    minPeople: 1,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "Full Day Self‑Drive Cobra",
+        pricePerPerson: 4500,
+        note: "8-hour experience. Includes one free passenger.",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Extra Driver",
+        price: 500,
+        unit: "per booking",
+        currency: "ZAR",
+        note: "",
+      },
+      {
+        category: "Additional Mileage",
+        price: 20,
+        unit: "per km",
+        currency: "ZAR",
+        note: "For mileage over 110 km",
+      },
+    ],
+
+    groupPricing: {
+      enabled: false,
+      icon: "",
+      tiers: [],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "Slip into the low‑slung seat of a classic Cobra, feel the rumble under you, and let Cape Town's most iconic roads unfold in front of you. This isn't just a drive — it's a head‑turning, wind‑in‑your‑hair, open‑top adrenaline moment wrapped in pure luxury. For the next few hours, the city becomes your playground, and the Cobra becomes your statement piece.",
+
+    highlights: [
+      { text: "8-hour self-drive Cobra experience" },
+      { text: "Factory-built modern classic with V8 engine" },
+      { text: "Automatic transmission with power steering" },
+      { text: "110 km free mileage included" },
+      { text: "One free passenger included" },
+      { text: "Flexible itinerary — choose coastal views or Cape Winelands" },
+      { text: "Turn-by-turn itineraries loaded onto your smartphone or GPS" },
+      {
+        text: "Cape Peninsula highlights: Boulders Beach, Cape Point, Hout Bay, Noordhoek",
+      },
+      { text: "Cape Winelands option: Stellenbosch and Franschhoek" },
+    ],
+
+    included: [
+      { text: "Hotel pickup" },
+      { text: "Drop-off at site (Foreshore, Cape Town)" },
+      { text: "110 km free mileage" },
+      { text: "Route itinerary loaded onto your device" },
+      { text: "Pick-up at site" },
+      { text: "Hotel drop-off" },
+      { text: "Vehicle orientation and safety briefing" },
+    ],
+
+    excluded: [
+      { text: "Fuel (must be replenished on return)" },
+      { text: "Additional mileage at R20.00 per km" },
+      { text: "Chapman's Peak Drive (restricted for safety reasons)" },
+      { text: "Personal purchases" },
+    ],
+
+    pickupOptions: [
+      "Cape Town CBD",
+      "Sea Point",
+      "Camps Bay",
+      "V&A Waterfront",
+      "Foreshore, Cape Town (collection point)",
+      "Custom pickup on request",
+    ],
+
+    requirements: [
+      { text: "Minimum age: 23 years" },
+      { text: "Valid driver's license required" },
+    ],
+
+    arrangements: {
+      availability: "All year round",
+      duration: "8 hours",
+      operatingTime: "08:30 – 16:30",
+      departure: "08:30",
+      return: "16:30",
+      location: "Foreshore, Cape Town, 8001",
+
+      clothing: ["Comfortable clothing", "Closed shoes", "Warm jacket"],
+
+      thingsToBring: [
+        "Valid driver's license",
+        "Credit card for security deposit",
+        "Cash for toll roads",
+      ],
+
+      passengerPolicy: "One free passenger may join the driver for the day.",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "Operates in safe weather conditions. Flexible wet weather policy applies.",
+      items: [
+        { text: "The drive will take place in all safe weather conditions" },
+        { text: "If it rains, rescheduling is available" },
+        {
+          text: "Voucher valid for 3 years can be issued if conditions are unsuitable",
+        },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "T's & C's apply. Flexible wet weather policy allows rescheduling or vouchers.",
+      items: [
+        { text: "T's & C's apply" },
+        { text: "Cancellation terms must be confirmed with the operator" },
+        {
+          text: "Wet weather allows rescheduling or voucher valid for 3 years",
+        },
+        { text: "Security deposit terms apply" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "All vehicles are factory built and comply with all regulations set out by the South African Department of Transport. Safety along with a memorable experience are the two most important factors.",
+      items: [
+        { text: "All vehicles are factory built" },
+        {
+          text: "All vehicles comply with South African Department of Transport regulations",
+        },
+        { text: "A valid driver's license is required" },
+        { text: "The minimum driver age is 23 years" },
+        { text: "Chapman's Peak Drive is restricted for safety reasons" },
+        { text: "Fuel must be replenished on return" },
+      ],
+    },
+
+    stops: [
+      {
+        id: "collection",
+        name: "Collection & Orientation",
+        time: "08:30",
+        duration: "30 min",
+        note: "Paperwork, safety briefing, and orientation",
+        description:
+          "Arrive at the Foreshore location for paperwork, a safety briefing, and a full orientation on your Cobra. An itinerary will be drawn up while the guest completes the paperwork.",
+        exactLocation: mapLocation({
+          label: "Foreshore, Cape Town",
+          address: "Foreshore, Cape Town, 8001, South Africa",
+          query: "Foreshore Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "self-drive-route",
+        name: "Self-Drive Route",
+        time: "Flexible",
+        duration: "8 hours",
+        note: "Explore at your own pace",
+        description:
+          "Choose your preferred route — Cape Peninsula highlights including Boulders Beach, Cape Point, Hout Bay, and Noordhoek, or the Cape Winelands option exploring Stellenbosch and Franschhoek. Turn-by-turn itineraries are loaded directly to your smartphone or GPS so you can enjoy the drive without worrying about navigation.",
+        exactLocation: mapLocation({
+          label: "Cape Peninsula or Cape Winelands",
+          address: "Cape Town, South Africa",
+          query: "Cape Town South Africa",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "return",
+        name: "Vehicle Return",
+        time: "16:30",
+        duration: "15 min",
+        note: "Return after 8 hours",
+        description:
+          "Return the Cobra to the Foreshore location. Vehicle inspection and fine clearance will be completed before the security deposit is released.",
+        exactLocation: mapLocation({
+          label: "Foreshore, Cape Town",
+          address: "Foreshore, Cape Town, 8001, South Africa",
+          query: "Foreshore Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+    ],
+
+    routeInformation: {
+      title: "Recommended Self-Drive Routes",
+
+      description:
+        "Whether you prefer coastal views or countryside charm, the Cobra is the perfect way to experience Cape Town's most celebrated destinations. We provide turn‑by‑turn itineraries directly to your smartphone or GPS so you can enjoy the drive without worrying about navigation.",
+
+      items: [
+        "Cape Peninsula Highlights: Boulders Beach and its famous penguins",
+        "Cape Point's dramatic cliffs and ocean vistas",
+        "Hout Bay Harbour and local markets",
+        "Noordhoek's long, sweeping coastline",
+        "Constantia's lush wine valley",
+        "Cape Winelands Option: Stellenbosch and Franschhoek — boutique shops, wine estates, mountain passes, and charming cafés",
+        "Chapman's Peak Drive is restricted for safety reasons",
+      ],
+    },
+
+    vehicle: {
+      name: "Official Backdraft Racing Cobra",
+      class: "Modern Classic",
+      doors: 2,
+      seats: 2,
+      fuel: "Petrol",
+      gearbox: "Automatic",
+      engine: "V8",
+
+      specifications: [
+        { text: "Factory built" },
+        { text: "V8 engine" },
+        { text: "Automatic transmission" },
+        { text: "Power steering" },
+        { text: "Modern brakes" },
+        { text: "Pre-installed Go-Pro mounts" },
+      ],
+    },
+
+    securityAndLiability: {
+      heading: "Security & Liability Holding Fee",
+
+      cardPreAuthorisation: {
+        amount: 15000,
+        currency: "ZAR",
+        description:
+          "A temporary holding fee covering insurance excess, vehicle damage, traffic fines, recovery costs, or breaches of the rental agreement.",
+        release:
+          "Any unused amount is released after inspection and fine clearance.",
+      },
+
+      cashDeposit: {
+        amountZAR: 20000,
+        alternativeAmountUSD: 1200,
+        paymentMethod: "Cash",
+        paidAt: "Venue",
+        refundPolicy:
+          "Cash deposits for sunset/sundowner hires may only be collected from 08:30 the following day.",
+      },
+    },
+
+    needToKnow: [
+      { text: "Minimum age: 23 years" },
+      { text: "Valid driver's license required" },
+      { text: "Duration: 08:30 – 16:30 (8 hours)" },
+      { text: "110 km free mileage included" },
+      { text: "Additional mileage: R20.00 per km" },
+      { text: "Fuel must be replenished on return" },
+      { text: "Extra driver fee: R500" },
+      { text: "One free passenger may join the driver" },
+      {
+        text: "R15,000 security deposit (card pre-authorisation) or R20,000 cash deposit",
+      },
+      { text: "Chapman's Peak Drive is restricted for safety reasons" },
+      { text: "T's & C's apply" },
+      { text: "Go-Pro and SD card rental packages available" },
+      {
+        text: "Refreshments, t-shirts, caps, and blankets available for purchase",
+      },
+    ],
+
+    faqs: [
+      {
+        question: "I have rented the car but have nowhere to go?",
+        answer:
+          "An itinerary will be drawn up while the guest completes the paperwork. Turn-by-turn itineraries are loaded directly to your smartphone or GPS.",
+      },
+      {
+        question: "Is safety a concern?",
+        answer:
+          "All our cars are factory built and comply with all regulations set out by the South African Department of Transport. Safety along with a memorable experience are the two most important factors for our Brand.",
+      },
+      {
+        question: "How many people can you accommodate?",
+        answer:
+          "We can currently take up to 10 pax in Backdraft Cobra's at a time but have a few other great classics we can offer in conjunction to accommodate larger groups. Up to 20 pax can be arranged.",
+      },
+      {
+        question: "What if it rains?",
+        answer:
+          "We have a flexible wet weather policy. The drive will take place in all safe weather conditions permitting. If you wake up and find it is raining we will allow rescheduling of the experience or issue you with a voucher valid for 3 years to take up the experience at a convenient time.",
+      },
+      {
+        question: "What do I need to bring with?",
+        answer:
+          "Bring along your driver's license, credit card, and cash for refuelling the car. All our cars have pre-installed Go-Pro mounts and we provide Go-Pro and SD card rental packages allowing you to capture the day on film. We also offer refreshments, t-shirts, caps, and blankets for purchase.",
+      },
+      {
+        question: "What vehicle will I drive?",
+        answer:
+          "You will drive an official Backdraft Racing Cobra, a factory-built modern classic with a V8 petrol engine, automatic gearbox, power steering, and modern brakes.",
+      },
+      {
+        question: "How much mileage is included?",
+        answer:
+          "The experience includes 110 km of free mileage. Additional mileage is charged at R20.00 per kilometre.",
+      },
+      {
+        question: "Is fuel included?",
+        answer: "No. Fuel must be replenished on return.",
+      },
+      {
+        question: "Can I add another driver?",
+        answer: "Yes. An extra driver can be added for R500.",
+      },
+      {
+        question: "What is the security deposit?",
+        answer:
+          "A R15,000 amount is pre-authorised on the card as a temporary holding fee. It covers insurance excess, vehicle damage, fines, recovery costs, or rental agreement breaches. Any unused amount is released after inspection and fine clearance.",
+      },
+      {
+        question: "Can I pay the deposit in cash?",
+        answer:
+          "Yes. The cash deposit is R20,000 or $1,200. Cash deposits for sunset/sundowner hires may only be collected from 08:30 the following day.",
+      },
+      {
+        question: "Can I drive along Chapman's Peak?",
+        answer: "No. Chapman's Peak Drive is restricted for safety reasons.",
+      },
+    ],
+
+    tags: [
+      "Adventure",
+      "Self-Drive",
+      "Classic Car",
+      "V8",
+      "Cobra",
+      "Full Day",
+      "Cape Peninsula",
+      "Cape Winelands",
+      "Road Trip",
+      "Cape Town",
+      "Luxury",
+    ],
+  },
+  // Horse-Riding
+  {
+    id: null, // New tour ID to be assigned (e.g., 25)
+    type: TOUR_TYPES.ADRENALINE,
+    category: TOUR_MODIFIERS.HALF_DAY,
+
+    title: "Horse Riding at the Cape Dunes",
+    slug: "horse-riding-at-the-cape-dunes",
+    canonicalPath: "/tours/horse-riding-at-the-cape-dunes",
+
+    seo: {
+      title: "Horse Riding at the Cape Dunes | Cape Frontier Tours",
+      description:
+        "A breathtaking guided horse‑riding experience along the Cape dunes, offering sweeping ocean views, soft white sand, and peaceful riding trails suitable for beginners and experienced riders.",
+      keywords: [
+        "horse riding Cape Town",
+        "Cape dunes horse riding",
+        "beach horse riding Cape Town",
+        "guided horse ride Cape Town",
+        "Cape Town horse riding experience",
+        "Noordhoek horse riding",
+        "family horse riding Cape Town",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "/src/assets/images/tours/adrenaline/horse-riding-dunes/1.webp",
+    images: [
+      "/src/assets/images/tours/adrenaline/horse-riding-dunes/1.webp",
+      "/src/assets/images/tours/adrenaline/horse-riding-dunes/2.webp",
+      "/src/assets/images/tours/adrenaline/horse-riding-dunes/3.webp",
+    ],
+    imageFolder: "adrenaline/horse-riding-dunes",
+
+    videos: [],
+
+    location: "Cape Dunes, Cape Town, South Africa",
+    duration: "2 hours (60–90 minutes riding time)",
+
+    priceBase: 2250,
+    minPeople: 2,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "Adults",
+        pricePerPerson: 2250,
+        note: "All-inclusive per person. Minimum 2 guests required.",
+      },
+      {
+        category: "Children (6+)",
+        pricePerPerson: 2250,
+        note: "Same price as adults.",
+      },
+    ],
+
+    additionalPricing: [],
+
+    groupPricing: {
+      enabled: false,
+      icon: "",
+      tiers: [],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "A breathtaking guided horse‑riding experience along the Cape dunes, offering sweeping ocean views, soft white sand, and peaceful riding trails suitable for beginners and experienced riders.",
+
+    highlights: [
+      { text: "Scenic dune trails with ocean and mountain views" },
+      { text: "Beginner‑friendly horses and professional guides" },
+      { text: "Peaceful riding experience away from crowds" },
+      { text: "Perfect for couples, families, and small groups" },
+      { text: "Bottled water included" },
+      { text: "60–90 minutes of riding time" },
+    ],
+
+    included: [
+      { text: "Pick up at location" },
+      {
+        text: "Professional driver and reliable vehicle with passenger liability",
+      },
+      { text: "Horse riding fee" },
+      { text: "Bottled water" },
+      { text: "Drop off at location" },
+      { text: "Safety briefing and helmet fitting" },
+      { text: "Guide introduction" },
+    ],
+
+    excluded: [
+      { text: "Breakfast" },
+      { text: "Lunch" },
+      { text: "Personal purchases" },
+    ],
+
+    pickupOptions: [
+      "At location only",
+      "Cape Town CBD (on request)",
+      "Sea Point (on request)",
+      "Camps Bay (on request)",
+      "Custom pickup on request",
+    ],
+
+    requirements: [
+      { text: "Minimum age: 6 years old" },
+      { text: "Maximum rider weight: 95–100 kg" },
+      {
+        text: "Riders must be physically able to mount, balance, and follow guide instructions",
+      },
+      {
+        text: "Guests with medical conditions must disclose this before booking",
+      },
+    ],
+
+    arrangements: {
+      availability: "Available all year (weather dependent)",
+      duration: "2 hours total",
+      operatingTime: "Flexible",
+      departure: "Flexible",
+      return: "Flexible",
+      location: "Cape Dunes, Cape Town, South Africa",
+
+      clothing: [
+        "Comfortable clothing",
+        "Closed shoes (no sandals)",
+        "Sunscreen",
+        "Sunglasses",
+        "Light jacket depending on weather",
+      ],
+
+      thingsToBring: [],
+
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "Horse riding is weather‑dependent. The operator may delay or cancel rides for safety reasons.",
+      items: [
+        { text: "Weather conditions may affect availability" },
+        { text: "Rides may be delayed or cancelled for safety reasons" },
+        { text: "Final confirmation provided before departure" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Weather-dependent activity. Cancellation terms must be confirmed with the operator.",
+      items: [
+        { text: "Cancellation terms must be confirmed with the operator" },
+        { text: "Weather may result in rescheduling or cancellation" },
+        { text: "Final cancellation policy is confirmed upon booking" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Horse riding is an outdoor adventure activity and involves inherent risks. By booking or participating, guests acknowledge and accept the safety terms outlined below. These conditions are in place to protect both riders and horses.",
+      items: [
+        {
+          text: "Participation at own risk — horse riding involves inherent risks including uneven terrain, sudden horse movements, weather conditions, and physical exertion",
+        },
+        {
+          text: "Maximum rider weight: 95–100 kg — riders may be weighed on arrival if uncertain",
+        },
+        {
+          text: "Minimum age: 6 years — riders must be physically able to mount, balance, and follow guide instructions",
+        },
+        { text: "Helmets must be worn at all times" },
+        { text: "Riders must follow all guide instructions" },
+        { text: "No racing, sudden movements, or galloping" },
+        { text: "No riding under the influence of alcohol or drugs" },
+        {
+          text: "Approach horses calmly — do not stand directly behind a horse",
+        },
+        { text: "Avoid loud noises or sudden gestures" },
+        {
+          text: "Cape Frontier Travel & Tours is not responsible for loss or damage to personal items during the ride",
+        },
+        {
+          text: "By booking, paying for, or participating, guests confirm they understand and accept all safety conditions",
+        },
+      ],
+    },
+
+    stops: [
+      {
+        id: "stables",
+        name: "Stables & Safety Briefing",
+        time: "Flexible",
+        duration: "20 min",
+        note: "Welcome, briefing, and helmet fitting",
+        description:
+          "Friendly licensed guides welcome you at the stables. Receive a safety briefing, helmet fitting, and guide introduction before beginning your ride.",
+        exactLocation: mapLocation({
+          label: "Cape Dunes Stables",
+          address: "Cape Dunes, Cape Town, South Africa",
+          query: "Cape Dunes Horse Riding",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "dune-ride",
+        name: "Cape Dunes Horse Ride",
+        time: "Flexible",
+        duration: "60 - 90 min",
+        note: "Gentle walk onto the dunes",
+        description:
+          "Enjoy a gentle walk onto the dunes with a scenic ride featuring sweeping ocean views, soft white sand, and peaceful riding trails. The relaxed pace is suitable for all levels.",
+        exactLocation: mapLocation({
+          label: "Cape Dunes",
+          address: "Cape Town, South Africa",
+          query: "Cape Dunes",
+        }),
+        images: [],
+        touristComments: [],
+      },
+    ],
+
+    routeInformation: {
+      title: "",
+      description: "",
+      items: [],
+    },
+
+    vehicle: {
+      name: "",
+      class: "",
+      doors: null,
+      seats: null,
+      fuel: "",
+      gearbox: "",
+      engine: "",
+      specifications: [],
+    },
+
+    securityAndLiability: {
+      heading: "",
+      cardPreAuthorisation: {
+        amount: null,
+        currency: "",
+        description: "",
+        release: "",
+      },
+      cashDeposit: {
+        amountZAR: null,
+        alternativeAmountUSD: null,
+        paymentMethod: "",
+        paidAt: "",
+        refundPolicy: "",
+      },
+    },
+
+    needToKnow: [
+      { text: "Minimum age: 6 years old" },
+      { text: "Maximum rider weight: 95–100 kg" },
+      { text: "Helmets must be worn at all times" },
+      { text: "No galloping or riding ahead of the guide" },
+      { text: "No racing, sudden movements, or riding under the influence" },
+      { text: "Riders must follow all guide instructions" },
+      { text: "Approach horses calmly — do not stand directly behind a horse" },
+      { text: "Avoid loud noises or sudden gestures" },
+      {
+        text: "Guests with medical conditions must disclose this before booking",
+      },
+      { text: "Horse riding is weather‑dependent" },
+      {
+        text: "Cape Frontier Travel & Tours is not responsible for loss or damage to personal items",
+      },
+    ],
+
+    faqs: [
+      {
+        question: "Do I need horse riding experience?",
+        answer:
+          "No. This experience is suitable for beginners and includes a safety briefing, helmet fitting, and guide introduction. The pace is relaxed and suitable for all levels.",
+      },
+      {
+        question: "What is the minimum age?",
+        answer:
+          "The minimum age is 6 years old. Riders must be physically able to mount, balance, and follow guide instructions.",
+      },
+      {
+        question: "What is the weight limit?",
+        answer:
+          "The maximum rider weight is 95–100 kg. Riders may be weighed on arrival if uncertain. Guests exceeding the limit cannot be accommodated.",
+      },
+      {
+        question: "What should I wear?",
+        answer:
+          "Wear comfortable clothing, closed shoes (no sandals), and bring sunscreen, sunglasses, and a light jacket depending on the weather.",
+      },
+      {
+        question: "Is the ride weather dependent?",
+        answer:
+          "Yes. Horse riding is weather‑dependent. The operator may delay or cancel rides for safety reasons.",
+      },
+      {
+        question: "Can children participate?",
+        answer:
+          "Yes. Children aged 6 years and older can participate at the same price as adults. All riders must follow guide instructions.",
+      },
+      {
+        question: "What is included in the price?",
+        answer:
+          "The price includes pick-up at location, professional driver, horse riding fee, bottled water, safety briefing, and drop-off at location.",
+      },
+    ],
+
+    tags: [
+      "Horse Riding",
+      "Cape Dunes",
+      "Adventure",
+      "Outdoor",
+      "Half Day",
+      "Family Friendly",
+      "Cape Town",
+      "Beginner Friendly",
+    ],
+  },
+  // Gun-Range + City Tour
+  {
+    id: null, // New tour ID to be assigned (e.g., 26)
+    type: TOUR_TYPES.ADRENALINE,
+    category: TOUR_MODIFIERS.FULL_DAY,
+
+    title: "Gun Range + Cape Town City Tour",
+    slug: "gun-range-cape-town-city-tour",
+    canonicalPath: "/tours/gun-range-cape-town-city-tour",
+
+    seo: {
+      title: "Gun Range & Cape Town City Tour | Cape Frontier Tours",
+      description:
+        "Perfect for travellers who want action plus sightseeing. Start with a shooting experience, then explore Cape Town's most iconic viewpoints including Bo-Kaap, Signal Hill, Camps Bay, and the V&A Waterfront.",
+      keywords: [
+        "Gun Range Cape Town",
+        "Cape Town City Tour",
+        "Bo-Kaap Tour",
+        "Signal Hill Tour",
+        "Camps Bay Tour",
+        "V&A Waterfront Tour",
+        "Private Cape Town Tour",
+        "Cape Town Shooting Experience",
+        "Cape Town Adventure Tour",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "/src/assets/images/tours/adrenaline/gun-range-city-tour/1.webp",
+    images: [
+      "/src/assets/images/tours/adrenaline/gun-range-city-tour/1.webp",
+      "/src/assets/images/tours/adrenaline/gun-range-city-tour/2.webp",
+      "/src/assets/images/tours/adrenaline/gun-range-city-tour/3.webp",
+    ],
+    imageFolder: "adrenaline/gun-range-city-tour",
+
+    videos: [],
+
+    location: "Cape Town, South Africa",
+    duration: "6 - 7 Hours",
+
+    priceBase: 7200,
+    minPeople: 2,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "2–4 Guests",
+        pricePerPerson: null,
+        note: "R7,200 total (private vehicle)",
+      },
+      {
+        category: "5–7 Guests",
+        pricePerPerson: null,
+        note: "R10,000 total (private vehicle)",
+      },
+    ],
+
+    additionalPricing: [],
+
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        {
+          minPeople: 2,
+          maxPeople: 4,
+          perPerson: null,
+          totalPrice: 7200,
+          label: "2–4 Guests",
+          note: "Private vehicle",
+        },
+        {
+          minPeople: 5,
+          maxPeople: 7,
+          perPerson: null,
+          totalPrice: 10000,
+          label: "5–7 Guests",
+          note: "Private vehicle",
+        },
+      ],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "Perfect for travellers who want action plus sightseeing. Start with a shooting experience, then explore Cape Town's most iconic viewpoints.",
+
+    highlights: [
+      { text: "Professionally supervised shooting range session" },
+      { text: "Explore colourful Bo-Kaap" },
+      { text: "Panoramic views from Signal Hill" },
+      { text: "Relax at beautiful Camps Bay" },
+      { text: "Visit the vibrant V&A Waterfront" },
+      { text: "Private vehicle with driver-guide" },
+      { text: "Flexible itinerary" },
+    ],
+
+    included: [
+      { text: "Private transport" },
+      { text: "Shooting range session" },
+      { text: "Driver-guide" },
+      { text: "Bottled water" },
+      { text: "Full safety briefing" },
+      { text: "Professional firearms instructor" },
+    ],
+
+    excluded: [
+      { text: "Meals" },
+      { text: "Optional museum entries" },
+      { text: "Personal purchases" },
+    ],
+
+    pickupOptions: [
+      "Cape Town CBD",
+      "Sea Point",
+      "Camps Bay",
+      "V&A Waterfront",
+      "Custom pickup on request",
+    ],
+
+    requirements: [
+      { text: "Minimum age: 18 years" },
+      { text: "Valid ID or passport required" },
+      { text: "No alcohol before shooting" },
+      { text: "All minors strictly prohibited from handling firearms" },
+    ],
+
+    arrangements: {
+      availability: "Available all year",
+      duration: "6 - 7 hours",
+      operatingTime: "Flexible",
+      departure: "Flexible",
+      return: "Flexible",
+      location: "Cape Town, South Africa",
+
+      clothing: ["Comfortable clothing", "Closed shoes"],
+
+      thingsToBring: ["Valid ID or passport", "Camera", "Sunscreen"],
+
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "All weather conditions – outdoor activities operate in safe conditions only.",
+      items: [
+        { text: "Shooting range operates in safe weather conditions" },
+        { text: "City tour continues in all weather conditions" },
+        { text: "Final timing confirmed after booking" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Tour itinerary may vary depending on weather and attraction operating hours.",
+      items: [
+        { text: "Private tour bookings require advance confirmation" },
+        { text: "Final cancellation policy is confirmed upon booking" },
+        { text: "Weather may affect outdoor activities" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience.",
+      items: [
+        { text: "All safety regulations must be followed at all times" },
+        {
+          text: "Professional instructors supervise the entire shooting session",
+        },
+        {
+          text: "Participants must comply with legal requirements for firearms training",
+        },
+        { text: "Age restrictions and eligibility criteria apply" },
+      ],
+    },
+
+    stops: [
+      {
+        id: "gun-range",
+        name: "Gun Range",
+        time: "Flexible",
+        duration: "1.5 - 2 hours",
+        note: "Professional supervised shooting experience",
+        description:
+          "Begin your day with an exciting shooting session led by experienced instructors. Suitable for beginners and experienced shooters alike.",
+        exactLocation: mapLocation({
+          label: "Gun Range",
+          address: "Cape Town, South Africa",
+          query: "Cape Town Gun Range",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "bo-kaap",
+        name: "Bo-Kaap",
+        time: "Flexible",
+        duration: "45 minutes",
+        note: "Historic Cape Malay neighbourhood",
+        description:
+          "Explore Cape Town's colourful Bo-Kaap with its cobbled streets, vibrant houses, and rich cultural heritage.",
+        exactLocation: mapLocation({
+          label: "Bo-Kaap",
+          address: "Bo-Kaap, Cape Town, South Africa",
+          query: "Bo-Kaap Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "signal-hill",
+        name: "Signal Hill",
+        time: "Flexible",
+        duration: "30 minutes",
+        note: "Panoramic city viewpoint",
+        description:
+          "Take in sweeping views of Cape Town, Table Mountain, the Atlantic coastline, and Robben Island.",
+        exactLocation: mapLocation({
+          label: "Signal Hill",
+          address: "Signal Hill, Cape Town, South Africa",
+          query: "Signal Hill Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "camps-bay",
+        name: "Camps Bay",
+        time: "Flexible",
+        duration: "1 hour",
+        note: "Scenic beachfront",
+        description:
+          "Enjoy one of Cape Town's most famous beaches, lined with palm trees, cafés, and spectacular ocean views.",
+        exactLocation: mapLocation({
+          label: "Camps Bay",
+          address: "Camps Bay, Cape Town, South Africa",
+          query: "Camps Bay Beach",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "waterfront",
+        name: "V&A Waterfront",
+        time: "Flexible",
+        duration: "1.5 hours",
+        note: "Shopping, dining and harbour",
+        description:
+          "Finish your tour exploring the lively V&A Waterfront, one of South Africa's most popular attractions for shopping, dining, and harbour views.",
+        exactLocation: mapLocation({
+          label: "V&A Waterfront",
+          address: "V&A Waterfront, Cape Town, South Africa",
+          query: "V&A Waterfront Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+    ],
+
+    routeInformation: {
+      title: "Cape Town City Tour Route",
+
+      description:
+        "Explore Cape Town's most iconic viewpoints and cultural landmarks on this private full-day tour.",
+
+      items: [
+        "Professional supervised shooting range session",
+        "Colourful Bo-Kaap neighbourhood",
+        "Panoramic Signal Hill views",
+        "Scenic Camps Bay beachfront",
+        "Vibrant V&A Waterfront",
+      ],
+    },
+
+    vehicle: {
+      name: "",
+      class: "",
+      doors: null,
+      seats: null,
+      fuel: "",
+      gearbox: "",
+      engine: "",
+      specifications: [],
+    },
+
+    securityAndLiability: {
+      heading: "",
+      cardPreAuthorisation: {
+        amount: null,
+        currency: "",
+        description: "",
+        release: "",
+      },
+      cashDeposit: {
+        amountZAR: null,
+        alternativeAmountUSD: null,
+        paymentMethod: "",
+        paidAt: "",
+        refundPolicy: "",
+      },
+    },
+
+    needToKnow: [
+      { text: "Participants must follow all firearm safety instructions" },
+      { text: "Valid identification may be required at the shooting range" },
+      { text: "Comfortable walking shoes are recommended" },
+      { text: "Museum visits are optional and paid separately" },
+      { text: "Minimum age: 18 years for shooting activity" },
+      { text: "No alcohol before shooting" },
+    ],
+
+    faqs: [
+      {
+        question: "Is the shooting experience suitable for beginners?",
+        answer:
+          "Yes. Professional instructors provide a full safety briefing and supervise the entire session.",
+      },
+      {
+        question: "Is this a private tour?",
+        answer:
+          "Yes. The tour includes a private vehicle with your own driver-guide and a flexible itinerary.",
+      },
+      {
+        question: "Are meals included?",
+        answer:
+          "No. Meals are excluded, allowing guests to choose where they'd like to eat.",
+      },
+      {
+        question: "Are museum entries included?",
+        answer:
+          "Optional museum entrance fees are excluded unless otherwise arranged.",
+      },
+      {
+        question: "How many guests can join?",
+        answer:
+          "The tour can accommodate 2–7 guests in a private vehicle. Pricing is tiered: R7,200 for 2–4 guests and R10,000 for 5–7 guests.",
+      },
+      {
+        question: "What should I bring?",
+        answer:
+          "Bring your valid ID or passport. Comfortable clothing, closed shoes, a camera, and sunscreen are recommended.",
+      },
+    ],
+
+    tags: [
+      "Gun Range",
+      "Cape Town",
+      "City Tour",
+      "Bo-Kaap",
+      "Signal Hill",
+      "Camps Bay",
+      "V&A Waterfront",
+      "Private Tour",
+      "Adventure",
+      "Full Day",
+    ],
   },
 
-  // {
-  //   id: 4,
-  //   type: TOUR_TYPES.ADRENALINE,
-  //   category: TOUR_MODIFIERS.HALF_DAY,
-  //
-  //   title: "Snorkelling",
-  //   slug: "snorkelling",
-  //   canonicalPath: "/tours/snorkelling",
-  //
-  //   seo: {
-  //     title: "Guided Snorkelling in Cape Town | Cape Frontier Tours",
-  //     description:
-  //       "Request a guided Cape Town snorkelling experience with beginner-friendly support, coastal scenery, and selected pickup options.",
-  //     keywords: [
-  //       "snorkelling Cape Town",
-  //       "guided snorkelling Cape Town",
-  //       "Cape Town ocean tour",
-  //     ],
-  //   },
-  //
-  //   workflow: defaultWorkflow,
-  //
-  //   image: getCoverImage("adrenaline/snorkelling"),
-  //   images: getTourImages("adrenaline/snorkelling", 3),
-  //
-  //   location: "Cape Town Coastline",
-  //   duration: "2 - 3 hours",
-  //
-  //   priceBase: 950,
-  //   minPeople: 1,
-  //   baseCurrency: "ZAR",
-  //   supportedCurrencies: SUPPORTED_CURRENCIES,
-  //
-  //   pricing: [
-  //     {
-  //       category: "Adults",
-  //       pricePerPerson: 3290,
-  //     },
-  //     {
-  //       category: "Children",
-  //       pricePerPerson: null,
-  //     },
-  //   ],
-  //
-  //   groupDiscount: {
-  //     enabled: true,
-  //     icon: "/icons/savemore.png",
-  //     rules: [{ minPeople: 5, discountPercent: 10 }],
-  //   },
-  //
-  //   rating: 4.6,
-  //   stars: 4,
-  //   mainReviewerName: "Sophie Martin",
-  //   mainReviewerCountry: "FR",
-  //   reviewYear: 2025,
-  //   otherReviews: 27,
-  //   mainReview:
-  //     "A calm but exciting ocean experience. The guide was patient and the water life was beautiful to see up close.",
-  //
-  //   description:
-  //     "Explore Cape Town’s coastal waters with a guided snorkelling experience. Ideal for ocean lovers who want a relaxed but memorable marine activity.",
-  //
-  //   highlights: [
-  //     { text: "Guided coastal snorkelling" },
-  //     { text: "Marine life viewing" },
-  //     { text: "Beginner-friendly guidance" },
-  //   ],
-  //
-  //   included: [
-  //     { text: "Safety briefing" },
-  //     { text: "Snorkelling equipment" },
-  //     { text: "Guided ocean session" },
-  //   ],
-  //
-  //   excluded: [
-  //     { text: "Swimwear and towel" },
-  //     { text: "Transport unless selected" },
-  //     { text: "Meals unless confirmed" },
-  //   ],
-  //
-  //   pickupOptions: [
-  //     "Cape Town CBD",
-  //     "Sea Point",
-  //     "Camps Bay",
-  //     "Meet at activity point",
-  //     "Custom pickup on request",
-  //   ],
-  //
-  //   stops: [
-  //     {
-  //       id: "coastline",
-  //       name: "Cape Town Coastline",
-  //       time: "Flexible",
-  //       duration: "2 - 3 hours",
-  //       note: "Final location depends on ocean conditions",
-  //       description:
-  //         "The guide selects a suitable coastal area according to weather, visibility, and ocean conditions.",
-  //       exactLocation: mapLocation({
-  //         label: "Cape Town Coastline",
-  //         address: "Cape Town, South Africa",
-  //         query: "Cape Town coastline snorkelling",
-  //       }),
-  //       images: getTourImages("adrenaline/snorkelling", 3),
-  //       touristComments: [
-  //         {
-  //           name: "Sophie",
-  //           country: "FR",
-  //           text: "It was relaxed, beautiful, and beginner-friendly from start to finish.",
-  //         },
-  //       ],
-  //     },
-  //   ],
-  //
-  //
-  //   needToKnow: [
-  //     { text: "Ocean conditions may affect availability" },
-  //     { text: "Bring swimwear and a towel" },
-  //     { text: "Basic swimming ability recommended" },
-  //     { text: "Final location depends on visibility and conditions" },
-  //   ],
-  //
-  //   cancellationPolicy: {
-  //     summary: "Ocean visibility and weather can affect the tour.",
-  //     items: [
-  //       { text: "Location may be adjusted based on conditions" },
-  //       { text: "Unsafe ocean conditions may require rescheduling" },
-  //       { text: "Final cancellation rules must be confirmed with the operator" },
-  //     ],
-  //   },
-  //
-  //   faqs: [
-  //     {
-  //       question: "Is the snorkelling location fixed?",
-  //       answer:
-  //         "The final spot can change depending on ocean conditions and visibility.",
-  //     },
-  //     {
-  //       question: "Do I need to be experienced?",
-  //       answer:
-  //         "No advanced experience is required, but basic swimming ability is recommended.",
-  //     },
-  //   ],
-  //
-  //   tags: ["Ocean", "Wildlife", "Beginner Friendly", "Half Day"],
-  // },
+  // FULL_DAY
+  // Gun-Range + Wine-Tasting
+  {
+    id: null, // New tour ID to be assigned (e.g., 27)
+    type: TOUR_TYPES.ADRENALINE,
+    category: TOUR_MODIFIERS.FULL_DAY,
 
+    title: "Gun Range + Wine Tasting (Constantia/Stellenbosch)",
+    slug: "gun-range-wine-tasting",
+    canonicalPath: "/tours/gun-range-wine-tasting",
+
+    seo: {
+      title: "Gun Range & Wine Tasting Tour in Cape Town | Cape Frontier Tours",
+      description:
+        "Enjoy a premium adult-only experience combining a professionally supervised shooting session with wine tasting at two top estates in Constantia or Stellenbosch. Optional cheese pairing available.",
+      keywords: [
+        "Gun Range Cape Town",
+        "Wine Tasting Tour",
+        "Constantia Wine Tour",
+        "Stellenbosch Wine Tour",
+        "Cape Town Wine Experience",
+        "Private Wine Tour",
+        "Cape Town Shooting Experience",
+        "Adult Experience Cape Town",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "/src/assets/images/tours/adrenaline/gun-range-wine-tasting/1.webp",
+    images: [
+      "/src/assets/images/tours/adrenaline/gun-range-wine-tasting/1.webp",
+      "/src/assets/images/tours/adrenaline/gun-range-wine-tasting/2.webp",
+      "/src/assets/images/tours/adrenaline/gun-range-wine-tasting/3.webp",
+    ],
+    imageFolder: "adrenaline/gun-range-wine-tasting",
+
+    videos: [],
+
+    location: "Cape Town, South Africa (Constantia or Stellenbosch)",
+    duration: "7 - 8 Hours",
+
+    priceBase: 7680,
+    minPeople: 2,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "2–4 Guests",
+        pricePerPerson: null,
+        note: "R7,680 total (private vehicle)",
+      },
+      {
+        category: "5–7 Guests",
+        pricePerPerson: null,
+        note: "R10,600 total (private vehicle)",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Wine Tasting Fees",
+        price: null,
+        unit: "per estate",
+        currency: "ZAR",
+        note: "Optional add-on. Prices vary by estate.",
+      },
+      {
+        category: "Cheese Pairing",
+        price: null,
+        unit: "per person",
+        currency: "ZAR",
+        note: "Optional add-on. Available on request.",
+      },
+    ],
+
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        {
+          minPeople: 2,
+          maxPeople: 4,
+          perPerson: null,
+          totalPrice: 7680,
+          label: "2–4 Guests",
+          note: "Private vehicle",
+        },
+        {
+          minPeople: 5,
+          maxPeople: 7,
+          perPerson: null,
+          totalPrice: 10600,
+          label: "5–7 Guests",
+          note: "Private vehicle",
+        },
+      ],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "A premium adult‑only experience combining a professionally supervised shooting session with wine tasting at two top estates in Constantia or Stellenbosch.",
+
+    highlights: [
+      { text: "Professionally supervised shooting range session" },
+      { text: "Visit 2 premium wine estates in Constantia or Stellenbosch" },
+      { text: "Optional cheese pairing available" },
+      { text: "Choice of Constantia or Stellenbosch wine route" },
+      { text: "Private transport with driver-guide" },
+      { text: "Flexible itinerary" },
+      { text: "Perfect for adult groups and special occasions" },
+    ],
+
+    included: [
+      { text: "Private transport" },
+      { text: "Shooting range session" },
+      { text: "Professional firearms instructor" },
+      { text: "Full safety briefing" },
+      { text: "Visit to 2 wine estates" },
+      { text: "Bottled water" },
+    ],
+
+    excluded: [
+      { text: "Lunch" },
+      { text: "Wine tasting fees (optional add-on)" },
+      { text: "Cheese pairings (optional add-on)" },
+      { text: "Personal purchases" },
+    ],
+
+    pickupOptions: [
+      "Cape Town CBD",
+      "Sea Point",
+      "Camps Bay",
+      "V&A Waterfront",
+      "Custom pickup on request",
+    ],
+
+    requirements: [
+      { text: "Minimum age: 18 years" },
+      { text: "Valid ID or passport required" },
+      { text: "No alcohol before shooting" },
+      { text: "All minors strictly prohibited from handling firearms" },
+      { text: "Guests must be of legal drinking age for wine tasting" },
+    ],
+
+    arrangements: {
+      availability: "Available all year",
+      duration: "7 - 8 hours",
+      operatingTime: "Flexible",
+      departure: "Flexible",
+      return: "Flexible",
+      location: "Cape Town, South Africa (Constantia or Stellenbosch)",
+
+      clothing: ["Comfortable clothing", "Closed shoes"],
+
+      thingsToBring: ["Valid ID or passport", "Camera", "Sunscreen"],
+
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "All weather conditions – shooting range operates in safe conditions only. Wine tasting continues regardless of weather.",
+      items: [
+        { text: "Shooting range operates in safe weather conditions" },
+        { text: "Wine tasting continues in all weather conditions" },
+        { text: "Final timing confirmed after booking" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Private tour bookings require advance confirmation. Wine estate availability may affect the final itinerary.",
+      items: [
+        { text: "Private tour bookings require advance confirmation" },
+        { text: "Estate availability may affect the final itinerary" },
+        { text: "Final cancellation policy is confirmed upon booking" },
+        { text: "Weather may affect shooting range activities" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience.",
+      items: [
+        { text: "All safety regulations must be followed at all times" },
+        {
+          text: "Professional instructors supervise the entire shooting session",
+        },
+        {
+          text: "Participants must comply with legal requirements for firearms training",
+        },
+        { text: "Age restrictions and eligibility criteria apply" },
+      ],
+    },
+
+    stops: [
+      {
+        id: "gun-range",
+        name: "Gun Range",
+        time: "Flexible",
+        duration: "1.5 - 2 hours",
+        note: "Professional supervised shooting experience",
+        description:
+          "Begin your day with a professionally supervised shooting session, including a complete firearm safety briefing suitable for beginners and experienced shooters.",
+        exactLocation: mapLocation({
+          label: "Gun Range",
+          address: "Cape Town, South Africa",
+          query: "Cape Town Gun Range",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "wine-estate-1",
+        name: "Wine Estate 1",
+        time: "Flexible",
+        duration: "1.5 hours",
+        note: "Premium estate visit",
+        description:
+          "Visit one of the Cape's renowned wine estates in Constantia or Stellenbosch for optional wine tastings and spectacular vineyard scenery.",
+        exactLocation: mapLocation({
+          label: "Wine Estate",
+          address: "Constantia or Stellenbosch, South Africa",
+          query: "Constantia Wine Estates",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "wine-estate-2",
+        name: "Wine Estate 2",
+        time: "Flexible",
+        duration: "1.5 hours",
+        note: "Optional cheese pairing",
+        description:
+          "Continue to a second premium estate to relax with additional wine tastings or optional cheese pairings while enjoying the Cape Winelands.",
+        exactLocation: mapLocation({
+          label: "Wine Estate",
+          address: "Constantia or Stellenbosch, South Africa",
+          query: "Stellenbosch Wine Estates",
+        }),
+        images: [],
+        touristComments: [],
+      },
+    ],
+
+    routeInformation: {
+      title: "Gun Range + Wine Tasting Route",
+
+      description:
+        "Choose between Constantia or Stellenbosch for your wine tasting experience after your shooting session. Both routes offer world-class wine estates and stunning scenery.",
+
+      items: [
+        "Professionally supervised shooting range session",
+        "2 premium wine estates in Constantia or Stellenbosch",
+        "Optional cheese pairings available",
+        "Spectacular vineyard and mountain views",
+        "Choice of wine route based on guest preference and availability",
+      ],
+    },
+
+    vehicle: {
+      name: "",
+      class: "",
+      doors: null,
+      seats: null,
+      fuel: "",
+      gearbox: "",
+      engine: "",
+      specifications: [],
+    },
+
+    securityAndLiability: {
+      heading: "",
+      cardPreAuthorisation: {
+        amount: null,
+        currency: "",
+        description: "",
+        release: "",
+      },
+      cashDeposit: {
+        amountZAR: null,
+        alternativeAmountUSD: null,
+        paymentMethod: "",
+        paidAt: "",
+        refundPolicy: "",
+      },
+    },
+
+    needToKnow: [
+      { text: "This experience is intended for adults of legal drinking age" },
+      { text: "Participants must follow all firearm safety instructions" },
+      { text: "Wine estate selection depends on availability" },
+      { text: "Wine tastings and cheese pairings are optional add-ons" },
+      { text: "Minimum age: 18 years for shooting activity" },
+      { text: "Valid identification may be required at the shooting range" },
+      { text: "No alcohol before shooting" },
+      { text: "Comfortable walking shoes are recommended" },
+    ],
+
+    faqs: [
+      {
+        question: "Which wine estates will we visit?",
+        answer:
+          "The tour visits two selected estates in either Constantia or Stellenbosch, depending on availability and guest preference.",
+      },
+      {
+        question: "Are wine tastings included?",
+        answer:
+          "Wine tastings are available as an optional add-on and can be arranged during booking. Prices vary by estate.",
+      },
+      {
+        question: "Is the shooting experience suitable for beginners?",
+        answer:
+          "Yes. Professional instructors supervise the entire session and provide a full safety briefing.",
+      },
+      {
+        question: "Is this a private tour?",
+        answer:
+          "Yes. The experience includes a private vehicle with your own driver-guide.",
+      },
+      {
+        question: "How many guests can join?",
+        answer:
+          "The tour can accommodate 2–7 guests in a private vehicle. Pricing is tiered: R7,680 for 2–4 guests and R10,600 for 5–7 guests.",
+      },
+      {
+        question: "Is cheese pairing available?",
+        answer:
+          "Yes. Cheese pairings are available as an optional add-on on request.",
+      },
+      {
+        question: "Is lunch included?",
+        answer: "No. Lunch is excluded from the tour price.",
+      },
+      {
+        question: "What should I bring?",
+        answer:
+          "Bring your valid ID or passport. Comfortable clothing, closed shoes, a camera, and sunscreen are recommended.",
+      },
+    ],
+
+    tags: [
+      "Gun Range",
+      "Wine Tasting",
+      "Constantia",
+      "Stellenbosch",
+      "Private Tour",
+      "Adult Experience",
+      "Cape Town",
+      "Full Day",
+      "Premium",
+    ],
+  },
+  // Gun-Range + Horse-Riding
+  {
+    id: null, // New tour ID to be assigned (e.g., 28)
+    type: TOUR_TYPES.ADRENALINE,
+    category: TOUR_MODIFIERS.FULL_DAY,
+
+    title: "Gun Range + Horse Riding",
+    slug: "gun-range-horse-riding",
+    canonicalPath: "/tours/gun-range-horse-riding",
+
+    seo: {
+      title: "Gun Range & Horse Riding Tour in Cape Town | Cape Frontier Tours",
+      description:
+        "Enjoy a balanced mix of adrenaline and scenic beauty. Start with a shooting session at a certified range, then relax with a peaceful horse ride along Noordhoek Beach.",
+      keywords: [
+        "Gun Range Cape Town",
+        "Horse Riding Noordhoek Beach",
+        "Noordhoek Horse Riding",
+        "Chapman's Peak Tour",
+        "Private Adventure Tour",
+        "Cape Town Horse Riding",
+        "Cape Town Shooting Experience",
+        "Cape Town Combo Tour",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "/src/assets/images/tours/adrenaline/gun-range-horse-riding/1.webp",
+    images: [
+      "/src/assets/images/tours/adrenaline/gun-range-horse-riding/1.webp",
+      "/src/assets/images/tours/adrenaline/gun-range-horse-riding/2.webp",
+      "/src/assets/images/tours/adrenaline/gun-range-horse-riding/3.webp",
+    ],
+    imageFolder: "adrenaline/gun-range-horse-riding",
+
+    videos: [],
+
+    location: "Cape Town, South Africa",
+    duration: "7 - 8 Hours",
+
+    priceBase: 10260,
+    minPeople: 2,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "2–4 Guests",
+        pricePerPerson: null,
+        note: "R10,260 total (private vehicle)",
+      },
+      {
+        category: "5–7 Guests",
+        pricePerPerson: null,
+        note: "R14,200 total (private vehicle)",
+      },
+    ],
+
+    additionalPricing: [],
+
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        {
+          minPeople: 2,
+          maxPeople: 4,
+          perPerson: null,
+          totalPrice: 10260,
+          label: "2–4 Guests",
+          note: "Private vehicle",
+        },
+        {
+          minPeople: 5,
+          maxPeople: 7,
+          perPerson: null,
+          totalPrice: 14200,
+          label: "5–7 Guests",
+          note: "Private vehicle",
+        },
+      ],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "Enjoy a balanced mix of adrenaline and scenic beauty. Start with a shooting session at a certified range, then relax with a peaceful horse ride along Noordhoek Beach.",
+
+    highlights: [
+      { text: "Professionally supervised shooting range session" },
+      { text: "Scenic Chapman's Peak Drive" },
+      { text: "1–2 hour Noordhoek Beach horse ride" },
+      { text: "Private transport throughout" },
+      { text: "Flexible private itinerary" },
+      { text: "Perfect balance of action and relaxation" },
+    ],
+
+    included: [
+      { text: "Private transport" },
+      { text: "Shooting range session" },
+      { text: "Professional firearms instructor" },
+      { text: "Full safety briefing" },
+      { text: "Horse riding experience" },
+      { text: "Horse riding safety equipment" },
+      { text: "Bottled water" },
+    ],
+
+    excluded: [{ text: "Meals" }, { text: "Personal purchases" }],
+
+    pickupOptions: [
+      "Cape Town CBD",
+      "Sea Point",
+      "Camps Bay",
+      "V&A Waterfront",
+      "Custom pickup on request",
+    ],
+
+    requirements: [
+      { text: "Minimum age: 18 years for shooting" },
+      { text: "Minimum age: 6 years for horse riding" },
+      { text: "Valid ID or passport required" },
+      { text: "No alcohol before shooting" },
+      { text: "All minors strictly prohibited from handling firearms" },
+      { text: "Maximum rider weight: 95–100 kg" },
+      {
+        text: "Riders must be physically able to mount, balance, and follow guide instructions",
+      },
+    ],
+
+    arrangements: {
+      availability: "Available all year",
+      duration: "7 - 8 hours",
+      operatingTime: "Flexible",
+      departure: "Flexible",
+      return: "Flexible",
+      location: "Cape Town, South Africa",
+
+      clothing: [
+        "Comfortable clothing",
+        "Closed shoes (no sandals for horse riding)",
+        "Sunscreen",
+        "Sunglasses",
+        "Light jacket depending on weather",
+      ],
+
+      thingsToBring: ["Valid ID or passport", "Camera"],
+
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "All weather conditions – shooting range operates in safe conditions only. Horse riding is weather-dependent.",
+      items: [
+        { text: "Shooting range operates in safe weather conditions" },
+        { text: "Horse riding may be delayed or cancelled for safety reasons" },
+        { text: "Final timing confirmed after booking" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Private tour bookings require advance confirmation. Horse riding is subject to weather and availability.",
+      items: [
+        { text: "Private tour bookings require advance confirmation" },
+        { text: "Weather may affect horse riding operations" },
+        { text: "Final cancellation policy is confirmed upon booking" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience. Horse riding involves inherent risks and guests participate at their own risk.",
+      items: [
+        {
+          text: "All safety regulations must be followed at all times during shooting",
+        },
+        {
+          text: "Professional instructors supervise the entire shooting session",
+        },
+        { text: "Helmets must be worn at all times during horse riding" },
+        { text: "Riders must follow all guide instructions" },
+        { text: "No racing, sudden movements, or galloping during horse ride" },
+        { text: "No riding under the influence of alcohol or drugs" },
+        {
+          text: "Approach horses calmly — do not stand directly behind a horse",
+        },
+        {
+          text: "Participants must comply with legal requirements for firearms training",
+        },
+        { text: "Age restrictions and eligibility criteria apply" },
+      ],
+    },
+
+    stops: [
+      {
+        id: "gun-range",
+        name: "Gun Range",
+        time: "Flexible",
+        duration: "1.5 - 2 hours",
+        note: "Professional supervised shooting experience",
+        description:
+          "Start your adventure with a professionally supervised shooting session. Receive a complete safety briefing before enjoying a handgun or rifle experience suitable for both beginners and experienced shooters.",
+        exactLocation: mapLocation({
+          label: "Gun Range",
+          address: "Cape Town, South Africa",
+          query: "Cape Town Gun Range",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "chapmans-peak",
+        name: "Chapman's Peak Drive",
+        time: "Flexible",
+        duration: "45 minutes",
+        note: "Scenic coastal drive",
+        description:
+          "Travel one of the world's most spectacular coastal roads while enjoying panoramic Atlantic Ocean views.",
+        exactLocation: mapLocation({
+          label: "Chapman's Peak Drive",
+          address: "Chapman's Peak, Cape Town, South Africa",
+          query: "Chapman's Peak Drive",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "horse-riding",
+        name: "Noordhoek Beach Horse Riding",
+        time: "Flexible",
+        duration: "1 - 2 hours",
+        note: "Beach horseback riding experience",
+        description:
+          "Enjoy a peaceful guided horseback ride along the expansive white sands of Noordhoek Beach surrounded by mountains and ocean views. Suitable for beginners and experienced riders alike.",
+        exactLocation: mapLocation({
+          label: "Noordhoek Beach",
+          address: "Noordhoek, Cape Town, South Africa",
+          query: "Noordhoek Beach Horse Riding",
+        }),
+        images: [],
+        touristComments: [],
+      },
+    ],
+
+    routeInformation: {
+      title: "Gun Range + Horse Riding Route",
+
+      description:
+        "Experience the perfect balance of adrenaline and natural beauty. Begin with a shooting session, travel along Chapman's Peak Drive, and enjoy a peaceful horse ride on Noordhoek Beach.",
+
+      items: [
+        "Professionally supervised shooting range session",
+        "Scenic Chapman's Peak Drive",
+        "1–2 hour Noordhoek Beach horse ride",
+        "Private transport throughout",
+      ],
+    },
+
+    vehicle: {
+      name: "",
+      class: "",
+      doors: null,
+      seats: null,
+      fuel: "",
+      gearbox: "",
+      engine: "",
+      specifications: [],
+    },
+
+    securityAndLiability: {
+      heading: "",
+      cardPreAuthorisation: {
+        amount: null,
+        currency: "",
+        description: "",
+        release: "",
+      },
+      cashDeposit: {
+        amountZAR: null,
+        alternativeAmountUSD: null,
+        paymentMethod: "",
+        paidAt: "",
+        refundPolicy: "",
+      },
+    },
+
+    needToKnow: [
+      { text: "Minimum age: 18 years for shooting" },
+      { text: "Minimum age: 6 years for horse riding" },
+      { text: "Participants must follow all firearm safety instructions" },
+      { text: "Valid identification may be required at the shooting range" },
+      { text: "Horse riding is suitable for beginners and experienced riders" },
+      { text: "Comfortable clothing and closed shoes are recommended" },
+      { text: "Maximum rider weight: 95–100 kg" },
+      { text: "No alcohol before shooting" },
+      { text: "No galloping or riding ahead of the guide" },
+      { text: "Horse riding is subject to weather conditions" },
+    ],
+
+    faqs: [
+      {
+        question: "Do I need horse riding experience?",
+        answer:
+          "No. The experience is suitable for beginners and includes guidance from experienced staff.",
+      },
+      {
+        question: "Is the shooting experience suitable for beginners?",
+        answer:
+          "Yes. Professional instructors provide a complete safety briefing before the session begins.",
+      },
+      {
+        question: "Is this a private tour?",
+        answer:
+          "Yes. The tour includes a private vehicle with your own driver-guide throughout the day.",
+      },
+      {
+        question: "How many guests can join?",
+        answer:
+          "The tour can accommodate 2–7 guests in a private vehicle. Pricing is tiered: R10,260 for 2–4 guests and R14,200 for 5–7 guests.",
+      },
+      {
+        question: "Are meals included?",
+        answer:
+          "No. Meals are excluded, allowing guests to choose their preferred dining option.",
+      },
+      {
+        question: "What is the weight limit for horse riding?",
+        answer:
+          "The maximum rider weight is 95–100 kg. Riders may be weighed on arrival if uncertain.",
+      },
+      {
+        question: "What should I wear?",
+        answer:
+          "Wear comfortable clothing, closed shoes (no sandals for horse riding), and bring sunscreen, sunglasses, and a light jacket depending on the weather.",
+      },
+    ],
+
+    tags: [
+      "Gun Range",
+      "Horse Riding",
+      "Noordhoek Beach",
+      "Chapman's Peak",
+      "Private Tour",
+      "Adventure",
+      "Cape Town",
+      "Full Day",
+      "Combo",
+    ],
+  },
+  // Gun-Range + Quad-Biking
+  {
+    id: null, // New tour ID to be assigned (e.g., 29)
+    type: TOUR_TYPES.ADRENALINE,
+    category: TOUR_MODIFIERS.FULL_DAY,
+
+    title: "Gun Range + Quad Biking Adventure",
+    slug: "gun-range-quad-biking-adventure",
+    canonicalPath: "/tours/gun-range-quad-biking-adventure",
+
+    seo: {
+      title:
+        "Gun Range & Quad Biking Adventure in Cape Town | Cape Frontier Tours",
+      description:
+        "A high‑adrenaline combo perfect for thrill‑seekers, bachelor groups, and adventure travellers. Start with a fully supervised shooting experience followed by a thrilling quad bike ride at the Atlantis Dunes.",
+      keywords: [
+        "Gun Range Cape Town",
+        "Atlantis Dunes Quad Biking",
+        "Quad Bike Cape Town",
+        "Cape Town Adventure Tour",
+        "Private Quad Biking Tour",
+        "Cape Town Shooting Experience",
+        "Adventure Activities Cape Town",
+        "Bachelor Party Cape Town",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "/src/assets/images/tours/adrenaline/gun-range-quad-biking/1.webp",
+    images: [
+      "/src/assets/images/tours/adrenaline/gun-range-quad-biking/1.webp",
+      "/src/assets/images/tours/adrenaline/gun-range-quad-biking/2.webp",
+      "/src/assets/images/tours/adrenaline/gun-range-quad-biking/3.webp",
+    ],
+    imageFolder: "adrenaline/gun-range-quad-biking",
+
+    videos: [],
+
+    location: "Cape Town, South Africa",
+    duration: "7 - 8 Hours",
+
+    priceBase: 9800,
+    minPeople: 2,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "2–4 Guests",
+        pricePerPerson: null,
+        note: "R9,800 total (private vehicle)",
+      },
+      {
+        category: "5–7 Guests",
+        pricePerPerson: null,
+        note: "R13,400 total (private vehicle)",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Photo & Video Package",
+        price: null,
+        unit: "per booking",
+        currency: "ZAR",
+        note: "Available on request",
+      },
+    ],
+
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        {
+          minPeople: 2,
+          maxPeople: 4,
+          perPerson: null,
+          totalPrice: 9800,
+          label: "2–4 Guests",
+          note: "Private vehicle",
+        },
+        {
+          minPeople: 5,
+          maxPeople: 7,
+          perPerson: null,
+          totalPrice: 13400,
+          label: "5–7 Guests",
+          note: "Private vehicle",
+        },
+      ],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "A high‑adrenaline combo perfect for thrill‑seekers, bachelor groups, and adventure travellers. Start with a fully supervised shooting experience at an accredited gun range, followed by a thrilling quad bike ride at the Atlantis Dunes.",
+
+    highlights: [
+      { text: "Fully supervised accredited shooting experience" },
+      { text: "Handgun or rifle shooting package" },
+      { text: "1‑hour Atlantis Dunes quad biking adventure" },
+      { text: "Private transport throughout" },
+      { text: "Ideal for adventure groups and bachelor parties" },
+      { text: "Professional instructors and guides" },
+    ],
+
+    included: [
+      { text: "Private transport" },
+      { text: "Accredited shooting instructor" },
+      { text: "Firearm safety briefing" },
+      { text: "Quad bike rental and safety gear" },
+      { text: "Bottled water" },
+    ],
+
+    excluded: [
+      { text: "Meals" },
+      { text: "Optional photo/video packages" },
+      { text: "Personal purchases" },
+    ],
+
+    pickupOptions: [
+      "Cape Town CBD",
+      "Sea Point",
+      "Camps Bay",
+      "V&A Waterfront",
+      "Custom pickup on request",
+    ],
+
+    requirements: [
+      { text: "Minimum age: 18 years for shooting" },
+      { text: "Minimum age: 16 years for quad biking" },
+      { text: "Valid ID or passport required" },
+      { text: "No alcohol before shooting or quad biking" },
+      { text: "All minors strictly prohibited from handling firearms" },
+    ],
+
+    arrangements: {
+      availability: "Available all year",
+      duration: "7 - 8 hours",
+      operatingTime: "Flexible",
+      departure: "Flexible",
+      return: "Flexible",
+      location: "Cape Town, South Africa",
+
+      clothing: [
+        "Comfortable clothing",
+        "Closed shoes",
+        "Sunscreen",
+        "Sunglasses",
+        "Light jacket depending on weather",
+      ],
+
+      thingsToBring: ["Valid ID or passport", "Camera"],
+
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "All weather conditions – shooting and quad biking operate in safe conditions only.",
+      items: [
+        { text: "Shooting range operates in safe weather conditions" },
+        { text: "Quad biking may be delayed or cancelled for safety reasons" },
+        { text: "Final timing confirmed after booking" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Private tour bookings require advance confirmation. Activities are subject to weather and availability.",
+      items: [
+        { text: "Private tour bookings require advance confirmation" },
+        { text: "Weather may affect quad biking operations" },
+        { text: "Final cancellation policy is confirmed upon booking" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience and quad biking adventure.",
+      items: [
+        {
+          text: "All safety regulations must be followed at all times during shooting",
+        },
+        {
+          text: "Professional instructors supervise the entire shooting session",
+        },
+        { text: "Quad biking safety briefing provided before the ride" },
+        { text: "Safety gear must be worn at all times during quad biking" },
+        { text: "Riders must follow all guide instructions" },
+        { text: "No riding under the influence of alcohol or drugs" },
+        {
+          text: "Participants must comply with legal requirements for firearms training",
+        },
+        { text: "Age restrictions and eligibility criteria apply" },
+      ],
+    },
+
+    stops: [
+      {
+        id: "gun-range",
+        name: "Gun Range",
+        time: "Flexible",
+        duration: "1.5 - 2 hours",
+        note: "Professional supervised shooting experience",
+        description:
+          "Begin your adventure with a professionally supervised shooting session, complete with a firearm safety briefing and handgun or rifle package. Suitable for beginners and experienced shooters alike.",
+        exactLocation: mapLocation({
+          label: "Gun Range",
+          address: "Cape Town, South Africa",
+          query: "Cape Town Gun Range",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "atlantis-dunes",
+        name: "Atlantis Dunes Quad Biking",
+        time: "Flexible",
+        duration: "1 hour",
+        note: "Guided dune adventure",
+        description:
+          "Ride powerful quad bikes across the spectacular white sand dunes of Atlantis on an exciting guided adventure suitable for beginners and experienced riders.",
+        exactLocation: mapLocation({
+          label: "Atlantis Dunes",
+          address: "Atlantis, Cape Town, South Africa",
+          query: "Atlantis Dunes Quad Biking",
+        }),
+        images: [],
+        touristComments: [],
+      },
+    ],
+
+    routeInformation: {
+      title: "Gun Range + Quad Biking Adventure Route",
+
+      description:
+        "Experience the ultimate Cape Town adrenaline adventure with a professionally supervised shooting session followed by an exciting quad biking experience at the Atlantis Dunes.",
+
+      items: [
+        "Professionally supervised shooting range session",
+        "Handgun or rifle shooting package",
+        "1‑hour Atlantis Dunes quad biking adventure",
+        "Private transport throughout",
+      ],
+    },
+
+    vehicle: {
+      name: "",
+      class: "",
+      doors: null,
+      seats: null,
+      fuel: "",
+      gearbox: "",
+      engine: "",
+      specifications: [],
+    },
+
+    securityAndLiability: {
+      heading: "",
+      cardPreAuthorisation: {
+        amount: null,
+        currency: "",
+        description: "",
+        release: "",
+      },
+      cashDeposit: {
+        amountZAR: null,
+        alternativeAmountUSD: null,
+        paymentMethod: "",
+        paidAt: "",
+        refundPolicy: "",
+      },
+    },
+
+    needToKnow: [
+      { text: "Participants must follow all firearm safety instructions" },
+      { text: "Valid identification may be required at the shooting range" },
+      { text: "Quad biking is suitable for beginners and experienced riders" },
+      { text: "Comfortable clothing and closed shoes are recommended" },
+      { text: "Minimum age: 18 years for shooting, 16 years for quad biking" },
+      { text: "No alcohol before shooting or quad biking" },
+      { text: "Quad biking is subject to weather conditions" },
+    ],
+
+    faqs: [
+      {
+        question: "Is quad biking suitable for beginners?",
+        answer:
+          "Yes. Experienced guides provide a full safety briefing before the ride begins.",
+      },
+      {
+        question: "Is the shooting experience suitable for beginners?",
+        answer:
+          "Yes. Professional instructors supervise the entire session and provide comprehensive safety instruction.",
+      },
+      {
+        question: "Is this a private tour?",
+        answer:
+          "Yes. The tour includes a private vehicle with your own driver-guide throughout the day.",
+      },
+      {
+        question: "How many guests can join?",
+        answer:
+          "The tour can accommodate 2–7 guests in a private vehicle. Pricing is tiered: R9,800 for 2–4 guests and R13,400 for 5–7 guests.",
+      },
+      {
+        question: "Are meals included?",
+        answer: "No. Meals are excluded from the tour price.",
+      },
+      {
+        question: "What should I wear?",
+        answer:
+          "Wear comfortable clothing and closed shoes. Bring sunscreen, sunglasses, and a light jacket depending on the weather.",
+      },
+      {
+        question: "Is this tour suitable for bachelor groups?",
+        answer:
+          "Yes. This high‑adrenaline combo is perfect for bachelor groups, thrill‑seekers, and adventure travellers.",
+      },
+    ],
+
+    tags: [
+      "Gun Range",
+      "Quad Biking",
+      "Atlantis Dunes",
+      "Adventure",
+      "Private Tour",
+      "Cape Town",
+      "Full Day",
+      "Bachelor Groups",
+      "Thrill Seekers",
+      "Combo",
+    ],
+  },
+  // Horse-Riding + Cape-Point-Boulders-Beach
+  {
+    id: null, // New tour ID to be assigned (e.g., 30)
+    type: TOUR_TYPES.ADRENALINE,
+    category: TOUR_MODIFIERS.FULL_DAY,
+
+    title: "Horse Riding, Penguins & Cape Point Full‑Day Tour",
+    slug: "horse-riding-penguins-cape-point-tour",
+    canonicalPath: "/tours/horse-riding-cape-point-tour",
+
+    seo: {
+      title:
+        "Horse Riding, Penguins & Cape Point Full‑Day Tour | Cape Frontier Tours",
+      description:
+        "Experience the ultimate Cape Peninsula adventure combining beach horse riding, African penguins, and the world‑famous Cape Point & Cape of Good Hope. Perfect for couples, families, and nature lovers.",
+      keywords: [
+        "Cape Point Tour",
+        "Horse Riding Cape Town",
+        "Noordhoek Beach Horse Riding",
+        "Boulders Beach Penguins",
+        "Cape of Good Hope Tour",
+        "Chapman's Peak Drive",
+        "Cape Peninsula Tour",
+        "Private Cape Town Tour",
+        "Penguin Colony Tour",
+        "Cape Point Nature Reserve",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "/src/assets/images/tours/adrenaline/horse-riding-cape-point/1.webp",
+    images: [
+      "/src/assets/images/tours/adrenaline/horse-riding-cape-point/1.webp",
+      "/src/assets/images/tours/adrenaline/horse-riding-cape-point/2.webp",
+      "/src/assets/images/tours/adrenaline/horse-riding-cape-point/3.webp",
+    ],
+    imageFolder: "adrenaline/horse-riding-cape-point",
+
+    videos: [],
+
+    location: "Cape Peninsula, Cape Town, South Africa",
+    duration: "8 - 9 Hours",
+
+    priceBase: 11560,
+    minPeople: 1,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "1–4 Guests",
+        pricePerPerson: null,
+        note: "R11,560 total (private vehicle)",
+      },
+      {
+        category: "5–7 Guests",
+        pricePerPerson: null,
+        note: "R17,300 total (private vehicle)",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Cape Point Flying Dutchman Funicular",
+        price: null,
+        unit: "per person",
+        currency: "ZAR",
+        note: "Optional. Paid directly at Cape Point.",
+      },
+    ],
+
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        {
+          minPeople: 1,
+          maxPeople: 4,
+          perPerson: null,
+          totalPrice: 11560,
+          label: "1–4 Guests",
+          note: "Private vehicle • All-inclusive",
+        },
+        {
+          minPeople: 5,
+          maxPeople: 7,
+          perPerson: null,
+          totalPrice: 17300,
+          label: "5–7 Guests",
+          note: "Private vehicle • All-inclusive",
+        },
+      ],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "Experience the ultimate Cape Peninsula adventure combining beach horse riding, African penguins, and the world‑famous Cape Point & Cape of Good Hope. This full‑day tour blends adventure, wildlife, and breathtaking scenery — perfect for couples, families, and nature lovers.",
+
+    highlights: [
+      {
+        text: "Chapman's Peak Drive — one of the world's most scenic coastal roads",
+      },
+      { text: "1–2 hour Noordhoek Beach horse riding experience" },
+      { text: "Visit Boulders Beach Penguin Colony" },
+      { text: "Cape Point Nature Reserve & Cape of Good Hope" },
+      { text: "Private transport with professional driver-guide" },
+      { text: "Flexible itinerary" },
+      { text: "Spectacular ocean and mountain views throughout" },
+    ],
+
+    included: [
+      { text: "Private vehicle and professional driver-guide" },
+      { text: "Chapman's Peak toll fees" },
+      { text: "Bottled water" },
+      { text: "Hotel pickup and drop-off" },
+      { text: "Horse riding fee" },
+      { text: "Boulders Beach entry fee" },
+      { text: "Cape Point Nature Reserve entry fee" },
+      { text: "Safety briefing and helmet for horse riding" },
+    ],
+
+    excluded: [
+      { text: "Lunch" },
+      { text: "Cape Point Flying Dutchman Funicular (optional)" },
+      { text: "Personal purchases" },
+    ],
+
+    pickupOptions: [
+      "Cape Town CBD",
+      "Sea Point",
+      "Camps Bay",
+      "V&A Waterfront",
+      "Custom pickup on request",
+    ],
+
+    requirements: [
+      { text: "Minimum age: 6 years for horse riding" },
+      { text: "Maximum rider weight: 95–100 kg" },
+      {
+        text: "Riders must be physically able to mount, balance, and follow guide instructions",
+      },
+      {
+        text: "Guests with medical conditions must disclose this before booking",
+      },
+    ],
+
+    arrangements: {
+      availability: "Available all year",
+      duration: "8 - 9 hours",
+      operatingTime: "Flexible",
+      departure: "Flexible",
+      return: "Flexible",
+      location: "Cape Peninsula, Cape Town, South Africa",
+
+      clothing: [
+        "Comfortable clothing",
+        "Closed shoes (no sandals for horse riding)",
+        "Sunscreen",
+        "Sunglasses",
+        "Light jacket depending on weather",
+      ],
+
+      thingsToBring: ["Camera", "Comfortable walking shoes"],
+
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "All weather conditions – horse riding is weather-dependent. Chapman's Peak and Cape Point tours continue in most conditions.",
+      items: [
+        { text: "Horse riding may be delayed or cancelled for safety reasons" },
+        { text: "Chapman's Peak Drive operates in safe weather conditions" },
+        {
+          text: "Cape Point and Boulders Beach continue in most weather conditions",
+        },
+        { text: "Final timing confirmed after booking" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Private tour bookings require advance confirmation. Horse riding is subject to weather and availability.",
+      items: [
+        { text: "Private tour bookings require advance confirmation" },
+        { text: "Weather may affect horse riding operations" },
+        { text: "Final cancellation policy is confirmed upon booking" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Horse riding involves inherent risks. Guests participate at their own risk. All safety guidelines must be followed.",
+      items: [
+        { text: "Helmets must be worn at all times during horse riding" },
+        { text: "Riders must follow all guide instructions" },
+        { text: "No racing, sudden movements, or galloping" },
+        { text: "No riding under the influence of alcohol or drugs" },
+        {
+          text: "Approach horses calmly — do not stand directly behind a horse",
+        },
+        { text: "Avoid loud noises or sudden gestures around horses" },
+        {
+          text: "Cape Frontier Travel & Tours is not responsible for loss or damage to personal items",
+        },
+        {
+          text: "By booking, guests confirm they understand and accept all safety conditions",
+        },
+      ],
+    },
+
+    stops: [
+      {
+        id: "chapmans-peak",
+        name: "Chapman's Peak Drive",
+        time: "Flexible",
+        duration: "45 minutes",
+        note: "One of the world's most scenic coastal drives",
+        description:
+          "Start your day with breathtaking views along the famous Chapman's Peak Drive before arriving at Noordhoek Beach for your horse riding experience.",
+        exactLocation: mapLocation({
+          label: "Chapman's Peak Drive",
+          address: "Chapman's Peak, Cape Town, South Africa",
+          query: "Chapman's Peak Drive",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "noordhoek-horse-riding",
+        name: "Noordhoek Beach Horse Riding",
+        time: "Flexible",
+        duration: "1 - 2 hours",
+        note: "Guided beach horseback riding",
+        description:
+          "Enjoy a scenic guided horse ride along one of Cape Town's most beautiful stretches of coastline at Noordhoek Beach. Surrounded by mountains, dunes, and endless white sand, this experience is suitable for beginners and experienced riders alike with calm, well‑trained horses and incredible photo opportunities.",
+        exactLocation: mapLocation({
+          label: "Noordhoek Beach",
+          address: "Noordhoek, Cape Town, South Africa",
+          query: "Noordhoek Beach Horse Riding",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "boulders-beach",
+        name: "Boulders Beach Penguin Colony",
+        time: "Flexible",
+        duration: "1 hour",
+        note: "African Penguin Colony",
+        description:
+          "Continue to Simon's Town to visit the famous African penguin colony at Boulders Beach. Walk along the boardwalks for close‑up views of these charming birds in their natural habitat surrounded by crystal‑clear water and giant granite boulders. A family‑friendly stop with optional lunch at the harbour.",
+        exactLocation: mapLocation({
+          label: "Boulders Beach",
+          address: "Kleintuin Road, Simon's Town, Cape Town, South Africa",
+          query: "Boulders Beach Penguin Colony",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "cape-point",
+        name: "Cape Point & Cape of Good Hope",
+        time: "Flexible",
+        duration: "2.5 - 3 hours",
+        note: "Cape Point Nature Reserve",
+        description:
+          "Explore the Cape Point Nature Reserve, home to dramatic cliffs, wildlife, and iconic viewpoints. Visit the Cape of Good Hope, take the Flying Dutchman Funicular up to the lighthouse (optional), and spot wildlife including baboons, ostriches, and antelope while enjoying spectacular ocean views.",
+        exactLocation: mapLocation({
+          label: "Cape Point",
+          address: "Cape Point Nature Reserve, Cape Peninsula, South Africa",
+          query: "Cape Point",
+        }),
+        images: [],
+        touristComments: [],
+      },
+    ],
+
+    routeInformation: {
+      title: "Horse Riding, Penguins & Cape Point Route",
+
+      description:
+        "Experience the ultimate Cape Peninsula adventure combining beach horse riding, African penguins, and the world‑famous Cape Point & Cape of Good Hope.",
+
+      items: [
+        "Chapman's Peak Drive — one of the world's most scenic coastal roads",
+        "1–2 hour Noordhoek Beach horse riding",
+        "Boulders Beach Penguin Colony",
+        "Cape Point Nature Reserve & Cape of Good Hope",
+        "Optional Cape Point Flying Dutchman Funicular",
+      ],
+    },
+
+    vehicle: {
+      name: "Private Vehicle",
+      class: "",
+      doors: null,
+      seats: null,
+      fuel: "",
+      gearbox: "",
+      engine: "",
+      specifications: [],
+    },
+
+    securityAndLiability: {
+      heading: "",
+      cardPreAuthorisation: {
+        amount: null,
+        currency: "",
+        description: "",
+        release: "",
+      },
+      cashDeposit: {
+        amountZAR: null,
+        alternativeAmountUSD: null,
+        paymentMethod: "",
+        paidAt: "",
+        refundPolicy: "",
+      },
+    },
+
+    needToKnow: [
+      { text: "Minimum age: 6 years for horse riding" },
+      { text: "Maximum rider weight: 95–100 kg" },
+      { text: "Horse riding is suitable for beginners and experienced riders" },
+      { text: "Comfortable clothing and closed shoes are recommended" },
+      { text: "Riders must follow all guide instructions" },
+      { text: "No galloping or riding ahead of the guide" },
+      { text: "Horse riding is subject to weather conditions" },
+      { text: "Wildlife sightings cannot be guaranteed" },
+      { text: "The Flying Dutchman Funicular is optional and not included" },
+    ],
+
+    faqs: [
+      {
+        question: "Do I need horse riding experience?",
+        answer:
+          "No. Calm, well‑trained horses and experienced guides make this suitable for beginners and experienced riders alike.",
+      },
+      {
+        question: "What is the minimum age for horse riding?",
+        answer:
+          "The minimum age is 6 years old. Riders must be physically able to mount, balance, and follow guide instructions.",
+      },
+      {
+        question: "What is the weight limit for horse riding?",
+        answer:
+          "The maximum rider weight is 95–100 kg. Riders may be weighed on arrival if uncertain.",
+      },
+      {
+        question: "Are entrance fees included?",
+        answer:
+          "Yes. Horse riding fees, Boulders Beach, and Cape Point Nature Reserve entry fees are all included in the tour price.",
+      },
+      {
+        question: "Is this a private tour?",
+        answer:
+          "Yes. The experience includes a private vehicle with your own professional driver-guide.",
+      },
+      {
+        question: "How many guests can join?",
+        answer:
+          "The tour can accommodate 1–7 guests in a private vehicle. Pricing is tiered: R11,560 for 1–4 guests and R17,300 for 5–7 guests.",
+      },
+      {
+        question: "Is lunch included?",
+        answer:
+          "No. Lunch is excluded, allowing guests to choose where they'd like to dine, with an optional lunch stop at Simon's Town harbour.",
+      },
+      {
+        question: "What should I wear?",
+        answer:
+          "Wear comfortable clothing and closed shoes (no sandals for horse riding). Bring sunscreen, sunglasses, and a light jacket depending on the weather.",
+      },
+      {
+        question: "What is the Cape Point Flying Dutchman Funicular?",
+        answer:
+          "The Flying Dutchman Funicular is a cable car that takes visitors up to the Cape Point lighthouse. It is optional and not included in the tour price.",
+      },
+    ],
+
+    tags: [
+      "Horse Riding",
+      "Noordhoek Beach",
+      "Chapman's Peak",
+      "Boulders Beach",
+      "Penguins",
+      "Cape Point",
+      "Cape of Good Hope",
+      "Private Tour",
+      "Adventure",
+      "Cape Town",
+      "Full Day",
+      "Family Friendly",
+    ],
+  },
+  // Gun-Range + Cape Peninsula (shooter-range)
+  {
+    id: null, // New tour ID to be assigned (e.g., 31)
+    type: TOUR_TYPES.ADRENALINE,
+    category: TOUR_MODIFIERS.FULL_DAY,
+
+    title: "Cape Peninsula Full Day Tour + Shooting Range Experience",
+    slug: "cape-peninsula-shooting-range-tour",
+    canonicalPath: "/tours/cape-peninsula-shooting-range-tour",
+
+    seo: {
+      title:
+        "Cape Peninsula Full Day Tour + Shooting Range Experience | Cape Frontier Tours",
+      description:
+        "A premium full‑day adventure combining adrenaline, wildlife, world‑class scenery and iconic Cape Town landmarks. Begin with an accredited shooting range experience before continuing along the breathtaking Cape Peninsula.",
+      keywords: [
+        "Cape Peninsula tour",
+        "shooting range Cape Town",
+        "Table Mountain tour",
+        "Cape Point tour",
+        "Boulders Beach penguins",
+        "Chapman's Peak Drive",
+        "Cape of Good Hope",
+        "Cape Town full day tour",
+        "private Cape Town tour",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image:
+      "/src/assets/images/tours/adrenaline/cape-peninsula-shooting-range/1.webp",
+    images: [
+      "/src/assets/images/tours/adrenaline/cape-peninsula-shooting-range/1.webp",
+      "/src/assets/images/tours/adrenaline/cape-peninsula-shooting-range/2.webp",
+      "/src/assets/images/tours/adrenaline/cape-peninsula-shooting-range/3.webp",
+    ],
+    imageFolder: "adrenaline/cape-peninsula-shooting-range",
+
+    videos: [],
+
+    location: "Cape Peninsula, Cape Town, South Africa",
+    duration: "Full Day (8 - 9 hours)",
+
+    priceBase: 6000,
+    minPeople: 1,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "1 person",
+        pricePerPerson: 6000,
+        note: "",
+      },
+      {
+        category: "2–4 people",
+        pricePerPerson: 5100,
+        note: "15% discount",
+      },
+      {
+        category: "5–7 people",
+        pricePerPerson: 4800,
+        note: "20% discount",
+      },
+      {
+        category: "Children (5–12 years)",
+        pricePerPerson: 2400,
+        note: "",
+      },
+      {
+        category: "Teens (13–17 years)",
+        pricePerPerson: 2600,
+        note: "",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Cape Point Flying Dutchman Funicular",
+        price: null,
+        unit: "per person",
+        currency: "ZAR",
+        note: "Optional. Paid directly at Cape Point.",
+      },
+    ],
+
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        {
+          minPeople: 1,
+          maxPeople: 1,
+          perPerson: 6000,
+          label: "1 Guest",
+          note: "Private vehicle • All-inclusive",
+        },
+        {
+          minPeople: 2,
+          maxPeople: 4,
+          perPerson: 5100,
+          label: "2–4 Guests",
+          note: "Private vehicle • 15% discount • All-inclusive",
+        },
+        {
+          minPeople: 5,
+          maxPeople: 7,
+          perPerson: 4800,
+          label: "5–7 Guests",
+          note: "Private vehicle • 20% discount • All-inclusive",
+        },
+      ],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "A premium full‑day adventure combining adrenaline, wildlife, world‑class scenery and iconic Cape Town landmarks. This tour begins with an accredited shooting range experience before continuing along the breathtaking Cape Peninsula.",
+
+    highlights: [
+      { text: "Accredited shooting range experience" },
+      { text: "Table Mountain Cableway" },
+      { text: "Camps Bay photo stop" },
+      { text: "Chapman's Peak Drive" },
+      { text: "Cape Point Ostrich Farm" },
+      { text: "Cape Point Nature Reserve" },
+      { text: "Old Cape Point Lighthouse" },
+      { text: "Cape of Good Hope" },
+      { text: "Boulders Beach Penguin Colony" },
+      { text: "Kalk Bay drive-through" },
+      { text: "Private transport with professional driver-guide" },
+    ],
+
+    included: [
+      { text: "Hotel pickup and drop-off" },
+      { text: "Table Mountain entry" },
+      { text: "Cape Point entry" },
+      { text: "Shooting range experience" },
+      { text: "Bottled water" },
+      { text: "Reliable, comfortable vehicle" },
+      { text: "Professional registered guide" },
+      { text: "Accredited firearms instructor" },
+      { text: "Full safety briefing" },
+    ],
+
+    excluded: [
+      { text: "Lunch" },
+      { text: "Gratuities" },
+      { text: "Personal purchases" },
+      { text: "Cape Point Flying Dutchman Funicular (optional)" },
+      { text: "Ostrich feeding (optional)" },
+    ],
+
+    pickupOptions: [
+      "Cape Town CBD",
+      "Sea Point",
+      "Camps Bay",
+      "V&A Waterfront",
+      "Custom pickup on request",
+    ],
+
+    requirements: [
+      { text: "Minimum age to participate: 18 years for shooting" },
+      { text: "Valid ID or passport required" },
+      { text: "No alcohol before shooting" },
+      { text: "All minors strictly prohibited from handling firearms" },
+    ],
+
+    arrangements: {
+      availability: "Available all year",
+      duration: "Full Day (8 - 9 hours)",
+      operatingTime: "07:00 – 16:00",
+      departure: "07:00",
+      return: "16:00",
+      location: "Cape Peninsula, Cape Town, South Africa",
+
+      clothing: [
+        "Comfortable clothing",
+        "Closed shoes",
+        "Sunscreen",
+        "Sunglasses",
+        "Warm jacket depending on weather",
+      ],
+
+      thingsToBring: [
+        "Valid ID or passport",
+        "Camera",
+        "Comfortable walking shoes",
+      ],
+
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "Weather-dependent activities include Table Mountain Cableway and Chapman's Peak Drive. Shooting range operates in safe conditions.",
+      items: [
+        {
+          text: "Table Mountain Cableway operates subject to weather. If closed, you may keep your tickets for another day or request a refund.",
+        },
+        { text: "Chapman's Peak Drive access is weather-dependent" },
+        { text: "Shooting range operates in safe weather conditions" },
+        { text: "Final timing confirmed after booking" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Cancellations must be made at least 2 days before the scheduled experience. Refunds will be subject to our discretion.",
+      items: [
+        {
+          text: "Cancellations must be made at least 2 days before scheduled date",
+        },
+        { text: "Refunds are subject to our discretion" },
+        { text: "Private tour bookings require advance confirmation" },
+        { text: "Weather may affect cableway and Chapman's Peak operations" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience. Keep vehicle windows closed near baboons. Maintain distance and do not feed baboons.",
+      items: [
+        {
+          text: "All safety regulations must be followed at all times during shooting",
+        },
+        {
+          text: "Professional instructors supervise the entire shooting session",
+        },
+        {
+          text: "Participants must comply with legal requirements for firearms training",
+        },
+        { text: "Age restrictions and eligibility criteria apply" },
+        {
+          text: "Be vigilant and observant of what is required when safety briefing is communicated",
+        },
+        { text: "Keep vehicle windows closed near baboons" },
+        { text: "Maintain distance from wildlife" },
+        { text: "Feeding baboons is strictly prohibited" },
+        {
+          text: "Touching or feeding penguins at Boulders Beach is not allowed",
+        },
+      ],
+    },
+
+    stops: [
+      {
+        id: "shooting-range",
+        name: "Shooting Range Experience",
+        time: "07:30 – 09:00",
+        duration: "1.5 hours",
+        note: "Accredited shooting range",
+        description:
+          "Begin your day with an exciting, professionally supervised shooting session at an accredited Cape Town gun range. Your instructor will guide you through firearm safety, handling and target shooting. This experience adds a thrilling and memorable start to your Cape Peninsula journey.",
+        exactLocation: mapLocation({
+          label: "Accredited Shooting Range",
+          address: "Cape Town, South Africa",
+          query: "Cape Town Gun Range",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "table-mountain",
+        name: "Table Mountain Cableway",
+        time: "09:15 – 10:00",
+        duration: "45 minutes",
+        note: "Panoramic views",
+        description:
+          "Ascend more than a kilometre above sea level for panoramic views of Cape Town, Robben Island and the Atlantic Ocean. Your guide will share insights into the mountain's geology, flora and fauna, and assist with photos.",
+        exactLocation: mapLocation({
+          label: "Table Mountain Cableway",
+          address: "Table Mountain, Cape Town, South Africa",
+          query: "Table Mountain Cableway",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "camps-bay",
+        name: "Camps Bay",
+        time: "10:15 – 10:30",
+        duration: "15 minutes",
+        note: "Scenic photo stop",
+        description:
+          "Enjoy a short photo stop in Cape Town's glamorous seaside suburb, framed by the Twelve Apostles mountain range and a pristine white‑sand beach. Your guide will highlight landmarks including Lion's Head and Table Mountain.",
+        exactLocation: mapLocation({
+          label: "Camps Bay",
+          address: "Camps Bay, Cape Town, South Africa",
+          query: "Camps Bay Beach",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "hout-bay",
+        name: "Hout Bay (Drive-Through)",
+        time: "10:30 – 10:50",
+        duration: "Drive-through",
+        note: "Coastal town",
+        description:
+          "Pass through this scenic coastal town known for its fishing harbour, seafood restaurants and dramatic mountain surroundings.",
+        exactLocation: mapLocation({
+          label: "Hout Bay",
+          address: "Hout Bay, Cape Town, South Africa",
+          query: "Hout Bay",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "chapmans-peak",
+        name: "Chapman's Peak Drive",
+        time: "10:50 – 11:10",
+        duration: "20 minutes",
+        note: "Spectacular coastal road",
+        description:
+          "Experience one of the world's most spectacular coastal roads. Chapman's Peak offers dramatic cliffside views and multiple photo opportunities.",
+        exactLocation: mapLocation({
+          label: "Chapman's Peak Drive",
+          address: "Chapman's Peak, Cape Town, South Africa",
+          query: "Chapman's Peak Drive",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "ostrich-farm",
+        name: "Cape Point Ostrich Farm",
+        time: "11:15 – 11:30",
+        duration: "15 minutes",
+        note: "Close-range ostrich viewing",
+        description:
+          "Located just before the Cape Point gate, this farm allows close range viewing of ostriches. Your guide can drive you inside for photos and optional feeding.",
+        exactLocation: mapLocation({
+          label: "Cape Point Ostrich Farm",
+          address: "Cape Point, Cape Peninsula, South Africa",
+          query: "Cape Point Ostrich Farm",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "cape-point-nature-reserve",
+        name: "Cape Point Nature Reserve",
+        time: "11:30 – 12:15",
+        duration: "45 minutes",
+        note: "Rich floral kingdom",
+        description:
+          "Explore one of the world's richest floral kingdoms, home to over 2,000 plant species and wildlife including antelope, ostriches, baboons, zebras and diverse birdlife. Your guide will share stories of early explorers and make scenic stops for photos.",
+        exactLocation: mapLocation({
+          label: "Cape Point Nature Reserve",
+          address: "Cape Point, Cape Peninsula, South Africa",
+          query: "Cape Point Nature Reserve",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "cape-point-lighthouse",
+        name: "Old Cape Point Lighthouse",
+        time: "12:15 – 13:00",
+        duration: "45 minutes",
+        note: "Historic lighthouse",
+        description:
+          "Perched more than 400 metres above sea level, this historic lighthouse offers breathtaking views. Reach it via a short hike or take the funicular (optional extra).",
+        exactLocation: mapLocation({
+          label: "Cape Point Lighthouse",
+          address: "Cape Point, Cape Peninsula, South Africa",
+          query: "Cape Point Lighthouse",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "cape-of-good-hope",
+        name: "Cape of Good Hope",
+        time: "13:00 – 13:45",
+        duration: "45 minutes",
+        note: "Most south-western point of Africa",
+        description:
+          "Visit the most south‑western point of the African continent, where Atlantic and Indian Ocean currents meet. Enjoy scenic walks, photo stops and the iconic Cape of Good Hope sign.",
+        exactLocation: mapLocation({
+          label: "Cape of Good Hope",
+          address: "Cape of Good Hope, Cape Peninsula, South Africa",
+          query: "Cape of Good Hope",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "simons-town",
+        name: "Simon's Town & Lunch Stop",
+        time: "13:45 – 14:45",
+        duration: "1 hour",
+        note: "Lunch stop",
+        description:
+          "A charming naval town known for its Victorian architecture, seafood restaurants and coastal views. Enjoy lunch at a restaurant of your choice before continuing to Boulders Beach.",
+        exactLocation: mapLocation({
+          label: "Simon's Town",
+          address: "Simon's Town, Cape Town, South Africa",
+          query: "Simon's Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "boulders-beach",
+        name: "Boulders Beach Penguin Colony",
+        time: "14:45 – 15:30",
+        duration: "45 minutes",
+        note: "African penguin colony",
+        description:
+          "Home to the endangered African penguin, Boulders Beach offers safe, close‑range viewing via elevated boardwalks. Touching or feeding penguins is not allowed.",
+        exactLocation: mapLocation({
+          label: "Boulders Beach",
+          address: "Kleintuin Road, Simon's Town, Cape Town, South Africa",
+          query: "Boulders Beach Penguin Colony",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "kalk-bay",
+        name: "Kalk Bay (Drive-Through)",
+        time: "15:30 – 15:45",
+        duration: "Drive-through",
+        note: "Vibrant seaside town",
+        description:
+          "A vibrant seaside town known for its fishing harbour, art galleries, boutique shops and restaurants. Once voted by Forbes as one of the coolest places to live in the world.",
+        exactLocation: mapLocation({
+          label: "Kalk Bay",
+          address: "Kalk Bay, Cape Town, South Africa",
+          query: "Kalk Bay",
+        }),
+        images: [],
+        touristComments: [],
+      },
+    ],
+
+    routeInformation: {
+      title: "Cape Peninsula Full Day Tour + Shooting Range Route",
+
+      description:
+        "A premium full‑day adventure combining adrenaline, wildlife, world‑class scenery and iconic Cape Town landmarks.",
+
+      items: [
+        "Accredited shooting range experience",
+        "Table Mountain Cableway",
+        "Camps Bay photo stop",
+        "Chapman's Peak Drive",
+        "Cape Point Ostrich Farm",
+        "Cape Point Nature Reserve",
+        "Old Cape Point Lighthouse",
+        "Cape of Good Hope",
+        "Simon's Town lunch stop",
+        "Boulders Beach Penguin Colony",
+        "Kalk Bay drive-through",
+      ],
+    },
+
+    vehicle: {
+      name: "",
+      class: "",
+      doors: null,
+      seats: null,
+      fuel: "",
+      gearbox: "",
+      engine: "",
+      specifications: [],
+    },
+
+    securityAndLiability: {
+      heading: "",
+      cardPreAuthorisation: {
+        amount: null,
+        currency: "",
+        description: "",
+        release: "",
+      },
+      cashDeposit: {
+        amountZAR: null,
+        alternativeAmountUSD: null,
+        paymentMethod: "",
+        paidAt: "",
+        refundPolicy: "",
+      },
+    },
+
+    needToKnow: [
+      { text: "Minimum age to participate: 18 years for shooting" },
+      { text: "Valid ID or passport required" },
+      { text: "No alcohol before shooting" },
+      { text: "All minors strictly prohibited from handling firearms" },
+      {
+        text: "Table Mountain Cableway operates subject to weather. If closed, you may keep your tickets for another day or request a refund.",
+      },
+      { text: "Chapman's Peak Drive access is weather-dependent" },
+      { text: "Keep vehicle windows closed near baboons" },
+      { text: "Maintain distance from wildlife" },
+      { text: "Feeding baboons is strictly prohibited" },
+      { text: "Touching or feeding penguins at Boulders Beach is not allowed" },
+      { text: "Comfortable walking shoes are recommended" },
+      {
+        text: "Lunch is excluded — choose your own restaurant in Simon's Town",
+      },
+    ],
+
+    faqs: [
+      {
+        question: "Is the shooting experience suitable for beginners?",
+        answer:
+          "Yes. Professional instructors provide a full safety briefing and supervise the entire session.",
+      },
+      {
+        question: "What is the minimum age for the shooting experience?",
+        answer:
+          "The minimum age is 18 years. Valid ID or passport is required.",
+      },
+      {
+        question: "Is Table Mountain Cableway always open?",
+        answer:
+          "The cable car operates subject to weather. If closed, you may keep your tickets for another day or request a refund.",
+      },
+      {
+        question: "Is Chapman's Peak Drive always open?",
+        answer:
+          "Chapman's Peak Drive access is weather-dependent and may close during high winds or rain.",
+      },
+      {
+        question: "Is this a private tour?",
+        answer:
+          "Yes. The tour includes a private vehicle with your own driver-guide.",
+      },
+      {
+        question: "What is included in the tour price?",
+        answer:
+          "The tour includes hotel pickup and drop-off, Table Mountain entry, Cape Point entry, shooting range experience, bottled water, and a professional registered guide.",
+      },
+      {
+        question: "Is lunch included?",
+        answer:
+          "No. Lunch is excluded, allowing guests to choose their restaurant of choice in Simon's Town.",
+      },
+      {
+        question: "Can children participate?",
+        answer:
+          "Children can participate in the sightseeing portion. Children 5–12 years are priced at R2,400 and teens 13–17 years at R2,600. All minors are strictly prohibited from handling firearms.",
+      },
+      {
+        question: "What should I bring?",
+        answer:
+          "Bring your valid ID or passport, camera, comfortable walking shoes, sunscreen, sunglasses, and a warm jacket depending on the weather.",
+      },
+    ],
+
+    tags: [
+      "Cape Peninsula",
+      "Shooting Range",
+      "Table Mountain",
+      "Cape Point",
+      "Boulders Beach",
+      "Penguins",
+      "Chapman's Peak",
+      "Cape of Good Hope",
+      "Private Tour",
+      "Adventure",
+      "Cape Town",
+      "Full Day",
+      "Wildlife",
+    ],
+  },
+
+  // =========================================== HIKING
+  // Lions-Head
   {
     id: 5,
     type: TOUR_TYPES.HIKING,
@@ -877,7 +5178,7 @@ export const tours = [
       tiers: [
         {
           minPeople: 4,
-          perPerson: 0,  // no discount confirmed yet. 
+          perPerson: 0, // no discount confirmed yet.
           label: "4+ Guests",
           note: "Private vehicle • All-inclusive",
         },
@@ -963,7 +5264,6 @@ export const tours = [
       },
     ],
 
-
     needToKnow: [
       { text: "Wear comfortable hiking shoes" },
       { text: "Bring water" },
@@ -995,7 +5295,7 @@ export const tours = [
 
     tags: ["Hiking", "Scenic", "Mountain", "Half Day"],
   },
-
+  // Platteklip
   {
     id: 6,
     type: TOUR_TYPES.HIKING,
@@ -1046,7 +5346,7 @@ export const tours = [
       tiers: [
         {
           minPeople: 4,
-          perPerson: 0,  // no discount confirmed yet.
+          perPerson: 0, // no discount confirmed yet.
           label: "4+ Guests",
           note: "Private vehicle • All-inclusive",
         },
@@ -1140,7 +5440,8 @@ export const tours = [
     ],
 
     cancellationPolicy: {
-      summary: "Mountain weather and cableway availability may affect the plan.",
+      summary:
+        "Mountain weather and cableway availability may affect the plan.",
       items: [
         { text: "Route may be adjusted for safety" },
         { text: "Cable car use is subject to availability if selected" },
@@ -1164,19 +5465,21 @@ export const tours = [
     tags: ["Hiking", "Table Mountain", "Scenic", "Active"],
   },
 
+  // =========================================== HISTORICAL
+  // Langa
   {
-    id: 7,
+    id: null, // New tour ID to be assigned (e.g., 32)
     type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.HALF_DAY,
 
     title: "Langa Township Cultural Experience",
     slug: "langa-township-cultural-experience",
-    canonicalPath: "/tours/langa-township-cultural-experience",
+    canonicalPath: "/tours/langatownship-cultural-experience",
 
     seo: {
       title: "Langa Township Cultural Experience | Cape Frontier Tours",
       description:
-        "Experience Cape Town's oldest township with local community guides, cultural storytelling, Guga S'thebe, craft markets, hotel transfers, and authentic local experiences.",
+        "Discover the heart of Cape Town's oldest township, Langa, on an immersive cultural tour led by local community guides. Experience authentic storytelling, vibrant art, history, and real connections with the people who call Langa home.",
       keywords: [
         "Langa Township Tour",
         "Langa Cultural Experience",
@@ -1185,92 +5488,220 @@ export const tours = [
         "Cape Town Cultural Tour",
         "Guga S'thebe",
         "Township Experience Cape Town",
+        "Langa history",
       ],
     },
 
     workflow: defaultWorkflow,
 
-    image: getCoverImage("historical/langa"),
-    images: getTourImages("historical/langa", 3),
+    image: "/src/assets/images/tours/historical/langa/1.webp",
+    images: [
+      "/src/assets/images/tours/historical/langa/1.webp",
+      "/src/assets/images/tours/historical/langa/2.webp",
+      "/src/assets/images/tours/historical/langa/3.webp",
+    ],
+    imageFolder: "historical/langa",
+
+    videos: [],
 
     location: "Langa, Cape Town, South Africa",
-    duration: "3 - 4 Hours",
+    duration: "3 - 4 hours",
 
-    basePrice: 1300,
-    minPeople: 1,
+    priceBase: 1300,
+    minPeople: 2,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
-        category: "Adults",
+        category: "Adults (2–3 guests)",
         pricePerPerson: 1300,
+        note: "Standard rate",
       },
       {
-        category: "Children under 5", 
-        pricePerPerson: 0, // no discount confirmed 
+        category: "Adults (4–6 guests)",
+        pricePerPerson: 1170,
+        note: "10% small‑group discount",
+      },
+      {
+        category: "Adults (7–10 guests)",
+        pricePerPerson: 1105,
+        note: "15% discount",
+      },
+      {
+        category: "Adults (11–14 guests)",
+        pricePerPerson: 1040,
+        note: "20% best value for large groups",
+      },
+      {
+        category: "Children (4–12 years, 2–3 guests)",
+        pricePerPerson: 650,
+        note: "Standard child rate",
+      },
+      {
+        category: "Children (4–12 years, 4–6 guests)",
+        pricePerPerson: 585,
+        note: "10% small‑group discount",
+      },
+      {
+        category: "Children (4–12 years, 7–10 guests)",
+        pricePerPerson: 555,
+        note: "15% discount",
+      },
+      {
+        category: "Children (4–12 years, 11–14 guests)",
+        pricePerPerson: 520,
+        note: "20% best value for large groups",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Groups 15+ (Schools, Corporate)",
+        price: 950,
+        unit: "per person",
+        currency: "ZAR",
+        note: "Custom pricing for large groups (R950–R1,000 adults, R475–R500 children)",
       },
     ],
 
     groupPricing: {
-      enabled: false,
+      enabled: true,
       icon: "/icons/savemore.png",
       tiers: [
         {
-          // minPeople: 2,
-          // maxPeople: 4,
-          // totalPrice: 9560,
-          // label: "2–4 Guests",
-          // note: "Private vehicle • All-inclusive",
+          minPeople: 2,
+          maxPeople: 3,
+          perPerson: 1300,
+          label: "2–3 Guests",
+          note: "Standard rate • All-inclusive",
+        },
+        {
+          minPeople: 4,
+          maxPeople: 6,
+          perPerson: 1170,
+          label: "4–6 Guests",
+          note: "10% discount • All-inclusive",
+        },
+        {
+          minPeople: 7,
+          maxPeople: 10,
+          perPerson: 1105,
+          label: "7–10 Guests",
+          note: "15% discount • Ideal shared tour size",
+        },
+        {
+          minPeople: 11,
+          maxPeople: 14,
+          perPerson: 1040,
+          label: "11–14 Guests",
+          note: "20% discount • Best value for large groups",
         },
       ],
     },
 
-    rating: 4.9,
-    stars: 5,
-    mainReviewerName: "Amina Clarke",
-    mainReviewerCountry: "UK",
-    reviewYear: 2026,
-    otherReviews: 46,
-    mainReview:
-      "An authentic and eye-opening experience. Our local guide shared incredible stories and made us feel truly welcome.",
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
 
     description:
-      "Discover the heart of Cape Town's oldest township on an immersive cultural experience led by local community guides. Langa, established in 1927, played an important role in South Africa's history and remains a vibrant community rich in culture, resilience, music, art, and entrepreneurship. Visit local landmarks, meet residents, explore Guga S'thebe Arts & Culture Centre, and experience authentic township life through meaningful storytelling and genuine local connections.",
-
-
-
+      "Langa Township, meaning 'sun' in isiXhosa, is Cape Town's oldest township and a vibrant destination for experiencing South Africa's culture, history, and community spirit. Established formally in 1927 following the 1923 Urban Areas Act, Langa is one of South Africa's oldest townships and played a pivotal role in the anti-apartheid struggle. It was initially developed to house Black Africans under strict apartheid regulations. The name 'Langa' derives from Chief Langalibalele, who resisted colonial authorities and was imprisoned on Robben Island, while 'sun' reflects its Xhosa meaning.",
 
     highlights: [
-      { text: "Cape Town's oldest township" },
-      { text: "Local community guide" },
-      { text: "Guga S'thebe Arts & Culture Centre" },
-      { text: "Cultural walking tour" },
-      { text: "Craft market visit" },
-      { text: "Authentic local storytelling" },
+      { text: "Cape Town's oldest township — established in 1927" },
+      { text: "Local community guide for authentic storytelling" },
+      { text: "Guga S'thebe Arts & Culture Centre visit" },
+      { text: "Cultural walking tour through Langa" },
+      { text: "Craft market stop supporting local artisans" },
+      { text: "See local creators, beadworks, and sculptures" },
+      {
+        text: "Learn about Langa's pivotal role in the anti-apartheid struggle",
+      },
+      { text: "Real connections with the people who call Langa home" },
     ],
 
     included: [
-      { text: "Hotel pickup & drop-off" },
-      { text: "Professional driver-guide" },
+      { text: "Hotel pick‑up and drop‑off" },
+      { text: "Professional driver‑guide" },
       { text: "Local Langa community guide" },
       { text: "Guga S'thebe visit" },
-      { text: "Guided cultural walk" },
+      { text: "Cultural walk" },
       { text: "Craft market stop" },
       { text: "Bottled water" },
-      { text: "All entrance fees" },
+      { text: "All entry fees" },
+      { text: "Air‑conditioned transport" },
     ],
 
-    excluded: [
-      { text: "Lunch" },
-      { text: "Personal purchases" },
-    ],
+    excluded: [{ text: "Lunch" }, { text: "Personal purchases" }],
 
     pickupOptions: [
       "Cape Town CBD",
       "Green Point",
       "Sea Point",
+      "Custom pickup on request",
     ],
+
+    requirements: [],
+
+    arrangements: {
+      availability: "Available all year",
+      duration: "3 - 4 hours",
+      operatingTime:
+        "09:00 – 12:00 (Morning Tour) • 13:00 – 16:00 (Afternoon Tour) • Custom times available",
+      departure: "Flexible (09:00, 10:00, 13:00, 14:00)",
+      return: "Flexible (12:00, 13:00, 16:00, 17:00)",
+      location: "Langa, Cape Town, South Africa",
+
+      clothing: [
+        "Comfortable clothing",
+        "Comfortable walking shoes",
+        "Sunscreen",
+        "Hat",
+      ],
+
+      thingsToBring: ["Camera", "Cash for personal purchases at craft market"],
+
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "Tour operates in all weather conditions. Rain is part of Cape Town's weather – bring an umbrella or rain jacket.",
+      items: [
+        { text: "Tour operates in all weather conditions" },
+        { text: "Bring an umbrella or rain jacket if rain is forecast" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Private tour bookings require advance confirmation. Route adjustments may occur when necessary.",
+      items: [
+        { text: "Private bookings require advance confirmation" },
+        { text: "Route adjustments may occur when necessary" },
+        { text: "Final cancellation policy is confirmed upon booking" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Langa is considered one of the safer townships for visitors, especially when exploring with local guides. Please ask permission before photographing residents.",
+      items: [
+        {
+          text: "Langa is considered one of the safer townships when visited with local guides",
+        },
+        { text: "Please ask permission before photographing residents" },
+        {
+          text: "Respectful behaviour towards the local community is expected",
+        },
+        { text: "Tours are conducted with experienced local community guides" },
+      ],
+    },
 
     stops: [
       {
@@ -1278,114 +5709,160 @@ export const tours = [
         name: "Hotel Pickup",
         time: "Flexible",
         duration: "30 minutes",
-        note: "Air-conditioned transfer",
+        note: "Air‑conditioned transfer",
         description:
           "Enjoy convenient hotel pickup from Cape Town CBD, Green Point, or Sea Point before travelling to Langa Township.",
         exactLocation: mapLocation({
           label: "Cape Town Pickup Area",
+          address: "Cape Town, South Africa",
           query: "Cape Town",
         }),
         images: [],
         touristComments: [],
       },
-
       {
         id: "guga-sthebe",
         name: "Guga S'thebe Arts & Culture Centre",
-        time: "09:30",
+        time: "Flexible",
         duration: "45 minutes",
         note: "Community arts centre",
         description:
-          "Visit one of Langa's best-known cultural landmarks, showcasing local artists, crafts, performances, and community initiatives.",
+          "Visit one of Langa's best-known cultural landmarks, showcasing local artists, crafts, performances, and community initiatives. See local creators, beadworks, and sculptures.",
         exactLocation: mapLocation({
           label: "Guga S'thebe Arts & Culture Centre",
+          address: "Langa, Cape Town, South Africa",
           query: "Guga Sthebe Langa",
         }),
-        images: getTourImages("historical/langa", 3),
-        touristComments: [
-          {
-            name: "David",
-            country: "AU",
-            text: "The artwork and community stories were inspiring.",
-          },
-        ],
+        images: [],
+        touristComments: [],
       },
-
       {
         id: "langa-walk",
         name: "Langa Cultural Walk",
-        time: "10:30",
+        time: "Flexible",
         duration: "1.5 - 2 hours",
         note: "Guided community experience",
         description:
-          "Walk through Langa with a local guide, learning about its history, daily life, community projects, and its important role during South Africa's anti-apartheid struggle.",
+          "Walk through Cape Town's oldest township with a local guide, learning about its history, daily life, community projects, and its important role during South Africa's anti-apartheid struggle. Experience authentic storytelling, vibrant art, and real connections with the people who call Langa home.",
         exactLocation: mapLocation({
           label: "Langa Township",
           address: "Langa, Cape Town, South Africa",
           query: "Langa Township",
         }),
-        images: getTourImages("historical/langa", 3),
-        touristComments: [
-          {
-            name: "Amina",
-            country: "UK",
-            text: "A respectful and unforgettable experience that gave us genuine insight into the community.",
-          },
-        ],
+        images: [],
+        touristComments: [],
       },
-
       {
         id: "craft-market",
         name: "Local Craft Market",
-        time: "12:00",
+        time: "Flexible",
         duration: "30 minutes",
         note: "Support local artisans",
         description:
           "Browse locally made arts and crafts while supporting small businesses and talented community artisans.",
         exactLocation: mapLocation({
           label: "Langa Craft Market",
+          address: "Langa, Cape Town, South Africa",
           query: "Langa Craft Market",
         }),
-        images: getTourImages("historical/langa", 3),
-        touristComments: [
-          {
-            name: "Emma",
-            country: "CA",
-            text: "Beautiful handmade crafts and friendly local artists.",
-          },
-        ],
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "dropoff",
+        name: "Hotel Drop-off",
+        time: "Flexible",
+        duration: "30 minutes",
+        note: "End of tour",
+        description:
+          "After completing your cultural experience, relax during the return transfer to your original Cape Town hotel.",
+        exactLocation: mapLocation({
+          label: "Cape Town Drop-off Area",
+          address: "Cape Town, South Africa",
+          query: "Cape Town",
+        }),
+        images: [],
+        touristComments: [],
       },
     ],
 
+    routeInformation: {
+      title: "Langa Township Cultural Experience Route",
 
-    needToKnow: [
-      { text: "Tours are conducted with experienced local community guides." },
-      { text: "Langa is considered one of the safer townships when visited with local guides." },
-      { text: "Please ask permission before photographing residents." },
-      { text: "Comfortable walking shoes are recommended." },
-      { text: "Respectful behaviour towards the local community is expected." },
-    ],
+      description:
+        "Discover the heart of Cape Town's oldest township, Langa, on an immersive cultural tour led by local community guides.",
 
-    cancellationPolicy: {
-      summary:
-        "Tour routes may vary depending on community events and local conditions.",
       items: [
-        { text: "Private bookings require advance confirmation." },
-        { text: "Route adjustments may occur when necessary." },
-        { text: "Final cancellation policy is confirmed upon booking." },
+        "Hotel pickup in Cape Town CBD, Green Point, or Sea Point",
+        "Guga S'thebe Arts & Culture Centre",
+        "Langa Cultural Walking Tour",
+        "Local Craft Market",
+        "Hotel drop-off",
       ],
     },
+
+    vehicle: {
+      name: "",
+      class: "",
+      doors: null,
+      seats: null,
+      fuel: "",
+      gearbox: "",
+      engine: "",
+      specifications: [],
+    },
+
+    securityAndLiability: {
+      heading: "",
+      cardPreAuthorisation: {
+        amount: null,
+        currency: "",
+        description: "",
+        release: "",
+      },
+      cashDeposit: {
+        amountZAR: null,
+        alternativeAmountUSD: null,
+        paymentMethod: "",
+        paidAt: "",
+        refundPolicy: "",
+      },
+    },
+
+    needToKnow: [
+      {
+        text: "Langa is considered one of the safer townships when visited with local guides",
+      },
+      { text: "Please ask permission before photographing residents" },
+      { text: "Respectful behaviour towards the local community is expected" },
+      { text: "Tours are conducted with experienced local community guides" },
+      { text: "Comfortable walking shoes are recommended" },
+      {
+        text: "Morning Tour (09:00–12:00) is the most popular — community activity is lively, craft markets are open",
+      },
+      {
+        text: "Afternoon Tour (13:00–16:00) is good for guests arriving later",
+      },
+      {
+        text: "Private/Custom times available for groups, cruise passengers, or custom itineraries",
+      },
+    ],
 
     faqs: [
       {
         question: "Is Langa safe to visit?",
         answer:
-          "Yes. Langa is considered one of Cape Town's safer townships to visit, especially when touring with experienced local community guides.",
+          "Yes. Langa is considered one of the safer townships for visitors, especially when exploring with local community guides.",
       },
       {
         question: "Who leads the tour?",
         answer:
           "The experience is led by a professional driver-guide together with a knowledgeable local community guide from Langa.",
+      },
+      {
+        question: "What is the historical significance of Langa?",
+        answer:
+          "Langa was established formally in 1927 following the 1923 Urban Areas Act and is one of South Africa's oldest townships. It played a pivotal role in the anti-apartheid struggle. The name derives from Chief Langalibalele, who resisted colonial authorities and was imprisoned on Robben Island.",
       },
       {
         question: "Are entrance fees included?",
@@ -1396,6 +5873,21 @@ export const tours = [
         question: "Is lunch included?",
         answer:
           "No. Lunch and personal purchases are excluded from the tour price.",
+      },
+      {
+        question: "What are the tour times?",
+        answer:
+          "Morning Tour: 09:00–12:00 (most popular), Afternoon Tour: 13:00–16:00. Private/Custom times also available (e.g., 10:00–13:00, 14:00–17:00).",
+      },
+      {
+        question: "Can children join?",
+        answer:
+          "Yes. Children 4–12 years receive discounted rates. Please contact us for children under 4 years.",
+      },
+      {
+        question: "What should I bring?",
+        answer:
+          "Bring comfortable walking shoes, sunscreen, a hat, your camera, and cash for personal purchases at the craft market.",
       },
     ],
 
@@ -1408,22 +5900,26 @@ export const tours = [
       "Guga S'thebe",
       "Cape Town",
       "Half Day",
+      "Cultural Tour",
+      "Authentic Experience",
+      "Local Guide",
     ],
   },
 
+  // Robben-Island
   {
-    id: 8,
+    id: null, // New tour ID to be assigned (e.g., 33)
     type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.HALF_DAY,
 
-    title: "Robben Island Half-Day Tour",
-    slug: "robben-island-tour",
-    canonicalPath: "/tours/robben-island-tour",
+    title: "Robben Island Half Day Tour",
+    slug: "robben-island-half-day-tour",
+    canonicalPath: "/tours/robben-island-half-day-tour",
 
     seo: {
-      title: "Robben Island Half-Day Tour | Cape Frontier Tours",
+      title: "Robben Island Half Day Tour | Cape Frontier Tours",
       description:
-        "Discover the history of Robben Island with hotel pickup, return ferry tickets, a guided prison tour, Nelson Mandela's cell, and an island bus tour.",
+        "Discover the historic Robben Island, a UNESCO World Heritage Site and former prison where Nelson Mandela was held. Includes return ferry, guided prison tour, Mandela's cell, island bus tour, and hotel pickup.",
       keywords: [
         "Robben Island tour",
         "Robben Island ferry",
@@ -1431,16 +5927,25 @@ export const tours = [
         "Cape Town historical tour",
         "UNESCO World Heritage Site",
         "Robben Island Museum",
+        "Nelson Mandela cell",
+        "Cape Town prison tour",
       ],
     },
 
     workflow: defaultWorkflow,
 
-    image: getCoverImage("historical/robben-island"),
-    images: getTourImages("historical/robben-island", 3),
+    image: "/src/assets/images/tours/historical/robben-island/1.webp",
+    images: [
+      "/src/assets/images/tours/historical/robben-island/1.webp",
+      "/src/assets/images/tours/historical/robben-island/2.webp",
+      "/src/assets/images/tours/historical/robben-island/3.webp",
+    ],
+    imageFolder: "historical/robben-island",
+
+    videos: [],
 
     location: "Robben Island, Cape Town, South Africa",
-    duration: "4 - 5 Hours",
+    duration: "4 - 5 hours",
 
     priceBase: 1990,
     minPeople: 1,
@@ -1451,160 +5956,268 @@ export const tours = [
       {
         category: "Adults",
         pricePerPerson: 1990,
+        note: "",
       },
       {
-        category: "Children under 12. ",
+        category: "Children (5–17 years)",
         pricePerPerson: 995,
+        note: "",
       },
       {
-        category: "Children under 5. ",
+        category: "Children (0–4 years)",
         pricePerPerson: 0,
+        note: "Free of charge",
       },
     ],
 
+    additionalPricing: [],
 
     groupPricing: {
       enabled: false,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          // minPeople: 2,
-          // maxPeople: 4,
-          // totalPrice: 9560,
-          // label: "2–4 Guests",
-          // note: "Private vehicle • All-inclusive",
-        },
-      ],
+      icon: "",
+      tiers: [],
     },
-    rating: 4.9,
-    stars: 5,
-    mainReviewerName: "Thomas Reed",
-    mainReviewerCountry: "US",
-    reviewYear: 2026,
-    otherReviews: 91,
-    mainReview:
-      "One of the most meaningful experiences in Cape Town. Learning the history from former inmates made the visit unforgettable.",
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
 
     description:
-      "Robben Island is a UNESCO World Heritage Site located approximately 7 km off the coast of Cape Town. Best known for imprisoning Nelson Mandela for 18 of his 27 years in captivity, the island has become a powerful symbol of freedom, resilience, and reconciliation. During this half-day experience, enjoy return ferry transport, a guided prison tour, Nelson Mandela's former cell, an island bus tour, and insights into South Africa's struggle for democracy from knowledgeable guides, including former political prisoners when available.",
+      "Robben Island is a small island off the coast of Cape Town, South Africa, historically used as a prison for political prisoners, including Nelson Mandela, and now serves as a UNESCO World Heritage Site and museum symbolizing the triumph of the human spirit over oppression. Robben Island, whose name derives from the Dutch word for 'seals,' spans roughly 5 square miles and lies about 7 kilometres from Cape Town. The island has a long and complex history stretching over 400 years. Other prominent prisoners included Robert Sobukwe, Ahmed Kathrada, and Walter Sisulu. Today, Robben Island is a UNESCO World Heritage Site and home to the Robben Island Museum. Visitors can explore the former prison, historical buildings, and natural landscapes, often guided by former inmates who share firsthand experiences. The island's enduring legacy lies in its poignant symbolism of resistance, resilience, and reconciliation, making it a major site of learning and reflection on South African history.",
 
     highlights: [
-      { text: "Return ferry ticket included" },
-      { text: "Guided prison tour" },
+      { text: "Return ferry ticket to Robben Island" },
+      { text: "Guided prison tour with former inmates where available" },
       { text: "Visit Nelson Mandela's prison cell" },
       { text: "Island bus tour" },
+      {
+        text: "Hotel pick‑up and drop‑off (Cape Town CBD, Green Point, Sea Point)",
+      },
+      { text: "Professional driver‑guide" },
       { text: "UNESCO World Heritage Site" },
-      { text: "Hotel pickup & drop-off" },
+      { text: "Explore historical buildings and natural landscapes" },
     ],
 
     included: [
       { text: "Return ferry ticket" },
       { text: "Guided Robben Island tour" },
       {
-        text: "Hotel pickup & drop-off (Cape Town CBD, Green Point & Sea Point)",
+        text: "Hotel pick‑up and drop‑off (Cape Town CBD, Green Point, Sea Point)",
       },
-      { text: "Air-conditioned vehicle" },
-      { text: "Professional driver-guide" },
+      { text: "Air‑conditioned vehicle" },
       { text: "Bottled water" },
+      { text: "Professional driver-guide" },
+      { text: "Island bus tour" },
     ],
 
-    excluded: [
-      { text: "Lunch" },
-      { text: "Personal purchases" },
-    ],
+    excluded: [{ text: "Lunch" }, { text: "Personal purchases" }],
 
     pickupOptions: [
       "Cape Town CBD",
       "Green Point",
       "Sea Point",
+      "Custom pickup on request",
     ],
+
+    requirements: [
+      { text: "Please carry identification if required for ferry boarding" },
+    ],
+
+    arrangements: {
+      availability: "Available all year (ferry dependent on weather)",
+      duration: "4 - 5 hours",
+      operatingTime: "09:00, 11:00, 13:00 departures",
+      departure: "Flexible (09:00, 11:00, 13:00)",
+      return: "Flexible (approximately 3.5-4 hours after departure)",
+      location: "Nelson Mandela Gateway, V&A Waterfront, Cape Town",
+
+      clothing: [
+        "Comfortable clothing",
+        "Comfortable walking shoes",
+        "Warm jacket (weather dependent)",
+        "Sunscreen",
+        "Hat",
+      ],
+
+      thingsToBring: [
+        "Identification (if required for ferry boarding)",
+        "Camera",
+        "Cash for personal purchases",
+      ],
+
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "Ferry operations are subject to weather and sea conditions. Cancelled departures may be rescheduled where possible.",
+      items: [
+        { text: "Ferry operations are subject to weather and sea conditions" },
+        { text: "Weather may result in ferry delays or cancellations" },
+        { text: "Cancelled departures may be rescheduled where possible" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Ferry operations are subject to weather and sea conditions. Cancellation terms are confirmed upon booking.",
+      items: [
+        { text: "Ferry operations are subject to weather and sea conditions" },
+        { text: "Weather may result in ferry delays or cancellations" },
+        { text: "Cancelled departures may be rescheduled where possible" },
+        { text: "Cancellation terms are confirmed upon booking" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "All tours are conducted in compliance with Robben Island Museum safety regulations and ferry operating procedures.",
+      items: [
+        { text: "All tours follow Robben Island Museum safety regulations" },
+        { text: "Ferry operates according to maritime safety standards" },
+        { text: "Guests must follow all guide instructions during the tour" },
+      ],
+    },
 
     stops: [
       {
-        id: "gateway",
+        id: "pickup",
+        name: "Hotel Pickup",
+        time: "Flexible",
+        duration: "30 minutes",
+        note: "Air‑conditioned transfer to V&A Waterfront",
+        description:
+          "Enjoy convenient hotel pickup from Cape Town CBD, Green Point, or Sea Point before travelling to the Nelson Mandela Gateway at the V&A Waterfront.",
+        exactLocation: mapLocation({
+          label: "Cape Town Pickup Area",
+          address: "Cape Town, South Africa",
+          query: "Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "nelson-mandela-gateway",
         name: "Nelson Mandela Gateway",
-        time: "Departure dependent",
+        time: "Flexible",
         duration: "30 minutes",
         note: "Ferry departure terminal",
         description:
-          "Begin your experience from the Nelson Mandela Gateway at the V&A Waterfront before boarding the ferry to Robben Island.",
+          "Arrive at the Nelson Mandela Gateway at the V&A Waterfront. Board the ferry for the 30-minute crossing to Robben Island. Departure times: 09:00, 11:00, or 13:00.",
         exactLocation: mapLocation({
           label: "Nelson Mandela Gateway",
-          address: "V&A Waterfront, Cape Town",
+          address: "V&A Waterfront, Cape Town, South Africa",
           query: "Nelson Mandela Gateway V&A Waterfront",
         }),
         images: [],
         touristComments: [],
       },
-
       {
         id: "robben-island",
         name: "Robben Island Museum",
-        time: "Ferry dependent",
+        time: "Flexible",
         duration: "3 - 4 hours",
         note: "UNESCO World Heritage Site",
         description:
-          "Explore the former maximum-security prison, visit Nelson Mandela's prison cell, enjoy an island bus tour, and learn about South Africa's history from expert guides and former political prisoners where available.",
+          "Explore the former maximum-security prison, visit Nelson Mandela's prison cell, enjoy an island bus tour, and learn about South Africa's history from expert guides and former political prisoners where available. Discover Robert Sobukwe House, Lime Quarry, WWII bunkers, Leper Church, and the Maximum Security Prison.",
         exactLocation: mapLocation({
           label: "Robben Island Museum",
-          address: "Robben Island, Cape Town",
+          address: "Robben Island, Cape Town, South Africa",
           query: "Robben Island Museum",
         }),
-        images: getTourImages("historical/robben-island", 3),
-        touristComments: [
-          {
-            name: "Thomas",
-            country: "US",
-            text: "Hearing the history from a former inmate made this one of the most moving experiences of our trip.",
-          },
-        ],
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "dropoff",
+        name: "Hotel Drop-off",
+        time: "Flexible",
+        duration: "30 minutes",
+        note: "End of tour",
+        description:
+          "After returning from Robben Island, relax during the transfer back to your original Cape Town hotel.",
+        exactLocation: mapLocation({
+          label: "Cape Town Drop-off Area",
+          address: "Cape Town, South Africa",
+          query: "Cape Town",
+        }),
+        images: [],
+        touristComments: [],
       },
     ],
 
-    groupDiscount: {
-      enabled: false,
-      icon: "/icons/savemore.png",
-      rules: [],
-    },
+    routeInformation: {
+      title: "Robben Island Half Day Tour Route",
 
-    pricing: [
-      {
-        category: "Adults",
-        pricePerPerson: 1990,
-      },
-      {
-        category: "Children (5–17 years)",
-        pricePerPerson: 995,
-      },
-      {
-        category: "Children (0–4 years)",
-        pricePerPerson: 0,
-      },
-    ],
+      description:
+        "Discover the historic Robben Island, a UNESCO World Heritage Site and former prison where Nelson Mandela was held for 18 of his 27 years.",
 
-    needToKnow: [
-      { text: "Morning and afternoon departures are available." },
-      { text: "Ferry departures are weather dependent." },
-      { text: "Advance booking is highly recommended." },
-      { text: "Please carry identification if required for ferry boarding." },
-      { text: "Comfortable walking shoes are recommended." },
-    ],
-
-    cancellationPolicy: {
-      summary:
-        "Ferry operations are subject to weather and sea conditions.",
       items: [
-        { text: "Weather may result in ferry delays or cancellations." },
-        { text: "Cancelled departures may be rescheduled where possible." },
-        { text: "Cancellation terms are confirmed upon booking." },
+        "Hotel pickup in Cape Town CBD, Green Point, or Sea Point",
+        "Nelson Mandela Gateway at the V&A Waterfront",
+        "30-minute ferry crossing to Robben Island",
+        "Island bus tour",
+        "Maximum Security Prison tour",
+        "Nelson Mandela's prison cell",
+        "Robert Sobukwe House",
+        "Lime Quarry",
+        "Return ferry crossing",
+        "Hotel drop-off",
       ],
     },
+
+    vehicle: {
+      name: "",
+      class: "",
+      doors: null,
+      seats: null,
+      fuel: "",
+      gearbox: "",
+      engine: "",
+      specifications: [],
+    },
+
+    securityAndLiability: {
+      heading: "",
+      cardPreAuthorisation: {
+        amount: null,
+        currency: "",
+        description: "",
+        release: "",
+      },
+      cashDeposit: {
+        amountZAR: null,
+        alternativeAmountUSD: null,
+        paymentMethod: "",
+        paidAt: "",
+        refundPolicy: "",
+      },
+    },
+
+    needToKnow: [
+      { text: "Morning and afternoon departures are available" },
+      { text: "Ferry departures are weather dependent" },
+      {
+        text: "Ferry times: 09:00 (best for calm seas), 11:00 (mid-morning), 13:00 (most popular)",
+      },
+      { text: "The crossing takes approximately 30 minutes each way" },
+      { text: "Advance booking is highly recommended" },
+      { text: "Please carry identification if required for ferry boarding" },
+      { text: "Comfortable walking shoes are recommended" },
+      {
+        text: "Total tour duration is 3.5-4 hours (excluding pickup/drop-off)",
+      },
+    ],
 
     faqs: [
       {
         question: "Is the ferry ticket included?",
-        answer:
-          "Yes. Return ferry tickets are included in the tour price.",
+        answer: "Yes. Return ferry tickets are included in the tour price.",
       },
       {
         question: "Is hotel pickup included?",
@@ -1614,12 +6227,32 @@ export const tours = [
       {
         question: "How long is the tour?",
         answer:
-          "The complete experience lasts approximately 4–5 hours, depending on ferry schedules.",
+          "The complete experience lasts approximately 4–5 hours, including hotel transfer. The island visit itself is 3.5-4 hours including the ferry crossing.",
       },
       {
         question: "Can weather affect the tour?",
         answer:
-          "Yes. Ferry departures depend on weather and sea conditions and may occasionally be delayed or cancelled.",
+          "Yes. Ferry departures depend on weather and sea conditions and may occasionally be delayed or cancelled. Cancelled departures may be rescheduled where possible.",
+      },
+      {
+        question: "What are the ferry departure times?",
+        answer:
+          "Ferries depart at 09:00 (best for calm seas), 11:00 (mid-morning), and 13:00 (most popular).",
+      },
+      {
+        question: "Who guides the tour on the island?",
+        answer:
+          "The island tour is conducted by Robben Island Museum guides, often former political prisoners who share firsthand experiences.",
+      },
+      {
+        question: "What will I see on the tour?",
+        answer:
+          "You will visit the Maximum Security Prison, Nelson Mandela's cell, Robert Sobukwe House, Lime Quarry, WWII bunkers, Leper Church, and enjoy an island bus tour.",
+      },
+      {
+        question: "Is lunch included?",
+        answer:
+          "No. Lunch and personal purchases are excluded from the tour price.",
       },
     ],
 
@@ -1632,11 +6265,958 @@ export const tours = [
       "Half Day",
       "Cape Town",
       "Heritage",
+      "Prison Tour",
+      "World Heritage Site",
     ],
   },
 
+  // Mannenburg
   {
-    id: 9,
+    id: null, // New tour ID to be assigned (e.g., 34)
+    type: TOUR_TYPES.HISTORICAL,
+    category: TOUR_MODIFIERS.FULL_DAY,
+
+    title: "Full‑Day Heritage, Faith & Cape Flats Community Tour",
+    slug: "heritage-faith-cape-flats-community-tour",
+    canonicalPath: "/tours/heritage-faith-cape-flats-community-tour",
+
+    seo: {
+      title:
+        "Full‑Day Heritage, Faith & Cape Flats Community Tour | Cape Frontier Tours",
+      description:
+        "A powerful cultural immersion into Cape Town's Coloured heritage — exploring Islamic and Christian roots, slavery, forced removals, and modern community life. Includes traditional Cape Malay lunch and community upliftment through food distribution.",
+      keywords: [
+        "Cape Flats tour",
+        "Manenberg tour",
+        "Bo-Kaap tour",
+        "Cape Malay heritage",
+        "Coloured heritage Cape Town",
+        "Cape Town cultural tour",
+        "Slave Lodge tour",
+        "Auwal Masjid",
+        "District Six forced removals",
+        "community upliftment tour",
+        "Cape Town township tour",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image:
+      "/src/assets/images/tours/historical/heritage-faith-cape-flats/1.webp",
+    images: [
+      "/src/assets/images/tours/historical/heritage-faith-cape-flats/1.webp",
+      "/src/assets/images/tours/historical/heritage-faith-cape-flats/2.webp",
+      "/src/assets/images/tours/historical/heritage-faith-cape-flats/3.webp",
+    ],
+    imageFolder: "historical/heritage-faith-cape-flats",
+
+    videos: [],
+
+    location: "Cape Town, South Africa (Bo-Kaap, CBD, Grassy Park, Manenberg)",
+    duration: "7 hours (09:00 – 16:00)",
+
+    priceBase: null, // Price not specified in the brief
+    minPeople: 1,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "Adults",
+        pricePerPerson: null,
+        note: "Please contact us for pricing",
+      },
+      {
+        category: "Children",
+        pricePerPerson: null,
+        note: "Please contact us for pricing",
+      },
+    ],
+
+    additionalPricing: [],
+
+    groupPricing: {
+      enabled: false,
+      icon: "",
+      tiers: [],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "A powerful cultural immersion into Cape Town's Coloured heritage — exploring Islamic and Christian roots, slavery, forced removals, and modern community life. Guests enjoy a traditional Cape Malay lunch and take part in meaningful community upliftment through food distribution. Every booking directly supports underprivileged families.",
+
+    highlights: [
+      { text: "Bo-Kaap cultural introduction and photography" },
+      { text: "Auwal Masjid — South Africa's oldest mosque (1794)" },
+      { text: "Slave Lodge Museum — slavery, colonialism, and human rights" },
+      { text: "Sendingkerk (Sendinggestig) — historic mission church" },
+      { text: "Traditional Cape Malay lunch in Grassy Park" },
+      { text: "Manenberg community visit and food distribution" },
+      { text: "Meaningful community upliftment through every booking" },
+      { text: "Guided by respectful, ethical tourism principles" },
+    ],
+
+    included: [
+      { text: "Reliable driver and transport" },
+      { text: "Hotel pickup and drop-off" },
+      { text: "Bottled water" },
+      { text: "Breakfast on the go (light snack)" },
+      { text: "Lunch (traditional Cape Malay or Cape Town home-style dishes)" },
+      { text: "Community engagement and briefing" },
+      { text: "All entry fees" },
+      { text: "Professional registered guide" },
+    ],
+
+    excluded: [{ text: "Personal purchases" }, { text: "Gratuities" }],
+
+    pickupOptions: [
+      "Cape Town CBD",
+      "Green Point",
+      "Sea Point",
+      "V&A Waterfront",
+      "Custom pickup on request",
+    ],
+
+    requirements: [
+      { text: "Comfortable walking shoes recommended" },
+      { text: "Respectful behaviour towards the local community is expected" },
+      { text: "Modest attire recommended for mosque visits" },
+      { text: "Guests must be physically able to walk for extended periods" },
+    ],
+
+    arrangements: {
+      availability: "Available all year",
+      duration: "7 hours",
+      operatingTime: "09:00 – 16:00",
+      departure: "09:00",
+      return: "16:00",
+      location: "Cape Town, South Africa",
+
+      clothing: [
+        "Comfortable clothing",
+        "Comfortable walking shoes",
+        "Sunscreen",
+        "Hat",
+        "Modest attire for mosque visits",
+      ],
+
+      thingsToBring: ["Camera", "Cash for personal purchases", "Water bottle"],
+
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "Tour operates in all weather conditions. Cape Town weather can change quickly — bring an umbrella or rain jacket.",
+      items: [
+        { text: "Tour operates in all weather conditions" },
+        { text: "Bring an umbrella or rain jacket if rain is forecast" },
+        { text: "Some outdoor portions may be adjusted in extreme weather" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Private tour bookings require advance confirmation. Route adjustments may occur when necessary.",
+      items: [
+        { text: "Private bookings require advance confirmation" },
+        { text: "Route adjustments may occur when necessary" },
+        { text: "Final cancellation policy is confirmed upon booking" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Cape Frontier Travel & Tours operates under full compliance with South African tourism and transport regulations. All tours are conducted with structured risk planning, pre-visit area assessments, guided movement, and emergency readiness protocols.",
+      items: [
+        { text: "Tourism Act 3 of 2014 — full compliance" },
+        { text: "City of Cape Town Community Tourism Guidelines followed" },
+        {
+          text: "Passenger Transport Regulations and licensing requirements met",
+        },
+        { text: "Public Liability & Passenger Liability Insurance maintained" },
+        { text: "Roadworthy & Operating Licence Requirements compliant" },
+        { text: "Pre-visit area assessments conducted" },
+        {
+          text: "Guided movement only — guests follow guide-led navigation at all times",
+        },
+        { text: "Emergency readiness protocols in place" },
+        { text: "Continuous situational awareness maintained" },
+        {
+          text: "All outreach activities conducted with verified community organisations",
+        },
+        {
+          text: "Guests receive a pre-tour briefing on movement protocols and respectful behavioural expectations",
+        },
+        {
+          text: "All staff trained in cultural sensitivity, conflict de-escalation, first-aid basics, and ethical tourism practices",
+        },
+        {
+          text: "Food distribution conducted in a controlled, hygienic, and dignified manner with proper food handling, crowd management, and community supervision",
+        },
+        {
+          text: "Ethical tourism principles: respectful storytelling, non-exploitation, ensuring community benefit from every booking",
+        },
+      ],
+    },
+
+    stops: [
+      {
+        id: "bo-kaap",
+        name: "Bo-Kaap Arrival & Orientation",
+        time: "09:00",
+        duration: "1 hour",
+        note: "Guided cultural introduction",
+        description:
+          "Bo-Kaap sits on the slopes of Signal Hill, just above the CBD. It is instantly recognisable by its brightly painted houses, cobblestone streets, and the sound of the Adhaan (call to prayer) from its historic mosques. The area is one of the oldest residential neighbourhoods in South Africa, with homes dating back to the 1760s. Bo-Kaap is deeply tied to the history of the Cape Malay community — descendants of enslaved people and political exiles. Enjoy a guided cultural introduction, photography moments, and a short walk through the iconic colourful neighbourhood.",
+        exactLocation: mapLocation({
+          label: "Bo-Kaap",
+          address: "Bo-Kaap, Cape Town, South Africa",
+          query: "Bo-Kaap Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "auwal-masjid",
+        name: "Auwal Masjid",
+        time: "10:15",
+        duration: "30 minutes",
+        note: "South Africa's oldest mosque (1794)",
+        description:
+          "Visit South Africa's oldest mosque, established in 1794. Learn about early Islamic education, community formation, and cultural preservation in the Cape Malay community.",
+        exactLocation: mapLocation({
+          label: "Auwal Masjid",
+          address: "Bo-Kaap, Cape Town, South Africa",
+          query: "Auwal Masjid Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "slave-lodge",
+        name: "Slave Lodge Museum",
+        time: "11:00",
+        duration: "1 hour",
+        note: "Slavery, colonialism, and human rights",
+        description:
+          "A deep historical experience covering slavery, colonialism, and human rights. The Slave Lodge is one of Cape Town's oldest buildings and provides powerful insights into South Africa's complex history of slavery and forced labour.",
+        exactLocation: mapLocation({
+          label: "Slave Lodge Museum",
+          address: "Adderley Street, Cape Town, South Africa",
+          query: "Slave Lodge Museum Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "sendingkerk",
+        name: "Sendingkerk (Sendinggestig)",
+        time: "12:00",
+        duration: "30 minutes",
+        note: "Historic mission church",
+        description:
+          "Explore the historic mission church connected to education and upliftment. The Sendingkerk played an important role in the spiritual and educational development of the Cape's diverse communities.",
+        exactLocation: mapLocation({
+          label: "Sendinggestig",
+          address: "Cape Town, South Africa",
+          query: "Sendinggestig Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "grassy-park-lunch",
+        name: "Lunch in Grassy Park",
+        time: "13:00",
+        duration: "1 hour",
+        note: "Traditional Cape Malay lunch",
+        description:
+          "Enjoy Cape Malay or Cape Town home‑style dishes at a local eatery in Grassy Park. Experience the rich flavours of Cape Malay cuisine, a fusion of Malay, Indonesian, and Cape Dutch influences.",
+        exactLocation: mapLocation({
+          label: "Grassy Park",
+          address: "Grassy Park, Cape Town, South Africa",
+          query: "Grassy Park Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "manenberg",
+        name: "Manenberg Community Visit & Food Distribution",
+        time: "14:20",
+        duration: "1 hour",
+        note: "Respectful community outreach",
+        description:
+          "Guests assist in handing out prepared food to families in a Coloured community. This is a respectful, guided outreach focused on dignity and upliftment. Manenberg is a large township on the Cape Flats, created in the late 1960s as part of apartheid's Group Areas Act. It is known for strong family networks, deep Cape Coloured cultural roots, active community organisations, and a mix of hardship, hope, and ongoing upliftment work. Despite decades of social challenges, Manenberg remains a place of identity, pride, and community strength.",
+        exactLocation: mapLocation({
+          label: "Manenberg",
+          address: "Manenberg, Cape Town, South Africa",
+          query: "Manenberg Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+    ],
+
+    routeInformation: {
+      title: "Heritage, Faith & Cape Flats Community Tour Route",
+
+      description:
+        "A powerful cultural immersion into Cape Town's Coloured heritage — exploring Islamic and Christian roots, slavery, forced removals, and modern community life.",
+
+      items: [
+        "Bo-Kaap — guided cultural introduction and photography",
+        "Auwal Masjid — South Africa's oldest mosque (1794)",
+        "Slave Lodge Museum — slavery, colonialism, and human rights",
+        "Sendingkerk (Sendinggestig) — historic mission church",
+        "Lunch in Grassy Park — traditional Cape Malay cuisine",
+        "Manenberg Community Visit — food distribution and community engagement",
+      ],
+    },
+
+    vehicle: {
+      name: "",
+      class: "",
+      doors: null,
+      seats: null,
+      fuel: "",
+      gearbox: "",
+      engine: "",
+      specifications: [],
+    },
+
+    securityAndLiability: {
+      heading: "",
+      cardPreAuthorisation: {
+        amount: null,
+        currency: "",
+        description: "",
+        release: "",
+      },
+      cashDeposit: {
+        amountZAR: null,
+        alternativeAmountUSD: null,
+        paymentMethod: "",
+        paidAt: "",
+        refundPolicy: "",
+      },
+    },
+
+    needToKnow: [
+      {
+        text: "Bo-Kaap is one of the oldest residential neighbourhoods in South Africa, with homes dating back to the 1760s",
+      },
+      {
+        text: "Manenberg was built by the apartheid government as a relocation zone for Coloured families forcibly removed from District Six, Bo-Kaap, Claremont, Simon's Town, Woodstock, Salt River, and Wynberg",
+      },
+      {
+        text: "Manenberg is not defined by crime — it is defined by history and resilience. The community did not choose its location — it was forced",
+      },
+      {
+        text: "Upliftment projects are a response to decades of structural inequality",
+      },
+      {
+        text: "The people of Manenberg carry a rich cultural identity shaped by survival and strength",
+      },
+      {
+        text: "Every booking directly supports underprivileged families through community upliftment",
+      },
+      { text: "Modest attire recommended for mosque visits" },
+      { text: "Respectful behaviour towards the local community is expected" },
+      { text: "Comfortable walking shoes are recommended" },
+    ],
+
+    faqs: [
+      {
+        question: "What is the historical significance of Bo-Kaap?",
+        answer:
+          "Bo-Kaap is one of the oldest residential neighbourhoods in South Africa, with homes dating back to the 1760s. It is deeply tied to the history of the Cape Malay community — descendants of enslaved people and political exiles.",
+      },
+      {
+        question: "What is Auwal Masjid?",
+        answer:
+          "Auwal Masjid is South Africa's oldest mosque, established in 1794. It played a crucial role in early Islamic education, community formation, and cultural preservation.",
+      },
+      {
+        question: "Why does Manenberg exist?",
+        answer:
+          "Manenberg was built by the apartheid government in the late 1960s as a relocation zone for Coloured families forcibly removed from District Six, Bo-Kaap, Claremont, Simon's Town, Woodstock, Salt River, and Wynberg under the Group Areas Act.",
+      },
+      {
+        question: "Is Manenberg safe to visit?",
+        answer:
+          "Yes. All township visits are conducted with structured risk planning, pre-visit area assessments, guided movement only, and continuous situational awareness. Tours are led by experienced guides with strong community partnerships.",
+      },
+      {
+        question: "What is the food distribution activity?",
+        answer:
+          "Guests assist in handing out prepared food to families in the Manenberg community. This is a respectful, guided outreach focused on dignity and upliftment. All food distribution is conducted in a controlled, hygienic, and dignified manner with proper food handling, crowd management, and community supervision.",
+      },
+      {
+        question: "Is lunch included?",
+        answer:
+          "Yes. A traditional Cape Malay or Cape Town home‑style lunch is included in the tour price.",
+      },
+      {
+        question: "What should I wear?",
+        answer:
+          "Wear comfortable clothing and walking shoes. Modest attire is recommended for mosque visits. Bring sunscreen, a hat, and a jacket depending on the weather.",
+      },
+      {
+        question: "How does this tour benefit the community?",
+        answer:
+          "Every booking directly supports underprivileged families through community upliftment and food distribution. The tour operates on ethical tourism principles: respectful storytelling, non‑exploitation, and ensuring community benefit from every booking.",
+      },
+      {
+        question: "Is this tour suitable for children?",
+        answer:
+          "Yes, the tour is family-friendly and offers meaningful cultural education. Please contact us for specific child pricing.",
+      },
+    ],
+
+    tags: [
+      "Heritage",
+      "Faith",
+      "Cape Flats",
+      "Bo-Kaap",
+      "Manenberg",
+      "Cape Malay",
+      "Coloured Heritage",
+      "Slavery",
+      "Forced Removals",
+      "Community",
+      "Upliftment",
+      "Cultural Tour",
+      "Full Day",
+      "Cape Town",
+      "Historical",
+      "Community Engagement",
+    ],
+  },
+
+  // Cape Flats
+  // {
+  //   id: null, // New tour ID to be assigned (e.g., 35)
+  //   type: TOUR_TYPES.HISTORICAL,
+  //   category: TOUR_MODIFIERS.FULL_DAY,
+
+  //   title: "Full‑Day Cape Flats Community, Heritage and Faith Tour",
+  //   slug: "cape-flats-heritage-faith-tour",
+  //   canonicalPath: "/tours/cape-flats-heritage-faith-tour",
+
+  //   seo: {
+  //     title:
+  //       "Full‑Day Cape Flats Community, Heritage and Faith Tour | Cape Frontier Tours",
+  //     description:
+  //       "Experience Cape Town's Coloured heritage in a powerful, immersive way — from deep Islamic and Christian roots to the legacy of slavery, forced removals, and modern community life. Includes traditional Cape Malay lunch and hands‑on community upliftment through food distribution.",
+  //     keywords: [
+  //       "Cape Flats tour",
+  //       "Manenberg tour",
+  //       "Bo-Kaap tour",
+  //       "Cape Malay heritage",
+  //       "Coloured heritage Cape Town",
+  //       "Cape Town cultural tour",
+  //       "Slave Lodge tour",
+  //       "Auwal Masjid",
+  //       "District Six forced removals",
+  //       "community upliftment tour",
+  //       "Cape Town township tour",
+  //       "Sherwood Park tour",
+  //       "meaningful travel Cape Town",
+  //     ],
+  //   },
+
+  //   workflow: defaultWorkflow,
+
+  //   image:
+  //     "/src/assets/images/tours/historical/cape-flats-heritage-faith/1.webp",
+  //   images: [
+  //     "/src/assets/images/tours/historical/cape-flats-heritage-faith/1.webp",
+  //     "/src/assets/images/tours/historical/cape-flats-heritage-faith/2.webp",
+  //     "/src/assets/images/tours/historical/cape-flats-heritage-faith/3.webp",
+  //   ],
+  //   imageFolder: "historical/cape-flats-heritage-faith",
+
+  //   videos: [],
+
+  //   location:
+  //     "Cape Town, South Africa (Bo-Kaap, CBD, Sherwood Park, Manenberg)",
+  //   duration: "7 hours (09:00 – 16:00)",
+
+  //   priceBase: 2500,
+  //   minPeople: 2,
+  //   baseCurrency: "ZAR",
+  //   supportedCurrencies: SUPPORTED_CURRENCIES,
+
+  //   pricing: [
+  //     {
+  //       category: "2–3 Guests",
+  //       pricePerPerson: 2500,
+  //       note: "Full‑day transport, guide, museums, lunch, outreach",
+  //     },
+  //     {
+  //       category: "4–6 Guests",
+  //       pricePerPerson: 2300,
+  //       note: "Full‑day transport, guide, museums, lunch, outreach",
+  //     },
+  //     {
+  //       category: "Private Group (up to 6 guests)",
+  //       pricePerPerson: null,
+  //       note: "R13,500 total • Private vehicle, guide, museums, lunch, outreach",
+  //     },
+  //     {
+  //       category: "Medium Group (7–12 guests)",
+  //       pricePerPerson: null,
+  //       note: "R22,000 total • Private vehicle, guide, museums, lunch, outreach",
+  //     },
+  //     {
+  //       category: "Large Group (13–20 guests)",
+  //       pricePerPerson: null,
+  //       note: "R36,000 total • Private vehicle, guide, museums, lunch, outreach",
+  //     },
+  //   ],
+
+  //   additionalPricing: [
+  //     {
+  //       category: "Children Under 12",
+  //       price: 0,
+  //       unit: "per child",
+  //       currency: "ZAR",
+  //       note: "Free of charge when accompanied by an adult",
+  //     },
+  //   ],
+
+  //   groupPricing: {
+  //     enabled: true,
+  //     icon: "/icons/savemore.png",
+  //     tiers: [
+  //       {
+  //         minPeople: 2,
+  //         maxPeople: 3,
+  //         perPerson: 2500,
+  //         label: "2–3 Guests",
+  //         note: "Full‑day transport, guide, museums, lunch, outreach",
+  //       },
+  //       {
+  //         minPeople: 4,
+  //         maxPeople: 6,
+  //         perPerson: 2300,
+  //         label: "4–6 Guests",
+  //         note: "Full‑day transport, guide, museums, lunch, outreach",
+  //       },
+  //       {
+  //         minPeople: 1,
+  //         maxPeople: 6,
+  //         perPerson: null,
+  //         totalPrice: 13500,
+  //         label: "Private Group (up to 6)",
+  //         note: "Private vehicle, guide, museums, lunch, outreach",
+  //       },
+  //       {
+  //         minPeople: 7,
+  //         maxPeople: 12,
+  //         perPerson: null,
+  //         totalPrice: 22000,
+  //         label: "Medium Group (7–12)",
+  //         note: "Private vehicle, guide, museums, lunch, outreach",
+  //       },
+  //       {
+  //         minPeople: 13,
+  //         maxPeople: 20,
+  //         perPerson: null,
+  //         totalPrice: 36000,
+  //         label: "Large Group (13–20)",
+  //         note: "Private vehicle, guide, museums, lunch, outreach",
+  //       },
+  //     ],
+  //   },
+
+  //   rating: null,
+  //   stars: null,
+  //   mainReviewerName: "",
+  //   mainReviewerCountry: "",
+  //   reviewYear: null,
+  //   otherReviews: null,
+  //   mainReview: "",
+
+  //   description:
+  //     "Experience Cape Town's Coloured heritage in a powerful, immersive way — from deep Islamic and Christian roots to the legacy of slavery, forced removals, and modern community life. Enjoy a traditional Cape Malay lunch and take part in hands‑on community upliftment through food distribution. This is tourism with purpose: every booking directly strengthens food‑support programmes in a Coloured community, and your involvement helps improve daily life for local families. Travel meaningfully. Leave a positive footprint. Every booking directly supports underprivileged families.",
+
+  //   highlights: [
+  //     { text: "Bo-Kaap cultural introduction and photography" },
+  //     { text: "Auwal Masjid — South Africa's oldest mosque (1794)" },
+  //     { text: "Slave Lodge Museum — slavery, colonialism, and human rights" },
+  //     { text: "Sendingkerk (Sendinggestig) — historic mission church" },
+  //     { text: "Traditional Cape Malay lunch in Sherwood Park" },
+  //     { text: "Manenberg community visit and food distribution" },
+  //     { text: "Hands‑on community upliftment through food distribution" },
+  //     { text: "Every booking directly supports underprivileged families" },
+  //     { text: "Guided by respectful, ethical tourism principles" },
+  //   ],
+
+  //   included: [
+  //     { text: "Reliable driver and transport" },
+  //     { text: "Hotel pickup and drop-off" },
+  //     { text: "Bottled water" },
+  //     { text: "Breakfast on the go (light snack)" },
+  //     { text: "Lunch (traditional Cape Malay or Cape Town home-style dishes)" },
+  //     { text: "Community engagement and briefing" },
+  //     { text: "All entry fees" },
+  //     { text: "Professional registered guide" },
+  //   ],
+
+  //   excluded: [{ text: "Personal purchases" }, { text: "Gratuities" }],
+
+  //   pickupOptions: [
+  //     "Cape Town CBD",
+  //     "Green Point",
+  //     "Sea Point",
+  //     "V&A Waterfront",
+  //     "Custom pickup on request",
+  //   ],
+
+  //   requirements: [
+  //     { text: "Comfortable walking shoes recommended" },
+  //     { text: "Respectful behaviour towards the local community is expected" },
+  //     { text: "Modest attire recommended for mosque visits" },
+  //     { text: "Guests must be physically able to walk for extended periods" },
+  //   ],
+
+  //   arrangements: {
+  //     availability: "Available all year",
+  //     duration: "7 hours",
+  //     operatingTime: "09:00 – 16:00",
+  //     departure: "09:00",
+  //     return: "16:00",
+  //     location: "Cape Town, South Africa",
+
+  //     clothing: [
+  //       "Comfortable clothing",
+  //       "Comfortable walking shoes",
+  //       "Sunscreen",
+  //       "Hat",
+  //       "Modest attire for mosque visits",
+  //     ],
+
+  //     thingsToBring: ["Camera", "Cash for personal purchases", "Water bottle"],
+
+  //     passengerPolicy: "",
+  //     sunsetNote: "",
+  //   },
+
+  //   weatherPolicy: {
+  //     summary:
+  //       "Tour operates in all weather conditions. Cape Town weather can change quickly — bring an umbrella or rain jacket.",
+  //     items: [
+  //       { text: "Tour operates in all weather conditions" },
+  //       { text: "Bring an umbrella or rain jacket if rain is forecast" },
+  //       { text: "Some outdoor portions may be adjusted in extreme weather" },
+  //     ],
+  //   },
+
+  //   cancellationPolicy: {
+  //     summary:
+  //       "Private tour bookings require advance confirmation. Route adjustments may occur when necessary.",
+  //     items: [
+  //       { text: "Private bookings require advance confirmation" },
+  //       { text: "Route adjustments may occur when necessary" },
+  //       { text: "Final cancellation policy is confirmed upon booking" },
+  //     ],
+  //   },
+
+  //   safetyPolicy: {
+  //     summary:
+  //       "Cape Frontier Travel & Tours operates under full compliance with South African tourism and transport regulations. All tours are conducted with structured risk planning, pre-visit area assessments, guided movement, and emergency readiness protocols.",
+  //     items: [
+  //       { text: "Tourism Act 3 of 2014 — full compliance" },
+  //       { text: "City of Cape Town Community Tourism Guidelines followed" },
+  //       {
+  //         text: "Passenger Transport Regulations and licensing requirements met",
+  //       },
+  //       { text: "Public Liability & Passenger Liability Insurance maintained" },
+  //       { text: "Roadworthy & Operating Licence Requirements compliant" },
+  //       { text: "Pre-visit area assessments conducted" },
+  //       {
+  //         text: "Guided movement only — guests follow guide-led navigation at all times",
+  //       },
+  //       { text: "Emergency readiness protocols in place" },
+  //       { text: "Continuous situational awareness maintained" },
+  //       {
+  //         text: "All outreach activities conducted with verified community organisations",
+  //       },
+  //       {
+  //         text: "Guests receive a pre-tour briefing on movement protocols and respectful behavioural expectations",
+  //       },
+  //       {
+  //         text: "All staff trained in cultural sensitivity, conflict de-escalation, first-aid basics, and ethical tourism practices",
+  //       },
+  //       {
+  //         text: "Food distribution conducted in a controlled, hygienic, and dignified manner with proper food handling, crowd management, and community supervision",
+  //       },
+  //       {
+  //         text: "Ethical tourism principles: respectful storytelling, non-exploitation, ensuring community benefit from every booking",
+  //       },
+  //     ],
+  //   },
+
+  //   stops: [
+  //     {
+  //       id: "bo-kaap",
+  //       name: "Bo-Kaap Arrival & Orientation",
+  //       time: "09:00",
+  //       duration: "1 hour",
+  //       note: "Guided cultural introduction",
+  //       description:
+  //         "Bo-Kaap sits on the slopes of Signal Hill, just above the CBD. It is instantly recognisable by its brightly painted houses, cobblestone streets, and the sound of the Adhaan (call to prayer) from its historic mosques. The area is one of the oldest residential neighbourhoods in South Africa, with homes dating back to the 1760s. Bo-Kaap is deeply tied to the history of the Cape Malay community — descendants of enslaved people and political exiles. Enjoy a guided cultural introduction, photography moments, and a short walk through the iconic colourful neighbourhood.",
+  //       exactLocation: mapLocation({
+  //         label: "Bo-Kaap",
+  //         address: "Bo-Kaap, Cape Town, South Africa",
+  //         query: "Bo-Kaap Cape Town",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "auwal-masjid",
+  //       name: "Auwal Masjid",
+  //       time: "10:15",
+  //       duration: "30 minutes",
+  //       note: "South Africa's oldest mosque (1794)",
+  //       description:
+  //         "Visit South Africa's oldest mosque, established in 1794. Learn about early Islamic education, community formation, and cultural preservation in the Cape Malay community.",
+  //       exactLocation: mapLocation({
+  //         label: "Auwal Masjid",
+  //         address: "Bo-Kaap, Cape Town, South Africa",
+  //         query: "Auwal Masjid Cape Town",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "slave-lodge",
+  //       name: "Slave Lodge Museum",
+  //       time: "11:00",
+  //       duration: "1 hour",
+  //       note: "Slavery, colonialism, and human rights",
+  //       description:
+  //         "A deep historical experience covering slavery, colonialism, and human rights. The Slave Lodge is one of Cape Town's oldest buildings and provides powerful insights into South Africa's complex history of slavery and forced labour.",
+  //       exactLocation: mapLocation({
+  //         label: "Slave Lodge Museum",
+  //         address: "Adderley Street, Cape Town, South Africa",
+  //         query: "Slave Lodge Museum Cape Town",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "sendingkerk",
+  //       name: "Sendingkerk (Sendinggestig)",
+  //       time: "12:00",
+  //       duration: "30 minutes",
+  //       note: "Historic mission church",
+  //       description:
+  //         "Explore the historic mission church connected to education and upliftment. The Sendingkerk played an important role in the spiritual and educational development of the Cape's diverse communities.",
+  //       exactLocation: mapLocation({
+  //         label: "Sendinggestig",
+  //         address: "Cape Town, South Africa",
+  //         query: "Sendinggestig Cape Town",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "sherwood-park-lunch",
+  //       name: "Lunch in Sherwood Park",
+  //       time: "13:00",
+  //       duration: "1 hour",
+  //       note: "Traditional Cape Malay lunch",
+  //       description:
+  //         "Enjoy Cape Malay or Cape Town home‑style dishes at a local eatery in Sherwood Park. Experience the rich flavours of Cape Malay cuisine, a fusion of Malay, Indonesian, and Cape Dutch influences.",
+  //       exactLocation: mapLocation({
+  //         label: "Sherwood Park",
+  //         address: "Cape Flats, Cape Town, South Africa",
+  //         query: "Sherwood Park Cape Town",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "manenberg",
+  //       name: "Manenberg Community Visit & Food Distribution",
+  //       time: "14:20",
+  //       duration: "1 hour",
+  //       note: "Respectful community outreach",
+  //       description:
+  //         "Guests assist in handing out prepared food to families in a Coloured community. This is a respectful, guided outreach focused on dignity and upliftment. Manenberg is a large township on the Cape Flats, created in the late 1960s as part of apartheid's Group Areas Act. It is known for strong family networks, deep Cape Coloured cultural roots, active community organisations, and a mix of hardship, hope, and ongoing upliftment work. Despite decades of social challenges, Manenberg remains a place of identity, pride, and community strength.",
+  //       exactLocation: mapLocation({
+  //         label: "Manenberg",
+  //         address: "Manenberg, Cape Town, South Africa",
+  //         query: "Manenberg Cape Town",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //   ],
+
+  //   routeInformation: {
+  //     title: "Cape Flats Community, Heritage and Faith Tour Route",
+
+  //     description:
+  //       "A powerful cultural immersion into Cape Town's Coloured heritage — exploring Islamic and Christian roots, slavery, forced removals, and modern community life.",
+
+  //     items: [
+  //       "Bo-Kaap — guided cultural introduction and photography",
+  //       "Auwal Masjid — South Africa's oldest mosque (1794)",
+  //       "Slave Lodge Museum — slavery, colonialism, and human rights",
+  //       "Sendingkerk (Sendinggestig) — historic mission church",
+  //       "Lunch in Sherwood Park — traditional Cape Malay cuisine",
+  //       "Manenberg Community Visit — food distribution and community engagement",
+  //     ],
+  //   },
+
+  //   vehicle: {
+  //     name: "",
+  //     class: "",
+  //     doors: null,
+  //     seats: null,
+  //     fuel: "",
+  //     gearbox: "",
+  //     engine: "",
+  //     specifications: [],
+  //   },
+
+  //   securityAndLiability: {
+  //     heading: "",
+  //     cardPreAuthorisation: {
+  //       amount: null,
+  //       currency: "",
+  //       description: "",
+  //       release: "",
+  //     },
+  //     cashDeposit: {
+  //       amountZAR: null,
+  //       alternativeAmountUSD: null,
+  //       paymentMethod: "",
+  //       paidAt: "",
+  //       refundPolicy: "",
+  //     },
+  //   },
+
+  //   needToKnow: [
+  //     {
+  //       text: "Bo-Kaap is one of the oldest residential neighbourhoods in South Africa, with homes dating back to the 1760s",
+  //     },
+  //     {
+  //       text: "Manenberg was built by the apartheid government as a relocation zone for Coloured families forcibly removed from District Six, Bo‑Kaap, and Manenberg",
+  //     },
+  //     {
+  //       text: "Manenberg is not defined by crime — it is defined by history and resilience",
+  //     },
+  //     { text: "The community did not choose its location — it was forced" },
+  //     {
+  //       text: "Upliftment projects are a response to decades of structural inequality",
+  //     },
+  //     {
+  //       text: "The people of Manenberg carry a rich cultural identity shaped by survival and strength",
+  //     },
+  //     {
+  //       text: "Every booking directly supports underprivileged families through community upliftment",
+  //     },
+  //     { text: "Modest attire recommended for mosque visits" },
+  //     { text: "Respectful behaviour towards the local community is expected" },
+  //     { text: "Comfortable walking shoes are recommended" },
+  //     { text: "Children under 12 are free of charge" },
+  //   ],
+
+  //   faqs: [
+  //     {
+  //       question: "What is the historical significance of Bo-Kaap?",
+  //       answer:
+  //         "Bo-Kaap is one of the oldest residential neighbourhoods in South Africa, with homes dating back to the 1760s. It is deeply tied to the history of the Cape Malay community — descendants of enslaved people and political exiles.",
+  //     },
+  //     {
+  //       question: "What is Auwal Masjid?",
+  //       answer:
+  //         "Auwal Masjid is South Africa's oldest mosque, established in 1794. It played a crucial role in early Islamic education, community formation, and cultural preservation.",
+  //     },
+  //     {
+  //       question: "Why does Manenberg exist?",
+  //       answer:
+  //         "Manenberg was built by the apartheid government in the late 1960s as a relocation zone for Coloured families forcibly removed from District Six, Bo‑Kaap, and other areas under the Group Areas Act.",
+  //     },
+  //     {
+  //       question: "Is Manenberg safe to visit?",
+  //       answer:
+  //         "Yes. All township visits are conducted with structured risk planning, pre-visit area assessments, guided movement only, and continuous situational awareness. Tours are led by experienced guides with strong community partnerships.",
+  //     },
+  //     {
+  //       question: "What is the food distribution activity?",
+  //       answer:
+  //         "Guests assist in handing out prepared food to families in the Manenberg community. This is a respectful, guided outreach focused on dignity and upliftment. All food distribution is conducted in a controlled, hygienic, and dignified manner.",
+  //     },
+  //     {
+  //       question: "Is lunch included?",
+  //       answer:
+  //         "Yes. A traditional Cape Malay or Cape Town home‑style lunch is included in the tour price.",
+  //     },
+  //     {
+  //       question: "Are children free?",
+  //       answer:
+  //         "Yes. Children under 12 are free of charge when accompanied by an adult.",
+  //     },
+  //     {
+  //       question: "What should I wear?",
+  //       answer:
+  //         "Wear comfortable clothing and walking shoes. Modest attire is recommended for mosque visits. Bring sunscreen, a hat, and a jacket depending on the weather.",
+  //     },
+  //     {
+  //       question: "How does this tour benefit the community?",
+  //       answer:
+  //         "Every booking directly supports underprivileged families through community upliftment and food distribution. The tour operates on ethical tourism principles: respectful storytelling, non‑exploitation, and ensuring community benefit from every booking.",
+  //     },
+  //     {
+  //       question: "Can I book this tour for a large group?",
+  //       answer:
+  //         "Yes. The tour can accommodate groups of up to 20 guests. Private group pricing is available for 1–6 guests (R13,500 total), medium groups 7–12 (R22,000 total), and large groups 13–20 (R36,000 total).",
+  //     },
+  //   ],
+
+  //   tags: [
+  //     "Cape Flats",
+  //     "Heritage",
+  //     "Faith",
+  //     "Bo-Kaap",
+  //     "Manenberg",
+  //     "Sherwood Park",
+  //     "Cape Malay",
+  //     "Coloured Heritage",
+  //     "Slavery",
+  //     "Forced Removals",
+  //     "Community",
+  //     "Upliftment",
+  //     "Cultural Tour",
+  //     "Full Day",
+  //     "Cape Town",
+  //     "Historical",
+  //     "Community Engagement",
+  //     "Meaningful Travel",
+  //   ],
+  // },
+
+  // =========================================== PACKAGES
+  // PenTour 1 - Mother City
+  {
+    id: null,
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.FULL_DAY,
 
@@ -1659,11 +7239,16 @@ export const tours = [
     workflow: defaultWorkflow,
 
     image: getCoverImage(`${PENINSULA_PACKAGE_ONE_BASE}/cape-point`),
-    images: packageGallery(PENINSULA_PACKAGE_ONE_BASE, PENINSULA_1_DESTINATIONS, 3),
+    images: packageGallery(
+      PENINSULA_PACKAGE_ONE_BASE,
+      PENINSULA_1_DESTINATIONS,
+      3,
+    ),
+    imageFolder: "packages/peninsula-tour-1",
     destinationGalleries: packageDestinationGalleries(
       PENINSULA_PACKAGE_ONE_BASE,
       PENINSULA_1_DESTINATIONS,
-      3
+      3,
     ),
 
     location: "Cape Peninsula, Cape Town",
@@ -1704,7 +7289,6 @@ export const tours = [
         },
       ],
     },
-
 
     rating: 4.9,
     stars: 5,
@@ -1859,7 +7443,10 @@ export const tours = [
           address: "Kleintuin Road, Simon’s Town, Cape Town",
           query: "Boulders Beach Penguin Colony Cape Town",
         }),
-        images: getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/boulders-beach`, 3),
+        images: getTourImages(
+          `${PENINSULA_PACKAGE_ONE_BASE}/boulders-beach`,
+          3,
+        ),
         touristComments: [
           {
             name: "Grace",
@@ -1902,12 +7489,13 @@ export const tours = [
       },
     ],
 
-
     needToKnow: [
       { text: "Start early to cover all major stops" },
       { text: "Some entrance fees may be separate" },
       { text: "Route may adjust due to weather or traffic" },
-      { text: "Package galleries now pull multiple images per destination folder" },
+      {
+        text: "Package galleries now pull multiple images per destination folder",
+      },
     ],
 
     cancellationPolicy: {
@@ -1934,7 +7522,7 @@ export const tours = [
 
     tags: ["Package", "Full Day", "Scenic", "Cape Peninsula"],
   },
-
+  // PenTour 2 -Peninsula Tour
   {
     id: 10,
     type: TOUR_TYPES.PACKAGES,
@@ -1959,11 +7547,16 @@ export const tours = [
     workflow: defaultWorkflow,
 
     image: getCoverImage(`${PENINSULA_PACKAGE_TWO_BASE}/chapmans-peak`),
-    images: packageGallery(PENINSULA_PACKAGE_TWO_BASE, PENINSULA_2_DESTINATIONS, 3),
+    images: packageGallery(
+      PENINSULA_PACKAGE_TWO_BASE,
+      PENINSULA_2_DESTINATIONS,
+      3,
+    ),
+    imageFolder: "packages/peninsula-tour-2",
     destinationGalleries: packageDestinationGalleries(
       PENINSULA_PACKAGE_TWO_BASE,
       PENINSULA_2_DESTINATIONS,
-      3
+      3,
     ),
 
     location: "Cape Peninsula, Cape Town",
@@ -2120,7 +7713,10 @@ export const tours = [
           address: "Kleintuin Road, Simon’s Town, Cape Town",
           query: "Boulders Beach Penguin Colony Cape Town",
         }),
-        images: getTourImages(`${PENINSULA_PACKAGE_TWO_BASE}/boulders-beach`, 3),
+        images: getTourImages(
+          `${PENINSULA_PACKAGE_TWO_BASE}/boulders-beach`,
+          3,
+        ),
         touristComments: [
           {
             name: "Noah",
@@ -2160,8 +7756,20 @@ export const tours = [
       { text: "Some entrance fees may be separate" },
       { text: "Full-day availability required" },
       { text: "Route may adjust due to weather or traffic" },
-      { text: "Package galleries now pull multiple images per destination folder" },
+      {
+        text: "Package galleries now pull multiple images per destination folder",
+      },
     ],
+
+    weatherPolicy: {
+      summary:
+        "Weather conditions can affect the route, timing, and accessibility of certain stops.",
+      items: [
+        { text: "Some stops may be shortened or skipped due to weather" },
+        { text: "Final route adjustments will be confirmed with the client" },
+        { text: "Weather-related changes may affect timing and duration" },
+      ],
+    },
 
     cancellationPolicy: {
       summary: "Route order can change due to timing, traffic, and weather.",
@@ -2187,7 +7795,7 @@ export const tours = [
 
     tags: ["Package", "Full Day", "Premium Route", "Cape Peninsula"],
   },
-
+  // Wine-Estate
   {
     id: 11,
     type: TOUR_TYPES.PACKAGES,
@@ -2217,12 +7825,12 @@ export const tours = [
     images: packageGallery(
       STELLENBOSCH_WINE_BASE,
       STELLENBOSCH_WINE_DESTINATIONS,
-      3
+      3,
     ),
     destinationGalleries: packageDestinationGalleries(
       STELLENBOSCH_WINE_BASE,
       STELLENBOSCH_WINE_DESTINATIONS,
-      3
+      3,
     ),
 
     location: "Stellenbosch, South Africa",
@@ -2432,1611 +8040,50 @@ export const tours = [
 
     tags: ["Wine", "Stellenbosch", "Full Day", "Cape Winelands"],
   },
-
+  // Robben-Island + Langa
   {
-    id: 12,
-    type: TOUR_TYPES.ADRENALINE,
-    category: TOUR_MODIFIERS.FULL_DAY,
-
-    title: "Gun Range + Cape Point",
-    slug: "gun-range-cape-point",
-    canonicalPath: "/tours/gun-range-cape-point",
-
-    seo: {
-      title: "Gun Range & Cape Point Full-Day Tour | Cape Frontier Tours",
-      description:
-        "Experience an adrenaline-filled private Cape Town tour combining a supervised shooting range session with Boulders Penguin Colony, Cape Point, Cape of Good Hope, and Chapman's Peak Drive.",
-      keywords: [
-        "Gun Range Cape Town",
-        "Cape Point Tour",
-        "Cape of Good Hope Tour",
-        "Boulders Penguins Tour",
-        "Private Cape Peninsula Tour",
-        "Cape Town Shooting Experience",
-        "Cape Town Adventure Tour",
-      ],
-    },
-
-    workflow: defaultWorkflow,
-
-    image: getCoverImage(`${ADRENALINE_BASE}/gun-range`),
-
-    images: [
-      ...getTourImages(`${ADRENALINE_BASE}/gun-range`, 3),
-      ...getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/boulders`, 2),
-      ...getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/cape-point`, 2),
-    ],
-
-    destinationGalleries: {
-      "gun-range": getTourImages(`${ADRENALINE_BASE}/gun-range`, 3),
-      boulders: getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/boulders`, 3),
-      "cape-point": getTourImages(
-        `${PENINSULA_PACKAGE_ONE_BASE}/cape-point`,
-        3
-      ),
-    },
-
-    location: "Cape Town, South Africa",
-    duration: "8 - 9 Hours",
-
-    priceBase: 9560,
-    minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
-    
-    pricing: [
-      {
-        category: "Adults",
-        pricePerPerson: null, // not confirmed yet
-      },
-    ],
-
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 2,
-          maxPeople: 4,
-          perPerson: 2390, // not confirmed yet
-          totalPrice: 9560,
-          label: "2–4 Guests",
-          note: "Private vehicle • All-inclusive",
-        },
-        {
-          minPeople: 5,
-          maxPeople: 7,
-          perPerson: 2470, // not confirmed yet
-          totalPrice: 17280,
-          label: "5–7 Guests",
-          note: "Private vehicle • All-inclusive",
-        },
-      ],
-    },
-
-    rating: 5.0,
-    stars: 5,
-    mainReviewerName: "Daniel Brooks",
-    mainReviewerCountry: "US",
-    reviewYear: 2026,
-    otherReviews: 29,
-    mainReview:
-      "A unique combination of adventure and sightseeing. The shooting experience was professional and Cape Point was unforgettable.",
-
-    description:
-      "Experience the perfect blend of adrenaline and iconic Cape Peninsula scenery. Start your day with a fully supervised shooting experience at an accredited gun range, then explore the world‑famous Boulders Penguins, Cape Point, and the Cape of Good Hope.",
-
-    highlights: [
-      { text: "Fully supervised accredited shooting experience" },
-      { text: "Visit Boulders Penguin Colony" },
-      { text: "Cape Point & Cape of Good Hope" },
-      { text: "Scenic Chapman's Peak Drive" },
-      { text: "Private vehicle and flexible itinerary" },
-    ],
-
-    included: [
-      { text: "Private vehicle with driver-guide" },
-      { text: "Hotel pickup & drop-off" },
-      { text: "Accredited gun range experience" },
-      { text: "Professional firearms instructor" },
-      { text: "Safety briefing" },
-      { text: "Handgun or rifle shooting package" },
-      { text: "Boulders Penguin Colony entry" },
-      { text: "Cape Point Nature Reserve entry" },
-      { text: "Bottled water" },
-    ],
-
-    excluded: [
-      { text: "Lunch" },
-      { text: "Cape Point Flying Dutchman Funicular (optional)" },
-      { text: "Personal purchases" },
-    ],
-
-    pickupOptions: DEFAULT_PICKUP_OPTIONS,
-
-    stops: [
-      {
-        id: "gun-range",
-        name: "Gun Range",
-        time: "09:00",
-        duration: "1.5 - 2 hours",
-        note: "Fully supervised accredited shooting experience",
-        description:
-          "Start your adventure with a professionally supervised shooting session. Receive a complete safety briefing before enjoying a handgun or rifle experience suitable for both beginners and experienced shooters.",
-        exactLocation: mapLocation({
-          label: "Gun Range",
-          query: "Cape Town Gun Range",
-        }),
-        images: getTourImages(`${ADRENALINE_BASE}/gun-range`, 3),
-        touristComments: [
-          {
-            name: "Daniel",
-            country: "US",
-            text: "The instructors made the experience safe, professional, and incredibly enjoyable.",
-          },
-        ],
-      },
-
-      {
-        id: "boulders",
-        name: "Boulders Penguin Colony",
-        time: "12:00",
-        duration: "1 hour",
-        note: "African Penguin Colony",
-        description:
-          "Walk along the boardwalks to observe the famous African penguins in their natural habitat while enjoying one of Cape Town's most photographed coastal attractions.",
-        exactLocation: mapLocation({
-          label: "Boulders Penguin Colony",
-          address: "Kleintuin Road, Simon's Town",
-          query: "Boulders Penguin Colony",
-        }),
-        images: getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/boulders`, 3),
-        touristComments: [
-          {
-            name: "Emma",
-            country: "UK",
-            text: "Seeing the penguins so close was an unforgettable experience.",
-          },
-        ],
-      },
-
-      {
-        id: "cape-point",
-        name: "Cape Point & Cape of Good Hope",
-        time: "14:00",
-        duration: "2.5 - 3 hours",
-        note: "Cape Peninsula Nature Reserve",
-        description:
-          "Discover the dramatic cliffs, iconic lighthouse, breathtaking ocean views, and the famous Cape of Good Hope while spotting local wildlife including baboons, ostriches, and antelope.",
-        exactLocation: mapLocation({
-          label: "Cape Point",
-          address: "Cape Point Nature Reserve",
-          query: "Cape Point",
-        }),
-        images: getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/cape-point`, 3),
-        touristComments: [
-          {
-            name: "Sophie",
-            country: "DE",
-            text: "Cape Point exceeded every expectation. The scenery was incredible.",
-          },
-        ],
-      },
-
-      {
-        id: "chapmans-peak",
-        name: "Chapman's Peak Drive",
-        time: "17:00",
-        duration: "30 minutes",
-        note: "Scenic coastal drive",
-        description:
-          "Finish the day with one of the world's most spectacular coastal drives featuring panoramic Atlantic Ocean views.",
-        exactLocation: mapLocation({
-          label: "Chapman's Peak Drive",
-          query: "Chapman's Peak Drive",
-        }),
-        images: getTourImages(`${PENINSULA_PACKAGE_TWO_BASE}/chapmans-peak`, 3),
-        touristComments: [
-          {
-            name: "Mark",
-            country: "CA",
-            text: "The drive alone was worth the trip. Absolutely stunning.",
-          },
-        ],
-      },
-    ],
-
-    groupDiscount: {
-      enabled: false,
-    },
-
-    needToKnow: [
-      { text: "Participants must follow all firearm safety instructions." },
-      { text: "Valid identification may be required at the shooting range." },
-      { text: "Children may accompany the sightseeing portion only where permitted." },
-      { text: "Comfortable walking shoes are recommended." },
-      { text: "Wildlife sightings cannot be guaranteed." },
-    ],
-
-    cancellationPolicy: {
-      summary:
-        "Shooting range bookings and park access are subject to availability.",
-      items: [
-        { text: "Private tour bookings require advance confirmation." },
-        { text: "Weather may affect the itinerary." },
-        { text: "Final cancellation policy is confirmed upon booking." },
-      ],
-    },
-
-    faqs: [
-      {
-        question: "Is the shooting experience suitable for beginners?",
-        answer:
-          "Yes. Professional instructors provide a complete safety briefing and supervise the entire session.",
-      },
-      {
-        question: "Are all entrance fees included?",
-        answer:
-          "Yes. The shooting range, Boulders Penguin Colony, and Cape Point Nature Reserve entrance fees are included.",
-      },
-      {
-        question: "Is this a private tour?",
-        answer:
-          "Yes. The tour includes a private vehicle with your own driver-guide and a flexible itinerary.",
-      },
-      {
-        question: "Is lunch included?",
-        answer:
-          "No. Lunch is excluded, allowing guests to choose where they'd like to dine.",
-      },
-    ],
-
-
-
-    tags: [
-      "Gun Range",
-      "Cape Point",
-      "Cape of Good Hope",
-      "Penguins",
-      "Private Tour",
-      "Adventure",
-      "Cape Town",
-      "Full Day",
-    ],
-  },
-
-  {
-    id: 13,
-    type: TOUR_TYPES.ADRENALINE,
-    category: TOUR_MODIFIERS.HALF_DAY,
-
-    title: "Gun Range + Cape Town City Tour",
-    slug: "gun-range-cape-town-city-tour",
-    canonicalPath: "/tours/gun-range-cape-town-city-tour",
-
-    seo: {
-      title: "Gun Range & Cape Town City Tour | Cape Frontier Tours",
-      description:
-        "Combine an exciting supervised shooting experience with a private Cape Town city tour featuring Bo-Kaap, Signal Hill, Camps Bay, and the V&A Waterfront.",
-      keywords: [
-        "Gun Range Cape Town",
-        "Cape Town City Tour",
-        "Bo-Kaap Tour",
-        "Signal Hill Tour",
-        "Camps Bay Tour",
-        "V&A Waterfront Tour",
-        "Private Cape Town Tour",
-        "Cape Town Adventure Tour",
-      ],
-    },
-
-    workflow: defaultWorkflow,
-
-    image: getCoverImage(`adrenaline/gun-range`),
-
-    images: [
-      ...getTourImages(`adrenaline/gun-range`, 3),
-      ...getTourImages(`packages/gun-range+city-tour/bo-kaap`, 2),
-      ...getTourImages(`packages/gun-range+city-tour/signal-hill`, 2),
-      ...getTourImages(`${PENINSULA_PACKAGE_TWO_BASE}/camps-bay`, 2),
-      ...getTourImages(`packages/gun-range+city-tour/va-waterfront`, 2),
-    ],
-
-    destinationGalleries: {
-      "gun-range": getTourImages(`${ADRENALINE_BASE}/gun-range`, 3),
-      "bo-kaap": getTourImages(`packages/gun-range+city-tour/bo-kaap`, 3),
-      "signal-hill": getTourImages(`packages/gun-range+city-tour/signal-hill`, 3),
-      "camps-bay": getTourImages(`${PENINSULA_PACKAGE_TWO_BASE}/camps-bay`, 3),
-      waterfront: getTourImages(`packages/gun-range+city-tour/va-waterfront`, 3),
-    },
-
-    location: "Cape Town, South Africa",
-    duration: "6 - 7 Hours",
-
-    priceBase: 7200,
-    minPeople: 1,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
- 
-    pricing: [
-      {
-        category: "Adults",
-        pricePerPerson: 3290,
-      },
-    ],
-
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 2,
-          maxPeople: 4,
-          perPerson: 1800, // not confirmed yet
-          totalPrice: 7200,
-          label: "2–4 Guests",
-          note: "Private vehicle",
-        },
-        {
-          minPeople: 5,
-          maxPeople: 7,
-          perPerson: 1428, // not confirmed yet
-          totalPrice: 10000,
-          label: "5–7 Guests",
-          note: "Private vehicle",
-        },
-      ],
-    },
-
-    rating: 5.0,
-    stars: 5,
-    mainReviewerName: "Michael Carter",
-    mainReviewerCountry: "US",
-    reviewYear: 2026,
-    otherReviews: 22,
-    mainReview:
-      "A fantastic mix of adrenaline and sightseeing. The shooting experience was professional and the city highlights were spectacular.",
-
-    description:
-      "Perfect for travellers looking to combine adventure with Cape Town's most iconic landmarks. Begin with a professionally supervised shooting experience before discovering colourful Bo-Kaap, panoramic Signal Hill, beautiful Camps Bay, and the vibrant V&A Waterfront.",
-
-    highlights: [
-      { text: "Fully supervised accredited shooting experience" },
-      { text: "Explore colourful Bo-Kaap" },
-      { text: "Panoramic views from Signal Hill" },
-      { text: "Relax at Camps Bay" },
-      { text: "Visit the V&A Waterfront" },
-      { text: "Private vehicle with flexible itinerary" },
-    ],
-
-    included: [
-      { text: "Private vehicle with driver-guide" },
-      { text: "Hotel pickup & drop-off" },
-      { text: "Accredited shooting range session" },
-      { text: "Professional firearms instructor" },
-      { text: "Safety briefing" },
-      { text: "Bottled water" },
-    ],
-
-    excluded: [
-      { text: "Meals" },
-      { text: "Optional museum entry fees" },
-      { text: "Personal purchases" },
-    ],
-
-    pickupOptions: DEFAULT_PICKUP_OPTIONS,
-
-    stops: [
-      {
-        id: "gun-range",
-        name: "Gun Range",
-        time: "09:00",
-        duration: "1.5 - 2 hours",
-        note: "Fully supervised shooting experience",
-        description:
-          "Begin your day with an exciting shooting session led by experienced instructors. Suitable for beginners and experienced shooters alike.",
-        exactLocation: mapLocation({
-          label: "Gun Range",
-          query: "Cape Town Gun Range",
-        }),
-        images: getTourImages(`${ADRENALINE_BASE}/gun-range`, 3),
-        touristComments: [
-          {
-            name: "Michael",
-            country: "US",
-            text: "Professional, safe, and one of the highlights of our trip.",
-          },
-        ],
-      },
-
-      {
-        id: "bo-kaap",
-        name: "Bo-Kaap",
-        time: "11:30",
-        duration: "45 minutes",
-        note: "Historic Cape Malay neighbourhood",
-        description:
-          "Explore Cape Town's colourful Bo-Kaap with its cobbled streets, vibrant houses, and rich cultural heritage.",
-        exactLocation: mapLocation({
-          label: "Bo-Kaap",
-          query: "Bo-Kaap Cape Town",
-        }),
-        images: getTourImages(`gun-range+city-tour/bo-kaap`, 3),
-        touristComments: [
-          {
-            name: "Emma",
-            country: "AU",
-            text: "The colourful streets made for incredible photographs.",
-          },
-        ],
-      },
-
-      {
-        id: "signal-hill",
-        name: "Signal Hill",
-        time: "12:30",
-        duration: "30 minutes",
-        note: "Panoramic city viewpoint",
-        description:
-          "Take in sweeping views of Cape Town, Table Mountain, the Atlantic coastline, and Robben Island.",
-        exactLocation: mapLocation({
-          label: "Signal Hill",
-          query: "Signal Hill Cape Town",
-        }),
-        images: getTourImages(`${CITY_TOUR_BASE}/signal-hill`, 3),
-        touristComments: [
-          {
-            name: "David",
-            country: "UK",
-            text: "The views across the city were absolutely breathtaking.",
-          },
-        ],
-      },
-
-      {
-        id: "camps-bay",
-        name: "Camps Bay",
-        time: "13:30",
-        duration: "1 hour",
-        note: "Scenic beachfront",
-        description:
-          "Enjoy one of Cape Town's most famous beaches, lined with palm trees, cafés, and spectacular ocean views.",
-        exactLocation: mapLocation({
-          label: "Camps Bay",
-          query: "Camps Bay Beach",
-        }),
-        images: getTourImages(`${CITY_TOUR_BASE}/camps-bay`, 3),
-        touristComments: [
-          {
-            name: "Claire",
-            country: "FR",
-            text: "Beautiful beach with an amazing mountain backdrop.",
-          },
-        ],
-      },
-
-      {
-        id: "waterfront",
-        name: "V&A Waterfront",
-        time: "15:00",
-        duration: "1.5 hours",
-        note: "Shopping, dining and harbour",
-        description:
-          "Finish your tour exploring the lively V&A Waterfront, one of South Africa's most popular attractions for shopping, dining, and harbour views.",
-        exactLocation: mapLocation({
-          label: "V&A Waterfront",
-          query: "V&A Waterfront Cape Town",
-        }),
-        images: getTourImages(`${CITY_TOUR_BASE}/va-waterfront`, 3),
-        touristComments: [
-          {
-            name: "Sarah",
-            country: "CA",
-            text: "A great place to end the day with plenty to see and do.",
-          },
-        ],
-      },
-    ],
-
-    groupDiscount: {
-      enabled: false,
-    },
-
-    needToKnow: [
-      { text: "Participants must follow all firearm safety instructions." },
-      { text: "Valid identification may be required at the shooting range." },
-      { text: "Comfortable walking shoes are recommended." },
-      { text: "Museum visits are optional and paid separately." },
-    ],
-
-    cancellationPolicy: {
-      summary:
-        "Tour itinerary may vary depending on weather and attraction operating hours.",
-      items: [
-        { text: "Private tour bookings require advance confirmation." },
-        { text: "Final cancellation policy is confirmed upon booking." },
-      ],
-    },
-
-    faqs: [
-      {
-        question: "Is the shooting experience suitable for beginners?",
-        answer:
-          "Yes. Professional instructors provide a full safety briefing and supervise the entire experience.",
-      },
-      {
-        question: "Is this a private tour?",
-        answer:
-          "Yes. The tour includes a private vehicle with your own driver-guide and a flexible itinerary.",
-      },
-      {
-        question: "Are meals included?",
-        answer:
-          "No. Meals are excluded, allowing guests to choose where they'd like to eat.",
-      },
-      {
-        question: "Are museum entries included?",
-        answer:
-          "Optional museum entrance fees are excluded unless otherwise arranged.",
-      },
-    ],
-
-
-    tags: [
-      "Gun Range",
-      "Cape Town",
-      "City Tour",
-      "Bo-Kaap",
-      "Signal Hill",
-      "Camps Bay",
-      "V&A Waterfront",
-      "Private Tour",
-      "Adventure",
-    ],
-  },
-
-  {
-    id: 14,
-    type: TOUR_TYPES.ADRENALINE,
-    category: TOUR_MODIFIERS.HALF_DAY,
-
-    title: "Gun Range + Horse Riding",
-    slug: "gun-range-horse-riding",
-    canonicalPath: "/tours/gun-range-horse-riding",
-
-    seo: {
-      title: "Gun Range & Noordhoek Beach Horse Riding Tour | Cape Frontier Tours",
-      description:
-        "Enjoy a private full-day adventure combining a supervised shooting range experience with a scenic horse ride along Noordhoek Beach via the spectacular Chapman's Peak Drive.",
-      keywords: [
-        "Gun Range Cape Town",
-        "Horse Riding Noordhoek Beach",
-        "Noordhoek Horse Riding",
-        "Chapman's Peak Tour",
-        "Private Adventure Tour",
-        "Cape Town Horse Riding",
-        "Cape Town Shooting Experience",
-      ],
-    },
-
-    workflow: defaultWorkflow,
-
-    image: getCoverImage(`adrenaline/horse-riding-dunes`),
-
-    images: [
-      ...getTourImages(`adrenaline/gun-range`, 3),
-      ...getTourImages(`adrenaline/horse-riding-dunes`, 3),
-      ...getTourImages(`${PENINSULA_PACKAGE_TWO_BASE}/chapmans-peak`, 2),
-    ],
-
-    destinationGalleries: {
-      "gun-range": getTourImages(`${ADRENALINE_BASE}/gun-range`, 3),
-      "horse-riding": getTourImages(
-        `${HIKING_BASE}/noordhoek-beach-horse-riding`,
-        3
-      ),
-      "chapmans-peak": getTourImages(
-        `${PENINSULA_PACKAGE_TWO_BASE}/chapmans-peak`,
-        3
-      ),
-    },
-
-    location: "Cape Town, South Africa",
-    duration: "4 - 5 Hours",
-
-    priceBase: 10260,
-    minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
- 
-    pricing: [
-      {
-        category: "Adults",
-        pricePerPerson: 2890, // not confirmed yet
-      },
-    ],
-
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 2,
-          maxPeople: 4,
-          perPerson: 5780, // not confirmed yet
-          totalPrice: 10260,
-          label: "2–4 Guests",
-          note: "Private vehicle",
-        },
-        {
-          minPeople: 5,
-          maxPeople: 7,
-          perPerson: 2030, // not confirmed yet
-          totalPrice: 14200,
-          label: "5–7 Guests",
-          note: "Private vehicle",
-        },
-      ],
-    },
-
-    rating: 5.0,
-    stars: 5,
-    mainReviewerName: "Emily Foster",
-    mainReviewerCountry: "UK",
-    reviewYear: 2026,
-    otherReviews: 18,
-    mainReview:
-      "The perfect combination of adventure and relaxation. The horse ride on Noordhoek Beach was unforgettable.",
-
-    description:
-      "Experience the perfect balance of adrenaline and natural beauty. Begin your day with a professionally supervised shooting session before travelling along the breathtaking Chapman's Peak Drive to enjoy a peaceful 1–2 hour horse ride on Noordhoek Beach.",
-
-    highlights: [
-      { text: "Accredited supervised shooting experience" },
-      { text: "Scenic Chapman's Peak Drive" },
-      { text: "1–2 hour Noordhoek Beach horse ride" },
-      { text: "Private transport throughout" },
-      { text: "Flexible private itinerary" },
-    ],
-
-    included: [
-      { text: "Private vehicle with driver-guide" },
-      { text: "Hotel pickup & drop-off" },
-      { text: "Accredited shooting range session" },
-      { text: "Professional firearms instructor" },
-      { text: "Horse riding experience" },
-      { text: "Horse riding safety equipment" },
-      { text: "Bottled water" },
-    ],
-
-    excluded: [
-      { text: "Meals" },
-      { text: "Personal purchases" },
-    ],
-
-    pickupOptions: DEFAULT_PICKUP_OPTIONS,
-
-    stops: [
-      {
-        id: "gun-range",
-        name: "Gun Range",
-        time: "09:00",
-        duration: "1.5 - 2 hours",
-        note: "Professional supervised shooting experience",
-        description:
-          "Enjoy a safe and exciting shooting session with experienced instructors. Suitable for both beginners and experienced shooters.",
-        exactLocation: mapLocation({
-          label: "Gun Range",
-          query: "Cape Town Gun Range",
-        }),
-        images: getTourImages(`${ADRENALINE_BASE}/gun-range`, 3),
-        touristComments: [
-          {
-            name: "Emily",
-            country: "UK",
-            text: "Very professional instructors and an unforgettable experience.",
-          },
-        ],
-      },
-
-      {
-        id: "chapmans-peak",
-        name: "Chapman's Peak Drive",
-        time: "11:30",
-        duration: "45 minutes",
-        note: "Scenic coastal drive",
-        description:
-          "Travel one of the world's most spectacular coastal roads while enjoying panoramic Atlantic Ocean views.",
-        exactLocation: mapLocation({
-          label: "Chapman's Peak Drive",
-          query: "Chapman's Peak Drive",
-        }),
-        images: getTourImages(`${PENINSULA_PACKAGE_TWO_BASE}/chapmans-peak`, 3),
-        touristComments: [
-          {
-            name: "Ryan",
-            country: "US",
-            text: "Every corner offered another incredible view.",
-          },
-        ],
-      },
-
-      {
-        id: "horse-riding",
-        name: "Noordhoek Beach Horse Riding",
-        time: "13:00",
-        duration: "1 - 2 hours",
-        note: "Beach horseback riding experience",
-        description:
-          "Enjoy a peaceful guided horseback ride along the expansive white sands of Noordhoek Beach surrounded by mountains and ocean views.",
-        exactLocation: mapLocation({
-          label: "Noordhoek Beach",
-          query: "Noordhoek Beach Horse Riding",
-        }),
-        images: getTourImages(
-          `${HIKING_BASE}/noordhoek-beach-horse-riding`,
-          3
-        ),
-        touristComments: [
-          {
-            name: "Olivia",
-            country: "AU",
-            text: "Riding along the beach was one of the highlights of our South Africa trip.",
-          },
-        ],
-      },
-    ],
-
-    groupDiscount: {
-      enabled: false,
-    },
-
-    needToKnow: [
-      { text: "Participants must follow all firearm safety instructions." },
-      { text: "Horse riding is suitable for beginners unless otherwise advised." },
-      { text: "Comfortable clothing and closed shoes are recommended." },
-      { text: "Horse riding is subject to weather conditions." },
-    ],
-
-    cancellationPolicy: {
-      summary:
-        "Horse riding and shooting range bookings are subject to availability and weather.",
-      items: [
-        { text: "Private bookings require advance confirmation." },
-        { text: "Weather may affect horse riding operations." },
-        { text: "Final cancellation policy is confirmed upon booking." },
-      ],
-    },
-
-    faqs: [
-      {
-        question: "Do I need horse riding experience?",
-        answer:
-          "No. The experience is suitable for beginners and includes guidance from experienced staff.",
-      },
-      {
-        question: "Is the shooting experience suitable for beginners?",
-        answer:
-          "Yes. Professional instructors provide a complete safety briefing before the session begins.",
-      },
-      {
-        question: "Is this a private tour?",
-        answer:
-          "Yes. The tour is operated as a private experience with your own driver-guide.",
-      },
-      {
-        question: "Are meals included?",
-        answer:
-          "No. Meals are excluded, allowing guests to choose their preferred dining option.",
-      },
-    ],
-
-
-
-    tags: [
-      "Gun Range",
-      "Horse Riding",
-      "Noordhoek Beach",
-      "Chapman's Peak",
-      "Private Tour",
-      "Adventure",
-      "Cape Town",
-      "Full Day",
-    ],
-  },
-
-  {
-    id: 15,
-    type: TOUR_TYPES.PACKAGES,
-    category: TOUR_MODIFIERS.FULL_DAY,
-
-    title: "Gun Range + Quad Biking Adventure",
-    slug: "gun-range-quad-biking-adventure",
-    canonicalPath: "/tours/gun-range-quad-biking-adventure",
-
-    seo: {
-      title: "Gun Range & Atlantis Dunes Quad Biking Tour | Cape Frontier Tours",
-      description:
-        "Experience the ultimate Cape Town adrenaline adventure with a supervised shooting range session followed by an exciting quad biking experience at the Atlantis Dunes.",
-      keywords: [
-        "Gun Range Cape Town",
-        "Atlantis Dunes Quad Biking",
-        "Quad Bike Cape Town",
-        "Cape Town Adventure Tour",
-        "Private Quad Biking Tour",
-        "Cape Town Shooting Experience",
-        "Adventure Activities Cape Town",
-      ],
-    },
-
-    workflow: defaultWorkflow,
-
-    image: getCoverImage(`packages/gun-range+quad-biking`),
-
-    images: [
-      ...getTourImages(`adrenaline/gun-range`, 3),
-      ...getTourImages(`packages/gun-range+quad-biking`, 3),
-    ],
-
-    destinationGalleries: {
-      "gun-range": getTourImages(`${ADRENALINE_BASE}/gun-range`, 3),
-      "quad-biking": getTourImages(`${ADRENALINE_BASE}/quad-biking`, 3),
-    },
-
-    location: "Cape Town, South Africa",
-    duration: "7 - 8 Hours",
-
-    priceBase: 9800,
-    minPeople: 1,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
-
-    pricing: [
-      {
-        category: "Adults",
-        pricePerPerson: 3290,
-      },
-    ],
-
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 2,
-          maxPeople: 4,
-          perPerson: 2450, // not confirmed yet
-          totalPrice: 9800,
-          label: "2–4 Guests",
-          note: "Private vehicle",
-        },
-        {
-          minPeople: 5,
-          maxPeople: 7,
-          perPerson: 1920, // not confirmed yet
-          totalPrice: 13400,
-          label: "5–7 Guests",
-          note: "Private vehicle",
-        },
-      ],
-    },
-
-    rating: 5.0,
-    stars: 5,
-    mainReviewerName: "Jake Harrison",
-    mainReviewerCountry: "US",
-    reviewYear: 2026,
-    otherReviews: 24,
-    mainReview:
-      "The perfect adrenaline day. The shooting session and Atlantis Dunes quad biking were both unforgettable.",
-
-    description:
-      "Designed for thrill-seekers, bachelor groups, and adventure travellers, this private experience combines a professionally supervised shooting session with an exhilarating one-hour quad biking adventure across the spectacular Atlantis Dunes.",
-
-    highlights: [
-      { text: "Fully supervised accredited shooting experience" },
-      { text: "Handgun or rifle shooting package" },
-      { text: "1-hour Atlantis Dunes quad biking adventure" },
-      { text: "Private transport throughout" },
-      { text: "Ideal for adventure groups and bachelor parties" },
-    ],
-
-    included: [
-      { text: "Private vehicle with driver-guide" },
-      { text: "Hotel pickup & drop-off" },
-      { text: "Accredited shooting instructor" },
-      { text: "Firearm safety briefing" },
-      { text: "Handgun or rifle shooting package" },
-      { text: "Quad bike rental" },
-      { text: "Quad biking safety equipment" },
-      { text: "Bottled water" },
-    ],
-
-    excluded: [
-      { text: "Meals" },
-      { text: "Optional photo and video packages" },
-      { text: "Personal purchases" },
-    ],
-
-    pickupOptions: DEFAULT_PICKUP_OPTIONS,
-
-    stops: [
-      {
-        id: "gun-range",
-        name: "Gun Range",
-        time: "09:00",
-        duration: "1.5 - 2 hours",
-        note: "Professional supervised shooting experience",
-        description:
-          "Begin your adventure with a professionally supervised shooting session, complete with a firearm safety briefing and handgun or rifle package.",
-        exactLocation: mapLocation({
-          label: "Gun Range",
-          query: "Cape Town Gun Range",
-        }),
-        images: getTourImages(`${ADRENALINE_BASE}/gun-range`, 3),
-        touristComments: [
-          {
-            name: "Jake",
-            country: "US",
-            text: "The instructors made the experience exciting while keeping everything safe.",
-          },
-        ],
-      },
-
-      {
-        id: "quad-biking",
-        name: "Atlantis Dunes Quad Biking",
-        time: "12:30",
-        duration: "1 hour",
-        note: "Guided dune adventure",
-        description:
-          "Ride powerful quad bikes across the spectacular white sand dunes of Atlantis on an exciting guided adventure suitable for beginners and experienced riders.",
-        exactLocation: mapLocation({
-          label: "Atlantis Dunes",
-          query: "Atlantis Dunes Quad Biking",
-        }),
-        images: getTourImages(`${ADRENALINE_BASE}/quad-biking`, 3),
-        touristComments: [
-          {
-            name: "Megan",
-            country: "IE",
-            text: "An incredible ride through the dunes and easily one of the most exciting things we've done.",
-          },
-        ],
-      },
-    ],
-
-    groupDiscount: {
-      enabled: false,
-    },
-
-    needToKnow: [
-      { text: "Participants must follow all firearm safety instructions." },
-      { text: "Valid identification may be required at the shooting range." },
-      { text: "Quad biking is subject to weather conditions." },
-      { text: "Closed shoes and comfortable clothing are recommended." },
-    ],
-
-    cancellationPolicy: {
-      summary:
-        "Quad biking and shooting sessions are subject to weather and operator availability.",
-      items: [
-        { text: "Private bookings require advance confirmation." },
-        { text: "Weather may affect quad biking operations." },
-        { text: "Final cancellation policy is confirmed upon booking." },
-      ],
-    },
-
-    faqs: [
-      {
-        question: "Is quad biking suitable for beginners?",
-        answer:
-          "Yes. Experienced guides provide a full safety briefing before the ride begins.",
-      },
-      {
-        question: "Is the shooting experience suitable for beginners?",
-        answer:
-          "Yes. Professional instructors supervise the entire session and provide comprehensive safety instruction.",
-      },
-      {
-        question: "Is this a private tour?",
-        answer:
-          "Yes. The tour includes a private vehicle with your own driver-guide throughout the day.",
-      },
-      {
-        question: "Are meals included?",
-        answer:
-          "No. Meals are excluded from the tour price.",
-      },
-    ],
-
-
-
-    tags: [
-      "Gun Range",
-      "Quad Biking",
-      "Atlantis Dunes",
-      "Adventure",
-      "Private Tour",
-      "Cape Town",
-      "Full Day",
-      "Bachelor Groups",
-    ],
-  },
-
-  {
-    id: 16,
-    type: TOUR_TYPES.ADRENALINE,
-    category: TOUR_MODIFIERS.FULL_DAY,
-
-    title: "Gun Range + Wine Tasting",
-    slug: "gun-range-wine-tasting",
-    canonicalPath: "/tours/gun-range-wine-tasting",
-
-    seo: {
-      title: "Gun Range & Wine Tasting Tour | Cape Frontier Tours",
-      description:
-        "Enjoy a premium private experience combining a supervised shooting session with wine tasting at selected estates in Constantia or Stellenbosch.",
-      keywords: [
-        "Gun Range Cape Town",
-        "Wine Tasting Tour",
-        "Constantia Wine Tour",
-        "Stellenbosch Wine Tour",
-        "Cape Town Wine Experience",
-        "Private Wine Tour",
-        "Cape Town Shooting Experience",
-      ],
-    },
-
-    workflow: defaultWorkflow,
-
-    image: getCoverImage(`adrenaline/gun-range`),
-
-    images: [
-      ...getTourImages(`${ADRENALINE_BASE}/gun-range`, 3),
-      ...getTourImages(`${STELLENBOSCH_WINE_BASE}/delaire`, 2),
-      ...getTourImages(`${STELLENBOSCH_WINE_BASE}/tokara`, 2),
-    ],
-
-    destinationGalleries: {
-      "gun-range": getTourImages(`${ADRENALINE_BASE}/gun-range`, 3),
-      "wine-estates": [
-        ...getTourImages(`${STELLENBOSCH_WINE_BASE}/delaire`, 3),
-        ...getTourImages(`${STELLENBOSCH_WINE_BASE}/tokara`, 3),
-      ],
-    },
-
-    location: "Cape Town, South Africa",
-    duration: "7 - 8 Hours",
-
-    priceBase: 7680,
-    minPeople: 1,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
-
-    pricing: [
-      {
-        category: "Adults",
-        pricePerPerson: 3290,
-      },
-    ],
-
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 2,
-          maxPeople: 4,
-          perPerson: 0, // not confirmed yet
-          totalPrice: 7680,
-          label: "2–4 Guests",
-          note: "Private vehicle",
-        },
-        {
-          minPeople: 5,
-          maxPeople: 7,
-          perPerson: 0, // not confirmed yet
-          totalPrice: 10600,
-          label: "5–7 Guests",
-          note: "Private vehicle",
-        },
-      ],
-    },
-
-    rating: 5.0,
-    stars: 5,
-    mainReviewerName: "Sophia Bennett",
-    mainReviewerCountry: "UK",
-    reviewYear: 2026,
-    otherReviews: 17,
-    mainReview:
-      "An excellent adults-only experience with the perfect balance of excitement and relaxation.",
-
-    description:
-      "Experience an unforgettable private day combining an exciting supervised shooting session with visits to two carefully selected wine estates in either Constantia or Stellenbosch. Enhance your experience with optional wine tastings and cheese pairings while enjoying the beautiful Cape Winelands.",
-
-    highlights: [
-      { text: "Accredited supervised shooting experience" },
-      { text: "Visit two premium wine estates" },
-      { text: "Choice of Constantia or Stellenbosch route" },
-      { text: "Optional wine tasting and cheese pairing" },
-      { text: "Private transport throughout" },
-    ],
-
-    included: [
-      { text: "Private vehicle with driver-guide" },
-      { text: "Hotel pickup & drop-off" },
-      { text: "Accredited shooting range session" },
-      { text: "Professional firearms instructor" },
-      { text: "Private wine estate visits" },
-      { text: "Bottled water" },
-    ],
-
-    excluded: [
-      { text: "Lunch" },
-      { text: "Wine tasting fees (optional add-on)" },
-      { text: "Optional cheese pairings" },
-      { text: "Personal purchases" },
-    ],
-
-    pickupOptions: DEFAULT_PICKUP_OPTIONS,
-
-    stops: [
-      {
-        id: "gun-range",
-        name: "Gun Range",
-        time: "09:00",
-        duration: "1.5 - 2 hours",
-        note: "Professional supervised shooting experience",
-        description:
-          "Start your day with a professionally supervised shooting session, including a complete firearm safety briefing suitable for beginners and experienced shooters.",
-        exactLocation: mapLocation({
-          label: "Gun Range",
-          query: "Cape Town Gun Range",
-        }),
-        images: getTourImages(`${ADRENALINE_BASE}/gun-range`, 3),
-        touristComments: [
-          {
-            name: "Sophia",
-            country: "UK",
-            text: "Safe, exciting and professionally organised from start to finish.",
-          },
-        ],
-      },
-
-      {
-        id: "wine-estate-1",
-        name: "Wine Estate",
-        time: "12:00",
-        duration: "1.5 hours",
-        note: "Premium estate visit",
-        description:
-          "Visit one of the Cape's renowned wine estates in Constantia or Stellenbosch for optional wine tastings and spectacular vineyard scenery.",
-        exactLocation: mapLocation({
-          label: "Wine Estate",
-          query: "Constantia Wine Estates",
-        }),
-        images: getTourImages(`${STELLENBOSCH_WINE_BASE}/delaire`, 3),
-        touristComments: [
-          {
-            name: "Oliver",
-            country: "DE",
-            text: "Excellent wines and beautiful mountain views.",
-          },
-        ],
-      },
-
-      {
-        id: "wine-estate-2",
-        name: "Second Wine Estate",
-        time: "14:30",
-        duration: "1.5 hours",
-        note: "Optional cheese pairing",
-        description:
-          "Continue to a second premium estate to relax with additional wine tastings or optional cheese pairings while enjoying the Cape Winelands.",
-        exactLocation: mapLocation({
-          label: "Wine Estate",
-          query: "Stellenbosch Wine Estates",
-        }),
-        images: getTourImages(`${STELLENBOSCH_WINE_BASE}/tokara`, 3),
-        touristComments: [
-          {
-            name: "Claire",
-            country: "FR",
-            text: "A perfect afternoon with fantastic wines and incredible scenery.",
-          },
-        ],
-      },
-    ],
-
-    groupDiscount: {
-      enabled: false,
-    },
-
-    needToKnow: [
-      { text: "This experience is intended for adults of legal drinking age." },
-      { text: "Participants must follow all firearm safety instructions." },
-      { text: "Wine estate selection depends on availability." },
-      { text: "Wine tastings and cheese pairings are optional add-ons." },
-    ],
-
-    cancellationPolicy: {
-      summary:
-        "Wine estate availability and shooting bookings are subject to confirmation.",
-      items: [
-        { text: "Private bookings require advance confirmation." },
-        { text: "Estate availability may affect the final itinerary." },
-        { text: "Final cancellation policy is confirmed upon booking." },
-      ],
-    },
-
-    faqs: [
-      {
-        question: "Which wine estates will we visit?",
-        answer:
-          "The tour visits two selected estates in either Constantia or Stellenbosch, depending on availability and guest preference.",
-      },
-      {
-        question: "Are wine tastings included?",
-        answer:
-          "Wine tastings are available as an optional add-on and can be arranged during booking.",
-      },
-      {
-        question: "Is this a private tour?",
-        answer:
-          "Yes. The experience includes a private vehicle with your own driver-guide.",
-      },
-      {
-        question: "Is the shooting experience suitable for beginners?",
-        answer:
-          "Yes. Professional instructors supervise the entire session and provide a full safety briefing.",
-      },
-    ],
-
-
-    tags: [
-      "Gun Range",
-      "Wine Tasting",
-      "Constantia",
-      "Stellenbosch",
-      "Private Tour",
-      "Adult Experience",
-      "Cape Town",
-      "Full Day",
-    ],
-  },
-
-  {
-    id: 17,
-    type: TOUR_TYPES.ADRENALINE,
-    category: TOUR_MODIFIERS.FULL_DAY,
-
-    title: "Horse Riding, Penguins & Cape Point",
-    slug: "horse-riding-penguins-cape-point",
-    canonicalPath: "/tours/horse-riding-penguins-cape-point",
-
-    seo: {
-      title:
-        "Horse Riding, Penguins & Cape Point Full-Day Tour | Cape Frontier Tours",
-      description:
-        "Experience a private full-day Cape Peninsula adventure featuring Noordhoek Beach horse riding, Boulders Beach Penguins, Cape Point, the Cape of Good Hope, and Chapman's Peak Drive.",
-      keywords: [
-        "Cape Point Tour",
-        "Horse Riding Cape Town",
-        "Noordhoek Beach Horse Riding",
-        "Boulders Beach Penguins",
-        "Cape of Good Hope Tour",
-        "Chapman's Peak Drive",
-        "Cape Peninsula Tour",
-        "Private Cape Town Tour",
-      ],
-    },
-
-    workflow: defaultWorkflow,
-
-    // image: getCoverImage(`${PENINSULA_PACKAGE_ONE_BASE}/noordhoek`),
-    image: getCoverImage(`adrenaline/horse-riding-dunes`),
-
-    images: [
-      ...getTourImages(`adrenaline/horse-riding-dunes`, 3),
-      ...getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/noordhoek`, 3),
-      ...getTourImages(`${PENINSULA_PACKAGE_TWO_BASE}/chapmans-peak`, 2),
-      ...getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/boulders-beach`, 2),
-      ...getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/cape-point`, 2),
-    ],
-
-    destinationGalleries: {
-      "horse-riding": getTourImages(
-        `${HIKING_BASE}/noordhoek-beach-horse-riding`,
-        3
-      ),
-      "chapmans-peak": getTourImages(
-        `${PENINSULA_PACKAGE_TWO_BASE}/chapmans-peak`,
-        3
-      ),
-      boulders: getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/boulders`, 3),
-      "cape-point": getTourImages(
-        `${PENINSULA_PACKAGE_ONE_BASE}/cape-point`,
-        3
-      ),
-    },
-
-    location: "Cape Town, South Africa",
-    duration: "8 - 9 Hours",
-
-    priceBase: 11560,
-    minPeople: 1,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
-
-    pricing: [
-      {
-        category: "Adults",
-        pricePerPerson: 3290,
-      },
-    ],
-
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-          {
-            minPeople: 1,
-            maxPeople: 4,
-            perPerson: 0, // not confirmed yet
-            totalPrice: 11560,
-            label: "1–4 Guests",
-            note: "Private vehicle • All-inclusive",
-          },
-          {
-            minPeople: 5,
-            maxPeople: 7,
-            perPerson: 0, // not confirmed yet
-            totalPrice: 17300,
-            label: "5–7 Guests",
-            note: "Private vehicle • All-inclusive",
-          },
-      ],
-
-    },
-    
-    rating: 5.0,
-    stars: 5,
-    mainReviewerName: "Emily Carter",
-    mainReviewerCountry: "UK",
-    reviewYear: 2026,
-    otherReviews: 41,
-    mainReview:
-      "An unforgettable day combining horseback riding, wildlife, and Cape Point. Every stop was spectacular.",
-
-    description:
-      "Experience the ultimate Cape Peninsula adventure combining scenic beach horse riding, African penguins, and the world-famous Cape Point Nature Reserve. This private full-day tour blends adventure, wildlife, and breathtaking scenery, making it perfect for couples, families, and nature lovers.",
-
-    highlights: [
-      { text: "Chapman's Peak Drive" },
-      { text: "1–2 hour Noordhoek Beach horse riding" },
-      { text: "Visit Boulders Beach Penguin Colony" },
-      { text: "Cape Point & Cape of Good Hope" },
-      { text: "Private transport with driver-guide" },
-      { text: "Flexible itinerary" },
-    ],
-
-    included: [
-      { text: "Private vehicle with professional driver-guide" },
-      { text: "Hotel pickup & drop-off" },
-      { text: "Chapman's Peak toll fees" },
-      { text: "1–2 hour horse riding experience" },
-      { text: "Horse riding fees" },
-      { text: "Boulders Beach entry fee" },
-      { text: "Cape Point Nature Reserve entry fee" },
-      { text: "Bottled water" },
-    ],
-
-    excluded: [
-      { text: "Lunch" },
-      { text: "Cape Point Flying Dutchman Funicular (optional)" },
-      { text: "Personal purchases" },
-    ],
-
-    pickupOptions: DEFAULT_PICKUP_OPTIONS,
-
-    stops: [
-      {
-        id: "chapmans-peak",
-        name: "Chapman's Peak Drive",
-        time: "09:00",
-        duration: "45 minutes",
-        note: "One of the world's most scenic coastal drives",
-        description:
-          "Begin your adventure with breathtaking views along the famous Chapman's Peak Drive before arriving at Noordhoek.",
-        exactLocation: mapLocation({
-          label: "Chapman's Peak Drive",
-          query: "Chapman's Peak Drive",
-        }),
-        images: getTourImages(`${PENINSULA_PACKAGE_TWO_BASE}/chapmans-peak`, 3),
-        touristComments: [
-          {
-            name: "James",
-            country: "US",
-            text: "Every viewpoint along the drive was breathtaking.",
-          },
-        ],
-      },
-
-      {
-        id: "horse-riding",
-        name: "Noordhoek Beach Horse Riding",
-        time: "10:00",
-        duration: "1 - 2 hours",
-        note: "Beach horseback riding",
-        description:
-          "Enjoy a guided horseback ride along Noordhoek Beach, surrounded by mountains, rolling dunes, and one of Cape Town's most beautiful coastlines. Suitable for beginners and experienced riders alike.",
-        exactLocation: mapLocation({
-          label: "Noordhoek Beach",
-          query: "Noordhoek Beach Horse Riding",
-        }),
-        images: getTourImages(
-          `${HIKING_BASE}/noordhoek-beach-horse-riding`,
-          3
-        ),
-        touristComments: [
-          {
-            name: "Emily",
-            country: "UK",
-            text: "The beach ride was peaceful, scenic, and unforgettable.",
-          },
-        ],
-      },
-
-      {
-        id: "boulders",
-        name: "Boulders Beach Penguin Colony",
-        time: "13:00",
-        duration: "1 hour",
-        note: "African Penguin Colony",
-        description:
-          "Walk the boardwalks for close-up views of the endangered African penguins while enjoying the crystal-clear waters and giant granite boulders.",
-        exactLocation: mapLocation({
-          label: "Boulders Beach",
-          query: "Boulders Beach",
-        }),
-        images: getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/boulders`, 3),
-        touristComments: [
-          {
-            name: "Olivia",
-            country: "AU",
-            text: "Seeing the penguins in their natural habitat was amazing.",
-          },
-        ],
-      },
-
-      {
-        id: "cape-point",
-        name: "Cape Point & Cape of Good Hope",
-        time: "15:00",
-        duration: "2.5 - 3 hours",
-        note: "Cape Point Nature Reserve",
-        description:
-          "Explore Cape Point Nature Reserve, visit the Cape of Good Hope, admire spectacular ocean views, and optionally ride the Flying Dutchman Funicular to the historic lighthouse while watching for baboons, ostriches, and antelope.",
-        exactLocation: mapLocation({
-          label: "Cape Point",
-          query: "Cape Point",
-        }),
-        images: getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/cape-point`, 3),
-        touristComments: [
-          {
-            name: "Daniel",
-            country: "CA",
-            text: "Cape Point is one of the most beautiful places we've ever visited.",
-          },
-        ],
-      },
-    ],
-
-    groupDiscount: {
-      enabled: false,
-    },
-
-    needToKnow: [
-      { text: "Horse riding is suitable for beginners and experienced riders." },
-      { text: "Comfortable clothing and closed shoes are recommended." },
-      { text: "Wildlife sightings cannot be guaranteed." },
-      { text: "Horse riding is subject to weather conditions." },
-      { text: "The funicular ride is optional and not included." },
-    ],
-
-    cancellationPolicy: {
-      summary:
-        "Horse riding and park access are subject to weather and operator availability.",
-      items: [
-        { text: "Private bookings require advance confirmation." },
-        { text: "Weather may affect horse riding operations." },
-        { text: "Final cancellation policy is confirmed upon booking." },
-      ],
-    },
-
-    faqs: [
-      {
-        question: "Do I need horse riding experience?",
-        answer:
-          "No. Calm, well-trained horses and experienced guides make this suitable for beginners.",
-      },
-      {
-        question: "Are entrance fees included?",
-        answer:
-          "Yes. Horse riding, Boulders Beach, Cape Point Nature Reserve, and Chapman's Peak toll fees are included.",
-      },
-      {
-        question: "Is this a private tour?",
-        answer:
-          "Yes. The experience includes a private vehicle with your own professional driver-guide.",
-      },
-      {
-        question: "Is lunch included?",
-        answer:
-          "No. Lunch is excluded, allowing guests to choose where they'd like to dine.",
-      },
-    ],
-
-   
-    tags: [
-      "Horse Riding",
-      "Noordhoek Beach",
-      "Chapman's Peak",
-      "Boulders Beach",
-      "Penguins",
-      "Cape Point",
-      "Cape of Good Hope",
-      "Private Tour",
-      "Adventure",
-      "Cape Town",
-      "Full Day",
-    ],
-  },
-
-  {
-    id: 18,
+    id: null, // New tour ID to be assigned (e.g., 36)
     type: TOUR_TYPES.HISTORICAL,
-    category: TOUR_MODIFIERS.PACKAGE | TOUR_MODIFIERS.FULL_DAY,
+    category: TOUR_MODIFIERS.FULL_DAY,
 
-    title: "Robben Island + Langa Township Tour",
-    slug: "robben-island-langa-township-tour",
-    canonicalPath: "/tours/robben-island-langa-township-tour",
+    title: "Full‑Day Robben Island & Langa Cultural Experience",
+    slug: "robben-island-langa-cultural-experience",
+    canonicalPath: "/tours/robben-island-langa-cultural-experience",
 
     seo: {
       title:
-        "Robben Island & Langa Township Full-Day Tour | Cape Frontier Tours",
+        "Full‑Day Robben Island & Langa Cultural Experience | Cape Frontier Tours",
       description:
-        "Experience two of Cape Town's most important historical and cultural attractions with a full-day tour including Robben Island, Langa Township, hotel transfers, ferry tickets, guides, and all entry fees.",
+        "Experience Cape Town's most meaningful cultural journey in one day. Combines the powerful history of Robben Island with the vibrant community life of Langa, Cape Town's oldest township.",
       keywords: [
-        "Robben Island Tour",
-        "Langa Township Tour",
-        "Cape Town Historical Tour",
-        "Cape Town Cultural Experience",
-        "Nelson Mandela Tour",
-        "Robben Island Ferry",
-        "Langa Cultural Tour",
-        "Cape Town Heritage Tour",
+        "Robben Island tour",
+        "Langa Township tour",
+        "Robben Island ferry",
+        "Nelson Mandela prison tour",
+        "Langa cultural experience",
+        "Cape Town township tour",
+        "Robben Island Museum",
+        "Guga S'thebe",
+        "Cape Town full day tour",
+        "Mandela's cell tour",
+        "Cape Town cultural tour",
       ],
     },
 
     workflow: defaultWorkflow,
 
-    image: getCoverImage("historical/robben-island"),
-
+    image: "/src/assets/images/tours/historical/robben-island-langa/1.webp",
     images: [
-      ...getTourImages("historical/robben-island", 3),
-      ...getTourImages("historical/langa", 3),
+      "/src/assets/images/tours/historical/robben-island-langa/1.webp",
+      "/src/assets/images/tours/historical/robben-island-langa/2.webp",
+      "/src/assets/images/tours/historical/robben-island-langa/3.webp",
     ],
+    imageFolder: "historical/robben-island-langa",
 
-    destinationGalleries: {
-      "robben-island": getTourImages("historical/robben-island", 3),
-      langa: getTourImages("historical/langa", 3),
-    },
+    videos: [],
 
-    location: "Cape Town, South Africa",
-    duration: "6 - 7 Hours",
+    location: "Cape Town, South Africa (V&A Waterfront, Robben Island, Langa)",
+    duration: "Full Day (08:00 – 16:00)",
 
     priceBase: 3290,
     minPeople: 1,
@@ -4047,218 +8094,372 @@ export const tours = [
       {
         category: "Adults",
         pricePerPerson: 3290,
+        note: "Full rate",
       },
-      // {
-      //   category: "Children under 12.",
-      //   pricePerPerson: 2400,
-      //   note: "",
-      // },
-      // {
-      //   category: "Children under 5.",
-      //   pricePerPerson: 0,
-      //   note: "",
-      // },
+      {
+        category: "Children (5–17 years)",
+        pricePerPerson: 1650,
+        note: "Discounted combined rate",
+      },
+      {
+        category: "Infants (0–4 years)",
+        pricePerPerson: 0,
+        note: "Free – no ticket required",
+      },
     ],
+
+    additionalPricing: [],
 
     groupPricing: {
       enabled: false,
-      icon: "/icons/savemore.png",
-      tiers: [
-        // {
-        //   minPeople: 2,
-        //   maxPeople: 4,
-        //   totalPrice: 7680,
-        //   label: "2–4 Guests",
-        //   note: "Private vehicle",
-        // },
-        // {
-        //   minPeople: 5,
-        //   maxPeople: 7,
-        //   totalPrice: 10600,
-        //   label: "5–7 Guests",
-        //   note: "Private vehicle",
-        // },
-      ],
+      icon: "",
+      tiers: [],
     },
 
-    rating: 5.0,
-    stars: 5,
-    mainReviewerName: "Sarah Mitchell",
-    mainReviewerCountry: "AU",
-    reviewYear: 2026,
-    otherReviews: 37,
-    mainReview:
-      "A moving and unforgettable journey through South Africa's history and culture. Highly recommended.",
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
 
     description:
-      "This powerful full-day experience combines two of Cape Town's most meaningful cultural and historical attractions. Visit Robben Island, where Nelson Mandela spent 18 years of his imprisonment, before discovering the vibrant community, history, art, and culture of Langa Township with experienced local guides.",
+      "Experience Cape Town's most meaningful cultural journey in one day. This full‑day tour combines the powerful history of Robben Island, where Nelson Mandela spent 18 years in prison, with the vibrant community life of Langa, Cape Town's oldest township. Guests enjoy seamless transport, accredited expert guides, and a deep understanding of South Africa's past and present.",
 
     highlights: [
-      { text: "Return Robben Island ferry ticket" },
-      { text: "Maximum-security prison tour" },
-      { text: "Visit Nelson Mandela's prison cell" },
-      { text: "Robben Island bus tour" },
-      { text: "Langa Township cultural experience" },
-      { text: "Guga S'thebe Arts & Culture Centre" },
-      { text: "Local community guide" },
-      { text: "Hotel pickup & drop-off" },
+      {
+        text: "Robben Island Prison Tour — walk through the maximum-security prison, including Mandela's cell, guided by former political prisoners",
+      },
+      {
+        text: "Island Bus Tour — visit historic sites including Lime Quarry, Sobukwe House, WWII bunkers, and the Leper Church",
+      },
+      {
+        text: "Scenic Ferry Ride — panoramic views of Table Mountain and the Atlantic Ocean",
+      },
+      {
+        text: "Langa Township Cultural Walk — explore Cape Town's oldest township with a registered local guide",
+      },
+      {
+        text: "Guga S'thebe Arts & Culture Centre — discover local art, crafts, pottery, and community upliftment projects",
+      },
+      {
+        text: "Authentic Community Interaction — meet residents, entrepreneurs, and artisans who share stories of culture, resilience, and creativity",
+      },
     ],
 
     included: [
-      { text: "Return Robben Island ferry ticket" },
-      { text: "Guided Robben Island tour" },
-      { text: "Professional driver-guide" },
-      { text: "Local Langa community guide" },
-      { text: "Guga S'thebe visit" },
-      { text: "Guided cultural walk" },
-      { text: "Hotel pickup & drop-off" },
-      { text: "Air-conditioned vehicle" },
-      { text: "Bottled water" },
-      { text: "All entrance fees" },
+      { text: "Return transport with hotel pick‑up and drop‑off" },
+      { text: "Robben Island Ferry Tickets (adult or child ticket)" },
+      { text: "Robben Island Guided Tour — prison, Mandela's cell, bus tour" },
+      { text: "Langa Walking Tour — cultural guided experience" },
+      { text: "Professional Driver‑Guide — full‑day hosting" },
+      { text: "Bottled Water — provided during transfers" },
+      { text: "Safety Briefing — before each activity" },
+      { text: "All entry fees" },
     ],
 
     excluded: [
-      { text: "Lunch" },
-      { text: "Personal purchases" },
+      { text: "Lunch — guests choose their own Waterfront restaurant" },
+      { text: "Breakfast and snacks" },
+      { text: "Gratuities" },
+      { text: "Personal purchases — crafts, souvenirs, drinks" },
+      { text: "Extra activities not listed" },
+      { text: "Accommodation" },
+      { text: "Travel Insurance — guests must arrange their own cover" },
     ],
 
     pickupOptions: [
       "Cape Town CBD",
       "Green Point",
       "Sea Point",
+      "V&A Waterfront",
+      "Custom pickup on request",
     ],
+
+    requirements: [
+      { text: "Please carry identification if required for ferry boarding" },
+      { text: "Comfortable walking shoes recommended" },
+      { text: "Respectful behaviour towards the local community is expected" },
+    ],
+
+    arrangements: {
+      availability: "Available all year (ferry dependent on weather)",
+      duration: "Full Day (08:00 – 16:00)",
+      operatingTime: "08:00 – 16:00",
+      departure: "08:00",
+      return: "16:00",
+      location: "Cape Town, South Africa",
+
+      clothing: [
+        "Comfortable clothing",
+        "Comfortable walking shoes",
+        "Sunscreen",
+        "Hat",
+        "Warm jacket (weather dependent)",
+      ],
+
+      thingsToBring: [
+        "Identification (if required for ferry boarding)",
+        "Camera",
+        "Cash for personal purchases",
+        "Water bottle",
+      ],
+
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "Ferry operations are subject to weather and sea conditions. Cancelled departures may be rescheduled where possible. Langa tour continues in all weather.",
+      items: [
+        { text: "Ferry operations are subject to weather and sea conditions" },
+        { text: "Weather may result in ferry delays or cancellations" },
+        { text: "Cancelled departures may be rescheduled where possible" },
+        { text: "Langa Township tour continues in all weather conditions" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Ferry operations are subject to weather and sea conditions. Cancellation terms are confirmed upon booking.",
+      items: [
+        { text: "Ferry operations are subject to weather and sea conditions" },
+        { text: "Weather may result in ferry delays or cancellations" },
+        { text: "Cancelled departures may be rescheduled where possible" },
+        { text: "Cancellation terms are confirmed upon booking" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "All tours are conducted in compliance with Robben Island Museum safety regulations, ferry operating procedures, and community tourism guidelines.",
+      items: [
+        { text: "All tours follow Robben Island Museum safety regulations" },
+        { text: "Ferry operates according to maritime safety standards" },
+        { text: "Guests must follow all guide instructions during the tour" },
+        {
+          text: "Langa is considered one of the safer townships when visited with local guides",
+        },
+        { text: "Please ask permission before photographing residents" },
+        {
+          text: "Respectful behaviour towards the local community is expected",
+        },
+      ],
+    },
 
     stops: [
       {
-        id: "gateway",
-        name: "Nelson Mandela Gateway",
-        time: "08:00",
+        id: "pickup",
+        name: "Hotel Pickup",
+        time: "08:00 – 08:30",
         duration: "30 minutes",
-        note: "Ferry departure",
+        note: "Hotel pick‑up anywhere in Cape Town",
         description:
-          "Board the ferry at the V&A Waterfront for your journey across Table Bay to Robben Island.",
+          "Enjoy convenient hotel pickup from anywhere in Cape Town before travelling to the V&A Waterfront Clock Tower ferry terminal.",
         exactLocation: mapLocation({
-          label: "Nelson Mandela Gateway",
-          address: "V&A Waterfront, Cape Town",
-          query: "Nelson Mandela Gateway V&A Waterfront",
+          label: "Cape Town Pickup Area",
+          address: "Cape Town, South Africa",
+          query: "Cape Town",
         }),
         images: [],
         touristComments: [],
       },
-
+      {
+        id: "va-waterfront",
+        name: "V&A Waterfront – Ferry Check-in",
+        time: "08:30 – 09:30",
+        duration: "1 hour",
+        note: "Check‑in for Robben Island ferry",
+        description:
+          "Transfer to the V&A Waterfront Clock Tower ferry terminal. Check in for the Robben Island ferry and prepare for the 30-minute crossing to Robben Island.",
+        exactLocation: mapLocation({
+          label: "V&A Waterfront Clock Tower",
+          address: "V&A Waterfront, Cape Town, South Africa",
+          query: "Clock Tower V&A Waterfront",
+        }),
+        images: [],
+        touristComments: [],
+      },
       {
         id: "robben-island",
-        name: "Robben Island",
-        time: "09:00",
-        duration: "3 - 4 hours",
-        note: "UNESCO World Heritage Site",
+        name: "Robben Island Experience",
+        time: "09:30 – 12:30",
+        duration: "3 hours",
+        note: "Prison tour, Mandela's cell, island bus tour, museum visit",
         description:
-          "Experience the ferry crossing, island bus tour, Robert Sobukwe House, Lime Quarry, WWII bunkers, Leper Church, Maximum Security Prison, and Nelson Mandela's prison cell while hearing firsthand stories from former political prisoners where available.",
+          "Cross to Robben Island by ferry. Experience the powerful prison tour, including Nelson Mandela's cell, the Lime Quarry, Sobukwe House, WWII bunkers, and the Leper Church. Walk through the maximum-security prison guided by former political prisoners where available, and enjoy an island bus tour with panoramic views of Table Mountain and the Atlantic Ocean.",
         exactLocation: mapLocation({
           label: "Robben Island Museum",
+          address: "Robben Island, Cape Town, South Africa",
           query: "Robben Island Museum",
         }),
-        images: getTourImages("historical/robben-island", 3),
-        touristComments: [
-          {
-            name: "Sarah",
-            country: "AU",
-            text: "One of the most powerful historical experiences we've ever had.",
-          },
-        ],
+        images: [],
+        touristComments: [],
       },
-
       {
-        id: "guga-sthebe",
-        name: "Guga S'thebe Arts & Culture Centre",
-        time: "14:00",
-        duration: "45 minutes",
-        note: "Arts & community centre",
+        id: "lunch",
+        name: "Lunch Break (Not Included)",
+        time: "12:30 – 13:30",
+        duration: "1 hour",
+        note: "Free time at V&A Waterfront",
         description:
-          "Discover local art studios, ceramic workshops, community projects, music spaces, and cultural exhibitions.",
+          "Guests have free time at the V&A Waterfront to enjoy lunch at any restaurant of their choice. Lunch is not included in the tour price.",
         exactLocation: mapLocation({
-          label: "Guga S'thebe",
-          query: "Guga Sthebe Langa",
+          label: "V&A Waterfront",
+          address: "V&A Waterfront, Cape Town, South Africa",
+          query: "V&A Waterfront",
         }),
-        images: getTourImages("historical/langa", 3),
-        touristComments: [
-          {
-            name: "Emma",
-            country: "UK",
-            text: "The creativity and community spirit were inspiring.",
-          },
-        ],
+        images: [],
+        touristComments: [],
       },
-
       {
         id: "langa",
-        name: "Langa Township Cultural Walk",
-        time: "15:00",
+        name: "Langa Cultural Walking Tour",
+        time: "14:00 – 15:30",
         duration: "1.5 hours",
-        note: "Community experience",
+        note: "Community history, arts & crafts, cultural storytelling",
         description:
-          "Walk through Cape Town's oldest township with a local guide while learning about its history, entrepreneurship, community upliftment projects, and vibrant daily life before visiting local craft markets.",
+          "Explore Cape Town's oldest township with a registered local guide. Experience community history, arts and crafts, cultural storytelling, and a safe guided walk. Visit Guga S'thebe Arts & Culture Centre to discover local art, crafts, pottery, and community upliftment projects. Meet residents, entrepreneurs, and artisans who share stories of culture, resilience, and creativity.",
         exactLocation: mapLocation({
           label: "Langa Township",
+          address: "Langa, Cape Town, South Africa",
           query: "Langa Township",
         }),
-        images: getTourImages("historical/langa", 3),
-        touristComments: [
-          {
-            name: "David",
-            country: "CA",
-            text: "An authentic experience that gave us a deeper appreciation of South Africa.",
-          },
-        ],
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "dropoff",
+        name: "Hotel Drop-off",
+        time: "15:30 – 16:00",
+        duration: "30 minutes",
+        note: "End of tour at ±16:00",
+        description:
+          "After completing your cultural experience, relax during the return transfer to your original Cape Town hotel. Tour ends at approximately 16:00.",
+        exactLocation: mapLocation({
+          label: "Cape Town Drop-off Area",
+          address: "Cape Town, South Africa",
+          query: "Cape Town",
+        }),
+        images: [],
+        touristComments: [],
       },
     ],
 
-    groupDiscount: {
-      enabled: false,
-    },
+    routeInformation: {
+      title: "Full‑Day Robben Island & Langa Cultural Experience Route",
 
-    needToKnow: [
-      { text: "Morning departures are recommended." },
-      { text: "Ferry departures depend on weather conditions." },
-      { text: "Comfortable walking shoes are recommended." },
-      { text: "Please ask permission before photographing local residents." },
-      { text: "Advance booking is highly recommended." },
-    ],
+      description:
+        "Experience Cape Town's most meaningful cultural journey in one day — from the powerful history of Robben Island to the vibrant community life of Langa.",
 
-    cancellationPolicy: {
-      summary:
-        "Ferry schedules and community activities may affect the itinerary.",
       items: [
-        { text: "Robben Island departures are weather dependent." },
-        { text: "Tour order may change depending on ferry schedules." },
-        { text: "Final cancellation policy is confirmed upon booking." },
+        "Hotel pickup anywhere in Cape Town",
+        "V&A Waterfront Clock Tower ferry check-in",
+        "Robben Island Experience — prison tour, Mandela's cell, island bus tour, museum visit",
+        "Lunch break at V&A Waterfront (not included)",
+        "Langa Cultural Walking Tour — community history, arts & crafts, cultural storytelling",
+        "Guga S'thebe Arts & Culture Centre visit",
+        "Hotel drop-off",
       ],
     },
 
+    vehicle: {
+      name: "",
+      class: "",
+      doors: null,
+      seats: null,
+      fuel: "",
+      gearbox: "",
+      engine: "",
+      specifications: [],
+    },
+
+    securityAndLiability: {
+      heading: "",
+      cardPreAuthorisation: {
+        amount: null,
+        currency: "",
+        description: "",
+        release: "",
+      },
+      cashDeposit: {
+        amountZAR: null,
+        alternativeAmountUSD: null,
+        paymentMethod: "",
+        paidAt: "",
+        refundPolicy: "",
+      },
+    },
+
+    needToKnow: [
+      { text: "Ferry departures are weather dependent" },
+      { text: "Please carry identification if required for ferry boarding" },
+      {
+        text: "Lunch is not included — guests choose their own restaurant at the V&A Waterfront",
+      },
+      { text: "Comfortable walking shoes are recommended" },
+      { text: "Please ask permission before photographing residents in Langa" },
+      { text: "Respectful behaviour towards the local community is expected" },
+      { text: "Total tour duration: 08:00 – 16:00 (8 hours)" },
+      {
+        text: "Robben Island experience is 3 hours including the ferry crossing and island tour",
+      },
+      { text: "Langa walking tour is 1.5 hours with a registered local guide" },
+    ],
+
     faqs: [
       {
-        question: "Are ferry tickets included?",
+        question: "Is the ferry ticket included?",
         answer:
-          "Yes. Return ferry tickets and all entrance fees are included.",
+          "Yes. Return ferry tickets to Robben Island are included in the tour price for both adults and children (5–17 years). Infants 0–4 years are free.",
       },
       {
         question: "Is hotel pickup included?",
         answer:
-          "Yes. Pickup and drop-off are included for Cape Town CBD, Green Point, and Sea Point.",
+          "Yes. Pickup and drop-off are included from anywhere in Cape Town.",
       },
       {
         question: "How long is the tour?",
-        answer:
-          "The complete experience lasts approximately 6–7 hours depending on ferry schedules.",
+        answer: "The complete experience runs from 08:00 to 16:00 (8 hours).",
       },
       {
         question: "Is lunch included?",
         answer:
-          "No. Lunch and personal purchases are excluded.",
+          "No. Lunch is not included. Guests have free time at the V&A Waterfront to enjoy lunch at any restaurant of their choice.",
+      },
+      {
+        question: "What is included in the Robben Island experience?",
+        answer:
+          "The Robben Island experience includes the ferry crossing, an island bus tour, visits to the Lime Quarry, Sobukwe House, WWII bunkers, Leper Church, and the Maximum Security Prison tour including Nelson Mandela's cell.",
+      },
+      {
+        question: "What is included in the Langa experience?",
+        answer:
+          "The Langa experience includes a cultural walking tour with a registered local guide, visits to Guga S'thebe Arts & Culture Centre, and authentic community interaction with residents, entrepreneurs, and artisans.",
+      },
+      {
+        question: "Can weather affect the tour?",
+        answer:
+          "Yes. Ferry departures depend on weather and sea conditions and may occasionally be delayed or cancelled. Cancelled departures may be rescheduled where possible. The Langa portion continues in all weather.",
+      },
+      {
+        question: "Who guides the Robben Island tour?",
+        answer:
+          "The Robben Island tour is guided by Robben Island Museum guides, often former political prisoners who share firsthand experiences.",
+      },
+      {
+        question: "Who guides the Langa tour?",
+        answer:
+          "The Langa Township tour is guided by a registered local guide who provides authentic insights into community history, culture, and daily life.",
+      },
+      {
+        question: "What should I bring?",
+        answer:
+          "Bring identification (if required for ferry boarding), comfortable walking shoes, sunscreen, a hat, a camera, and cash for personal purchases. Bring a warm jacket depending on the weather.",
       },
     ],
-
-
 
     tags: [
       "Robben Island",
@@ -4270,64 +8471,1151 @@ export const tours = [
       "Township",
       "Cape Town",
       "Full Day",
+      "Prison Tour",
+      "Community",
+      "Heritage",
+      "Combined Tour",
+      "World Heritage Site",
     ],
   },
-
+  // District-Six + Langa
   {
-    id: 19,
-    type: TOUR_TYPES.ADRENALINE,
+    id: null, // New tour ID to be assigned (e.g., 37)
+    type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.HALF_DAY,
 
-    title: "Horse Riding – The Dunes",
-    slug: "horse-riding-the-dunes",
-    canonicalPath: "/tours/horse-riding-the-dunes",
+    title: "District Six + Langa Combined Tour Package",
+    slug: "district-six-langa-combined-tour",
+    canonicalPath: "/tours/district-six-langa-combined-tour",
 
     seo: {
-      title: "Horse Riding – The Dunes | Cape Frontier Tours",
+      title: "District Six & Langa Combined Tour Package | Cape Frontier Tours",
       description:
-        "Enjoy a scenic dune horse riding experience with bottled water included. A relaxed single-adventure ride through Cape Town’s coastal dune landscapes.",
+        "A powerful, emotionally rich half‑day experience connecting Cape Town's past, present, and community future. Explore District Six — the heart of forced removals — and Langa, Cape Town's oldest Black township.",
       keywords: [
-        "Horse riding Cape Town",
-        "Dune horse riding",
-        "Noordhoek horse riding",
-        "Cape Town horse riding experience",
-        "Beach and dune horse ride",
+        "District Six tour",
+        "Langa township tour",
+        "District Six Museum",
+        "Langa cultural experience",
+        "Cape Town forced removals",
+        "Cape Town township tour",
+        "Guga S'thebe",
+        "District Six land restitution",
+        "Cape Town heritage tour",
+        "combined tour Cape Town",
       ],
     },
 
     workflow: defaultWorkflow,
 
-    image: getCoverImage("adrenaline/horse-riding-dunes"),
-    images: getTourImages("adrenaline/horse-riding-dunes", 3),
+    image: "/src/assets/images/tours/historical/district-six-langa/1.webp",
+    images: [
+      "/src/assets/images/tours/historical/district-six-langa/1.webp",
+      "/src/assets/images/tours/historical/district-six-langa/2.webp",
+      "/src/assets/images/tours/historical/district-six-langa/3.webp",
+    ],
+    imageFolder: "historical/district-six-langa",
 
-    destinationGalleries: {
-      dunes: getTourImages("adrenaline-adventure/horse-riding-dunes", 3),
-    },
+    videos: [],
 
-    location: "Cape Town, South Africa",
-    duration: "1.5 - 2 Hours",
+    location: "Cape Town, South Africa (District Six, Langa)",
+    duration: "Half Day (4 - 5 hours)",
 
-    priceBase: 2250,
+    priceBase: 2300,
     minPeople: 2,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
-    
     pricing: [
       {
-        category: "Adults",
-        pricePerPerson: 2250,
+        category: "Adults (2–3 Guests)",
+        pricePerPerson: 2300,
+        note: "Full rate",
       },
-      // {
-      //   category: "Children under 12.",
-      //   pricePerPerson: 2400,
-      //   note: "",
-      // },
-      // {
-      //   category: "Children under 5.",
-      //   pricePerPerson: 0,
-      //   note: "",
-      // }, // no group/childrens pricing
+      {
+        category: "Adults (4 Guests)",
+        pricePerPerson: 2000,
+        note: "Reduced rate for 4 guests",
+      },
+      {
+        category: "Adults (5–7 Guests)",
+        pricePerPerson: 1700,
+        note: "15% discount",
+      },
+      {
+        category: "Teens (13–17 years)",
+        pricePerPerson: null,
+        note: "Adult rate depending on group size",
+      },
+      {
+        category: "Children (4–12 years)",
+        pricePerPerson: 1200,
+        note: "",
+      },
+      {
+        category: "Children (0–3 years)",
+        pricePerPerson: 0,
+        note: "Free of charge",
+      },
+    ],
+
+    additionalPricing: [],
+
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        {
+          minPeople: 2,
+          maxPeople: 3,
+          perPerson: 2300,
+          label: "2–3 Guests",
+          note: "Full rate • All-inclusive",
+        },
+        {
+          minPeople: 4,
+          maxPeople: 4,
+          perPerson: 2000,
+          label: "4 Guests",
+          note: "Reduced rate • All-inclusive",
+        },
+        {
+          minPeople: 5,
+          maxPeople: 7,
+          perPerson: 1700,
+          label: "5–7 Guests",
+          note: "15% discount • All-inclusive",
+        },
+      ],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "A powerful, emotionally rich half‑day experience connecting Cape Town's past, present, and community future. This combined tour brings together District Six — the heart of forced removals — and Langa, Cape Town's oldest Black township. Guests experience two deeply significant communities in one seamless narrative: displacement → resilience → cultural revival.",
+
+    highlights: [
+      {
+        text: "District Six Museum — stories of families forcibly removed, the vibrant culture that once filled the streets, and the ongoing fight for land restitution",
+      },
+      {
+        text: "Drive through the old District Six area — empty land awaiting restitution, churches and landmarks that survived demolition, and the contrast between past destruction and present rebuilding",
+      },
+      {
+        text: "Langa Township arrival — history of Langa as the first planned Black township, resistance movements, cultural identity, and modern community upliftment projects",
+      },
+      {
+        text: "Guga S'thebe Arts & Culture Centre — art studios, ceramic workshops, community craft markets, and colourful murals",
+      },
+      {
+        text: "Guided Cultural Walk Through Langa — traditional hostels and modern housing, local entrepreneurship, daily life, and community upliftment initiatives",
+      },
+      { text: "Authentic, safe, and meaningful community interaction" },
+    ],
+
+    included: [
+      { text: "Hotel pick‑up and drop‑off" },
+      { text: "Driver‑guide" },
+      { text: "District Six Museum entry" },
+      { text: "Langa community guide" },
+      { text: "Guga S'thebe visit" },
+      { text: "Langa cultural walk" },
+      { text: "Bottled water" },
+      { text: "All entry fees" },
+    ],
+
+    excluded: [
+      { text: "Meals" },
+      { text: "Personal purchases" },
+      { text: "Optional upgrades" },
+      { text: "Gratuities" },
+    ],
+
+    pickupOptions: [
+      "Cape Town CBD",
+      "Green Point",
+      "Sea Point",
+      "V&A Waterfront",
+      "Custom pickup on request",
+    ],
+
+    requirements: [
+      { text: "Comfortable walking shoes recommended" },
+      { text: "Respectful behaviour towards the local community is expected" },
+      { text: "Please ask permission before photographing residents" },
+    ],
+
+    arrangements: {
+      availability: "Available all year",
+      duration: "Half Day (4 - 5 hours)",
+      operatingTime: "Flexible",
+      departure: "Flexible",
+      return: "Flexible",
+      location: "Cape Town, South Africa",
+
+      clothing: [
+        "Comfortable clothing",
+        "Comfortable walking shoes",
+        "Sunscreen",
+        "Hat",
+      ],
+
+      thingsToBring: ["Camera", "Cash for personal purchases", "Water bottle"],
+
+      passengerPolicy: "",
+      sunsetNote: "",
+    },
+
+    weatherPolicy: {
+      summary:
+        "Tour operates in all weather conditions. Cape Town weather can change quickly — bring an umbrella or rain jacket.",
+      items: [
+        { text: "Tour operates in all weather conditions" },
+        { text: "Bring an umbrella or rain jacket if rain is forecast" },
+        { text: "Some outdoor portions may be adjusted in extreme weather" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Private tour bookings require advance confirmation. Route adjustments may occur when necessary.",
+      items: [
+        { text: "Private bookings require advance confirmation" },
+        { text: "Route adjustments may occur when necessary" },
+        { text: "Final cancellation policy is confirmed upon booking" },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Langa is considered one of the safer townships when visited with local guides. District Six Museum visits are conducted in a safe, guided environment.",
+      items: [
+        {
+          text: "Langa is considered one of the safer townships when visited with local guides",
+        },
+        { text: "Please ask permission before photographing residents" },
+        {
+          text: "Respectful behaviour towards the local community is expected",
+        },
+        { text: "Tours are conducted with experienced local community guides" },
+        { text: "All museum visits follow standard safety protocols" },
+      ],
+    },
+
+    stops: [
+      {
+        id: "district-six-museum",
+        name: "District Six Museum",
+        time: "Flexible",
+        duration: "1 - 1.5 hours",
+        note: "Heart of forced removals",
+        description:
+          "Explore the District Six Museum, which tells the stories of families forcibly removed from this vibrant community during apartheid. Learn about the vibrant culture that once filled the streets and the ongoing fight for land restitution. This stop sets the emotional foundation for the rest of the tour.",
+        exactLocation: mapLocation({
+          label: "District Six Museum",
+          address: "25A Buitenkant Street, Cape Town, South Africa",
+          query: "District Six Museum Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "district-six-drive",
+        name: "Drive Through the Old District Six Area",
+        time: "Flexible",
+        duration: "20 minutes",
+        note: "Empty land awaiting restitution",
+        description:
+          "Drive through the old District Six area to experience the empty land still awaiting restitution, churches and landmarks that survived demolition, and the contrast between past destruction and present rebuilding. This creates a powerful visual connection to the museum's stories.",
+        exactLocation: mapLocation({
+          label: "District Six",
+          address: "District Six, Cape Town, South Africa",
+          query: "District Six Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "langa-arrival",
+        name: "Langa Township Arrival",
+        time: "Flexible",
+        duration: "15 minutes",
+        note: "Welcome to Cape Town's oldest Black township",
+        description:
+          "Arrive in Langa, Cape Town's oldest Black township. Your local accredited community guide welcomes you and shares the history of Langa as the first planned Black township, resistance movements, cultural identity, and modern community upliftment projects.",
+        exactLocation: mapLocation({
+          label: "Langa Township",
+          address: "Langa, Cape Town, South Africa",
+          query: "Langa Township",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "guga-sthebe",
+        name: "Guga S'thebe Arts & Culture Centre",
+        time: "Flexible",
+        duration: "30 - 45 minutes",
+        note: "Art studios, ceramic workshops, craft markets",
+        description:
+          "Explore one of Langa's best-known cultural landmarks. Guests discover art studios, ceramic workshops, community craft markets, and colourful murals and cultural expressions. This is one of the most photographed locations in Langa.",
+        exactLocation: mapLocation({
+          label: "Guga S'thebe Arts & Culture Centre",
+          address: "Langa, Cape Town, South Africa",
+          query: "Guga Sthebe Langa",
+        }),
+        images: [],
+        touristComments: [],
+      },
+      {
+        id: "langa-cultural-walk",
+        name: "Guided Cultural Walk Through Langa",
+        time: "Flexible",
+        duration: "1 - 1.5 hours",
+        note: "Traditional hostels, local entrepreneurship, daily life",
+        description:
+          "Your guide leads you through traditional hostels and modern housing, local entrepreneurship, daily life in Langa, and community upliftment initiatives. This is the most interactive part of the tour — authentic, safe, and meaningful.",
+        exactLocation: mapLocation({
+          label: "Langa Township",
+          address: "Langa, Cape Town, South Africa",
+          query: "Langa Township",
+        }),
+        images: [],
+        touristComments: [],
+      },
+    ],
+
+    routeInformation: {
+      title: "District Six + Langa Combined Tour Route",
+
+      description:
+        "A powerful, emotionally rich half‑day experience connecting Cape Town's past, present, and community future.",
+
+      items: [
+        "District Six Museum — stories of forced removals, vibrant culture, and land restitution",
+        "Drive through the old District Six area — empty land, surviving landmarks, past vs present",
+        "Langa Township arrival — first planned Black township, resistance movements, modern upliftment",
+        "Guga S'thebe Arts & Culture Centre — art studios, ceramic workshops, craft markets, murals",
+        "Guided Cultural Walk — traditional hostels, local entrepreneurship, daily life, community initiatives",
+      ],
+    },
+
+    vehicle: {
+      name: "",
+      class: "",
+      doors: null,
+      seats: null,
+      fuel: "",
+      gearbox: "",
+      engine: "",
+      specifications: [],
+    },
+
+    securityAndLiability: {
+      heading: "",
+      cardPreAuthorisation: {
+        amount: null,
+        currency: "",
+        description: "",
+        release: "",
+      },
+      cashDeposit: {
+        amountZAR: null,
+        alternativeAmountUSD: null,
+        paymentMethod: "",
+        paidAt: "",
+        refundPolicy: "",
+      },
+    },
+
+    needToKnow: [
+      {
+        text: "District Six Museum tells the stories of families forcibly removed during apartheid",
+      },
+      {
+        text: "The old District Six area still has empty land awaiting restitution",
+      },
+      {
+        text: "Langa is Cape Town's oldest Black township, established in 1927",
+      },
+      {
+        text: "Guga S'thebe is one of the most photographed locations in Langa",
+      },
+      { text: "Please ask permission before photographing residents" },
+      { text: "Respectful behaviour towards the local community is expected" },
+      { text: "Comfortable walking shoes are recommended" },
+      { text: "Children 0–3 years are free of charge" },
+    ],
+
+    faqs: [
+      {
+        question: "What is the historical significance of District Six?",
+        answer:
+          "District Six was a vibrant, multi-racial community in Cape Town before the apartheid government declared it a 'whites only' area under the Group Areas Act. Over 60,000 residents were forcibly removed, and their homes were bulldozed. The District Six Museum preserves their stories and the ongoing fight for land restitution.",
+      },
+      {
+        question: "What is Langa?",
+        answer:
+          "Langa is Cape Town's oldest Black township, established in 1927. It played a pivotal role in the anti-apartheid struggle and today is a vibrant community with strong cultural identity, local entrepreneurship, and community upliftment projects.",
+      },
+      {
+        question: "What is Guga S'thebe?",
+        answer:
+          "Guga S'thebe is an Arts & Culture Centre in Langa that showcases local art, crafts, pottery, and community projects. It is one of the most photographed locations in Langa and a hub for creative expression.",
+      },
+      {
+        question: "Is Langa safe to visit?",
+        answer:
+          "Yes. Langa is considered one of the safer townships when visited with local community guides. The tour is conducted with experienced guides who ensure a safe and meaningful experience.",
+      },
+      {
+        question: "How long is the tour?",
+        answer:
+          "The combined tour is a half‑day experience lasting approximately 4–5 hours.",
+      },
+      {
+        question: "Are entry fees included?",
+        answer:
+          "Yes. All entry fees, transport, guides, and bottled water are included in the tour price.",
+      },
+      {
+        question: "Are meals included?",
+        answer:
+          "No. Meals, personal purchases, optional upgrades, and gratuities are excluded from the tour price.",
+      },
+      {
+        question: "Can children join?",
+        answer:
+          "Yes. Children 0–3 years are free, children 4–12 years are R1,200, and teens 13–17 years pay the adult rate depending on group size.",
+      },
+      {
+        question: "What should I bring?",
+        answer:
+          "Bring comfortable walking shoes, sunscreen, a hat, your camera, and cash for personal purchases.",
+      },
+      {
+        question: "What is the connection between District Six and Langa?",
+        answer:
+          "The combined tour creates a seamless narrative from displacement (District Six forced removals) to resilience and cultural revival (Langa's ongoing community strength). Many families forcibly removed from District Six were relocated to townships like Langa on the Cape Flats.",
+      },
+    ],
+
+    tags: [
+      "District Six",
+      "Langa",
+      "Township",
+      "Heritage",
+      "History",
+      "Forced Removals",
+      "Cultural Tour",
+      "Cape Town",
+      "Half Day",
+      "Museum",
+      "Community",
+      "Authentic Experience",
+      "Combined Tour",
+    ],
+  },
+  // 3Day - Garden Route
+  {
+    id: null, // New tour ID to be assigned (e.g., 38)
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.MULTI_DAY,
+
+    title: "3‑Day Garden Route & Route 62 Tour",
+    slug: "3-day-garden-route-route-62-tour",
+    canonicalPath: "/tours/3-day-garden-route-route-62-tour",
+
+    seo: {
+      title: "3‑Day Garden Route & Route 62 Tour | Cape Frontier Tours",
+      description:
+        "Experience South Africa's most iconic road trip — a 3‑day private journey through the Cape Winelands, Route 62, Klein Karoo, Cango Caves, Botlierskop Safari, Knysna, Hermanus, and the Garden Route coastline.",
+      keywords: [
+        "Garden Route tour",
+        "3 day Garden Route tour",
+        "Route 62 tour",
+        "Cango Caves tour",
+        "Botlierskop safari",
+        "Knysna Heads tour",
+        "Klein Karoo tour",
+        "South Africa road trip",
+        "Garden Route itinerary",
+        "Cape Town to Garden Route",
+        "private Garden Route tour",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image:
+      "/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp",
+    images: [
+      "/src/assets/images/tours/packages/garden-route-3day/1.webp",
+      "/src/assets/images/tours/packages/garden-route-3day/2.webp",
+      "/src/assets/images/tours/packages/garden-route-3day/3.webp",
+    ],
+    imageFolder: "/packages/3-day-garden-route",
+    videos: [],
+
+    location: "Garden Route, South Africa",
+    duration: "3 Days / 2 Nights",
+
+    priceBase: 10500,
+    minPeople: 1,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "Solo Traveller",
+        pricePerPerson: 17000,
+        note: "Includes accommodation, breakfast, transport",
+      },
+
+      {
+        category: "Children (4–12 years)",
+        pricePerPerson: 6300,
+        note: "Child rate (60–75% of adult rate) – R6,300 to R12,750 depending on group size",
+      },
+      {
+        category: "Children (0–3 years)",
+        pricePerPerson: 0,
+        note: "Free of charge",
+      },
+    ],
+
+    additionalPricing: [],
+
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        {
+          minPeople: 2,
+          maxPeople: 2,
+          perPerson: 14800,
+          label: "2 Guests",
+          note: "Includes accommodation, breakfast, transport",
+        },
+        {
+          minPeople: 3,
+          maxPeople: 4,
+          perPerson: 12500,
+          label: "3–4 Guests",
+          note: "Includes accommodation, breakfast, transport",
+        },
+        {
+          minPeople: 5,
+          perPerson: 10500,
+          label: "5+ Guests",
+          note: "Includes accommodation, breakfast, transport",
+        },
+      ],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "The Garden Route is one of South Africa's most famous and beautiful travel regions — a 300 km stretch of coastline from Mossel Bay to Storms River, known for forests, beaches, lagoons, wildlife, adventure activities, and charming towns. It's a place where mountains meet the ocean, where ancient forests run alongside sparkling lakes, and where every town offers its own unique charm — from seaside villages to nature‑rich reserves. The region is celebrated for its mild climate, making it a year‑round destination for travellers seeking both relaxation and adventure. The Garden Route blends coastal beauty, indigenous forests, mountain passes, and protected national parks, offering everything from whale watching and hiking to boat cruises, game drives, and world‑class cuisine. With its mix of natural wonders and cultural heritage, it remains South Africa's most iconic road‑trip route — perfect for families, couples, and adventure seekers alike.",
+
+    highlights: [
+      {
+        text: "Robertson Winelands — coffee stop or optional wine tasting with scenic vineyards and mountain views",
+      },
+      {
+        text: "Route 62 Scenic Drive — South Africa's most iconic country road through Montagu, Ashton, and Barrydale",
+      },
+      {
+        text: "Cango Caves — guided Heritage or Adventure Tour through ancient limestone chambers and incredible formations",
+      },
+      {
+        text: "Botlierskop Private Game Reserve — 3‑hour morning safari with lions, rhino, giraffe, buffalo, and zebra",
+      },
+      {
+        text: "Knysna Heads — panoramic views over the lagoon and Indian Ocean",
+      },
+      {
+        text: "Knysna Quays Waterfront — restaurants, cafés, boutique shops, optional lagoon cruise",
+      },
+      {
+        text: "Hermanus — Whale Coast cliff paths, ocean views, markets, and cafés",
+      },
+      {
+        text: "Benguela Cove Lagoon Wine Estate — premium wine tasting with lagoon views",
+      },
+      {
+        text: "Betty's Bay — Stony Point Penguin Colony with boardwalks and African penguins in a natural coastal habitat",
+      },
+      { text: "Scenic Clarence Drive (R44) return route to Cape Town" },
+    ],
+
+    included: [
+      { text: "Hotel pickup in Cape Town CBD" },
+      { text: "Private vehicle" },
+      { text: "Professional driver/guide" },
+      { text: "2 nights guest house accommodation" },
+      { text: "Breakfast (Day 2 & Day 3)" },
+      { text: "Cango Caves entrance" },
+      { text: "Botlierskop Safari" },
+      { text: "Wine tasting at Benguela Cove" },
+      { text: "Bottled water" },
+    ],
+
+    excluded: [
+      { text: "Lunch and dinner" },
+      { text: "Optional activities" },
+      { text: "Personal purchases" },
+      { text: "Gratuities" },
+    ],
+
+    pickupOptions: [
+      "Cape Town CBD",
+      "Green Point",
+      "Sea Point",
+      "V&A Waterfront",
+      "Custom pickup on request",
+    ],
+
+    requirements: [],
+
+    arrangements: {
+      availability: "Available all year",
+      duration: "3 Days / 2 Nights",
+      operatingTime: "Flexible",
+      departure: "06:30 – 07:00",
+      return: "Day 3 evening",
+      location: "Cape Town → Garden Route → Cape Town",
+
+      clothing: [
+        "Comfortable clothing",
+        "Comfortable walking shoes",
+        "Warm jacket (evenings can be cool)",
+        "Sunscreen",
+        "Hat",
+        "Swimwear (optional)",
+      ],
+
+      thingsToBring: [
+        "Camera",
+        "Cash for personal purchases",
+        "Water bottle",
+        "Chargers for electronics",
+      ],
+
+      passengerPolicy: "",
+      notes: ["Accommodation subject to availability"],
+    },
+
+    weatherPolicy: {
+      summary:
+        "The Garden Route experiences mild weather year‑round. However, weather can change quickly — bring layers and rain gear.",
+      items: [
+        { text: "Garden Route has mild weather year‑round" },
+        { text: "Weather can change quickly — bring layers and rain gear" },
+        { text: "Cango Caves are indoors and not weather dependent" },
+        { text: "Game drives may be adjusted in extreme weather" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
+      items: [
+        {
+          text: "Cancellations must be made at least 24 hours before the trip starts",
+        },
+        {
+          text: "Refunds are forfeited for cancellations within 24 hours of departure",
+        },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "All game drives are conducted by experienced rangers at Botlierskop Private Game Reserve. Guests must follow all safety instructions during wildlife encounters.",
+      items: [
+        { text: "Game drives conducted by experienced rangers" },
+        { text: "Follow all safety instructions during wildlife encounters" },
+        { text: "Keep vehicle windows closed near wildlife" },
+        { text: "Do not feed or approach wild animals" },
+        { text: "Cango Caves tours follow strict safety protocols" },
+      ],
+    },
+
+    /*
+     * MULTI‑DAY ITINERARY
+     */
+    itinerary: {
+      intro: {
+        title: "The Ultimate Garden Road Trip",
+        description:
+          "The Garden Route is one of South Africa's most famous and beautiful travel regions — a 300 km stretch of coastline from Mossel Bay to Storms River, known for forests, beaches, lagoons, wildlife, adventure activities, and charming towns. It's a place where mountains meet the ocean, where ancient forests run alongside sparkling lakes, and where every town offers its own unique charm.",
+      },
+
+      route: {
+        title:
+          "Cape Town → Robertson → Route 62 → Cango Caves → Botlierskop → Knysna → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
+        description:
+          "A premium private tour combining mountains, wildlife, wine estates, coastal scenery, and adventure. Each day blends scenic drives with guided experiences, wildlife encounters, wine tasting, and coastal highlights.",
+      },
+
+      days: [
+        {
+          day: 1,
+          title: "Cape Town → Robertson → Route 62 → Klein Karoo → Cango Caves",
+          route:
+            "Robertson → Route 62 → Montagu → Barrydale → Oudtshoorn → Cango Caves",
+          description:
+            "Depart from Cape Town and travel through the Cape Winelands to Robertson for a coffee stop or optional wine tasting. Continue along South Africa's most iconic country road — Route 62 — passing through Montagu, Ashton, and Barrydale before arriving in Oudtshoorn, the ostrich capital of South Africa. Explore the ancient Cango Caves with a guided Heritage or Adventure Tour.",
+
+          activities: [
+            {
+              title: "Hotel Pickup & Departure",
+              description:
+                "Your driver/guide collects you from your hotel in Cape Town.",
+              time: "06:30 – 07:00",
+              duration: "30 min",
+              type: "transfer",
+              optional: false,
+              image: "images/tours/shared/pickup/1.webp",
+            },
+            {
+              title: "Robertson Winelands Stop",
+              description:
+                "Coffee stop or optional wine tasting. Scenic vineyards and mountain views.",
+              time: "09:00",
+              duration: "45 min",
+              type: "wine",
+              optional: true,
+              image:
+                "/images/tours/packages/3-day-garden-route/robertson-wine-valley.webp",
+            },
+            {
+              title: "Route 62 Scenic Drive",
+              description:
+                "Travel through Montagu, Ashton, and Barrydale — South Africa's most iconic country road.",
+              time: "Flexible",
+              duration: "2.5 hours",
+              type: "scenic",
+              optional: false,
+              image:
+                "/images/tours/packages/3-day-garden-route/960px-Montagu_street.webp",
+            },
+            {
+              title: "Cango Caves Guided Tour",
+              description:
+                "Choose between the Heritage Tour or Adventure Tour. Explore ancient limestone chambers and incredible formations.",
+              time: "Flexible",
+              duration: "1.5 - 2 hours",
+              type: "adventure",
+              optional: false,
+              image:
+                "images/tours/packages/3-day-garden-route/960px-Cango_Caves_-_Western_Cape.webp",
+            },
+            {
+              title: "Arrival & Check-in",
+              description:
+                "Arrive in Oudtshoorn and check in to your accommodation.",
+              time: "Evening",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+              image:
+                "images/tours/packages/3-day-garden-route/960px-Oudtshoorn_Ostriches_-_Gar.webp",
+            },
+          ],
+
+          meals: {
+            breakfast: false,
+            lunch: false,
+            dinner: false,
+          },
+
+          accommodation: {
+            title: "Oudtshoorn Accommodation (Based on Availability)",
+            location: "Oudtshoorn, Klein Karoo",
+            availabilityNote:
+              "Accommodation subject to availability — please enquire for current options.",
+            options: [
+              "De Oude Meul Country Lodge",
+              "Old Mill Nature Lodge",
+              "Die Fonteine Guest House",
+              "Cango Retreat Ou Tol",
+            ],
+          },
+
+          images: [],
+        },
+
+        {
+          day: 2,
+          title:
+            "Oudtshoorn → Botlierskop → Knysna Heads → Knysna Quays Waterfront",
+          route:
+            "Oudtshoorn → Botlierskop Private Game Reserve → Knysna Heads → Knysna Quays Waterfront",
+          description:
+            "Start your day with breakfast before heading to Botlierskop Private Game Reserve for a 3‑hour morning safari with sightings of lions, rhino, giraffe, buffalo, and zebra. After your safari, travel to Knysna to experience the panoramic views from the Knysna Heads and explore the Knysna Quays Waterfront with its restaurants, cafés, and boutique shops.",
+
+          activities: [
+            {
+              title: "Breakfast",
+              description:
+                "Enjoy breakfast at your accommodation in Oudtshoorn.",
+              time: "07:00",
+              duration: "45 min",
+              type: "meal",
+              optional: false,
+              image: "images/tours/shared/breakfast.webp",
+            },
+            {
+              title: "Botlierskop Morning Safari",
+              description:
+                "3‑hour guided game drive with sightings of lions, rhino, giraffe, buffalo, and zebra.",
+              time: "08:30",
+              duration: "3 hours",
+              type: "safari",
+              optional: false,
+              image:
+                "/images/tours/packages/3-day-garden-route/960px-Botlierskop_Landscape_2.webp",
+            },
+            {
+              title: "Knysna Heads Viewpoint",
+              description: "Panoramic views over the lagoon and Indian Ocean.",
+              time: "Afternoon",
+              duration: "30 min",
+              type: "scenic",
+              optional: false,
+              image:
+                "/images/tours/packages/3-day-garden-route/960px-Knysna_ZA,_Knysna_River,_E.webp",
+            },
+            {
+              title: "Knysna Quays Waterfront",
+              description:
+                "Explore restaurants, cafés, boutique shops, optional lagoon cruise.",
+              time: "Afternoon",
+              duration: "2 hours",
+              type: "leisure",
+              optional: true,
+              image:
+                "/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp",
+            },
+          ],
+
+          meals: {
+            breakfast: true,
+            lunch: false,
+            dinner: false,
+          },
+
+          accommodation: {
+            title: "Knysna / Wilderness Accommodation (Based on Availability)",
+            location: "Knysna or Wilderness, Garden Route",
+            availabilityNote:
+              "Accommodation subject to availability — please enquire for current options.",
+            options: [
+              "Knysna Country House",
+              "Paradise Found Guest House",
+              "Waterfront Lodge",
+              "Wilderness Beach Hotel",
+            ],
+          },
+
+          images: [],
+        },
+
+        {
+          day: 3,
+          title:
+            "Knysna/Wilderness → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
+          route:
+            "Knysna/Wilderness → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
+          description:
+            "After breakfast, depart for Hermanus — the heart of the Whale Coast. Explore the cliff paths with ocean views, visit markets and cafés. Continue to Benguela Cove Lagoon Wine Estate for premium wine tasting with stunning lagoon views. Visit Stony Point Penguin Colony at Betty's Bay before returning to Cape Town via the scenic Clarence Drive (R44).",
+
+          activities: [
+            {
+              title: "Breakfast",
+              description:
+                "Enjoy breakfast at your accommodation in Knysna or Wilderness.",
+              time: "07:00",
+              duration: "45 min",
+              type: "meal",
+              optional: false,
+              image: "images/tours/shared/breakfast.webp",
+            },
+            {
+              title: "Hermanus Whale Coast",
+              description:
+                "Cliff paths, ocean views, markets, and cafés in the heart of the Whale Coast.",
+              time: "10:30",
+              duration: "1.5 hours",
+              type: "scenic",
+              optional: false,
+              image: "images/tours/packages/3-day-garden-route/Hermanus.webp",
+            },
+            {
+              title: "Benguela Cove Lagoon Wine Estate",
+              description: "Premium wine tasting with lagoon views.",
+              time: "12:30",
+              duration: "1.5 hours",
+              type: "wine",
+              optional: false,
+              image:
+                "/images/tours/packages/3-day-garden-route/960px-Benguela_Cove_Lagoon_Wine.webp",
+            },
+            {
+              title: "Betty's Bay – Stony Point Penguin Colony",
+              description:
+                "Boardwalks and African penguins in a natural coastal habitat.",
+              time: "14:30",
+              duration: "1 hour",
+              type: "wildlife",
+              optional: false,
+              image:
+                "/images/tours/packages/3-day-garden-route/960px-BB_-_Bettys_Bay_seen_from.webp",
+            },
+            {
+              title: "Scenic Drive to Cape Town",
+              description:
+                "Return to Cape Town via the scenic Clarence Drive (R44) with spectacular coastal views.",
+              time: "15:30",
+              duration: "2 hours",
+              type: "transfer",
+              optional: false,
+              image: "/images/tours/shared/return/1.webp",
+            },
+          ],
+
+          meals: {
+            breakfast: true,
+            lunch: false,
+            dinner: false,
+          },
+
+          accommodation: {
+            title: "",
+            location: "",
+            availabilityNote: "",
+            options: [],
+          },
+
+          images: [],
+        },
+      ],
+    },
+
+    stops: null,
+
+    // routeInformation: {
+    //   title: "3‑Day Garden Route & Route 62 Tour Route",
+    //   description:
+    //     "A premium private tour combining mountains, wildlife, wine estates, coastal scenery, and adventure — from Cape Town to the Garden Route and back.",
+    //   items: [
+    //     "Cape Town → Robertson Winelands → Route 62 → Montagu → Barrydale → Oudtshoorn",
+    //     "Cango Caves (Heritage or Adventure Tour)",
+    //     "Botlierskop Private Game Reserve – Morning Safari",
+    //     "Knysna Heads & Knysna Quays Waterfront",
+    //     "Hermanus Whale Coast Cliff Paths",
+    //     "Benguela Cove Lagoon Wine Estate",
+    //     "Betty's Bay – Stony Point Penguin Colony",
+    //     "Clarence Drive (R44) – Scenic return to Cape Town",
+    //   ],
+    // },
+
+    vehicle: null,
+
+    securityAndLiability: null,
+
+    accommodation: {
+      included: true,
+      type: "Guest House / Lodge",
+      description:
+        "Hand‑selected guest houses in Oudtshoorn and Knysna/Wilderness. Breakfast included. Accommodation subject to availability.",
+    },
+
+    needToKnow: [
+      {
+        text: "Accommodation subject to availability — options listed are examples only",
+      },
+      {
+        text: "Child rates: 0–3 years free, 4–12 years at 60–75% of adult rate, 13–17 years at adult rate",
+      },
+      { text: "Cancellations must be made at least 24 hours before departure" },
+      {
+        text: "Cango Caves offers Heritage Tour (easy) or Adventure Tour (more strenuous)",
+      },
+      {
+        text: "Game drives are subject to wildlife sightings — not guaranteed",
+      },
+      { text: "Whale watching in Hermanus is seasonal (June–November)" },
+      {
+        text: "Comfortable walking shoes recommended for Cango Caves and penguin viewing",
+      },
+      { text: "This is a private tour with a dedicated driver/guide" },
+    ],
+
+    faqs: [
+      {
+        question: "How long is the Garden Route tour?",
+        answer:
+          "This is a 3‑day, 2‑night tour from Cape Town, exploring the Garden Route, Route 62, and the Klein Karoo.",
+      },
+      {
+        question: "What is included in the tour price?",
+        answer:
+          "The tour includes hotel pickup, private vehicle, professional driver/guide, 2 nights guest house accommodation, breakfast (Day 2 & 3), Cango Caves entrance, Botlierskop Safari, wine tasting at Benguela Cove, and bottled water.",
+      },
+      {
+        question: "What is not included?",
+        answer:
+          "Lunch and dinner, optional activities, personal purchases, and gratuities are not included.",
+      },
+      {
+        question: "What is the cancellation policy?",
+        answer:
+          "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
+      },
+      {
+        question: "What are the accommodation options?",
+        answer:
+          "Accommodation is in hand‑selected guest houses in Oudtshoorn and Knysna/Wilderness, subject to availability. Example options include De Oude Meul Country Lodge, Old Mill Nature Lodge, Knysna Country House, and Wilderness Beach Hotel.",
+      },
+      {
+        question: "Can children join the tour?",
+        answer:
+          "Yes. Children 0–3 years are free, 4–12 years are charged at 60–75% of the adult rate, and teens 13–17 years pay the adult rate.",
+      },
+      {
+        question: "What activities are included?",
+        answer:
+          "The tour includes a Cango Caves guided tour, Botlierskop morning safari, wine tasting at Benguela Cove, and visits to Knysna Heads, Hermanus, and Betty's Bay Penguin Colony.",
+      },
+      {
+        question: "What should I bring?",
+        answer:
+          "Bring comfortable clothing, walking shoes, a warm jacket, sunscreen, a hat, swimwear (optional), a camera, and cash for personal purchases.",
+      },
+      {
+        question: "Is this a private tour?",
+        answer:
+          "Yes. This is a private tour with a dedicated driver/guide and private vehicle.",
+      },
+      {
+        question: "What is the best time of year for this tour?",
+        answer:
+          "The Garden Route has a mild climate year‑round. Whale watching in Hermanus is best from June to November.",
+      },
+    ],
+
+    tags: [
+      "Garden Route",
+      "Route 62",
+      "Multi-Day",
+      "3 Day Tour",
+      "Cango Caves",
+      "Safari",
+      "Botlierskop",
+      "Knysna",
+      "Hermanus",
+      "Wine Tasting",
+      "Klein Karoo",
+      "South Africa",
+      "Road Trip",
+      "Private Tour",
+      "Family Friendly",
+      "Wildlife",
+    ],
+  },
+  // 5Day - Botliersklop
+  {
+    id: null, // New tour ID to be assigned (e.g., 39)
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.MULTI_DAY,
+
+    title: "5‑Day Garden Route & Botlierskop Luxury Safari Tour",
+    slug: "5-day-garden-route-botlierskop-safari-tour",
+    canonicalPath: "/tours/5-day-garden-route-botlierskop-safari-tour",
+
+    seo: {
+      title:
+        "5‑Day Garden Route & Botlierskop Luxury Safari Tour | Cape Frontier Tours",
+      description:
+        "A premium Garden Route journey featuring a luxury safari at Botlierskop, dramatic mountain passes, forests, coastline, wine tasting, and charming towns. Includes 4 nights accommodation, breakfast daily, and private driver/guide.",
+      keywords: [
+        "Garden Route tour",
+        "5 day Garden Route tour",
+        "Botlierskop safari",
+        "luxury safari Garden Route",
+        "Cango Caves tour",
+        "Knysna Heads tour",
+        "Tsitsikamma National Park",
+        "South Africa road trip",
+        "Garden Route itinerary",
+        "Cape Town to Garden Route",
+        "private Garden Route tour",
+        "Storms River suspension bridge",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image:
+      "/src/assets/images/tours/packages/5-day-boltierskop/960px-KNYSNA_-_Waterfront_terrac.webp",
+    images: [
+      "/src/assets/images/tours/packages/garden-route-5day/1.webp",
+      "/src/assets/images/tours/packages/garden-route-5day/2.webp",
+      "/src/assets/images/tours/packages/garden-route-5day/3.webp",
+    ],
+    imageFolder: "packages/5-day-boltierskop",
+    videos: [],
+
+    location: "Garden Route, South Africa",
+    duration: "5 Days / 4 Nights",
+
+    priceBase: 15500,
+    minPeople: 1,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "Solo Traveller",
+        pricePerPerson: 23500,
+        note: "Includes accommodation, breakfast, transport, safari",
+      },
+      {
+        category: "Children (4–12 years)",
+        pricePerPerson: 9300,
+        note: "Child rate (60–75% of adult rate) – R9,300 to R11,600 depending on group size",
+      },
+
+      {
+        category: "Children (0–3 years)",
+        pricePerPerson: 0,
+        note: "Free of charge",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Optional Adventure Activities (Tsitsikamma)",
+        price: null,
+        unit: "per person",
+        currency: "ZAR",
+        note: "Ziplining, kayak, Lilo – available on request at Tsitsikamma",
+      },
     ],
 
     groupPricing: {
@@ -4336,123 +9624,1712 @@ export const tours = [
       tiers: [
         {
           minPeople: 2,
-          perPerson: 2250,
-          label: "2+ Guests",
-          note: "Private vehicle",
+          maxPeople: 2,
+          perPerson: 20000,
+          label: "2 Guests",
+          note: "Includes accommodation, breakfast, transport, safari",
+        },
+        {
+          minPeople: 3,
+          maxPeople: 4,
+          perPerson: 17500,
+          label: "3–4 Guests",
+          note: "Includes accommodation, breakfast, transport, safari",
+        },
+        {
+          minPeople: 5,
+          perPerson: 15500,
+          label: "5+ Guests",
+          note: "Includes accommodation, breakfast, transport, safari",
         },
       ],
     },
 
-
-    rating: 4.8,
-    stars: 5,
-    mainReviewerName: "Daniel Brooks",
-    mainReviewerCountry: "UK",
-    reviewYear: 2026,
-    otherReviews: 18,
-    mainReview:
-      "A peaceful yet exciting ride through the dunes with incredible scenery and well-trained horses.",
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
 
     description:
-      "Experience a guided horse riding adventure through Cape Town’s scenic dune landscapes. This relaxed ride is suitable for beginners and experienced riders alike, offering open spaces, coastal air, and beautiful natural surroundings.",
+      "Experience the Garden Route in comfort and style with a private driver/guide and hand‑selected accommodation. Your adventure begins with a luxury safari at Botlierskop Private Game Reserve, followed by the scenic Route 62, the world‑famous Cango Caves, the lagoon views of Knysna, and the forested trails of Tsitsikamma National Park. The final day includes Hermanus, Benguela Cove, and the penguins of Betty's Bay, ending with the breathtaking Clarence Drive back to Cape Town. This tour offers a perfect balance of adventure, scenery, wildlife, and relaxation — ideal for families, couples, solo travellers, and small groups.",
 
     highlights: [
-      { text: "Guided dune horse riding experience" },
-      { text: "Suitable for beginners and experienced riders" },
-      { text: "Scenic coastal dune landscapes" },
-      { text: "Well-trained horses and safety briefing" },
-      { text: "Bottled water included" },
+      {
+        text: "Botlierskop Safari — 3‑hour guided safari with lion, rhino, giraffe, buffalo, zebra and more",
+      },
+      {
+        text: "Luxury Tented Camp Stay — Mountain views, private decks, and premium comfort",
+      },
+      { text: "Route 62 — Vineyards, orchards, and Karoo landscapes" },
+      {
+        text: "Cango Caves — Heritage or Adventure guided tour through ancient limestone chambers",
+      },
+      { text: "Outeniqua Pass — Dramatic mountain scenery" },
+      { text: "Knysna Heads — Iconic lagoon and ocean viewpoint" },
+      { text: "Knysna Waterfront — Restaurants, cafés, boutique shops" },
+      {
+        text: "Tsitsikamma National Park — Suspension bridge & adventure activities",
+      },
+      {
+        text: "Hermanus Whale Coast — Seasonal whale watching (June–November)",
+      },
+      { text: "Benguela Cove Wine Estate — Lagoon‑side wine tasting" },
+      {
+        text: "Betty's Bay Penguins — Stony Point Nature Reserve with boardwalks and African penguins",
+      },
+      { text: "Clarence Drive (R44) — One of SA's most scenic coastal roads" },
     ],
 
     included: [
-      { text: "Horse riding experience" },
-      { text: "Professional guide/instructor" },
-      { text: "Safety equipment briefing" },
+      { text: "Private vehicle" },
+      { text: "Professional driver/guide" },
+      { text: "Botlierskop Safari" },
+      { text: "4 nights accommodation" },
+      { text: "Breakfast daily" },
+      { text: "Cango Caves entrance" },
+      { text: "Tsitsikamma National Park entrance" },
+      { text: "Benguela Cove wine tasting" },
       { text: "Bottled water" },
     ],
 
     excluded: [
-      { text: "Transport (at location meeting point)" },
-      { text: "Meals" },
+      { text: "Lunch and dinner" },
+      { text: "Optional adventure activities (ziplining, kayak, Lilo)" },
       { text: "Personal purchases" },
+      { text: "Gratuities" },
     ],
 
     pickupOptions: [
-      "At location only",
+      "Cape Town CBD",
+      "Green Point",
+      "Sea Point",
+      "V&A Waterfront",
+      "Custom pickup on request",
     ],
 
-    stops: [
-      {
-        id: "dunes-ride",
-        name: "Dune Horse Riding Route",
-        time: "Flexible",
-        duration: "1.5 - 2 hours",
-        note: "Guided dune riding experience",
-        description:
-          "Ride through wide-open dune landscapes with professional guidance, calm horses, and scenic coastal views ideal for photography and relaxation.",
-        exactLocation: mapLocation({
-          label: "Horse Riding Dunes",
-          query: "Noordhoek dunes horse riding",
-        }),
-        images: getTourImages("adrenaline-adventure/horse-riding-dunes", 3),
-        touristComments: [
-          {
-            name: "Mia",
-            country: "NL",
-            text: "Peaceful, scenic, and very well organized. Perfect introduction to horse riding.",
-          },
-        ],
-      },
-    ],
+    requirements: [],
 
-    groupDiscount: {
-      enabled: false,
-    },
+    arrangements: {
+      availability: "Available all year",
+      duration: "5 Days / 4 Nights",
+      operatingTime: "Flexible",
+      departure: "07:30 – 08:00",
+      return: "Day 5 evening",
+      location: "Cape Town → Garden Route → Cape Town",
 
-    needToKnow: [
-      { text: "Minimum 2 guests required" },
-      { text: "Suitable for beginners and experienced riders" },
-      { text: "Comfortable clothing and closed shoes recommended" },
-      { text: "Subject to weather conditions" },
-    ],
+      clothing: [
+        "Comfortable clothing",
+        "Comfortable walking shoes",
+        "Warm jacket (evenings can be cool)",
+        "Sunscreen",
+        "Hat",
+        "Swimwear (optional)",
+      ],
 
-    cancellationPolicy: {
-      summary: "Weather conditions may affect dune riding availability.",
-      items: [
-        { text: "Cancellations due to weather may be rescheduled" },
-        { text: "Advance booking recommended" },
-        { text: "Final policy confirmed on booking" },
+      thingsToBring: [
+        "Camera",
+        "Cash for personal purchases",
+        "Water bottle",
+        "Chargers for electronics",
+        "Binoculars (recommended for safari)",
+      ],
+
+      passengerPolicy: "",
+      notes: [
+        "Accommodation subject to availability",
+        "Optional adventure activities in Tsitsikamma available on request",
+        "Whale watching in Hermanus is seasonal (June–November)",
       ],
     },
 
+    weatherPolicy: {
+      summary:
+        "The Garden Route experiences mild weather year‑round. However, weather can change quickly — bring layers and rain gear.",
+      items: [
+        { text: "Garden Route has mild weather year‑round" },
+        { text: "Weather can change quickly — bring layers and rain gear" },
+        { text: "Cango Caves are indoors and not weather dependent" },
+        { text: "Game drives may be adjusted in extreme weather" },
+        { text: "Tsitsikamma activities may be affected by weather" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
+      items: [
+        {
+          text: "Cancellations must be made at least 24 hours before the trip starts",
+        },
+        {
+          text: "Refunds are forfeited for cancellations within 24 hours of departure",
+        },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "All game drives are conducted by experienced rangers at Botlierskop Private Game Reserve. Guests must follow all safety instructions during wildlife encounters.",
+      items: [
+        { text: "Game drives conducted by experienced rangers" },
+        { text: "Follow all safety instructions during wildlife encounters" },
+        { text: "Keep vehicle windows closed near wildlife" },
+        { text: "Do not feed or approach wild animals" },
+        { text: "Cango Caves tours follow strict safety protocols" },
+        {
+          text: "Tsitsikamma activities have their own safety briefings and equipment",
+        },
+      ],
+    },
+
+    /*
+     * MULTI‑DAY ITINERARY
+     */
+    itinerary: {
+      intro: {
+        title: "The Ultimate Garden Route Luxury Safari",
+        description:
+          "Experience the Garden Route in comfort and style with a private driver/guide and hand‑selected accommodation. Your adventure begins with a luxury safari at Botlierskop Private Game Reserve, followed by the scenic Route 62, the world‑famous Cango Caves, the lagoon views of Knysna, and the forested trails of Tsitsikamma National Park. The final day includes Hermanus, Benguela Cove, and the penguins of Betty's Bay, ending with the breathtaking Clarence Drive back to Cape Town.",
+      },
+
+      route: {
+        title:
+          "Cape Town → Botlierskop → Oudtshoorn → Knysna → Tsitsikamma → Hermanus → Cape Town",
+        description:
+          "This itinerary blends wildlife, nature, coastline, wine, and culture into one unforgettable 5‑day experience. Each day blends scenic drives with guided experiences, wildlife encounters, wine tasting, and coastal highlights.",
+      },
+
+      days: [
+        {
+          day: 1,
+          title: "Botlierskop Safari Experience",
+          route: "Cape Town → Botlierskop Private Game Reserve",
+          description:
+            "Depart from Cape Town and travel to Botlierskop Private Game Reserve for a 3‑hour guided safari with sightings of lion, rhino, giraffe, buffalo, zebra and more. Stay overnight in a luxury tented suite with mountain and river views.",
+
+          activities: [
+            {
+              title: "Hotel Pickup & Departure",
+              description:
+                "Your driver/guide collects you from your hotel in Cape Town.",
+              time: "07:30 – 08:00",
+              duration: "30 min",
+              type: "transfer",
+              optional: false,
+              image: "images/tours/shared/pickup/1.webp",
+            },
+            {
+              title: "Scenic Drive to Botlierskop",
+              description:
+                "Travel along the N2 through scenic landscapes towards Botlierskop Private Game Reserve.",
+              time: "08:00 – 11:00",
+              duration: "3 hours",
+              type: "transfer",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-boltierskop/960px-Botlierskop_Landscape_2.webp",
+            },
+            {
+              title: "Botlierskop Safari",
+              description:
+                "3‑hour guided safari with sightings of lion, rhino, giraffe, buffalo, zebra and more.",
+              time: "11:30 – 14:30",
+              duration: "3 hours",
+              type: "safari",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-boltierskop/960px-Game_Lodge_Botlierskop,_So.webp",
+            },
+            {
+              title: "Arrival & Check-in",
+              description:
+                "Check in to your luxury tented suite at Botlierskop with mountain and river views.",
+              time: "Afternoon",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+              image: "/images/tours/packages/5-day-boltierskop/check-in.webp",
+            },
+            {
+              title: "Dinner (Own Account)",
+              description:
+                "Enjoy dinner at the lodge restaurant with views over the reserve.",
+              time: "Evening",
+              duration: "",
+              type: "meal",
+              optional: true,
+              image: "images/tours/shared/dinner.webp",
+            },
+          ],
+
+          meals: {
+            breakfast: false,
+            lunch: false,
+            dinner: false,
+          },
+
+          accommodation: {
+            title: "Botlierskop Private Game Reserve",
+            location: "Botlierskop, Garden Route",
+            availabilityNote:
+              "Luxury tented suites with mountain and river views.",
+            options: ["Luxury Tented Suite", "Premium Suite with Private Deck"],
+          },
+
+          images: [],
+        },
+
+        {
+          day: 2,
+          title: "Route 62 & Cango Caves",
+          route: "Botlierskop → Route 62 → Oudtshoorn → Cango Caves",
+          description:
+            "After breakfast, travel along the scenic Route 62 with its vineyards, orchards, and Karoo landscapes. Visit the world‑famous Cango Caves for a guided Heritage or Adventure Tour through ancient limestone chambers. Overnight in Oudtshoorn.",
+
+          activities: [
+            {
+              title: "Breakfast",
+              description: "Enjoy breakfast at your Botlierskop accommodation.",
+              time: "07:00 – 08:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: false,
+              image: "/images/tours/shared/breakfast2.webp",
+            },
+            {
+              title: "Route 62 Scenic Drive",
+              description:
+                "Travel along South Africa's most iconic country road with vineyards, orchards, and Karoo landscapes.",
+              time: "08:00 – 11:00",
+              duration: "3 hours",
+              type: "scenic",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-boltierskop/960px-Karoo,_Eastern_Cape,_South.webp",
+            },
+            {
+              title: "Lunch Stop (Own Account)",
+              description:
+                "Lunch stop in Oudtshoorn, the ostrich capital of South Africa.",
+              time: "11:30 – 12:30",
+              duration: "1 hour",
+              type: "meal",
+              optional: true,
+              image: "/images/tours/shared/lunch.webp",
+            },
+            {
+              title: "Cango Caves Guided Tour",
+              description:
+                "Choose between the Heritage Tour or Adventure Tour. Explore ancient limestone chambers and incredible formations.",
+              time: "13:00 – 15:00",
+              duration: "2 hours",
+              type: "adventure",
+              optional: false,
+              image:
+                "images/tours/packages/5-day-boltierskop/960px-Cango_Caves_-_Western_Cape.webp",
+            },
+            {
+              title: "Arrival & Check-in",
+              description: "Check in to your accommodation in Oudtshoorn.",
+              time: "Afternoon",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-boltierskop/check-in-oude-muele.webp",
+            },
+            {
+              title: "Dinner (Own Account)",
+              description:
+                "Explore local restaurants in Oudtshoorn for dinner.",
+              time: "Evening",
+              duration: "",
+              type: "meal",
+              optional: true,
+              image: "/images/tours/shared/dinner.webp",
+            },
+          ],
+
+          meals: {
+            breakfast: true,
+            lunch: false,
+            dinner: false,
+          },
+
+          accommodation: {
+            title: "Oudtshoorn Accommodation",
+            location: "Oudtshoorn, Klein Karoo",
+            availabilityNote:
+              "Accommodation subject to availability — please enquire for current options.",
+            options: [
+              "De Oude Meul Country Lodge",
+              "Old Mill Nature Lodge",
+              "Die Fonteine Guest House",
+              "Cango Retreat Ou Tol",
+            ],
+          },
+
+          images: [],
+        },
+
+        {
+          day: 3,
+          title: "Knysna Lagoon & Heads",
+          route:
+            "Oudtshoorn → Outeniqua Pass → Knysna Heads → Knysna Waterfront",
+          description:
+            "After breakfast, travel through the dramatic Outeniqua Pass to Knysna. Visit the iconic Knysna Heads viewpoint overlooking the lagoon and Indian Ocean, then explore the Knysna Waterfront with its restaurants, cafés, and boutique shops. Overnight in Knysna.",
+
+          activities: [
+            {
+              title: "Breakfast",
+              description:
+                "Enjoy breakfast at your accommodation in Oudtshoorn.",
+              time: "07:00 – 08:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: false,
+              image: "/images/tours/shared/breakfast2.webp",
+            },
+            {
+              title: "Outeniqua Pass Drive",
+              description:
+                "Travel through the dramatic Outeniqua Pass with mountain and valley views.",
+              time: "08:00 – 10:30",
+              duration: "2.5 hours",
+              type: "scenic",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-boltierskop/960px-Outeniqua_mountains_158882.webp",
+              // Bob Adams from Amanzimtoti, South Africa
+              // Creative Commons Attribution-Share Alike 2.0
+              // Outeniqua mountains (15888233442).jpg Copy
+              // [[File:Outeniqua mountains (15888233442).jpg|Outeniqua_mountains_(15888233442)]]
+              // Copy
+              // November 26, 2014
+            },
+            {
+              title: "Knysna Heads Viewpoint",
+              description:
+                "Iconic viewpoint overlooking the lagoon and Indian Ocean.",
+              time: "10:30 – 11:30",
+              duration: "1 hour",
+              type: "scenic",
+              optional: false,
+              image:
+                "images/tours/packages/5-day-boltierskop/960px-Knysna_Heads_view.webp",
+              // Steveknysna
+              // Creative Commons Attribution-Share Alike 3.0
+              // Knysna Heads view.JPG Copy
+              // [[File:Knysna Heads view.JPG|Knysna_Heads_view]]
+              // Copy
+              // February 7, 2013
+            },
+            {
+              title: "Lunch Stop (Own Account)",
+              description:
+                "Lunch at the Knysna Waterfront with views over the lagoon.",
+              time: "12:00 – 13:30",
+              duration: "1.5 hours",
+              type: "meal",
+              optional: true,
+              image: "/images/tours/shared/lunch.webp",
+            },
+            {
+              title: "Knysna Waterfront Exploration",
+              description:
+                "Explore restaurants, cafés, boutique shops, optional lagoon cruise.",
+              time: "13:30 – 15:00",
+              duration: "1.5 hours",
+              type: "leisure",
+              optional: true,
+              image:
+                "/images/tours/packages/5-day-boltierskop/960px-KNYSNA_-_Waterfront_terrac.webp",
+              // Josep M. Gracia
+              // Creative Commons Attribution-Share Alike 4.0
+              // KNYSNA - Waterfront terraces in Knysna, South Africa, 2017.jpg Copy
+              // [[File:KNYSNA - Waterfront terraces in Knysna, South Africa, 2017.jpg|KNYSNA_-_Waterfront_terraces_in_Knysna,_South_Africa,_2017]]
+              // Copy
+              // August 2017
+            },
+            {
+              title: "Arrival & Check-in",
+              description: "Check in to your accommodation in Knysna.",
+              time: "Afternoon",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-boltierskop/check-in-country-house-2.webp",
+            },
+            {
+              title: "Dinner (Own Account)",
+              description:
+                "Enjoy dinner at one of Knysna's renowned seafood restaurants.",
+              time: "Evening",
+              duration: "",
+              type: "meal",
+              optional: true,
+              image: "/images/tours/shared/dinner.webp",
+            },
+          ],
+
+          meals: {
+            breakfast: true,
+            lunch: false,
+            dinner: false,
+          },
+
+          accommodation: {
+            title: "Knysna Accommodation",
+            location: "Knysna, Garden Route",
+            availabilityNote:
+              "Accommodation subject to availability — please enquire for current options.",
+            options: [
+              "Knysna Country House",
+              "Paradise Found Guest House",
+              "Waterfront Lodge",
+            ],
+          },
+
+          images: [],
+        },
+
+        {
+          day: 4,
+          title: "Tsitsikamma Forests & Adventure",
+          route: "Knysna → Tsitsikamma National Park → Storms River",
+          description:
+            "After breakfast, travel to Tsitsikamma National Park for a forest experience. Walk across the famous Storms River Suspension Bridge and explore the dramatic coastline. Optional adventure activities include ziplining, kayak, and Lilo (own expense). Overnight in Tsitsikamma.",
+
+          activities: [
+            {
+              title: "Breakfast",
+              description: "Enjoy breakfast at your accommodation in Knysna.",
+              time: "07:00 – 08:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: false,
+              image: "/images/tours/shared/breakfast2.webp",
+            },
+            {
+              title: "Scenic Drive to Tsitsikamma",
+              description:
+                "Travel along the Garden Route coast to Tsitsikamma National Park.",
+              time: "08:00 – 09:30",
+              duration: "1.5 hours",
+              type: "transfer",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-boltierskop/960px-Tsitsikamma_National_Park.webp",
+            },
+            {
+              title: "Storms River Suspension Bridge",
+              description:
+                "Walk across the famous suspension bridge with views over the dramatic coastline and Storms River mouth.",
+              time: "09:30 – 11:30",
+              duration: "2 hours",
+              type: "adventure",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-boltierskop/960px-2014-11-30_Tsitsikamma_Nat.webp",
+            },
+            {
+              title: "Lunch Stop (Own Account)",
+              description: "Lunch at a local restaurant near Tsitsikamma.",
+              time: "12:00 – 13:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: true,
+              image: "/images/tours/shared/lunch2.webp",
+            },
+            {
+              title: "Optional Adventure Activities",
+              description:
+                "Choose from ziplining, kayak, or Lilo (own expense). Activities subject to availability and weather.",
+              time: "13:00 – 15:00",
+              duration: "2 hours",
+              type: "adventure",
+              optional: true,
+              image: "/images/tours/shared/kayak.webp",
+            },
+            {
+              title: "Arrival & Check-in",
+              description: "Check in to your accommodation in Tsitsikamma.",
+              time: "Afternoon",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-boltierskop/check-in-tsitsikama-lodge.webp",
+            },
+            {
+              title: "Dinner (Own Account)",
+              description:
+                "Enjoy dinner at your accommodation or a local restaurant.",
+              time: "Evening",
+              duration: "",
+              type: "meal",
+              optional: true,
+              image: "/images/tours/shared/dinner2.webp",
+            },
+          ],
+
+          meals: {
+            breakfast: true,
+            lunch: false,
+            dinner: false,
+          },
+
+          accommodation: {
+            title: "Tsitsikamma Accommodation",
+            location: "Tsitsikamma, Garden Route",
+            availabilityNote:
+              "Accommodation subject to availability — please enquire for current options.",
+            options: [
+              "Tsitsikamma Lodge",
+              "Forest Hideaway",
+              "Storms River Guest House",
+            ],
+          },
+
+          images: [],
+        },
+
+        {
+          day: 5,
+          title: "Hermanus, Wine & Penguins",
+          route:
+            "Tsitsikamma → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
+          description:
+            "After breakfast, travel along the coast to Hermanus — the heart of the Whale Coast. Explore the cliff paths with ocean views, visit markets and cafés. Continue to Benguela Cove Lagoon Wine Estate for premium wine tasting with stunning lagoon views. Visit Stony Point Penguin Colony at Betty's Bay before returning to Cape Town via the scenic Clarence Drive (R44).",
+
+          activities: [
+            {
+              title: "Breakfast",
+              description:
+                "Enjoy breakfast at your accommodation in Tsitsikamma.",
+              time: "07:00 – 08:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: false,
+              image: "/images/tours/shared/breakfast.webp",
+            },
+            {
+              title: "Hermanus Whale Coast",
+              description:
+                "Explore the cliff paths with ocean views, markets, and cafés. Seasonal whale watching (June–November).",
+              time: "10:00 – 12:00",
+              duration: "2 hours",
+              type: "scenic",
+              optional: false,
+              image: "images/tours/packages/3-day-garden-route/Hermanus.webp",
+            },
+            {
+              title: "Lunch Stop (Own Account)",
+              description: "Lunch at a local restaurant in Hermanus.",
+              time: "12:00 – 13:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: true,
+              image: "/images/tours/shared/lunch.webp",
+            },
+            {
+              title: "Benguela Cove Wine Estate",
+              description: "Premium wine tasting with stunning lagoon views.",
+              time: "13:30 – 15:00",
+              duration: "1.5 hours",
+              type: "wine",
+              optional: false,
+              image:
+                "images/tours/packages/3-day-garden-route/960px-Benguela_Cove_Lagoon_Wine.webp",
+            },
+            {
+              title: "Betty's Bay – Stony Point Penguin Colony",
+              description:
+                "Boardwalks and African penguins in a natural coastal habitat.",
+              time: "15:30 – 16:30",
+              duration: "1 hour",
+              type: "wildlife",
+              optional: false,
+              image:
+                "images/tours/packages/3-day-garden-route/960px-BB_-_Bettys_Bay_seen_from.webp",
+            },
+            {
+              title: "Clarence Drive Return to Cape Town",
+              description:
+                "Return to Cape Town via the scenic Clarence Drive (R44) with spectacular coastal views.",
+              time: "16:30 – 19:00",
+              duration: "2.5 hours",
+              type: "transfer",
+              optional: false,
+              image: "/images/tours/shared/return/1.webp",
+            },
+          ],
+
+          meals: {
+            breakfast: true,
+            lunch: false,
+            dinner: false,
+          },
+
+          accommodation: {
+            title: "",
+            location: "",
+            availabilityNote: "",
+            options: [],
+          },
+
+          images: [],
+        },
+      ],
+    },
+
+    stops: [],
+
+    // routeInformation: {
+    //   title: "5‑Day Garden Route & Botlierskop Luxury Safari Route",
+    //   description:
+    //     "A premium Garden Route journey featuring a luxury safari, dramatic mountain passes, forests, coastline, wine tasting, and charming towns.",
+    //   items: [
+    //     "Cape Town → Botlierskop Private Game Reserve",
+    //     "Botlierskop Safari (lion, rhino, giraffe, buffalo, zebra)",
+    //     "Route 62 – Vineyards, orchards, and Karoo landscapes",
+    //     "Cango Caves – Heritage or Adventure Tour",
+    //     "Outeniqua Pass – Dramatic mountain scenery",
+    //     "Knysna Heads – Iconic lagoon and ocean viewpoint",
+    //     "Knysna Waterfront – Restaurants, cafés, boutique shops",
+    //     "Tsitsikamma National Park – Storms River Suspension Bridge",
+    //     "Hermanus Whale Coast – Seasonal whale watching",
+    //     "Benguela Cove – Lagoon‑side wine tasting",
+    //     "Betty's Bay – Stony Point Penguin Colony",
+    //     "Clarence Drive (R44) – Scenic return to Cape Town",
+    //   ],
+    // },
+
+    vehicle: null,
+
+    securityAndLiability: null,
+
+    accommodation: {
+      included: true,
+      type: "Luxury Tented Suite / Guest House / Lodge",
+      description:
+        "Hand‑selected accommodation in Botlierskop (luxury tented suite), Oudtshoorn, Knysna, and Tsitsikamma. Breakfast included daily. Accommodation subject to availability.",
+    },
+
+    needToKnow: [
+      {
+        text: "Accommodation subject to availability — options listed are examples only",
+      },
+      {
+        text: "Child rates: 0–3 years free, 4–12 years at 60–75% of adult rate, 13–17 years at adult rate",
+      },
+      { text: "Cancellations must be made at least 24 hours before departure" },
+      {
+        text: "Cango Caves offers Heritage Tour (easy) or Adventure Tour (more strenuous)",
+      },
+      {
+        text: "Game drives are subject to wildlife sightings — not guaranteed",
+      },
+      { text: "Whale watching in Hermanus is seasonal (June–November)" },
+      {
+        text: "Optional Tsitsikamma activities: ziplining, kayak, Lilo (own expense)",
+      },
+      {
+        text: "Comfortable walking shoes recommended for Cango Caves, Tsitsikamma, and penguin viewing",
+      },
+      { text: "This is a private tour with a dedicated driver/guide" },
+    ],
+
     faqs: [
       {
-        question: "Do I need horse riding experience?",
+        question: "How long is the Garden Route tour?",
         answer:
-          "No. The experience is suitable for beginners with full guidance provided.",
+          "This is a 5‑day, 4‑night tour from Cape Town, exploring the Garden Route, Botlierskop, Route 62, and the Klein Karoo.",
       },
       {
-        question: "Is transport included?",
+        question: "What is included in the tour price?",
         answer:
-          "No. This is an at-location activity unless otherwise arranged.",
+          "The tour includes private vehicle, professional driver/guide, Botlierskop Safari, 4 nights accommodation, breakfast daily, Cango Caves entrance, Tsitsikamma National Park entrance, Benguela Cove wine tasting, and bottled water.",
       },
       {
-        question: "What should I wear?",
+        question: "What is not included?",
         answer:
-          "Comfortable clothing and closed shoes are recommended for safety.",
+          "Lunch and dinner, optional adventure activities (ziplining, kayak, Lilo), personal purchases, and gratuities are not included.",
+      },
+      {
+        question: "What is the cancellation policy?",
+        answer:
+          "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
+      },
+      {
+        question: "What is Botlierskop Private Game Reserve?",
+        answer:
+          "Botlierskop is a luxury private game reserve offering 3‑hour guided safaris with sightings of the Big 5 (lion, rhino, buffalo, elephant, leopard) as well as giraffe, zebra, and more.",
+      },
+      {
+        question: "Can children join the tour?",
+        answer:
+          "Yes. Children 0–3 years are free, 4–12 years are charged at 60–75% of the adult rate, and teens 13–17 years pay the adult rate.",
+      },
+      {
+        question: "What activities are included?",
+        answer:
+          "The tour includes Botlierskop Safari, Cango Caves guided tour, Tsitsikamma National Park entrance, Knysna Heads viewpoint, Hermanus Whale Coast, Benguela Cove wine tasting, and Betty's Bay Penguin Colony.",
+      },
+      {
+        question: "What are the optional activities in Tsitsikamma?",
+        answer:
+          "Optional activities include ziplining, kayak, and Lilo (own expense). These can be arranged on request and are subject to availability and weather.",
+      },
+      {
+        question: "What should I bring?",
+        answer:
+          "Bring comfortable clothing, walking shoes, a warm jacket, sunscreen, a hat, swimwear (optional), a camera, and cash for personal purchases.",
+      },
+      {
+        question: "Is this a private tour?",
+        answer:
+          "Yes. This is a private tour with a dedicated driver/guide and private vehicle.",
+      },
+      {
+        question: "What is the best time of year for this tour?",
+        answer:
+          "The Garden Route has a mild climate year‑round. Whale watching in Hermanus is best from June to November.",
       },
     ],
 
     tags: [
-      "Horse Riding",
-      "Dunes",
+      "Garden Route",
+      "Botlierskop",
+      "Safari",
+      "Multi-Day",
+      "5 Day Tour",
+      "Cango Caves",
+      "Knysna",
+      "Tsitsikamma",
+      "Hermanus",
+      "Wine Tasting",
+      "South Africa",
+      "Road Trip",
+      "Private Tour",
+      "Luxury Safari",
+      "Family Friendly",
+      "Wildlife",
       "Adventure",
-      "Cape Town",
-      "Outdoor",
-      "Single Activity",
     ],
-  }
+  },
+  // 5Day - Garden Route
+  {
+    id: null, // New tour ID to be assigned (e.g., 40)
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.MULTI_DAY,
 
+    title: "5‑Day Garden Route & Gondwana Big 5 Safari Tour",
+    slug: "5-day-garden-route-gondwana-big-5-safari",
+    canonicalPath: "/tours/5-day-garden-route-gondwana-big-5-safari",
+
+    seo: {
+      title:
+        "5‑Day Garden Route & Gondwana Big 5 Safari Tour | Cape Frontier Tours",
+      description:
+        "A premium 5‑day journey combining a luxury Big 5 safari at Gondwana Game Reserve, mountain passes, forests, coastline, wine tasting, and hand‑selected guest‑house accommodation.",
+      keywords: [
+        "Garden Route tour",
+        "5 day Garden Route tour",
+        "Gondwana Game Reserve",
+        "Big 5 safari Garden Route",
+        "Cango Caves tour",
+        "Knysna Heads tour",
+        "Tsitsikamma National Park",
+        "South Africa road trip",
+        "Garden Route itinerary",
+        "Cape Town to Garden Route",
+        "private Garden Route tour",
+        "Storms River suspension bridge",
+        "Big 5 safari South Africa",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    // image: "/src/assets/images/tours/packages/5-day-garden-route/image.webp",
+    image:
+      "/src/assets/images/tours/packages/5-day-garden-route/960px-Big_five_gam.webp",
+    images: [
+      "/src/assets/images/tours/packages/5-day-garden-route/1.webp",
+      "/src/assets/images/tours/packages/5-day-garden-route/2.webp",
+      "/src/assets/images/tours/packages/5-day-garden-route/3.webp",
+    ],
+    imageFolder: "packages/5-day-garden-route",
+    videos: [],
+
+    location: "Garden Route, South Africa",
+    duration: "5 Days / 4 Nights",
+
+    priceBase: 17500,
+    minPeople: 1,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "Solo Traveller",
+        pricePerPerson: 26000,
+        note: "Includes Gondwana safari, 4 nights accommodation, breakfast, transport",
+      },
+
+      {
+        category: "Children (4–12 years)",
+        pricePerPerson: 10500,
+        note: "Child rate (60–75% of adult rate) – R10,500 to R13,000 depending on group size",
+      },
+      {
+        category: "Children (0–3 years)",
+        pricePerPerson: 0,
+        note: "Free of charge",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Optional Adventure Activities (Tsitsikamma)",
+        price: null,
+        unit: "per person",
+        currency: "ZAR",
+        note: "Ziplining, kayak, Lilo, forest hiking – available on request at Tsitsikamma",
+      },
+      {
+        category: "Optional Ostrich Farm Experience (Oudtshoorn)",
+        price: null,
+        unit: "per person",
+        currency: "ZAR",
+        note: "Available on request",
+      },
+    ],
+
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        {
+          minPeople: 2,
+          maxPeople: 2,
+          perPerson: 22000,
+          label: "2 Guests",
+          note: "Includes Gondwana safari, accommodation, breakfast, transport",
+        },
+        {
+          minPeople: 3,
+          maxPeople: 4,
+          perPerson: 19500,
+          label: "3–4 Guests",
+          note: "Includes Gondwana safari, accommodation, breakfast, transport",
+        },
+        {
+          minPeople: 5,
+          perPerson: 17500,
+          label: "5+ Guests",
+          note: "Includes Gondwana safari, accommodation, breakfast, transport",
+        },
+      ],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "This 5‑day journey combines the very best of the Garden Route with an exclusive Big 5 safari experience at Gondwana Game Reserve. Travellers enjoy a seamless blend of wildlife, mountain passes, forests, coastline, wine tasting, and charming towns — all guided privately and comfortably. The tour begins with a luxury safari stay at Gondwana, followed by the scenic Route 62, the dramatic Cango Caves, the lagoon views of Knysna, and the adventure‑rich Tsitsikamma National Park. The final day includes Hermanus, Benguela Cove, and the penguins of Betty's Bay before returning to Cape Town via the iconic Clarence Drive. With 4 nights of hand‑selected accommodation, breakfast included, and a dedicated driver/guide throughout, this itinerary offers a complete Garden Route experience with the added value of a premium Big 5 safari.",
+
+    highlights: [
+      {
+        text: "Exclusive Big 5 Safari at Gondwana Game Reserve — Lion, elephant, rhino, buffalo, giraffe, zebra and more",
+      },
+      {
+        text: "Luxury Lodge Stay — Panoramic views, private suites, and exceptional hospitality",
+      },
+      {
+        text: "Route 62 Scenic Drive — Mountain passes, orchards, vineyards, and Karoo landscapes",
+      },
+      {
+        text: "Cango Caves Guided Tour — Heritage or Adventure route through ancient limestone chambers",
+      },
+      {
+        text: "Outeniqua Pass — A dramatic mountain drive into the Garden Route forests",
+      },
+      {
+        text: "Knysna Heads & Lagoon — One of South Africa's most photographed coastal viewpoints",
+      },
+      {
+        text: "Knysna Waterfront — Restaurants, cafés, boutique shops, and lagoon cruises",
+      },
+      {
+        text: "Tsitsikamma National Park — Storms River Suspension Bridge and optional adventure activities",
+      },
+      {
+        text: "Hermanus Whale Coast — Seasonal whale watching from cliff paths (June–November)",
+      },
+      {
+        text: "Benguela Cove Wine Estate — Premium wine tasting with lagoon and mountain views",
+      },
+      {
+        text: "Betty's Bay Penguin Colony — African penguins at Stony Point Nature Reserve",
+      },
+      {
+        text: "Clarence Drive (R44) — One of the most scenic coastal roads in South Africa",
+      },
+    ],
+
+    included: [
+      { text: "Exclusive Gondwana Big 5 Safari" },
+      { text: "4 nights guest‑house accommodation" },
+      { text: "Breakfast daily" },
+      { text: "Private vehicle" },
+      { text: "Professional driver/guide" },
+      { text: "Driver accommodation" },
+      { text: "Cango Caves entrance" },
+      { text: "Tsitsikamma National Park entrance" },
+      { text: "Wine tasting at Benguela Cove" },
+      { text: "Bottled water" },
+    ],
+
+    excluded: [
+      { text: "Lunch and dinner" },
+      { text: "Optional adventure activities" },
+      { text: "Optional Ostrich Farm Experience" },
+      { text: "Personal purchases" },
+      { text: "Gratuities" },
+    ],
+
+    pickupOptions: [
+      "Cape Town CBD",
+      "Green Point",
+      "Sea Point",
+      "V&A Waterfront",
+      "Custom pickup on request",
+    ],
+
+    requirements: [],
+
+    arrangements: {
+      availability: "Available all year",
+      duration: "5 Days / 4 Nights",
+      operatingTime: "Flexible",
+      departure: "07:00 – 08:00",
+      return: "Day 5 evening",
+      location: "Cape Town → Garden Route → Cape Town",
+
+      clothing: [
+        "Comfortable clothing",
+        "Comfortable walking shoes",
+        "Warm jacket (evenings can be cool)",
+        "Sunscreen",
+        "Hat",
+        "Swimwear (optional)",
+      ],
+
+      thingsToBring: [
+        "Camera",
+        "Cash for personal purchases",
+        "Water bottle",
+        "Chargers for electronics",
+        "Binoculars (recommended for safari)",
+      ],
+
+      passengerPolicy: "",
+      notes: [
+        "Accommodation subject to availability",
+        "Optional adventure activities in Tsitsikamma available on request",
+        "Optional Ostrich Farm experience available on request",
+        "Whale watching in Hermanus is seasonal (June–November)",
+      ],
+    },
+
+    weatherPolicy: {
+      summary:
+        "The Garden Route experiences mild weather year‑round. However, weather can change quickly — bring layers and rain gear.",
+      items: [
+        { text: "Garden Route has mild weather year‑round" },
+        { text: "Weather can change quickly — bring layers and rain gear" },
+        { text: "Cango Caves are indoors and not weather dependent" },
+        { text: "Game drives may be adjusted in extreme weather" },
+        { text: "Tsitsikamma activities may be affected by weather" },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
+      items: [
+        {
+          text: "Cancellations must be made at least 24 hours before the trip starts",
+        },
+        {
+          text: "Refunds are forfeited for cancellations within 24 hours of departure",
+        },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "All game drives are conducted by experienced rangers at Gondwana Game Reserve. Guests must follow all safety instructions during wildlife encounters.",
+      items: [
+        { text: "Game drives conducted by experienced rangers" },
+        { text: "Follow all safety instructions during wildlife encounters" },
+        { text: "Keep vehicle windows closed near wildlife" },
+        { text: "Do not feed or approach wild animals" },
+        { text: "Cango Caves tours follow strict safety protocols" },
+        {
+          text: "Tsitsikamma activities have their own safety briefings and equipment",
+        },
+      ],
+    },
+
+    /*
+     * MULTI‑DAY ITINERARY
+     */
+    itinerary: {
+      intro: {
+        title: "The Ultimate Garden Route & Big 5 Safari",
+        description:
+          "This 5‑day journey combines the very best of the Garden Route with an exclusive Big 5 safari experience at Gondwana Game Reserve. Travellers enjoy a seamless blend of wildlife, mountain passes, forests, coastline, wine tasting, and charming towns — all guided privately and comfortably.",
+      },
+
+      route: {
+        title:
+          "Cape Town → Gondwana → Oudtshoorn → Knysna → Tsitsikamma → Hermanus → Cape Town",
+        description:
+          "A premium 5‑day journey combining a luxury Big 5 safari, mountain passes, forests, coastline, wine tasting, and hand‑selected guest‑house accommodation.",
+      },
+
+      days: [
+        {
+          day: 1,
+          title: "Cape Town → Gondwana Game Reserve (Exclusive Big 5 Safari)",
+          route: "Cape Town → Gondwana Game Reserve",
+          description:
+            "Your tour begins with a luxury safari at Gondwana Game Reserve, one of the Garden Route's premier Big 5 destinations. Expect sightings of lion, elephant, rhino, buffalo, giraffe, zebra, and more. Enjoy panoramic views, private suites, and exceptional hospitality at your luxury lodge stay.",
+
+          activities: [
+            {
+              title: "Hotel Pickup & Departure",
+              description:
+                "Your driver/guide collects you from your hotel in Cape Town.",
+              time: "07:00 – 08:00",
+              duration: "1 hour",
+              type: "transfer",
+              optional: false,
+              image: "/images/tours/shared/pickup/1.webp",
+            },
+            {
+              title: "Scenic Drive to Gondwana",
+              description:
+                "Travel along the N2 through scenic landscapes towards Gondwana Game Reserve.",
+              time: "08:00 – 11:30",
+              duration: "3.5 hours",
+              type: "transfer",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-garden-route/gamedrive2-1-1536x899.webp",
+            },
+            {
+              title: "Arrival & Check-in",
+              description:
+                "Check in to your luxury lodge at Gondwana Game Reserve with panoramic views.",
+              time: "11:30 – 12:30",
+              duration: "1 hour",
+              type: "accommodation",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-garden-route/kwenalodge1.webp",
+            },
+            {
+              title: "Lunch (Own Account)",
+              description: "Enjoy lunch at the lodge restaurant.",
+              time: "12:30 – 13:30",
+              duration: "1 hour",
+              type: "meal",
+              optional: true,
+              image: "images/tours/shared/lunch.webp",
+            },
+            {
+              title: "Afternoon Big 5 Safari",
+              description:
+                "Exclusive 3‑hour guided safari with sightings of lion, elephant, rhino, buffalo, giraffe, zebra and more.",
+              time: "14:00 – 17:00",
+              duration: "3 hours",
+              type: "safari",
+              optional: false,
+              // image: "/images/tours/packages/5-day-garden-route/960px-Big_five_gam.webp"
+              image: "/images/tours/packages/5-day-garden-route/image.webp",
+              // User:מנחם.אל
+              // Creative Commons Attribution 4.0
+              // Big five gam.jpg Copy
+              // [[File:Big five gam.jpg|Big_five_gam]]
+              // Copy
+              // 26 September 2016 (upload date)
+            },
+            {
+              title: "Dinner (Own Account)",
+              description:
+                "Enjoy dinner at the lodge restaurant with views over the reserve.",
+              time: "Evening",
+              duration: "",
+              type: "meal",
+              optional: true,
+              image: "images/tours/shared/dinner.webp",
+            },
+          ],
+
+          meals: {
+            breakfast: false,
+            lunch: false,
+            dinner: false,
+          },
+
+          accommodation: {
+            title: "Gondwana Game Reserve",
+            location: "Gondwana, Garden Route",
+            availabilityNote:
+              "Luxury lodge accommodation with panoramic views and private suites.",
+            options: ["Kwena Lodge", "Bush Villas"],
+          },
+
+          images: [],
+        },
+
+        {
+          day: 2,
+          title: "Gondwana → Oudtshoorn (Route 62 & Cango Caves)",
+          route: "Gondwana → Route 62 → Oudtshoorn → Cango Caves",
+          description:
+            "After breakfast, travel along the scenic Route 62 through mountain passes, orchards, and Karoo landscapes. Visit the world‑famous Cango Caves for a guided Heritage or Adventure Tour through ancient limestone chambers. Optional Ostrich Farm experience available. Overnight in Oudtshoorn.",
+
+          activities: [
+            {
+              title: "Breakfast",
+              description: "Enjoy breakfast at your Gondwana lodge.",
+              time: "07:00 – 08:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: false,
+              image: "images/tours/shared/breakfast2.webp",
+            },
+            {
+              title: "Route 62 Scenic Drive",
+              description:
+                "Travel through mountain passes, orchards, vineyards, and Karoo landscapes.",
+              time: "08:00 – 11:00",
+              duration: "3 hours",
+              type: "scenic",
+              optional: false,
+              image:
+                "/images/tours/packages/3-day-garden-route/960px-Montagu_street.webp",
+            },
+            {
+              title: "Lunch Stop (Own Account)",
+              description:
+                "Lunch stop in Oudtshoorn, the ostrich capital of South Africa.",
+              time: "11:30 – 12:30",
+              duration: "1 hour",
+              type: "meal",
+              optional: true,
+              image: "images/tours/shared/lunch2.webp",
+            },
+            {
+              title: "Cango Caves Guided Tour",
+              description:
+                "Choose between the Heritage Tour or Adventure Tour. Explore ancient limestone chambers and incredible formations.",
+              time: "13:00 – 15:00",
+              duration: "2 hours",
+              type: "adventure",
+              optional: false,
+              image:
+                "/images/tours/packages/3-day-garden-route/960px-Cango_Caves_-_Western_Cape.webp",
+            },
+            {
+              title: "Optional Ostrich Farm Experience",
+              description:
+                "Optional visit to an ostrich farm to learn about these fascinating birds.",
+              time: "15:00 – 16:00",
+              duration: "1 hour",
+              type: "wildlife",
+              optional: true,
+              image:
+                "/images/tours/packages/3-day-garden-route/960px-Oudtshoorn_Ostriches_-_Gar.webp",
+            },
+            {
+              title: "Arrival & Check-in",
+              description: "Check in to your accommodation in Oudtshoorn.",
+              time: "16:30",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-garden-route/check-in-buffel.webp",
+            },
+            {
+              title: "Dinner (Own Account)",
+              description:
+                "Explore local restaurants in Oudtshoorn for dinner.",
+              time: "Evening",
+              duration: "",
+              type: "meal",
+              optional: true,
+              image: "images/tours/shared/dinner2.webp",
+            },
+          ],
+
+          meals: {
+            breakfast: true,
+            lunch: false,
+            dinner: false,
+          },
+
+          accommodation: {
+            title: "Oudtshoorn Accommodation",
+            location: "Oudtshoorn, Klein Karoo",
+            availabilityNote:
+              "Accommodation subject to availability — please enquire for current options.",
+            options: ["Buffelsdrift Game Lodge", "De Zeekoe Guest Farm"],
+          },
+
+          images: [],
+        },
+
+        {
+          day: 3,
+          title: "Oudtshoorn → Knysna (Lagoon & Heads)",
+          route:
+            "Oudtshoorn → Outeniqua Pass → Knysna Heads → Knysna Waterfront",
+          description:
+            "After breakfast, travel through the dramatic Outeniqua Pass into the Garden Route forests. Visit the iconic Knysna Heads viewpoint overlooking the lagoon and Indian Ocean, then explore the Knysna Waterfront with its restaurants, cafés, boutique shops, and optional lagoon cruises. Overnight in Knysna.",
+
+          activities: [
+            {
+              title: "Breakfast",
+              description:
+                "Enjoy breakfast at your accommodation in Oudtshoorn.",
+              time: "07:00 – 08:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: false,
+              image: "images/tours/shared/breakfast2.webp",
+            },
+            {
+              title: "Outeniqua Pass Drive",
+              description:
+                "A dramatic mountain drive through the Outeniqua Pass into the Garden Route forests.",
+              time: "08:00 – 10:30",
+              duration: "2.5 hours",
+              type: "scenic",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-boltierskop/960px-Outeniqua_mountains_158882.webp",
+            },
+            {
+              title: "Knysna Heads Viewpoint",
+              description:
+                "One of South Africa's most photographed coastal viewpoints overlooking the lagoon and Indian Ocean.",
+              time: "10:30 – 11:30",
+              duration: "1 hour",
+              type: "scenic",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-boltierskop/960px-Knysna_Heads_view.webp",
+            },
+            {
+              title: "Lunch Stop (Own Account)",
+              description:
+                "Lunch at the Knysna Waterfront with views over the lagoon.",
+              time: "12:00 – 13:30",
+              duration: "1.5 hours",
+              type: "meal",
+              optional: true,
+              image: "images/tours/shared/lunch.webp",
+            },
+            {
+              title: "Knysna Waterfront Exploration",
+              description:
+                "Explore restaurants, cafés, boutique shops, optional lagoon cruises.",
+              time: "13:30 – 15:00",
+              duration: "1.5 hours",
+              type: "leisure",
+              optional: true,
+              image:
+                "/images/tours/packages/5-day-boltierskop/960px-KNYSNA_-_Waterfront_terrac.webp",
+            },
+            {
+              title: "Arrival & Check-in",
+              description: "Check in to your accommodation in Knysna.",
+              time: "15:30",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+              image:
+                "images/tours/packages/5-day-garden-route/check-in-paradise.webp",
+            },
+            {
+              title: "Dinner (Own Account)",
+              description:
+                "Enjoy dinner at one of Knysna's renowned seafood restaurants.",
+              time: "Evening",
+              duration: "",
+              type: "meal",
+              optional: true,
+              image: "images/tours/shared/dinner.webp",
+            },
+          ],
+
+          meals: {
+            breakfast: true,
+            lunch: false,
+            dinner: false,
+          },
+
+          accommodation: {
+            title: "Knysna Accommodation",
+            location: "Knysna, Garden Route",
+            availabilityNote:
+              "Accommodation subject to availability — please enquire for current options.",
+            options: ["Paradise Found Guest House", "Waterfront Lodge"],
+          },
+
+          images: [],
+        },
+
+        {
+          day: 4,
+          title: "Knysna → Tsitsikamma (Forests & Adventure)",
+          route: "Knysna → Tsitsikamma National Park → Storms River",
+          description:
+            "After breakfast, travel to Tsitsikamma National Park for a forest experience. Walk the famous Storms River Suspension Bridge and explore the dramatic coastline. Optional adventure activities include ziplining, kayak, Lilo, and forest hiking (own expense). Overnight in Tsitsikamma.",
+
+          activities: [
+            {
+              title: "Breakfast",
+              description: "Enjoy breakfast at your accommodation in Knysna.",
+              time: "07:00 – 08:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: false,
+              image: "images/tours/shared/breakfast2.webp",
+            },
+            {
+              title: "Scenic Drive to Tsitsikamma",
+              description:
+                "Travel along the Garden Route coast to Tsitsikamma National Park.",
+              time: "08:00 – 09:30",
+              duration: "1.5 hours",
+              type: "transfer",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-boltierskop/960px-Tsitsikamma_National_Park.webp",
+            },
+            {
+              title: "Storms River Suspension Bridge",
+              description:
+                "Walk the famous suspension bridge with views over the dramatic coastline and Storms River mouth.",
+              time: "09:30 – 11:30",
+              duration: "2 hours",
+              type: "adventure",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-boltierskop/960px-2014-11-30_Tsitsikamma_Nat.webp",
+            },
+            {
+              title: "Lunch Stop (Own Account)",
+              description: "Lunch at a local restaurant near Tsitsikamma.",
+              time: "12:00 – 13:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: true,
+              image: "images/tours/shared/lunch.webp",
+            },
+            {
+              title: "Optional Adventure Activities",
+              description:
+                "Choose from ziplining, kayak, Lilo, or forest hiking (own expense). Activities subject to availability and weather.",
+              time: "13:00 – 15:00",
+              duration: "2 hours",
+              type: "adventure",
+              optional: true,
+            },
+            {
+              title: "Arrival & Check-in",
+              description: "Check in to your accommodation in Tsitsikamma.",
+              time: "15:30",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+              image:
+                "/images/tours/packages/5-day-garden-route/tsitsikamma-village-inn-village.webp",
+            },
+            {
+              title: "Dinner (Own Account)",
+              description:
+                "Enjoy dinner at your accommodation or a local restaurant.",
+              time: "Evening",
+              duration: "",
+              type: "meal",
+              optional: true,
+              image: "images/tours/shared/dinner.webp",
+            },
+          ],
+
+          meals: {
+            breakfast: true,
+            lunch: false,
+            dinner: false,
+          },
+
+          accommodation: {
+            title: "Tsitsikamma Accommodation",
+            location: "Tsitsikamma, Garden Route",
+            availabilityNote:
+              "Accommodation subject to availability — please enquire for current options.",
+            options: ["Tsitsikamma Village Inn", "At the Woods Guest House"],
+          },
+
+          images: [],
+        },
+
+        {
+          day: 5,
+          title: "Tsitsikamma → Hermanus → Cape Town",
+          route:
+            "Tsitsikamma → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
+          description:
+            "After breakfast, travel along the coast to Hermanus — the heart of the Whale Coast. Explore the cliff paths with ocean views and seasonal whale watching. Continue to Benguela Cove Lagoon Wine Estate for premium wine tasting with stunning lagoon views. Visit Stony Point Penguin Colony at Betty's Bay before returning to Cape Town via the scenic Clarence Drive (R44).",
+
+          activities: [
+            {
+              title: "Breakfast",
+              description:
+                "Enjoy breakfast at your accommodation in Tsitsikamma.",
+              time: "07:00 – 08:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: false,
+              image: "images/tours/shared/breakfast2.webp",
+            },
+            {
+              title: "Hermanus Whale Coast",
+              description:
+                "Explore the cliff paths with ocean views, markets, and cafés. Seasonal whale watching (June–November).",
+              time: "10:00 – 12:00",
+              duration: "2 hours",
+              type: "scenic",
+              optional: false,
+              image: "/images/tours/packages/3-day-garden-route/Hermanus.webp",
+            },
+            {
+              title: "Lunch Stop (Own Account)",
+              description: "Lunch at a local restaurant in Hermanus.",
+              time: "12:00 – 13:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: true,
+              image: "images/tours/shared/lunch2.webp",
+            },
+            {
+              title: "Benguela Cove Wine Estate",
+              description:
+                "Premium wine tasting with lagoon and mountain views.",
+              time: "13:30 – 15:00",
+              duration: "1.5 hours",
+              type: "wine",
+              optional: false,
+              image:
+                "/images/tours/packages/3-day-garden-route/960px-Benguela_Cove_Lagoon_Wine.webp",
+            },
+            {
+              title: "Betty's Bay – Stony Point Penguin Colony",
+              description:
+                "Boardwalks and African penguins in a natural coastal habitat.",
+              time: "15:30 – 16:30",
+              duration: "1 hour",
+              type: "wildlife",
+              optional: false,
+              image:
+                "/images/tours/packages/3-day-garden-route/960px-BB_-_Bettys_Bay_seen_from.webp",
+            },
+            {
+              title: "Clarence Drive Return to Cape Town",
+              description:
+                "Return to Cape Town via the scenic Clarence Drive (R44) with spectacular coastal views.",
+              time: "16:30 – 19:00",
+              duration: "2.5 hours",
+              type: "transfer",
+              optional: false,
+              image: "images/tours/shared/return/1.webp",
+            },
+          ],
+
+          meals: {
+            breakfast: true,
+            lunch: false,
+            dinner: false,
+          },
+
+          accommodation: {
+            title: "",
+            location: "",
+            availabilityNote: "",
+            options: [],
+          },
+
+          images: [],
+        },
+      ],
+    },
+
+    stops: [],
+
+    // routeInformation: {
+    //   title: "5‑Day Garden Route & Gondwana Big 5 Safari Route",
+    //   description:
+    //     "A premium 5‑day journey combining a luxury Big 5 safari, mountain passes, forests, coastline, wine tasting, and hand‑selected guest‑house accommodation.",
+    //   items: [
+    //     "Cape Town → Gondwana Game Reserve",
+    //     "Exclusive Big 5 Safari (lion, elephant, rhino, buffalo, giraffe, zebra)",
+    //     "Route 62 – Mountain passes, orchards, vineyards, and Karoo landscapes",
+    //     "Cango Caves – Heritage or Adventure Tour",
+    //     "Outeniqua Pass – Dramatic mountain drive",
+    //     "Knysna Heads – Iconic lagoon and ocean viewpoint",
+    //     "Knysna Waterfront – Restaurants, cafés, boutique shops",
+    //     "Tsitsikamma National Park – Storms River Suspension Bridge",
+    //     "Hermanus Whale Coast – Seasonal whale watching",
+    //     "Benguela Cove – Lagoon‑side wine tasting",
+    //     "Betty's Bay – Stony Point Penguin Colony",
+    //     "Clarence Drive (R44) – Scenic return to Cape Town",
+    //   ],
+    // },
+
+    vehicle: null,
+
+    securityAndLiability: null,
+
+    accommodation: {
+      included: true,
+      type: "Luxury Lodge / Guest House",
+      description:
+        "Hand‑selected accommodation in Gondwana (luxury lodge), Oudtshoorn, Knysna, and Tsitsikamma. Breakfast included daily. Accommodation subject to availability.",
+    },
+
+    needToKnow: [
+      {
+        text: "Accommodation subject to availability — options listed are examples only",
+      },
+      {
+        text: "Child rates: 0–3 years free, 4–12 years at 60–75% of adult rate, 13–17 years at adult rate",
+      },
+      { text: "Cancellations must be made at least 24 hours before departure" },
+      {
+        text: "Gondwana is a Big 5 game reserve — sightings of lion, elephant, rhino, buffalo, and leopard are possible but not guaranteed",
+      },
+      {
+        text: "Cango Caves offers Heritage Tour (easy) or Adventure Tour (more strenuous)",
+      },
+      { text: "Whale watching in Hermanus is seasonal (June–November)" },
+      {
+        text: "Optional Tsitsikamma activities: ziplining, kayak, Lilo, forest hiking (own expense)",
+      },
+      { text: "Optional Ostrich Farm experience available on request" },
+      {
+        text: "Comfortable walking shoes recommended for Cango Caves, Tsitsikamma, and penguin viewing",
+      },
+      { text: "This is a private tour with a dedicated driver/guide" },
+    ],
+
+    faqs: [
+      {
+        question: "How long is the Garden Route tour?",
+        answer:
+          "This is a 5‑day, 4‑night tour from Cape Town, exploring the Garden Route with a Big 5 safari at Gondwana Game Reserve.",
+      },
+      {
+        question: "What is included in the tour price?",
+        answer:
+          "The tour includes exclusive Gondwana Big 5 Safari, 4 nights guest‑house accommodation, breakfast daily, private vehicle, professional driver/guide, Cango Caves entrance, Tsitsikamma National Park entrance, Benguela Cove wine tasting, and bottled water.",
+      },
+      {
+        question: "What is not included?",
+        answer:
+          "Lunch and dinner, optional adventure activities, optional Ostrich Farm experience, personal purchases, and gratuities are not included.",
+      },
+      {
+        question: "What is the cancellation policy?",
+        answer:
+          "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
+      },
+      {
+        question: "What is Gondwana Game Reserve?",
+        answer:
+          "Gondwana is a premier Big 5 game reserve in the Garden Route, offering guided safaris with sightings of lion, elephant, rhino, buffalo, leopard, giraffe, zebra, and more.",
+      },
+      {
+        question: "Can children join the tour?",
+        answer:
+          "Yes. Children 0–3 years are free, 4–12 years are charged at 60–75% of the adult rate, and teens 13–17 years pay the adult rate.",
+      },
+      {
+        question: "What activities are included?",
+        answer:
+          "The tour includes Gondwana Big 5 Safari, Cango Caves guided tour, Tsitsikamma National Park entrance, Knysna Heads viewpoint, Hermanus Whale Coast, Benguela Cove wine tasting, and Betty's Bay Penguin Colony.",
+      },
+      {
+        question: "What are the optional activities?",
+        answer:
+          "Optional activities include Tsitsikamma adventure activities (ziplining, kayak, Lilo, forest hiking) and an Ostrich Farm experience in Oudtshoorn. These are at own expense.",
+      },
+      {
+        question: "What should I bring?",
+        answer:
+          "Bring comfortable clothing, walking shoes, a warm jacket, sunscreen, a hat, swimwear (optional), a camera, and cash for personal purchases.",
+      },
+      {
+        question: "Is this a private tour?",
+        answer:
+          "Yes. This is a private tour with a dedicated driver/guide and private vehicle.",
+      },
+      {
+        question: "What is the best time of year for this tour?",
+        answer:
+          "The Garden Route has a mild climate year‑round. Whale watching in Hermanus is best from June to November.",
+      },
+    ],
+
+    tags: [
+      "Garden Route",
+      "Gondwana Game Reserve",
+      "Big 5 Safari",
+      "Safari",
+      "Multi-Day",
+      "5 Day Tour",
+      "Cango Caves",
+      "Knysna",
+      "Tsitsikamma",
+      "Hermanus",
+      "Wine Tasting",
+      "South Africa",
+      "Road Trip",
+      "Private Tour",
+      "Luxury Safari",
+      "Family Friendly",
+      "Wildlife",
+      "Adventure",
+    ],
+  },
 ];
 
 export const getAllTourGalleryImages = (tour) => {
@@ -4462,7 +11339,7 @@ export const getAllTourGalleryImages = (tour) => {
 
   if (Array.isArray(tour.destinationGalleries)) {
     destinationImages = tour.destinationGalleries.flatMap(
-      (destination) => destination.images || []
+      (destination) => destination.images || [],
     );
   } else if (
     tour.destinationGalleries &&
@@ -4476,9 +11353,7 @@ export const getAllTourGalleryImages = (tour) => {
     ...(tour.images || []),
     ...destinationImages,
     ...(tour.stops || [])
-      .filter(
-        (stop) => stop.id !== "pickup" && stop.id !== "return"
-      )
+      .filter((stop) => stop.id !== "pickup" && stop.id !== "return")
       .flatMap((stop) => stop.images || []),
   ]
     .filter(Boolean)

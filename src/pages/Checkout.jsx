@@ -249,7 +249,6 @@ const VehicleOptionCard = ({ vehicle }) => (
   </div>
 );
 
-
 const RevealButton = ({ active, title, detail, onClick }) => (
   <button
     type="button"
@@ -299,7 +298,6 @@ const RevealPanel = ({ open, children }) => {
     </div>
   );
 };
-
 
 const CheckoutForm = ({
   totalAmountLabel,
@@ -578,11 +576,6 @@ const Checkout = () => {
 
     if (Math.abs(deltaY) < 1) return;
 
-    /*
-      The Stripe iframe handles its own pointer/wheel behavior.
-      This handler mainly fixes the surrounding pinned payment card, which can
-      otherwise trap wheel scrolling when the cursor is over empty card space.
-    */
     event.preventDefault();
     event.stopPropagation();
 
@@ -1252,6 +1245,7 @@ const Checkout = () => {
           </div>
 
           <div ref={checkoutGridRef} className="grid overflow-visible gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.82fr)] lg:items-start lg:gap-6">
+            {/* LEFT COLUMN */}
             <section
               ref={leftRef}
               className="order-2 overflow-hidden rounded-[1.65rem] bg-white/92 shadow-[0_20px_60px_rgba(7,31,79,0.08)] lg:order-1 lg:rounded-[2rem]"
@@ -1677,6 +1671,7 @@ const Checkout = () => {
               </div>
             </section>
 
+            {/* RIGHT COLUMN – with new header */}
             <div ref={rightColumnRef} className="order-1 relative min-h-[1px] w-full self-start lg:order-2">
               <div ref={rightPinRef} className="relative h-fit w-full">
                 <aside
@@ -1684,57 +1679,72 @@ const Checkout = () => {
                   onWheel={handlePaymentPanelWheel}
                   className="h-fit max-h-[calc(100svh-1rem)] overflow-visible rounded-[1.5rem] bg-white/94 shadow-[0_20px_60px_rgba(7,31,79,0.08)] lg:rounded-[2rem]"
                 >
-              <div
-                onPointerDown={() => setPaymentCompact(true)}
-                onMouseEnter={() => setPaymentCompact(true)}
-                onFocusCapture={() => setPaymentCompact(true)}
-                className="space-y-3 overflow-visible p-3 pb-5 sm:p-4 sm:pb-6 md:p-5 md:pb-7"
-              >
-                <div className="flex items-center justify-between gap-3 px-1">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#071f4f]">
-                      Payment
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      Final details confirmed after purchase.
-                    </p>
+                  {/* --- NEW HEADER: Pickup + Main Participant --- */}
+                  <div className="border-b border-slate-100/90 bg-white/80 px-4 py-3 sm:px-5 sm:py-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#071f4f]/10">
+                          <svg className="h-4 w-4 text-[#071f4f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </span>
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Pickup</p>
+                          <p className="text-sm font-bold leading-none text-slate-900">{pickupTimeLabel}</p>
+                          <p className="text-xs text-slate-500">{bookingDetails.date || "Date TBC"}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#071f4f]/10">
+                          <svg className="h-4 w-4 text-[#071f4f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Main participant</p>
+                          <p className="truncate text-sm font-bold leading-none text-slate-900">{bookingDetails.fullName || "Not provided"}</p>
+                          <p className="truncate text-xs text-slate-500">{bookingDetails.email || "No email"}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  <span className="rounded-full bg-[#071f4f] px-3 py-1.5 text-xs font-bold text-white">
-                    Secure
-                  </span>
-                </div>
-                {clientSecret ? (
-                  <Elements
-                    stripe={stripePromise}
-                    options={options}
-                    key={clientSecret}
+                  {/* --- PAYMENT FORM (unchanged) --- */}
+                  <div
+                    onPointerDown={() => setPaymentCompact(true)}
+                    onMouseEnter={() => setPaymentCompact(true)}
+                    onFocusCapture={() => setPaymentCompact(true)}
+                    className="space-y-3 overflow-visible p-3 pb-5 sm:p-4 sm:pb-6 md:p-5 md:pb-7"
                   >
-                    <CheckoutForm
-                      totalAmountLabel={totalAmountLabel}
-                      currency={currency}
-                      tour={tour}
-                      bookingDetails={enrichedBookingDetails}
-                      notes={isCustom ? notes : ""}
-                      pricingSummary={pricingSummary}
-                      checkoutStops={checkoutStops}
-                    />
-                  </Elements>
-                ) : (
-                  <div className="rounded-[1.5rem] bg-[#eef4ff]/70 p-6 text-center text-[#071f4f]">
-                    <div className="mx-auto h-10 w-10 rounded-full border-4 border-[#071f4f]/10 border-t-[#071f4f] animate-spin" />
+                    <div className="flex items-center justify-between gap-3 px-1">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#071f4f]">Payment</p>
+                        <p className="text-xs text-slate-500">Final details confirmed after purchase.</p>
+                      </div>
+                      <span className="rounded-full bg-[#071f4f] px-3 py-1.5 text-xs font-bold text-white">Secure</span>
+                    </div>
 
-                    <p className="mt-4 font-bitter text-sm font-bold">
-                      Loading secure payment form...
-                    </p>
-
-                    <p className="mt-1 text-xs text-[#071f4f]/65">
-                      This usually takes a few seconds.
-                    </p>
+                    {clientSecret ? (
+                      <Elements stripe={stripePromise} options={options} key={clientSecret}>
+                        <CheckoutForm
+                          totalAmountLabel={totalAmountLabel}
+                          currency={currency}
+                          tour={tour}
+                          bookingDetails={enrichedBookingDetails}
+                          notes={isCustom ? notes : ""}
+                          pricingSummary={pricingSummary}
+                          checkoutStops={checkoutStops}
+                        />
+                      </Elements>
+                    ) : (
+                      <div className="rounded-[1.5rem] bg-[#eef4ff]/70 p-6 text-center text-[#071f4f]">
+                        <div className="mx-auto h-10 w-10 rounded-full border-4 border-[#071f4f]/10 border-t-[#071f4f] animate-spin" />
+                        <p className="mt-4 font-bitter text-sm font-bold">Loading secure payment form...</p>
+                        <p className="mt-1 text-xs text-[#071f4f]/65">This usually takes a few seconds.</p>
+                      </div>
+                    )}
                   </div>
-                )}
-
-              </div>
                 </aside>
               </div>
             </div>

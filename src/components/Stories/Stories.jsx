@@ -7,17 +7,29 @@ import Gallery from './GoalsGallery'
 import reviews from '../../data/reviews.js'
 import ContactPlatforms from '../ContactPlatforms.jsx'
 
+// Import image resolver
+import { resolveImage } from '../../utils/ImageLoader.js'
+
+// Import icons directly (assuming they are in src/assets/icons/)
+import quoteGreenIcon from '/public/icons/quote-green.png'
+import recentIcon from '/public/icons/recent.png'
+// Background pattern (if still used)
+import bgPattern from '/public/assets/content/clip-art/section1-bg.png'
+
 gsap.registerPlugin(ScrollTrigger)
 
 // ============================================================
 // 1. STORY MEDIA + REVIEW HELPERS
 // ============================================================
 
-const storyImages = [
+const storyImagesRaw = [
   '/images/tours/hiking/platteklip/1.webp',
   '/images/tours/hiking/platteklip/3.webp',
   '/images/tours/historical/robben-island/1.webp',
 ]
+
+// Resolve the story images once
+const storyImages = storyImagesRaw.map(resolveImage)
 
 const fallbackTestimonial = {
   text:
@@ -320,7 +332,7 @@ const Stories = () => {
             <div className="mx-auto mb-7 max-w-4xl text-center md:my-24">
               <img
                 ref={quoteRef}
-                src="/icons/quote-green.png"
+                src={quoteGreenIcon}
                 className="mx-auto h-12 w-12 object-contain sm:h-14 sm:w-14"
                 alt=""
                 aria-hidden="true"
@@ -338,7 +350,7 @@ const Stories = () => {
                   ref={recentBadgeRef}
                   className="inline-flex items-center gap-2 rounded-full border border-green-300/70 bg-green-200 px-4 py-2 font-bitter text-[10px] font-black uppercase tracking-[0.14em] text-green-950 shadow-[0_12px_26px_rgba(34,197,94,0.12)]"
                 >
-                  <img src="/icons/recent.png" alt="" className="h-4 w-4" />
+                  <img src={recentIcon} alt="" className="h-4 w-4" />
                   <span>Recent testimonial</span>
                 </div>
 
@@ -453,7 +465,7 @@ const Stories = () => {
       ============================================================ */}
       <section className="relative z-30 mx-auto w-full pt-8">
         <img
-          src="/assets/content/clip-art/section1-bg.png"
+          src={bgPattern}
           className="absolute inset-0 -z-10 h-full w-full object-cover opacity-100"
           alt=""
           aria-hidden="true"
@@ -469,27 +481,7 @@ const Stories = () => {
         </div>
 
         <ContactPlatforms className='w-5xl mx-auto ' />
-        {/* <div ref={leaveReviewRef} className="mx-auto flex max-w-5xl flex-col px-4 sm:px-6 lg:px-0">
-          <div className="z-10 my-10 grid w-full gap-5 rounded-[2rem] border border-black/5 bg-white p-6 font-bitter leading-none text-black shadow-[0_18px_45px_rgba(0,0,0,0.08)] sm:p-8 md:grid-cols-[0.25fr_0.75fr] md:items-center">
-            <div className="flex gap-4">
-              <img src="/icons/quote-green.png" className="h-10 sm:h-12" alt="" />
-              <img src="/icons/quote-green.png" className="h-10 opacity-60 sm:h-12" alt="" />
-            </div>
-
-            <div className="leading-snug">
-              <p className="font-frank text-4xl font-bold">Leave a review</p>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-black/55">
-                After your Cape Frontier experience, use your traveller code to
-                share feedback and help future guests choose with confidence.
-              </p>
-
-              <button className="hero-gradient mt-5 flex w-fit items-center gap-4 rounded-full px-6 py-3 text-white shadow-xl shadow-black/10">
-                <span className="font-frank text-xl">Proceed</span>
-                <img src="/icons/go.png" alt="" className="h-6 w-6" />
-              </button>
-            </div>
-          </div>
-        </div> */}
+        {/* Commented out leave review block – if you uncomment, update image sources similarly */}
       </section>
     </div>
   )
