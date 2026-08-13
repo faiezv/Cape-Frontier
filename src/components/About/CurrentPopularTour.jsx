@@ -4,7 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const promotedTour = "src/assets/images/tours/hiking/platteklip/1.webp"
+import imageOfTour from  "/src/assets/images/tours/hiking/platteklip/1.webp"
 
 const ClassicTourBanner = () => {
   const bannerRef = useRef(null)
@@ -125,7 +125,7 @@ const ClassicTourBanner = () => {
           >
             <img
               ref={imageRef}
-              src={promotedTour}
+              src={imageOfTour}
               className="h-full w-full object-cover"
               alt="Platteklip Gorge cable car view"
             />

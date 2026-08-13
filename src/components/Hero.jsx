@@ -3,14 +3,20 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import TourSelect from './Tours/TourSelect.jsx'
 
+import kaap from '/src/assets/images/content/hero/kaap.png'
+import cobra1 from '/src/assets/images/tours/adrenaline/cobra/1.webp'
+import simonsTown from '/src/assets/images/content/hero/1.webp'
+import cobra2 from '/src/assets/images/tours/adrenaline/cobra/2.webp'
+import landing from '/src/assets/images/content/hero/landing.webp'
+
 gsap.registerPlugin(ScrollTrigger)
 
 const slides = [
-  { image: '/src/assets/images/content/hero/kaap.png', location: 'Bo-Kaap, Cape Town' },
-  { image: '/src/assets/images/tours/adrenaline/cobra/1.webp', location: 'Cobra Sundowner, Cape Town' },
-  { image: '/src/assets/images/content/hero/1.webp', location: 'Simon\'s Town, Cape Town' },
-  { image: '/src/assets/images/tours/adrenaline/cobra/2.webp', location: 'Cobra Sundowner, Cape Town' },
-  { image: '/src/assets/images/content/hero/landing.webp', location: 'Cape Town' },
+  { image: kaap, location: 'Bo-Kaap, Cape Town' },
+  { image: cobra1, location: 'Cobra Sundowner, Cape Town' },
+  { image: simonsTown, location: 'Simon\'s Town, Cape Town' },
+  { image: cobra2, location: 'Cobra Sundowner, Cape Town' },
+  { image: landing, location: 'Cape Town' },
 ]
 
 const trustItems = [
