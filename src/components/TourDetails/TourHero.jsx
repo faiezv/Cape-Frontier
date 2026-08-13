@@ -1,10 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import TourVideoStrip from "./TourVideoStrip.jsx";
 import { resolveTourImage } from "/src/utils/ImageLoader.js";
 
 const TourHero = ({ tour }) => {
+  const navigate = useNavigate();
   if (!tour) return null;
 
   /*
@@ -122,8 +124,9 @@ const TourHero = ({ tour }) => {
         {/* ==================================================== */}
 
         <div className="absolute left-4 top-24 z-30 sm:left-6 sm:top-28 lg:left-8 lg:top-32">
-          <Link
-            to="/tours"
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
             className="
               group inline-flex items-center gap-2
               rounded-full
@@ -160,8 +163,8 @@ const TourHero = ({ tour }) => {
               />
             </svg>
 
-            Back to tours
-          </Link>
+            Back
+          </button>
         </div>
 
         {/* ==================================================== */}
