@@ -1458,7 +1458,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
                             className="group flex items-center gap-3 rounded-2xl border border-black/5 bg-neutral-50 p-2 text-left transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_12px_28px_rgba(0,0,0,0.07)]"
                           >
                             <img
-                              src={relatedImage}
+                              src={resolveImage(relatedImage)}
                               alt={related.title}
                               className="h-16 w-20 shrink-0 rounded-xl object-cover"
                               loading="lazy"
@@ -1526,7 +1526,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
               >
                 {/* BACKGROUND IMAGE */}
                 <img
-                  src={tour.image || fallbackImage}
+                  src={resolveImage(tour.image)}
                   alt=""
                   aria-hidden="true"
                   loading="lazy"
@@ -1541,7 +1541,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
                     group-hover/right:scale-[1.03]
                   "
                   onError={(e) => {
-                    e.currentTarget.src = fallbackImage;
+                    e.currentTarget.src = resolveImage(fallbackImage);
                   }}
                 />
 
