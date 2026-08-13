@@ -25,51 +25,51 @@ const tourImageAssets = import.meta.glob(
 /* ============================================================
    RESOLVE TOUR IMAGE
 ============================================================ */
-const resolveTourImage = (imagePath) => {
-  if (!imagePath || typeof imagePath !== "string") {
-    return null;
-  }
+// const resolveTourImage = (imagePath) => {
+//   if (!imagePath || typeof imagePath !== "string") {
+//     return null;
+//   }
 
-  // Remove leading slash and any "src/assets/images/" prefix
-  const normalized = imagePath
-    .replace(/^\/+/, "")
-    .replace(/^src\/assets\/images\//, "");
+//   // Remove leading slash and any "src/assets/images/" prefix
+//   const normalized = imagePath
+//     .replace(/^\/+/, "")
+//     .replace(/^src\/assets\/images\//, "");
 
-  let globPath;
+//   let globPath;
 
-  // Handle paths starting with "images/tours/" → map to "tours/"
-  if (normalized.startsWith("images/tours/")) {
-    const rest = normalized.replace("images/tours/", "");
-    globPath = `/src/assets/images/tours/${rest}`;
-  }
-  // Handle paths starting with "tours/images/" (original format)
-  else if (normalized.startsWith("tours/images/")) {
-    globPath = `/src/assets/images/${normalized.replace("tours/images/", "tours/")}`;
-  }
-  // Handle paths starting with "tours/"
-  else if (normalized.startsWith("tours/")) {
-    globPath = `/src/assets/images/${normalized}`;
-  }
-  // Fallback: assume it's already relative to tours/
-  else {
-    globPath = `/src/assets/images/tours/${normalized}`;
-  }
+//   // Handle paths starting with "images/tours/" → map to "tours/"
+//   if (normalized.startsWith("images/tours/")) {
+//     const rest = normalized.replace("images/tours/", "");
+//     globPath = `/src/assets/images/tours/${rest}`;
+//   }
+//   // Handle paths starting with "tours/images/" (original format)
+//   else if (normalized.startsWith("tours/images/")) {
+//     globPath = `/src/assets/images/${normalized.replace("tours/images/", "tours/")}`;
+//   }
+//   // Handle paths starting with "tours/"
+//   else if (normalized.startsWith("tours/")) {
+//     globPath = `/src/assets/images/${normalized}`;
+//   }
+//   // Fallback: assume it's already relative to tours/
+//   else {
+//     globPath = `/src/assets/images/tours/${normalized}`;
+//   }
 
-  // Try direct match
-  if (tourImageAssets[globPath]) {
-    return tourImageAssets[globPath];
-  }
+//   // Try direct match
+//   if (tourImageAssets[globPath]) {
+//     return tourImageAssets[globPath];
+//   }
 
-  // Fallback matching by suffix (case-insensitive)
-  const suffix = globPath.replace("/src/assets/", "");
-  const matchingKey = Object.keys(tourImageAssets).find((key) =>
-    key.replace("/src/assets/", "").toLowerCase() === suffix.toLowerCase()
-  );
+//   // Fallback matching by suffix (case-insensitive)
+//   const suffix = globPath.replace("/src/assets/", "");
+//   const matchingKey = Object.keys(tourImageAssets).find((key) =>
+//     key.replace("/src/assets/", "").toLowerCase() === suffix.toLowerCase()
+//   );
 
-  return matchingKey ? tourImageAssets[matchingKey] : null;
-};
+//   return matchingKey ? tourImageAssets[matchingKey] : null;
+// };
 
-// import {resolveTourImage} from "../../utils/ImageLoader"
+import {resolveTourImage} from "../../utils/ImageLoader"
 
 /* ============================================================
    ACTIVITY ICONS
@@ -1586,7 +1586,7 @@ function ActivityRow({
         {image && (
           <div className="hidden h-50 overflow-hidden  sm:block">
             <img
-              src={resolveTourImage(image) || ''}
+              src={resolveTourImage(image)}
               alt={
                 activity.title
               }

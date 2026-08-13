@@ -55,7 +55,6 @@ function normalisePath(path) {
 }
 
 export function resolveImage(path) {
-  if (!path) return fallbackImg;
 
   const key = normalisePath(path);
   if (imageMap[key]) return imageMap[key];
