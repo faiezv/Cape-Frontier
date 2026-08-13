@@ -1322,7 +1322,7 @@ function ExpandedDay({
               <div className="flex items-start gap-8">
                 <div className="flex h-50 w-50 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-1 ring-blue-100">
                   <img
-                    src={ resolveImage (accommodationImg)} // or your imported path
+                    src={accommodationImg} // or your imported path
                     alt="Accommodation"
                     className="h-full w-full object-cover"
                   />
@@ -1586,7 +1586,7 @@ function ActivityRow({
         {image && (
           <div className="hidden h-50 overflow-hidden  sm:block">
             <img
-              src={ resolveImage (image)}
+              src={image}
               alt={
                 activity.title
               }
