@@ -25,7 +25,7 @@ const tourImageAssets = import.meta.glob(
 /* ============================================================
    RESOLVE TOUR IMAGE
 ============================================================ */
-// const resolveTourImage = (imagePath) => {
+// const  resolveImage  = (imagePath) => {
 //   if (!imagePath || typeof imagePath !== "string") {
 //     return null;
 //   }
@@ -69,7 +69,7 @@ const tourImageAssets = import.meta.glob(
 //   return matchingKey ? tourImageAssets[matchingKey] : null;
 // };
 
-import {resolveTourImage} from "../../utils/ImageLoader"
+import { resolveImage } from "../../utils/ImageLoader"
 
 /* ============================================================
    ACTIVITY ICONS
@@ -281,7 +281,7 @@ const activityImages = {
 ============================================================ */
 const getActivityImage = (activity) => {
   if (activity?.image) {
-    const resolved = resolveTourImage(
+    const resolved =  resolveImage (
       activity.image
     );
 
@@ -1155,7 +1155,7 @@ function DayCard({
           {day.activities?.map((activity, index) => (
             <img
               key={activity.id ?? index}
-              src={resolveTourImage(activity.image)}  // try this
+              src={ resolveImage (activity.image)}  // try this
               alt={activity.name ?? "Activity"}
               className="h-12 w-12 flex-shrink-0 bg-red-400 object-cover"
             />
@@ -1322,7 +1322,7 @@ function ExpandedDay({
               <div className="flex items-start gap-8">
                 <div className="flex h-50 w-50 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-1 ring-blue-100">
                   <img
-                    src={accommodationImg} // or your imported path
+                    src={ resolveImage (accommodationImg)} // or your imported path
                     alt="Accommodation"
                     className="h-full w-full object-cover"
                   />
@@ -1586,7 +1586,7 @@ function ActivityRow({
         {image && (
           <div className="hidden h-50 overflow-hidden  sm:block">
             <img
-              src={resolveTourImage(image)}
+              src={ resolveImage (image)}
               alt={
                 activity.title
               }

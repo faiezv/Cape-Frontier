@@ -54,12 +54,35 @@ function normalisePath(path) {
   return key;
 }
 
+// export function resolveImage(path) {
+//   if (!path) return fallbackImg;
+
+//   const key = normalisePath(path);
+//   if (imageMap[key]) return imageMap[key];
+
+//   // Fallback: try to match by filename (last part) – useful if folder structure differs
+//   const parts = key.split('/');
+//   const filename = parts[parts.length - 1];
+
+//   for (const mapKey in imageMap) {
+//     if (mapKey.endsWith(filename)) {
+//       return imageMap[mapKey];
+//     }
+//   }
+
+//   return fallbackImg;
+// }
+
 export function resolveImage(path) {
+  if (!path) return null;
 
   const key = normalisePath(path);
-  if (imageMap[key]) return imageMap[key];
 
-  // Fallback: try to match by filename (last part) – useful if folder structure differs
+  if (imageMap[key]) {
+    return imageMap[key];
+  }
+
+  // Fallback: try to match by filename
   const parts = key.split('/');
   const filename = parts[parts.length - 1];
 
@@ -69,7 +92,10 @@ export function resolveImage(path) {
     }
   }
 
-  return fallbackImg;
+  console.warn('[resolveImage] Image not found:', path);
+
+  return null;
 }
+
 
 export const resolveTourImage = resolveImage;
