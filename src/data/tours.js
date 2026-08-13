@@ -189,7 +189,7 @@ export const tours = [
       "/src/assets/images/tours/adrenaline/shark-cage-diving/2.webp",
       "/src/assets/images/tours/adrenaline/shark-cage-diving/3.webp",
     ],
-    imageFolder: "adrenaline/shark-cage-diving-gansbaai",
+    imageFolder: "adrenaline/shark-cage-diving",
 
     videos: [],
 
@@ -511,7 +511,7 @@ export const tours = [
       "/src/assets/images/tours/adrenaline/gun-range/2.webp",
       "/src/assets/images/tours/adrenaline/gun-range/3.webp",
     ],
-    imageFolder: "adrenaline/shooting-experience",
+    imageFolder: "adrenaline/gun-range",
 
     videos: [],
 
@@ -849,7 +849,7 @@ export const tours = [
       "/src/assets/images/tours/adrenaline/paragliding/2.webp",
       "/src/assets/images/tours/adrenaline/paragliding/3.webp",
     ],
-    imageFolder: "adrenaline/paragliding-cape-town",
+    imageFolder: "adrenaline/paragliding",
 
     videos: [],
 
@@ -1201,7 +1201,7 @@ export const tours = [
       "/videos/tours/adrenaline/cobra/Vid 3.mp4",
       "/videos/tours/adrenaline/cobra/Vid 4.mp4",
       "/videos/tours/adrenaline/cobra/VID 5.mp4",
-      "/videos/tours/adrenaline/cobra/WhatsApp Video 2026-07-31 at 08.45.48.mp4",
+      "/videos/tours/adrenaline/cobra/7.mp4",
     ],
 
     location: "Foreshore, Cape Town, 8001",
