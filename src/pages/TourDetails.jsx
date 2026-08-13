@@ -1643,7 +1643,7 @@ function MobileItineraryCarousel({ stops }) {
             >
               {mainImage ? (
                 <img
-                  src={resolveImgae(mainImage)}
+                  src={resolveImage(mainImage)}
                   alt={`${stop.name} preview`}
                   loading="lazy"
                   decoding="async"
