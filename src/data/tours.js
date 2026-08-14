@@ -2706,1439 +2706,1439 @@ export const tours = [
     ],
   },
   // Gun-Range + City Tour
-  {
-    id: null, // New tour ID to be assigned (e.g., 26)
-    type: TOUR_TYPES.ADRENALINE,
-    category: TOUR_MODIFIERS.FULL_DAY,
+  // {
+  //   id: null, // New tour ID to be assigned (e.g., 26)
+  //   type: TOUR_TYPES.ADRENALINE,
+  //   category: TOUR_MODIFIERS.FULL_DAY,
 
-    title: "Gun Range + Cape Town City Tour",
-    slug: "gun-range-cape-town-city-tour",
-    canonicalPath: "/tours/gun-range-cape-town-city-tour",
+  //   title: "Gun Range + Cape Town City Tour",
+  //   slug: "gun-range-cape-town-city-tour",
+  //   canonicalPath: "/tours/gun-range-cape-town-city-tour",
 
-    seo: {
-      title: "Gun Range & Cape Town City Tour | Cape Frontier Tours",
-      description:
-        "Perfect for travellers who want action plus sightseeing. Start with a shooting experience, then explore Cape Town's most iconic viewpoints including Bo-Kaap, Signal Hill, Camps Bay, and the V&A Waterfront.",
-      keywords: [
-        "Gun Range Cape Town",
-        "Cape Town City Tour",
-        "Bo-Kaap Tour",
-        "Signal Hill Tour",
-        "Camps Bay Tour",
-        "V&A Waterfront Tour",
-        "Private Cape Town Tour",
-        "Cape Town Shooting Experience",
-        "Cape Town Adventure Tour",
-      ],
-    },
+  //   seo: {
+  //     title: "Gun Range & Cape Town City Tour | Cape Frontier Tours",
+  //     description:
+  //       "Perfect for travellers who want action plus sightseeing. Start with a shooting experience, then explore Cape Town's most iconic viewpoints including Bo-Kaap, Signal Hill, Camps Bay, and the V&A Waterfront.",
+  //     keywords: [
+  //       "Gun Range Cape Town",
+  //       "Cape Town City Tour",
+  //       "Bo-Kaap Tour",
+  //       "Signal Hill Tour",
+  //       "Camps Bay Tour",
+  //       "V&A Waterfront Tour",
+  //       "Private Cape Town Tour",
+  //       "Cape Town Shooting Experience",
+  //       "Cape Town Adventure Tour",
+  //     ],
+  //   },
 
-    workflow: defaultWorkflow,
+  //   workflow: defaultWorkflow,
 
-    image: "/src/assets/images/tours/adrenaline/gun-range-city-tour/1.webp",
-    images: [
-      "/src/assets/images/tours/adrenaline/gun-range-city-tour/1.webp",
-      "/src/assets/images/tours/adrenaline/gun-range-city-tour/2.webp",
-      "/src/assets/images/tours/adrenaline/gun-range-city-tour/3.webp",
-    ],
-    imageFolder: "adrenaline/gun-range-city-tour",
+  //   image: "/src/assets/images/tours/adrenaline/gun-range-city-tour/1.webp",
+  //   images: [
+  //     "/src/assets/images/tours/adrenaline/gun-range-city-tour/1.webp",
+  //     "/src/assets/images/tours/adrenaline/gun-range-city-tour/2.webp",
+  //     "/src/assets/images/tours/adrenaline/gun-range-city-tour/3.webp",
+  //   ],
+  //   imageFolder: "adrenaline/gun-range-city-tour",
 
-    videos: [],
+  //   videos: [],
 
-    location: "Cape Town, South Africa",
-    duration: "6 - 7 Hours",
+  //   location: "Cape Town, South Africa",
+  //   duration: "6 - 7 Hours",
 
-    priceBase: 7200,
-    minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
+  //   priceBase: 7200,
+  //   minPeople: 2,
+  //   baseCurrency: "ZAR",
+  //   supportedCurrencies: SUPPORTED_CURRENCIES,
 
-    pricing: [
-      {
-        category: "2–4 Guests",
-        pricePerPerson: null,
-        note: "R7,200 total (private vehicle)",
-      },
-      {
-        category: "5–7 Guests",
-        pricePerPerson: null,
-        note: "R10,000 total (private vehicle)",
-      },
-    ],
+  //   pricing: [
+  //     {
+  //       category: "2–4 Guests",
+  //       pricePerPerson: null,
+  //       note: "R7,200 total (private vehicle)",
+  //     },
+  //     {
+  //       category: "5–7 Guests",
+  //       pricePerPerson: null,
+  //       note: "R10,000 total (private vehicle)",
+  //     },
+  //   ],
 
-    additionalPricing: [],
+  //   additionalPricing: [],
 
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 2,
-          maxPeople: 4,
-          perPerson: null,
-          totalPrice: 7200,
-          label: "2–4 Guests",
-          note: "Private vehicle",
-        },
-        {
-          minPeople: 5,
-          maxPeople: 7,
-          perPerson: null,
-          totalPrice: 10000,
-          label: "5–7 Guests",
-          note: "Private vehicle",
-        },
-      ],
-    },
+  //   groupPricing: {
+  //     enabled: true,
+  //     icon: "/icons/savemore.png",
+  //     tiers: [
+  //       {
+  //         minPeople: 2,
+  //         maxPeople: 4,
+  //         perPerson: null,
+  //         totalPrice: 7200,
+  //         label: "2–4 Guests",
+  //         note: "Private vehicle",
+  //       },
+  //       {
+  //         minPeople: 5,
+  //         maxPeople: 7,
+  //         perPerson: null,
+  //         totalPrice: 10000,
+  //         label: "5–7 Guests",
+  //         note: "Private vehicle",
+  //       },
+  //     ],
+  //   },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
+  //   rating: null,
+  //   stars: null,
+  //   mainReviewerName: "",
+  //   mainReviewerCountry: "",
+  //   reviewYear: null,
+  //   otherReviews: null,
+  //   mainReview: "",
 
-    description:
-      "Perfect for travellers who want action plus sightseeing. Start with a shooting experience, then explore Cape Town's most iconic viewpoints.",
+  //   description:
+  //     "Perfect for travellers who want action plus sightseeing. Start with a shooting experience, then explore Cape Town's most iconic viewpoints.",
 
-    highlights: [
-      { text: "Professionally supervised shooting range session" },
-      { text: "Explore colourful Bo-Kaap" },
-      { text: "Panoramic views from Signal Hill" },
-      { text: "Relax at beautiful Camps Bay" },
-      { text: "Visit the vibrant V&A Waterfront" },
-      { text: "Private vehicle with driver-guide" },
-      { text: "Flexible itinerary" },
-    ],
+  //   highlights: [
+  //     { text: "Professionally supervised shooting range session" },
+  //     { text: "Explore colourful Bo-Kaap" },
+  //     { text: "Panoramic views from Signal Hill" },
+  //     { text: "Relax at beautiful Camps Bay" },
+  //     { text: "Visit the vibrant V&A Waterfront" },
+  //     { text: "Private vehicle with driver-guide" },
+  //     { text: "Flexible itinerary" },
+  //   ],
 
-    included: [
-      { text: "Private transport" },
-      { text: "Shooting range session" },
-      { text: "Driver-guide" },
-      { text: "Bottled water" },
-      { text: "Full safety briefing" },
-      { text: "Professional firearms instructor" },
-    ],
+  //   included: [
+  //     { text: "Private transport" },
+  //     { text: "Shooting range session" },
+  //     { text: "Driver-guide" },
+  //     { text: "Bottled water" },
+  //     { text: "Full safety briefing" },
+  //     { text: "Professional firearms instructor" },
+  //   ],
 
-    excluded: [
-      { text: "Meals" },
-      { text: "Optional museum entries" },
-      { text: "Personal purchases" },
-    ],
+  //   excluded: [
+  //     { text: "Meals" },
+  //     { text: "Optional museum entries" },
+  //     { text: "Personal purchases" },
+  //   ],
 
-    pickupOptions: [
-      "Cape Town CBD",
-      "Sea Point",
-      "Camps Bay",
-      "V&A Waterfront",
-      "Custom pickup on request",
-    ],
+  //   pickupOptions: [
+  //     "Cape Town CBD",
+  //     "Sea Point",
+  //     "Camps Bay",
+  //     "V&A Waterfront",
+  //     "Custom pickup on request",
+  //   ],
 
-    requirements: [
-      { text: "Minimum age: 18 years" },
-      { text: "Valid ID or passport required" },
-      { text: "No alcohol before shooting" },
-      { text: "All minors strictly prohibited from handling firearms" },
-    ],
+  //   requirements: [
+  //     { text: "Minimum age: 18 years" },
+  //     { text: "Valid ID or passport required" },
+  //     { text: "No alcohol before shooting" },
+  //     { text: "All minors strictly prohibited from handling firearms" },
+  //   ],
 
-    arrangements: {
-      availability: "Available all year",
-      duration: "6 - 7 hours",
-      operatingTime: "Flexible",
-      departure: "Flexible",
-      return: "Flexible",
-      location: "Cape Town, South Africa",
+  //   arrangements: {
+  //     availability: "Available all year",
+  //     duration: "6 - 7 hours",
+  //     operatingTime: "Flexible",
+  //     departure: "Flexible",
+  //     return: "Flexible",
+  //     location: "Cape Town, South Africa",
 
-      clothing: ["Comfortable clothing", "Closed shoes"],
+  //     clothing: ["Comfortable clothing", "Closed shoes"],
 
-      thingsToBring: ["Valid ID or passport", "Camera", "Sunscreen"],
+  //     thingsToBring: ["Valid ID or passport", "Camera", "Sunscreen"],
 
-      passengerPolicy: "",
-      sunsetNote: "",
-    },
+  //     passengerPolicy: "",
+  //     sunsetNote: "",
+  //   },
 
-    weatherPolicy: {
-      summary:
-        "All weather conditions – outdoor activities operate in safe conditions only.",
-      items: [
-        { text: "Shooting range operates in safe weather conditions" },
-        { text: "City tour continues in all weather conditions" },
-        { text: "Final timing confirmed after booking" },
-      ],
-    },
+  //   weatherPolicy: {
+  //     summary:
+  //       "All weather conditions – outdoor activities operate in safe conditions only.",
+  //     items: [
+  //       { text: "Shooting range operates in safe weather conditions" },
+  //       { text: "City tour continues in all weather conditions" },
+  //       { text: "Final timing confirmed after booking" },
+  //     ],
+  //   },
 
-    cancellationPolicy: {
-      summary:
-        "Tour itinerary may vary depending on weather and attraction operating hours.",
-      items: [
-        { text: "Private tour bookings require advance confirmation" },
-        { text: "Final cancellation policy is confirmed upon booking" },
-        { text: "Weather may affect outdoor activities" },
-      ],
-    },
+  //   cancellationPolicy: {
+  //     summary:
+  //       "Tour itinerary may vary depending on weather and attraction operating hours.",
+  //     items: [
+  //       { text: "Private tour bookings require advance confirmation" },
+  //       { text: "Final cancellation policy is confirmed upon booking" },
+  //       { text: "Weather may affect outdoor activities" },
+  //     ],
+  //   },
 
-    safetyPolicy: {
-      summary:
-        "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience.",
-      items: [
-        { text: "All safety regulations must be followed at all times" },
-        {
-          text: "Professional instructors supervise the entire shooting session",
-        },
-        {
-          text: "Participants must comply with legal requirements for firearms training",
-        },
-        { text: "Age restrictions and eligibility criteria apply" },
-      ],
-    },
+  //   safetyPolicy: {
+  //     summary:
+  //       "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience.",
+  //     items: [
+  //       { text: "All safety regulations must be followed at all times" },
+  //       {
+  //         text: "Professional instructors supervise the entire shooting session",
+  //       },
+  //       {
+  //         text: "Participants must comply with legal requirements for firearms training",
+  //       },
+  //       { text: "Age restrictions and eligibility criteria apply" },
+  //     ],
+  //   },
 
-    stops: [
-      {
-        id: "gun-range",
-        name: "Gun Range",
-        time: "Flexible",
-        duration: "1.5 - 2 hours",
-        note: "Professional supervised shooting experience",
-        description:
-          "Begin your day with an exciting shooting session led by experienced instructors. Suitable for beginners and experienced shooters alike.",
-        exactLocation: mapLocation({
-          label: "Gun Range",
-          address: "Cape Town, South Africa",
-          query: "Cape Town Gun Range",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "bo-kaap",
-        name: "Bo-Kaap",
-        time: "Flexible",
-        duration: "45 minutes",
-        note: "Historic Cape Malay neighbourhood",
-        description:
-          "Explore Cape Town's colourful Bo-Kaap with its cobbled streets, vibrant houses, and rich cultural heritage.",
-        exactLocation: mapLocation({
-          label: "Bo-Kaap",
-          address: "Bo-Kaap, Cape Town, South Africa",
-          query: "Bo-Kaap Cape Town",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "signal-hill",
-        name: "Signal Hill",
-        time: "Flexible",
-        duration: "30 minutes",
-        note: "Panoramic city viewpoint",
-        description:
-          "Take in sweeping views of Cape Town, Table Mountain, the Atlantic coastline, and Robben Island.",
-        exactLocation: mapLocation({
-          label: "Signal Hill",
-          address: "Signal Hill, Cape Town, South Africa",
-          query: "Signal Hill Cape Town",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "camps-bay",
-        name: "Camps Bay",
-        time: "Flexible",
-        duration: "1 hour",
-        note: "Scenic beachfront",
-        description:
-          "Enjoy one of Cape Town's most famous beaches, lined with palm trees, cafés, and spectacular ocean views.",
-        exactLocation: mapLocation({
-          label: "Camps Bay",
-          address: "Camps Bay, Cape Town, South Africa",
-          query: "Camps Bay Beach",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "waterfront",
-        name: "V&A Waterfront",
-        time: "Flexible",
-        duration: "1.5 hours",
-        note: "Shopping, dining and harbour",
-        description:
-          "Finish your tour exploring the lively V&A Waterfront, one of South Africa's most popular attractions for shopping, dining, and harbour views.",
-        exactLocation: mapLocation({
-          label: "V&A Waterfront",
-          address: "V&A Waterfront, Cape Town, South Africa",
-          query: "V&A Waterfront Cape Town",
-        }),
-        images: [],
-        touristComments: [],
-      },
-    ],
+  //   stops: [
+  //     {
+  //       id: "gun-range",
+  //       name: "Gun Range",
+  //       time: "Flexible",
+  //       duration: "1.5 - 2 hours",
+  //       note: "Professional supervised shooting experience",
+  //       description:
+  //         "Begin your day with an exciting shooting session led by experienced instructors. Suitable for beginners and experienced shooters alike.",
+  //       exactLocation: mapLocation({
+  //         label: "Gun Range",
+  //         address: "Cape Town, South Africa",
+  //         query: "Cape Town Gun Range",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "bo-kaap",
+  //       name: "Bo-Kaap",
+  //       time: "Flexible",
+  //       duration: "45 minutes",
+  //       note: "Historic Cape Malay neighbourhood",
+  //       description:
+  //         "Explore Cape Town's colourful Bo-Kaap with its cobbled streets, vibrant houses, and rich cultural heritage.",
+  //       exactLocation: mapLocation({
+  //         label: "Bo-Kaap",
+  //         address: "Bo-Kaap, Cape Town, South Africa",
+  //         query: "Bo-Kaap Cape Town",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "signal-hill",
+  //       name: "Signal Hill",
+  //       time: "Flexible",
+  //       duration: "30 minutes",
+  //       note: "Panoramic city viewpoint",
+  //       description:
+  //         "Take in sweeping views of Cape Town, Table Mountain, the Atlantic coastline, and Robben Island.",
+  //       exactLocation: mapLocation({
+  //         label: "Signal Hill",
+  //         address: "Signal Hill, Cape Town, South Africa",
+  //         query: "Signal Hill Cape Town",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "camps-bay",
+  //       name: "Camps Bay",
+  //       time: "Flexible",
+  //       duration: "1 hour",
+  //       note: "Scenic beachfront",
+  //       description:
+  //         "Enjoy one of Cape Town's most famous beaches, lined with palm trees, cafés, and spectacular ocean views.",
+  //       exactLocation: mapLocation({
+  //         label: "Camps Bay",
+  //         address: "Camps Bay, Cape Town, South Africa",
+  //         query: "Camps Bay Beach",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "waterfront",
+  //       name: "V&A Waterfront",
+  //       time: "Flexible",
+  //       duration: "1.5 hours",
+  //       note: "Shopping, dining and harbour",
+  //       description:
+  //         "Finish your tour exploring the lively V&A Waterfront, one of South Africa's most popular attractions for shopping, dining, and harbour views.",
+  //       exactLocation: mapLocation({
+  //         label: "V&A Waterfront",
+  //         address: "V&A Waterfront, Cape Town, South Africa",
+  //         query: "V&A Waterfront Cape Town",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //   ],
 
-    routeInformation: {
-      title: "Cape Town City Tour Route",
+  //   routeInformation: {
+  //     title: "Cape Town City Tour Route",
 
-      description:
-        "Explore Cape Town's most iconic viewpoints and cultural landmarks on this private full-day tour.",
+  //     description:
+  //       "Explore Cape Town's most iconic viewpoints and cultural landmarks on this private full-day tour.",
 
-      items: [
-        "Professional supervised shooting range session",
-        "Colourful Bo-Kaap neighbourhood",
-        "Panoramic Signal Hill views",
-        "Scenic Camps Bay beachfront",
-        "Vibrant V&A Waterfront",
-      ],
-    },
+  //     items: [
+  //       "Professional supervised shooting range session",
+  //       "Colourful Bo-Kaap neighbourhood",
+  //       "Panoramic Signal Hill views",
+  //       "Scenic Camps Bay beachfront",
+  //       "Vibrant V&A Waterfront",
+  //     ],
+  //   },
 
-    vehicle: {
-      name: "",
-      class: "",
-      doors: null,
-      seats: null,
-      fuel: "",
-      gearbox: "",
-      engine: "",
-      specifications: [],
-    },
+  //   vehicle: {
+  //     name: "",
+  //     class: "",
+  //     doors: null,
+  //     seats: null,
+  //     fuel: "",
+  //     gearbox: "",
+  //     engine: "",
+  //     specifications: [],
+  //   },
 
-    securityAndLiability: {
-      heading: "",
-      cardPreAuthorisation: {
-        amount: null,
-        currency: "",
-        description: "",
-        release: "",
-      },
-      cashDeposit: {
-        amountZAR: null,
-        alternativeAmountUSD: null,
-        paymentMethod: "",
-        paidAt: "",
-        refundPolicy: "",
-      },
-    },
+  //   securityAndLiability: {
+  //     heading: "",
+  //     cardPreAuthorisation: {
+  //       amount: null,
+  //       currency: "",
+  //       description: "",
+  //       release: "",
+  //     },
+  //     cashDeposit: {
+  //       amountZAR: null,
+  //       alternativeAmountUSD: null,
+  //       paymentMethod: "",
+  //       paidAt: "",
+  //       refundPolicy: "",
+  //     },
+  //   },
 
-    needToKnow: [
-      { text: "Participants must follow all firearm safety instructions" },
-      { text: "Valid identification may be required at the shooting range" },
-      { text: "Comfortable walking shoes are recommended" },
-      { text: "Museum visits are optional and paid separately" },
-      { text: "Minimum age: 18 years for shooting activity" },
-      { text: "No alcohol before shooting" },
-    ],
+  //   needToKnow: [
+  //     { text: "Participants must follow all firearm safety instructions" },
+  //     { text: "Valid identification may be required at the shooting range" },
+  //     { text: "Comfortable walking shoes are recommended" },
+  //     { text: "Museum visits are optional and paid separately" },
+  //     { text: "Minimum age: 18 years for shooting activity" },
+  //     { text: "No alcohol before shooting" },
+  //   ],
 
-    faqs: [
-      {
-        question: "Is the shooting experience suitable for beginners?",
-        answer:
-          "Yes. Professional instructors provide a full safety briefing and supervise the entire session.",
-      },
-      {
-        question: "Is this a private tour?",
-        answer:
-          "Yes. The tour includes a private vehicle with your own driver-guide and a flexible itinerary.",
-      },
-      {
-        question: "Are meals included?",
-        answer:
-          "No. Meals are excluded, allowing guests to choose where they'd like to eat.",
-      },
-      {
-        question: "Are museum entries included?",
-        answer:
-          "Optional museum entrance fees are excluded unless otherwise arranged.",
-      },
-      {
-        question: "How many guests can join?",
-        answer:
-          "The tour can accommodate 2–7 guests in a private vehicle. Pricing is tiered: R7,200 for 2–4 guests and R10,000 for 5–7 guests.",
-      },
-      {
-        question: "What should I bring?",
-        answer:
-          "Bring your valid ID or passport. Comfortable clothing, closed shoes, a camera, and sunscreen are recommended.",
-      },
-    ],
+  //   faqs: [
+  //     {
+  //       question: "Is the shooting experience suitable for beginners?",
+  //       answer:
+  //         "Yes. Professional instructors provide a full safety briefing and supervise the entire session.",
+  //     },
+  //     {
+  //       question: "Is this a private tour?",
+  //       answer:
+  //         "Yes. The tour includes a private vehicle with your own driver-guide and a flexible itinerary.",
+  //     },
+  //     {
+  //       question: "Are meals included?",
+  //       answer:
+  //         "No. Meals are excluded, allowing guests to choose where they'd like to eat.",
+  //     },
+  //     {
+  //       question: "Are museum entries included?",
+  //       answer:
+  //         "Optional museum entrance fees are excluded unless otherwise arranged.",
+  //     },
+  //     {
+  //       question: "How many guests can join?",
+  //       answer:
+  //         "The tour can accommodate 2–7 guests in a private vehicle. Pricing is tiered: R7,200 for 2–4 guests and R10,000 for 5–7 guests.",
+  //     },
+  //     {
+  //       question: "What should I bring?",
+  //       answer:
+  //         "Bring your valid ID or passport. Comfortable clothing, closed shoes, a camera, and sunscreen are recommended.",
+  //     },
+  //   ],
 
-    tags: [
-      "Gun Range",
-      "Cape Town",
-      "City Tour",
-      "Bo-Kaap",
-      "Signal Hill",
-      "Camps Bay",
-      "V&A Waterfront",
-      "Private Tour",
-      "Adventure",
-      "Full Day",
-    ],
-  },
+  //   tags: [
+  //     "Gun Range",
+  //     "Cape Town",
+  //     "City Tour",
+  //     "Bo-Kaap",
+  //     "Signal Hill",
+  //     "Camps Bay",
+  //     "V&A Waterfront",
+  //     "Private Tour",
+  //     "Adventure",
+  //     "Full Day",
+  //   ],
+  // },
 
   // FULL_DAY
   // Gun-Range + Wine-Tasting
-  {
-    id: null, // New tour ID to be assigned (e.g., 27)
-    type: TOUR_TYPES.ADRENALINE,
-    category: TOUR_MODIFIERS.FULL_DAY,
-
-    title: "Gun Range + Wine Tasting (Constantia/Stellenbosch)",
-    slug: "gun-range-wine-tasting",
-    canonicalPath: "/tours/gun-range-wine-tasting",
-
-    seo: {
-      title: "Gun Range & Wine Tasting Tour in Cape Town | Cape Frontier Tours",
-      description:
-        "Enjoy a premium adult-only experience combining a professionally supervised shooting session with wine tasting at two top estates in Constantia or Stellenbosch. Optional cheese pairing available.",
-      keywords: [
-        "Gun Range Cape Town",
-        "Wine Tasting Tour",
-        "Constantia Wine Tour",
-        "Stellenbosch Wine Tour",
-        "Cape Town Wine Experience",
-        "Private Wine Tour",
-        "Cape Town Shooting Experience",
-        "Adult Experience Cape Town",
-      ],
-    },
-
-    workflow: defaultWorkflow,
-
-    image: "/src/assets/images/tours/adrenaline/gun-range-wine-tasting/1.webp",
-    images: [
-      "/src/assets/images/tours/adrenaline/gun-range-wine-tasting/1.webp",
-      "/src/assets/images/tours/adrenaline/gun-range-wine-tasting/2.webp",
-      "/src/assets/images/tours/adrenaline/gun-range-wine-tasting/3.webp",
-    ],
-    imageFolder: "adrenaline/gun-range-wine-tasting",
-
-    videos: [],
-
-    location: "Cape Town, South Africa (Constantia or Stellenbosch)",
-    duration: "7 - 8 Hours",
-
-    priceBase: 7680,
-    minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
-
-    pricing: [
-      {
-        category: "2–4 Guests",
-        pricePerPerson: null,
-        note: "R7,680 total (private vehicle)",
-      },
-      {
-        category: "5–7 Guests",
-        pricePerPerson: null,
-        note: "R10,600 total (private vehicle)",
-      },
-    ],
-
-    additionalPricing: [
-      {
-        category: "Wine Tasting Fees",
-        price: null,
-        unit: "per estate",
-        currency: "ZAR",
-        note: "Optional add-on. Prices vary by estate.",
-      },
-      {
-        category: "Cheese Pairing",
-        price: null,
-        unit: "per person",
-        currency: "ZAR",
-        note: "Optional add-on. Available on request.",
-      },
-    ],
-
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 2,
-          maxPeople: 4,
-          perPerson: null,
-          totalPrice: 7680,
-          label: "2–4 Guests",
-          note: "Private vehicle",
-        },
-        {
-          minPeople: 5,
-          maxPeople: 7,
-          perPerson: null,
-          totalPrice: 10600,
-          label: "5–7 Guests",
-          note: "Private vehicle",
-        },
-      ],
-    },
-
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
-
-    description:
-      "A premium adult‑only experience combining a professionally supervised shooting session with wine tasting at two top estates in Constantia or Stellenbosch.",
-
-    highlights: [
-      { text: "Professionally supervised shooting range session" },
-      { text: "Visit 2 premium wine estates in Constantia or Stellenbosch" },
-      { text: "Optional cheese pairing available" },
-      { text: "Choice of Constantia or Stellenbosch wine route" },
-      { text: "Private transport with driver-guide" },
-      { text: "Flexible itinerary" },
-      { text: "Perfect for adult groups and special occasions" },
-    ],
-
-    included: [
-      { text: "Private transport" },
-      { text: "Shooting range session" },
-      { text: "Professional firearms instructor" },
-      { text: "Full safety briefing" },
-      { text: "Visit to 2 wine estates" },
-      { text: "Bottled water" },
-    ],
-
-    excluded: [
-      { text: "Lunch" },
-      { text: "Wine tasting fees (optional add-on)" },
-      { text: "Cheese pairings (optional add-on)" },
-      { text: "Personal purchases" },
-    ],
-
-    pickupOptions: [
-      "Cape Town CBD",
-      "Sea Point",
-      "Camps Bay",
-      "V&A Waterfront",
-      "Custom pickup on request",
-    ],
-
-    requirements: [
-      { text: "Minimum age: 18 years" },
-      { text: "Valid ID or passport required" },
-      { text: "No alcohol before shooting" },
-      { text: "All minors strictly prohibited from handling firearms" },
-      { text: "Guests must be of legal drinking age for wine tasting" },
-    ],
-
-    arrangements: {
-      availability: "Available all year",
-      duration: "7 - 8 hours",
-      operatingTime: "Flexible",
-      departure: "Flexible",
-      return: "Flexible",
-      location: "Cape Town, South Africa (Constantia or Stellenbosch)",
-
-      clothing: ["Comfortable clothing", "Closed shoes"],
-
-      thingsToBring: ["Valid ID or passport", "Camera", "Sunscreen"],
-
-      passengerPolicy: "",
-      sunsetNote: "",
-    },
-
-    weatherPolicy: {
-      summary:
-        "All weather conditions – shooting range operates in safe conditions only. Wine tasting continues regardless of weather.",
-      items: [
-        { text: "Shooting range operates in safe weather conditions" },
-        { text: "Wine tasting continues in all weather conditions" },
-        { text: "Final timing confirmed after booking" },
-      ],
-    },
-
-    cancellationPolicy: {
-      summary:
-        "Private tour bookings require advance confirmation. Wine estate availability may affect the final itinerary.",
-      items: [
-        { text: "Private tour bookings require advance confirmation" },
-        { text: "Estate availability may affect the final itinerary" },
-        { text: "Final cancellation policy is confirmed upon booking" },
-        { text: "Weather may affect shooting range activities" },
-      ],
-    },
-
-    safetyPolicy: {
-      summary:
-        "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience.",
-      items: [
-        { text: "All safety regulations must be followed at all times" },
-        {
-          text: "Professional instructors supervise the entire shooting session",
-        },
-        {
-          text: "Participants must comply with legal requirements for firearms training",
-        },
-        { text: "Age restrictions and eligibility criteria apply" },
-      ],
-    },
-
-    stops: [
-      {
-        id: "gun-range",
-        name: "Gun Range",
-        time: "Flexible",
-        duration: "1.5 - 2 hours",
-        note: "Professional supervised shooting experience",
-        description:
-          "Begin your day with a professionally supervised shooting session, including a complete firearm safety briefing suitable for beginners and experienced shooters.",
-        exactLocation: mapLocation({
-          label: "Gun Range",
-          address: "Cape Town, South Africa",
-          query: "Cape Town Gun Range",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "wine-estate-1",
-        name: "Wine Estate 1",
-        time: "Flexible",
-        duration: "1.5 hours",
-        note: "Premium estate visit",
-        description:
-          "Visit one of the Cape's renowned wine estates in Constantia or Stellenbosch for optional wine tastings and spectacular vineyard scenery.",
-        exactLocation: mapLocation({
-          label: "Wine Estate",
-          address: "Constantia or Stellenbosch, South Africa",
-          query: "Constantia Wine Estates",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "wine-estate-2",
-        name: "Wine Estate 2",
-        time: "Flexible",
-        duration: "1.5 hours",
-        note: "Optional cheese pairing",
-        description:
-          "Continue to a second premium estate to relax with additional wine tastings or optional cheese pairings while enjoying the Cape Winelands.",
-        exactLocation: mapLocation({
-          label: "Wine Estate",
-          address: "Constantia or Stellenbosch, South Africa",
-          query: "Stellenbosch Wine Estates",
-        }),
-        images: [],
-        touristComments: [],
-      },
-    ],
-
-    routeInformation: {
-      title: "Gun Range + Wine Tasting Route",
-
-      description:
-        "Choose between Constantia or Stellenbosch for your wine tasting experience after your shooting session. Both routes offer world-class wine estates and stunning scenery.",
-
-      items: [
-        "Professionally supervised shooting range session",
-        "2 premium wine estates in Constantia or Stellenbosch",
-        "Optional cheese pairings available",
-        "Spectacular vineyard and mountain views",
-        "Choice of wine route based on guest preference and availability",
-      ],
-    },
-
-    vehicle: {
-      name: "",
-      class: "",
-      doors: null,
-      seats: null,
-      fuel: "",
-      gearbox: "",
-      engine: "",
-      specifications: [],
-    },
-
-    securityAndLiability: {
-      heading: "",
-      cardPreAuthorisation: {
-        amount: null,
-        currency: "",
-        description: "",
-        release: "",
-      },
-      cashDeposit: {
-        amountZAR: null,
-        alternativeAmountUSD: null,
-        paymentMethod: "",
-        paidAt: "",
-        refundPolicy: "",
-      },
-    },
-
-    needToKnow: [
-      { text: "This experience is intended for adults of legal drinking age" },
-      { text: "Participants must follow all firearm safety instructions" },
-      { text: "Wine estate selection depends on availability" },
-      { text: "Wine tastings and cheese pairings are optional add-ons" },
-      { text: "Minimum age: 18 years for shooting activity" },
-      { text: "Valid identification may be required at the shooting range" },
-      { text: "No alcohol before shooting" },
-      { text: "Comfortable walking shoes are recommended" },
-    ],
-
-    faqs: [
-      {
-        question: "Which wine estates will we visit?",
-        answer:
-          "The tour visits two selected estates in either Constantia or Stellenbosch, depending on availability and guest preference.",
-      },
-      {
-        question: "Are wine tastings included?",
-        answer:
-          "Wine tastings are available as an optional add-on and can be arranged during booking. Prices vary by estate.",
-      },
-      {
-        question: "Is the shooting experience suitable for beginners?",
-        answer:
-          "Yes. Professional instructors supervise the entire session and provide a full safety briefing.",
-      },
-      {
-        question: "Is this a private tour?",
-        answer:
-          "Yes. The experience includes a private vehicle with your own driver-guide.",
-      },
-      {
-        question: "How many guests can join?",
-        answer:
-          "The tour can accommodate 2–7 guests in a private vehicle. Pricing is tiered: R7,680 for 2–4 guests and R10,600 for 5–7 guests.",
-      },
-      {
-        question: "Is cheese pairing available?",
-        answer:
-          "Yes. Cheese pairings are available as an optional add-on on request.",
-      },
-      {
-        question: "Is lunch included?",
-        answer: "No. Lunch is excluded from the tour price.",
-      },
-      {
-        question: "What should I bring?",
-        answer:
-          "Bring your valid ID or passport. Comfortable clothing, closed shoes, a camera, and sunscreen are recommended.",
-      },
-    ],
-
-    tags: [
-      "Gun Range",
-      "Wine Tasting",
-      "Constantia",
-      "Stellenbosch",
-      "Private Tour",
-      "Adult Experience",
-      "Cape Town",
-      "Full Day",
-      "Premium",
-    ],
-  },
-  // Gun-Range + Horse-Riding
-  {
-    id: null, // New tour ID to be assigned (e.g., 28)
-    type: TOUR_TYPES.ADRENALINE,
-    category: TOUR_MODIFIERS.FULL_DAY,
-
-    title: "Gun Range + Horse Riding",
-    slug: "gun-range-horse-riding",
-    canonicalPath: "/tours/gun-range-horse-riding",
-
-    seo: {
-      title: "Gun Range & Horse Riding Tour in Cape Town | Cape Frontier Tours",
-      description:
-        "Enjoy a balanced mix of adrenaline and scenic beauty. Start with a shooting session at a certified range, then relax with a peaceful horse ride along Noordhoek Beach.",
-      keywords: [
-        "Gun Range Cape Town",
-        "Horse Riding Noordhoek Beach",
-        "Noordhoek Horse Riding",
-        "Chapman's Peak Tour",
-        "Private Adventure Tour",
-        "Cape Town Horse Riding",
-        "Cape Town Shooting Experience",
-        "Cape Town Combo Tour",
-      ],
-    },
-
-    workflow: defaultWorkflow,
-
-    image: "/src/assets/images/tours/adrenaline/gun-range-horse-riding/1.webp",
-    images: [
-      "/src/assets/images/tours/adrenaline/gun-range-horse-riding/1.webp",
-      "/src/assets/images/tours/adrenaline/gun-range-horse-riding/2.webp",
-      "/src/assets/images/tours/adrenaline/gun-range-horse-riding/3.webp",
-    ],
-    imageFolder: "adrenaline/gun-range-horse-riding",
-
-    videos: [],
-
-    location: "Cape Town, South Africa",
-    duration: "7 - 8 Hours",
-
-    priceBase: 10260,
-    minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
-
-    pricing: [
-      {
-        category: "2–4 Guests",
-        pricePerPerson: null,
-        note: "R10,260 total (private vehicle)",
-      },
-      {
-        category: "5–7 Guests",
-        pricePerPerson: null,
-        note: "R14,200 total (private vehicle)",
-      },
-    ],
-
-    additionalPricing: [],
-
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 2,
-          maxPeople: 4,
-          perPerson: null,
-          totalPrice: 10260,
-          label: "2–4 Guests",
-          note: "Private vehicle",
-        },
-        {
-          minPeople: 5,
-          maxPeople: 7,
-          perPerson: null,
-          totalPrice: 14200,
-          label: "5–7 Guests",
-          note: "Private vehicle",
-        },
-      ],
-    },
-
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
-
-    description:
-      "Enjoy a balanced mix of adrenaline and scenic beauty. Start with a shooting session at a certified range, then relax with a peaceful horse ride along Noordhoek Beach.",
-
-    highlights: [
-      { text: "Professionally supervised shooting range session" },
-      { text: "Scenic Chapman's Peak Drive" },
-      { text: "1–2 hour Noordhoek Beach horse ride" },
-      { text: "Private transport throughout" },
-      { text: "Flexible private itinerary" },
-      { text: "Perfect balance of action and relaxation" },
-    ],
-
-    included: [
-      { text: "Private transport" },
-      { text: "Shooting range session" },
-      { text: "Professional firearms instructor" },
-      { text: "Full safety briefing" },
-      { text: "Horse riding experience" },
-      { text: "Horse riding safety equipment" },
-      { text: "Bottled water" },
-    ],
-
-    excluded: [{ text: "Meals" }, { text: "Personal purchases" }],
-
-    pickupOptions: [
-      "Cape Town CBD",
-      "Sea Point",
-      "Camps Bay",
-      "V&A Waterfront",
-      "Custom pickup on request",
-    ],
-
-    requirements: [
-      { text: "Minimum age: 18 years for shooting" },
-      { text: "Minimum age: 6 years for horse riding" },
-      { text: "Valid ID or passport required" },
-      { text: "No alcohol before shooting" },
-      { text: "All minors strictly prohibited from handling firearms" },
-      { text: "Maximum rider weight: 95–100 kg" },
-      {
-        text: "Riders must be physically able to mount, balance, and follow guide instructions",
-      },
-    ],
-
-    arrangements: {
-      availability: "Available all year",
-      duration: "7 - 8 hours",
-      operatingTime: "Flexible",
-      departure: "Flexible",
-      return: "Flexible",
-      location: "Cape Town, South Africa",
-
-      clothing: [
-        "Comfortable clothing",
-        "Closed shoes (no sandals for horse riding)",
-        "Sunscreen",
-        "Sunglasses",
-        "Light jacket depending on weather",
-      ],
-
-      thingsToBring: ["Valid ID or passport", "Camera"],
-
-      passengerPolicy: "",
-      sunsetNote: "",
-    },
-
-    weatherPolicy: {
-      summary:
-        "All weather conditions – shooting range operates in safe conditions only. Horse riding is weather-dependent.",
-      items: [
-        { text: "Shooting range operates in safe weather conditions" },
-        { text: "Horse riding may be delayed or cancelled for safety reasons" },
-        { text: "Final timing confirmed after booking" },
-      ],
-    },
-
-    cancellationPolicy: {
-      summary:
-        "Private tour bookings require advance confirmation. Horse riding is subject to weather and availability.",
-      items: [
-        { text: "Private tour bookings require advance confirmation" },
-        { text: "Weather may affect horse riding operations" },
-        { text: "Final cancellation policy is confirmed upon booking" },
-      ],
-    },
-
-    safetyPolicy: {
-      summary:
-        "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience. Horse riding involves inherent risks and guests participate at their own risk.",
-      items: [
-        {
-          text: "All safety regulations must be followed at all times during shooting",
-        },
-        {
-          text: "Professional instructors supervise the entire shooting session",
-        },
-        { text: "Helmets must be worn at all times during horse riding" },
-        { text: "Riders must follow all guide instructions" },
-        { text: "No racing, sudden movements, or galloping during horse ride" },
-        { text: "No riding under the influence of alcohol or drugs" },
-        {
-          text: "Approach horses calmly — do not stand directly behind a horse",
-        },
-        {
-          text: "Participants must comply with legal requirements for firearms training",
-        },
-        { text: "Age restrictions and eligibility criteria apply" },
-      ],
-    },
-
-    stops: [
-      {
-        id: "gun-range",
-        name: "Gun Range",
-        time: "Flexible",
-        duration: "1.5 - 2 hours",
-        note: "Professional supervised shooting experience",
-        description:
-          "Start your adventure with a professionally supervised shooting session. Receive a complete safety briefing before enjoying a handgun or rifle experience suitable for both beginners and experienced shooters.",
-        exactLocation: mapLocation({
-          label: "Gun Range",
-          address: "Cape Town, South Africa",
-          query: "Cape Town Gun Range",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "chapmans-peak",
-        name: "Chapman's Peak Drive",
-        time: "Flexible",
-        duration: "45 minutes",
-        note: "Scenic coastal drive",
-        description:
-          "Travel one of the world's most spectacular coastal roads while enjoying panoramic Atlantic Ocean views.",
-        exactLocation: mapLocation({
-          label: "Chapman's Peak Drive",
-          address: "Chapman's Peak, Cape Town, South Africa",
-          query: "Chapman's Peak Drive",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "horse-riding",
-        name: "Noordhoek Beach Horse Riding",
-        time: "Flexible",
-        duration: "1 - 2 hours",
-        note: "Beach horseback riding experience",
-        description:
-          "Enjoy a peaceful guided horseback ride along the expansive white sands of Noordhoek Beach surrounded by mountains and ocean views. Suitable for beginners and experienced riders alike.",
-        exactLocation: mapLocation({
-          label: "Noordhoek Beach",
-          address: "Noordhoek, Cape Town, South Africa",
-          query: "Noordhoek Beach Horse Riding",
-        }),
-        images: [],
-        touristComments: [],
-      },
-    ],
-
-    routeInformation: {
-      title: "Gun Range + Horse Riding Route",
-
-      description:
-        "Experience the perfect balance of adrenaline and natural beauty. Begin with a shooting session, travel along Chapman's Peak Drive, and enjoy a peaceful horse ride on Noordhoek Beach.",
-
-      items: [
-        "Professionally supervised shooting range session",
-        "Scenic Chapman's Peak Drive",
-        "1–2 hour Noordhoek Beach horse ride",
-        "Private transport throughout",
-      ],
-    },
-
-    vehicle: {
-      name: "",
-      class: "",
-      doors: null,
-      seats: null,
-      fuel: "",
-      gearbox: "",
-      engine: "",
-      specifications: [],
-    },
-
-    securityAndLiability: {
-      heading: "",
-      cardPreAuthorisation: {
-        amount: null,
-        currency: "",
-        description: "",
-        release: "",
-      },
-      cashDeposit: {
-        amountZAR: null,
-        alternativeAmountUSD: null,
-        paymentMethod: "",
-        paidAt: "",
-        refundPolicy: "",
-      },
-    },
-
-    needToKnow: [
-      { text: "Minimum age: 18 years for shooting" },
-      { text: "Minimum age: 6 years for horse riding" },
-      { text: "Participants must follow all firearm safety instructions" },
-      { text: "Valid identification may be required at the shooting range" },
-      { text: "Horse riding is suitable for beginners and experienced riders" },
-      { text: "Comfortable clothing and closed shoes are recommended" },
-      { text: "Maximum rider weight: 95–100 kg" },
-      { text: "No alcohol before shooting" },
-      { text: "No galloping or riding ahead of the guide" },
-      { text: "Horse riding is subject to weather conditions" },
-    ],
-
-    faqs: [
-      {
-        question: "Do I need horse riding experience?",
-        answer:
-          "No. The experience is suitable for beginners and includes guidance from experienced staff.",
-      },
-      {
-        question: "Is the shooting experience suitable for beginners?",
-        answer:
-          "Yes. Professional instructors provide a complete safety briefing before the session begins.",
-      },
-      {
-        question: "Is this a private tour?",
-        answer:
-          "Yes. The tour includes a private vehicle with your own driver-guide throughout the day.",
-      },
-      {
-        question: "How many guests can join?",
-        answer:
-          "The tour can accommodate 2–7 guests in a private vehicle. Pricing is tiered: R10,260 for 2–4 guests and R14,200 for 5–7 guests.",
-      },
-      {
-        question: "Are meals included?",
-        answer:
-          "No. Meals are excluded, allowing guests to choose their preferred dining option.",
-      },
-      {
-        question: "What is the weight limit for horse riding?",
-        answer:
-          "The maximum rider weight is 95–100 kg. Riders may be weighed on arrival if uncertain.",
-      },
-      {
-        question: "What should I wear?",
-        answer:
-          "Wear comfortable clothing, closed shoes (no sandals for horse riding), and bring sunscreen, sunglasses, and a light jacket depending on the weather.",
-      },
-    ],
-
-    tags: [
-      "Gun Range",
-      "Horse Riding",
-      "Noordhoek Beach",
-      "Chapman's Peak",
-      "Private Tour",
-      "Adventure",
-      "Cape Town",
-      "Full Day",
-      "Combo",
-    ],
-  },
-  // Gun-Range + Quad-Biking
-  {
-    id: null, // New tour ID to be assigned (e.g., 29)
-    type: TOUR_TYPES.ADRENALINE,
-    category: TOUR_MODIFIERS.FULL_DAY,
-
-    title: "Gun Range + Quad Biking Adventure",
-    slug: "gun-range-quad-biking-adventure",
-    canonicalPath: "/tours/gun-range-quad-biking-adventure",
-
-    seo: {
-      title:
-        "Gun Range & Quad Biking Adventure in Cape Town | Cape Frontier Tours",
-      description:
-        "A high‑adrenaline combo perfect for thrill‑seekers, bachelor groups, and adventure travellers. Start with a fully supervised shooting experience followed by a thrilling quad bike ride at the Atlantis Dunes.",
-      keywords: [
-        "Gun Range Cape Town",
-        "Atlantis Dunes Quad Biking",
-        "Quad Bike Cape Town",
-        "Cape Town Adventure Tour",
-        "Private Quad Biking Tour",
-        "Cape Town Shooting Experience",
-        "Adventure Activities Cape Town",
-        "Bachelor Party Cape Town",
-      ],
-    },
-
-    workflow: defaultWorkflow,
-
-    image: "/src/assets/images/tours/adrenaline/gun-range-quad-biking/1.webp",
-    images: [
-      "/src/assets/images/tours/adrenaline/gun-range-quad-biking/1.webp",
-      "/src/assets/images/tours/adrenaline/gun-range-quad-biking/2.webp",
-      "/src/assets/images/tours/adrenaline/gun-range-quad-biking/3.webp",
-    ],
-    imageFolder: "adrenaline/gun-range-quad-biking",
-
-    videos: [],
-
-    location: "Cape Town, South Africa",
-    duration: "7 - 8 Hours",
-
-    priceBase: 9800,
-    minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
-
-    pricing: [
-      {
-        category: "2–4 Guests",
-        pricePerPerson: null,
-        note: "R9,800 total (private vehicle)",
-      },
-      {
-        category: "5–7 Guests",
-        pricePerPerson: null,
-        note: "R13,400 total (private vehicle)",
-      },
-    ],
-
-    additionalPricing: [
-      {
-        category: "Photo & Video Package",
-        price: null,
-        unit: "per booking",
-        currency: "ZAR",
-        note: "Available on request",
-      },
-    ],
-
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 2,
-          maxPeople: 4,
-          perPerson: null,
-          totalPrice: 9800,
-          label: "2–4 Guests",
-          note: "Private vehicle",
-        },
-        {
-          minPeople: 5,
-          maxPeople: 7,
-          perPerson: null,
-          totalPrice: 13400,
-          label: "5–7 Guests",
-          note: "Private vehicle",
-        },
-      ],
-    },
-
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
-
-    description:
-      "A high‑adrenaline combo perfect for thrill‑seekers, bachelor groups, and adventure travellers. Start with a fully supervised shooting experience at an accredited gun range, followed by a thrilling quad bike ride at the Atlantis Dunes.",
-
-    highlights: [
-      { text: "Fully supervised accredited shooting experience" },
-      { text: "Handgun or rifle shooting package" },
-      { text: "1‑hour Atlantis Dunes quad biking adventure" },
-      { text: "Private transport throughout" },
-      { text: "Ideal for adventure groups and bachelor parties" },
-      { text: "Professional instructors and guides" },
-    ],
-
-    included: [
-      { text: "Private transport" },
-      { text: "Accredited shooting instructor" },
-      { text: "Firearm safety briefing" },
-      { text: "Quad bike rental and safety gear" },
-      { text: "Bottled water" },
-    ],
-
-    excluded: [
-      { text: "Meals" },
-      { text: "Optional photo/video packages" },
-      { text: "Personal purchases" },
-    ],
-
-    pickupOptions: [
-      "Cape Town CBD",
-      "Sea Point",
-      "Camps Bay",
-      "V&A Waterfront",
-      "Custom pickup on request",
-    ],
-
-    requirements: [
-      { text: "Minimum age: 18 years for shooting" },
-      { text: "Minimum age: 16 years for quad biking" },
-      { text: "Valid ID or passport required" },
-      { text: "No alcohol before shooting or quad biking" },
-      { text: "All minors strictly prohibited from handling firearms" },
-    ],
-
-    arrangements: {
-      availability: "Available all year",
-      duration: "7 - 8 hours",
-      operatingTime: "Flexible",
-      departure: "Flexible",
-      return: "Flexible",
-      location: "Cape Town, South Africa",
-
-      clothing: [
-        "Comfortable clothing",
-        "Closed shoes",
-        "Sunscreen",
-        "Sunglasses",
-        "Light jacket depending on weather",
-      ],
-
-      thingsToBring: ["Valid ID or passport", "Camera"],
-
-      passengerPolicy: "",
-      sunsetNote: "",
-    },
-
-    weatherPolicy: {
-      summary:
-        "All weather conditions – shooting and quad biking operate in safe conditions only.",
-      items: [
-        { text: "Shooting range operates in safe weather conditions" },
-        { text: "Quad biking may be delayed or cancelled for safety reasons" },
-        { text: "Final timing confirmed after booking" },
-      ],
-    },
-
-    cancellationPolicy: {
-      summary:
-        "Private tour bookings require advance confirmation. Activities are subject to weather and availability.",
-      items: [
-        { text: "Private tour bookings require advance confirmation" },
-        { text: "Weather may affect quad biking operations" },
-        { text: "Final cancellation policy is confirmed upon booking" },
-      ],
-    },
-
-    safetyPolicy: {
-      summary:
-        "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience and quad biking adventure.",
-      items: [
-        {
-          text: "All safety regulations must be followed at all times during shooting",
-        },
-        {
-          text: "Professional instructors supervise the entire shooting session",
-        },
-        { text: "Quad biking safety briefing provided before the ride" },
-        { text: "Safety gear must be worn at all times during quad biking" },
-        { text: "Riders must follow all guide instructions" },
-        { text: "No riding under the influence of alcohol or drugs" },
-        {
-          text: "Participants must comply with legal requirements for firearms training",
-        },
-        { text: "Age restrictions and eligibility criteria apply" },
-      ],
-    },
-
-    stops: [
-      {
-        id: "gun-range",
-        name: "Gun Range",
-        time: "Flexible",
-        duration: "1.5 - 2 hours",
-        note: "Professional supervised shooting experience",
-        description:
-          "Begin your adventure with a professionally supervised shooting session, complete with a firearm safety briefing and handgun or rifle package. Suitable for beginners and experienced shooters alike.",
-        exactLocation: mapLocation({
-          label: "Gun Range",
-          address: "Cape Town, South Africa",
-          query: "Cape Town Gun Range",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "atlantis-dunes",
-        name: "Atlantis Dunes Quad Biking",
-        time: "Flexible",
-        duration: "1 hour",
-        note: "Guided dune adventure",
-        description:
-          "Ride powerful quad bikes across the spectacular white sand dunes of Atlantis on an exciting guided adventure suitable for beginners and experienced riders.",
-        exactLocation: mapLocation({
-          label: "Atlantis Dunes",
-          address: "Atlantis, Cape Town, South Africa",
-          query: "Atlantis Dunes Quad Biking",
-        }),
-        images: [],
-        touristComments: [],
-      },
-    ],
-
-    routeInformation: {
-      title: "Gun Range + Quad Biking Adventure Route",
-
-      description:
-        "Experience the ultimate Cape Town adrenaline adventure with a professionally supervised shooting session followed by an exciting quad biking experience at the Atlantis Dunes.",
-
-      items: [
-        "Professionally supervised shooting range session",
-        "Handgun or rifle shooting package",
-        "1‑hour Atlantis Dunes quad biking adventure",
-        "Private transport throughout",
-      ],
-    },
-
-    vehicle: {
-      name: "",
-      class: "",
-      doors: null,
-      seats: null,
-      fuel: "",
-      gearbox: "",
-      engine: "",
-      specifications: [],
-    },
-
-    securityAndLiability: {
-      heading: "",
-      cardPreAuthorisation: {
-        amount: null,
-        currency: "",
-        description: "",
-        release: "",
-      },
-      cashDeposit: {
-        amountZAR: null,
-        alternativeAmountUSD: null,
-        paymentMethod: "",
-        paidAt: "",
-        refundPolicy: "",
-      },
-    },
-
-    needToKnow: [
-      { text: "Participants must follow all firearm safety instructions" },
-      { text: "Valid identification may be required at the shooting range" },
-      { text: "Quad biking is suitable for beginners and experienced riders" },
-      { text: "Comfortable clothing and closed shoes are recommended" },
-      { text: "Minimum age: 18 years for shooting, 16 years for quad biking" },
-      { text: "No alcohol before shooting or quad biking" },
-      { text: "Quad biking is subject to weather conditions" },
-    ],
-
-    faqs: [
-      {
-        question: "Is quad biking suitable for beginners?",
-        answer:
-          "Yes. Experienced guides provide a full safety briefing before the ride begins.",
-      },
-      {
-        question: "Is the shooting experience suitable for beginners?",
-        answer:
-          "Yes. Professional instructors supervise the entire session and provide comprehensive safety instruction.",
-      },
-      {
-        question: "Is this a private tour?",
-        answer:
-          "Yes. The tour includes a private vehicle with your own driver-guide throughout the day.",
-      },
-      {
-        question: "How many guests can join?",
-        answer:
-          "The tour can accommodate 2–7 guests in a private vehicle. Pricing is tiered: R9,800 for 2–4 guests and R13,400 for 5–7 guests.",
-      },
-      {
-        question: "Are meals included?",
-        answer: "No. Meals are excluded from the tour price.",
-      },
-      {
-        question: "What should I wear?",
-        answer:
-          "Wear comfortable clothing and closed shoes. Bring sunscreen, sunglasses, and a light jacket depending on the weather.",
-      },
-      {
-        question: "Is this tour suitable for bachelor groups?",
-        answer:
-          "Yes. This high‑adrenaline combo is perfect for bachelor groups, thrill‑seekers, and adventure travellers.",
-      },
-    ],
-
-    tags: [
-      "Gun Range",
-      "Quad Biking",
-      "Atlantis Dunes",
-      "Adventure",
-      "Private Tour",
-      "Cape Town",
-      "Full Day",
-      "Bachelor Groups",
-      "Thrill Seekers",
-      "Combo",
-    ],
-  },
+  // {
+  //   id: null, // New tour ID to be assigned (e.g., 27)
+  //   type: TOUR_TYPES.ADRENALINE,
+  //   category: TOUR_MODIFIERS.FULL_DAY,
+
+  //   title: "Gun Range + Wine Tasting (Constantia/Stellenbosch)",
+  //   slug: "gun-range-wine-tasting",
+  //   canonicalPath: "/tours/gun-range-wine-tasting",
+
+  //   seo: {
+  //     title: "Gun Range & Wine Tasting Tour in Cape Town | Cape Frontier Tours",
+  //     description:
+  //       "Enjoy a premium adult-only experience combining a professionally supervised shooting session with wine tasting at two top estates in Constantia or Stellenbosch. Optional cheese pairing available.",
+  //     keywords: [
+  //       "Gun Range Cape Town",
+  //       "Wine Tasting Tour",
+  //       "Constantia Wine Tour",
+  //       "Stellenbosch Wine Tour",
+  //       "Cape Town Wine Experience",
+  //       "Private Wine Tour",
+  //       "Cape Town Shooting Experience",
+  //       "Adult Experience Cape Town",
+  //     ],
+  //   },
+
+  //   workflow: defaultWorkflow,
+
+  //   image: "/src/assets/images/tours/adrenaline/gun-range-wine-tasting/1.webp",
+  //   images: [
+  //     "/src/assets/images/tours/adrenaline/gun-range-wine-tasting/1.webp",
+  //     "/src/assets/images/tours/adrenaline/gun-range-wine-tasting/2.webp",
+  //     "/src/assets/images/tours/adrenaline/gun-range-wine-tasting/3.webp",
+  //   ],
+  //   imageFolder: "adrenaline/gun-range-wine-tasting",
+
+  //   videos: [],
+
+  //   location: "Cape Town, South Africa (Constantia or Stellenbosch)",
+  //   duration: "7 - 8 Hours",
+
+  //   priceBase: 7680,
+  //   minPeople: 2,
+  //   baseCurrency: "ZAR",
+  //   supportedCurrencies: SUPPORTED_CURRENCIES,
+
+  //   pricing: [
+  //     {
+  //       category: "2–4 Guests",
+  //       pricePerPerson: null,
+  //       note: "R7,680 total (private vehicle)",
+  //     },
+  //     {
+  //       category: "5–7 Guests",
+  //       pricePerPerson: null,
+  //       note: "R10,600 total (private vehicle)",
+  //     },
+  //   ],
+
+  //   additionalPricing: [
+  //     {
+  //       category: "Wine Tasting Fees",
+  //       price: null,
+  //       unit: "per estate",
+  //       currency: "ZAR",
+  //       note: "Optional add-on. Prices vary by estate.",
+  //     },
+  //     {
+  //       category: "Cheese Pairing",
+  //       price: null,
+  //       unit: "per person",
+  //       currency: "ZAR",
+  //       note: "Optional add-on. Available on request.",
+  //     },
+  //   ],
+
+  //   groupPricing: {
+  //     enabled: true,
+  //     icon: "/icons/savemore.png",
+  //     tiers: [
+  //       {
+  //         minPeople: 2,
+  //         maxPeople: 4,
+  //         perPerson: null,
+  //         totalPrice: 7680,
+  //         label: "2–4 Guests",
+  //         note: "Private vehicle",
+  //       },
+  //       {
+  //         minPeople: 5,
+  //         maxPeople: 7,
+  //         perPerson: null,
+  //         totalPrice: 10600,
+  //         label: "5–7 Guests",
+  //         note: "Private vehicle",
+  //       },
+  //     ],
+  //   },
+
+  //   rating: null,
+  //   stars: null,
+  //   mainReviewerName: "",
+  //   mainReviewerCountry: "",
+  //   reviewYear: null,
+  //   otherReviews: null,
+  //   mainReview: "",
+
+  //   description:
+  //     "A premium adult‑only experience combining a professionally supervised shooting session with wine tasting at two top estates in Constantia or Stellenbosch.",
+
+  //   highlights: [
+  //     { text: "Professionally supervised shooting range session" },
+  //     { text: "Visit 2 premium wine estates in Constantia or Stellenbosch" },
+  //     { text: "Optional cheese pairing available" },
+  //     { text: "Choice of Constantia or Stellenbosch wine route" },
+  //     { text: "Private transport with driver-guide" },
+  //     { text: "Flexible itinerary" },
+  //     { text: "Perfect for adult groups and special occasions" },
+  //   ],
+
+  //   included: [
+  //     { text: "Private transport" },
+  //     { text: "Shooting range session" },
+  //     { text: "Professional firearms instructor" },
+  //     { text: "Full safety briefing" },
+  //     { text: "Visit to 2 wine estates" },
+  //     { text: "Bottled water" },
+  //   ],
+
+  //   excluded: [
+  //     { text: "Lunch" },
+  //     { text: "Wine tasting fees (optional add-on)" },
+  //     { text: "Cheese pairings (optional add-on)" },
+  //     { text: "Personal purchases" },
+  //   ],
+
+  //   pickupOptions: [
+  //     "Cape Town CBD",
+  //     "Sea Point",
+  //     "Camps Bay",
+  //     "V&A Waterfront",
+  //     "Custom pickup on request",
+  //   ],
+
+  //   requirements: [
+  //     { text: "Minimum age: 18 years" },
+  //     { text: "Valid ID or passport required" },
+  //     { text: "No alcohol before shooting" },
+  //     { text: "All minors strictly prohibited from handling firearms" },
+  //     { text: "Guests must be of legal drinking age for wine tasting" },
+  //   ],
+
+  //   arrangements: {
+  //     availability: "Available all year",
+  //     duration: "7 - 8 hours",
+  //     operatingTime: "Flexible",
+  //     departure: "Flexible",
+  //     return: "Flexible",
+  //     location: "Cape Town, South Africa (Constantia or Stellenbosch)",
+
+  //     clothing: ["Comfortable clothing", "Closed shoes"],
+
+  //     thingsToBring: ["Valid ID or passport", "Camera", "Sunscreen"],
+
+  //     passengerPolicy: "",
+  //     sunsetNote: "",
+  //   },
+
+  //   weatherPolicy: {
+  //     summary:
+  //       "All weather conditions – shooting range operates in safe conditions only. Wine tasting continues regardless of weather.",
+  //     items: [
+  //       { text: "Shooting range operates in safe weather conditions" },
+  //       { text: "Wine tasting continues in all weather conditions" },
+  //       { text: "Final timing confirmed after booking" },
+  //     ],
+  //   },
+
+  //   cancellationPolicy: {
+  //     summary:
+  //       "Private tour bookings require advance confirmation. Wine estate availability may affect the final itinerary.",
+  //     items: [
+  //       { text: "Private tour bookings require advance confirmation" },
+  //       { text: "Estate availability may affect the final itinerary" },
+  //       { text: "Final cancellation policy is confirmed upon booking" },
+  //       { text: "Weather may affect shooting range activities" },
+  //     ],
+  //   },
+
+  //   safetyPolicy: {
+  //     summary:
+  //       "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience.",
+  //     items: [
+  //       { text: "All safety regulations must be followed at all times" },
+  //       {
+  //         text: "Professional instructors supervise the entire shooting session",
+  //       },
+  //       {
+  //         text: "Participants must comply with legal requirements for firearms training",
+  //       },
+  //       { text: "Age restrictions and eligibility criteria apply" },
+  //     ],
+  //   },
+
+  //   stops: [
+  //     {
+  //       id: "gun-range",
+  //       name: "Gun Range",
+  //       time: "Flexible",
+  //       duration: "1.5 - 2 hours",
+  //       note: "Professional supervised shooting experience",
+  //       description:
+  //         "Begin your day with a professionally supervised shooting session, including a complete firearm safety briefing suitable for beginners and experienced shooters.",
+  //       exactLocation: mapLocation({
+  //         label: "Gun Range",
+  //         address: "Cape Town, South Africa",
+  //         query: "Cape Town Gun Range",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "wine-estate-1",
+  //       name: "Wine Estate 1",
+  //       time: "Flexible",
+  //       duration: "1.5 hours",
+  //       note: "Premium estate visit",
+  //       description:
+  //         "Visit one of the Cape's renowned wine estates in Constantia or Stellenbosch for optional wine tastings and spectacular vineyard scenery.",
+  //       exactLocation: mapLocation({
+  //         label: "Wine Estate",
+  //         address: "Constantia or Stellenbosch, South Africa",
+  //         query: "Constantia Wine Estates",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "wine-estate-2",
+  //       name: "Wine Estate 2",
+  //       time: "Flexible",
+  //       duration: "1.5 hours",
+  //       note: "Optional cheese pairing",
+  //       description:
+  //         "Continue to a second premium estate to relax with additional wine tastings or optional cheese pairings while enjoying the Cape Winelands.",
+  //       exactLocation: mapLocation({
+  //         label: "Wine Estate",
+  //         address: "Constantia or Stellenbosch, South Africa",
+  //         query: "Stellenbosch Wine Estates",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //   ],
+
+  //   routeInformation: {
+  //     title: "Gun Range + Wine Tasting Route",
+
+  //     description:
+  //       "Choose between Constantia or Stellenbosch for your wine tasting experience after your shooting session. Both routes offer world-class wine estates and stunning scenery.",
+
+  //     items: [
+  //       "Professionally supervised shooting range session",
+  //       "2 premium wine estates in Constantia or Stellenbosch",
+  //       "Optional cheese pairings available",
+  //       "Spectacular vineyard and mountain views",
+  //       "Choice of wine route based on guest preference and availability",
+  //     ],
+  //   },
+
+  //   vehicle: {
+  //     name: "",
+  //     class: "",
+  //     doors: null,
+  //     seats: null,
+  //     fuel: "",
+  //     gearbox: "",
+  //     engine: "",
+  //     specifications: [],
+  //   },
+
+  //   securityAndLiability: {
+  //     heading: "",
+  //     cardPreAuthorisation: {
+  //       amount: null,
+  //       currency: "",
+  //       description: "",
+  //       release: "",
+  //     },
+  //     cashDeposit: {
+  //       amountZAR: null,
+  //       alternativeAmountUSD: null,
+  //       paymentMethod: "",
+  //       paidAt: "",
+  //       refundPolicy: "",
+  //     },
+  //   },
+
+  //   needToKnow: [
+  //     { text: "This experience is intended for adults of legal drinking age" },
+  //     { text: "Participants must follow all firearm safety instructions" },
+  //     { text: "Wine estate selection depends on availability" },
+  //     { text: "Wine tastings and cheese pairings are optional add-ons" },
+  //     { text: "Minimum age: 18 years for shooting activity" },
+  //     { text: "Valid identification may be required at the shooting range" },
+  //     { text: "No alcohol before shooting" },
+  //     { text: "Comfortable walking shoes are recommended" },
+  //   ],
+
+  //   faqs: [
+  //     {
+  //       question: "Which wine estates will we visit?",
+  //       answer:
+  //         "The tour visits two selected estates in either Constantia or Stellenbosch, depending on availability and guest preference.",
+  //     },
+  //     {
+  //       question: "Are wine tastings included?",
+  //       answer:
+  //         "Wine tastings are available as an optional add-on and can be arranged during booking. Prices vary by estate.",
+  //     },
+  //     {
+  //       question: "Is the shooting experience suitable for beginners?",
+  //       answer:
+  //         "Yes. Professional instructors supervise the entire session and provide a full safety briefing.",
+  //     },
+  //     {
+  //       question: "Is this a private tour?",
+  //       answer:
+  //         "Yes. The experience includes a private vehicle with your own driver-guide.",
+  //     },
+  //     {
+  //       question: "How many guests can join?",
+  //       answer:
+  //         "The tour can accommodate 2–7 guests in a private vehicle. Pricing is tiered: R7,680 for 2–4 guests and R10,600 for 5–7 guests.",
+  //     },
+  //     {
+  //       question: "Is cheese pairing available?",
+  //       answer:
+  //         "Yes. Cheese pairings are available as an optional add-on on request.",
+  //     },
+  //     {
+  //       question: "Is lunch included?",
+  //       answer: "No. Lunch is excluded from the tour price.",
+  //     },
+  //     {
+  //       question: "What should I bring?",
+  //       answer:
+  //         "Bring your valid ID or passport. Comfortable clothing, closed shoes, a camera, and sunscreen are recommended.",
+  //     },
+  //   ],
+
+  //   tags: [
+  //     "Gun Range",
+  //     "Wine Tasting",
+  //     "Constantia",
+  //     "Stellenbosch",
+  //     "Private Tour",
+  //     "Adult Experience",
+  //     "Cape Town",
+  //     "Full Day",
+  //     "Premium",
+  //   ],
+  // },
+  // // Gun-Range + Horse-Riding
+  // {
+  //   id: null, // New tour ID to be assigned (e.g., 28)
+  //   type: TOUR_TYPES.ADRENALINE,
+  //   category: TOUR_MODIFIERS.FULL_DAY,
+
+  //   title: "Gun Range + Horse Riding",
+  //   slug: "gun-range-horse-riding",
+  //   canonicalPath: "/tours/gun-range-horse-riding",
+
+  //   seo: {
+  //     title: "Gun Range & Horse Riding Tour in Cape Town | Cape Frontier Tours",
+  //     description:
+  //       "Enjoy a balanced mix of adrenaline and scenic beauty. Start with a shooting session at a certified range, then relax with a peaceful horse ride along Noordhoek Beach.",
+  //     keywords: [
+  //       "Gun Range Cape Town",
+  //       "Horse Riding Noordhoek Beach",
+  //       "Noordhoek Horse Riding",
+  //       "Chapman's Peak Tour",
+  //       "Private Adventure Tour",
+  //       "Cape Town Horse Riding",
+  //       "Cape Town Shooting Experience",
+  //       "Cape Town Combo Tour",
+  //     ],
+  //   },
+
+  //   workflow: defaultWorkflow,
+
+  //   image: "/src/assets/images/tours/adrenaline/gun-range-horse-riding/1.webp",
+  //   images: [
+  //     "/src/assets/images/tours/adrenaline/gun-range-horse-riding/1.webp",
+  //     "/src/assets/images/tours/adrenaline/gun-range-horse-riding/2.webp",
+  //     "/src/assets/images/tours/adrenaline/gun-range-horse-riding/3.webp",
+  //   ],
+  //   imageFolder: "adrenaline/gun-range-horse-riding",
+
+  //   videos: [],
+
+  //   location: "Cape Town, South Africa",
+  //   duration: "7 - 8 Hours",
+
+  //   priceBase: 10260,
+  //   minPeople: 2,
+  //   baseCurrency: "ZAR",
+  //   supportedCurrencies: SUPPORTED_CURRENCIES,
+
+  //   pricing: [
+  //     {
+  //       category: "2–4 Guests",
+  //       pricePerPerson: null,
+  //       note: "R10,260 total (private vehicle)",
+  //     },
+  //     {
+  //       category: "5–7 Guests",
+  //       pricePerPerson: null,
+  //       note: "R14,200 total (private vehicle)",
+  //     },
+  //   ],
+
+  //   additionalPricing: [],
+
+  //   groupPricing: {
+  //     enabled: true,
+  //     icon: "/icons/savemore.png",
+  //     tiers: [
+  //       {
+  //         minPeople: 2,
+  //         maxPeople: 4,
+  //         perPerson: null,
+  //         totalPrice: 10260,
+  //         label: "2–4 Guests",
+  //         note: "Private vehicle",
+  //       },
+  //       {
+  //         minPeople: 5,
+  //         maxPeople: 7,
+  //         perPerson: null,
+  //         totalPrice: 14200,
+  //         label: "5–7 Guests",
+  //         note: "Private vehicle",
+  //       },
+  //     ],
+  //   },
+
+  //   rating: null,
+  //   stars: null,
+  //   mainReviewerName: "",
+  //   mainReviewerCountry: "",
+  //   reviewYear: null,
+  //   otherReviews: null,
+  //   mainReview: "",
+
+  //   description:
+  //     "Enjoy a balanced mix of adrenaline and scenic beauty. Start with a shooting session at a certified range, then relax with a peaceful horse ride along Noordhoek Beach.",
+
+  //   highlights: [
+  //     { text: "Professionally supervised shooting range session" },
+  //     { text: "Scenic Chapman's Peak Drive" },
+  //     { text: "1–2 hour Noordhoek Beach horse ride" },
+  //     { text: "Private transport throughout" },
+  //     { text: "Flexible private itinerary" },
+  //     { text: "Perfect balance of action and relaxation" },
+  //   ],
+
+  //   included: [
+  //     { text: "Private transport" },
+  //     { text: "Shooting range session" },
+  //     { text: "Professional firearms instructor" },
+  //     { text: "Full safety briefing" },
+  //     { text: "Horse riding experience" },
+  //     { text: "Horse riding safety equipment" },
+  //     { text: "Bottled water" },
+  //   ],
+
+  //   excluded: [{ text: "Meals" }, { text: "Personal purchases" }],
+
+  //   pickupOptions: [
+  //     "Cape Town CBD",
+  //     "Sea Point",
+  //     "Camps Bay",
+  //     "V&A Waterfront",
+  //     "Custom pickup on request",
+  //   ],
+
+  //   requirements: [
+  //     { text: "Minimum age: 18 years for shooting" },
+  //     { text: "Minimum age: 6 years for horse riding" },
+  //     { text: "Valid ID or passport required" },
+  //     { text: "No alcohol before shooting" },
+  //     { text: "All minors strictly prohibited from handling firearms" },
+  //     { text: "Maximum rider weight: 95–100 kg" },
+  //     {
+  //       text: "Riders must be physically able to mount, balance, and follow guide instructions",
+  //     },
+  //   ],
+
+  //   arrangements: {
+  //     availability: "Available all year",
+  //     duration: "7 - 8 hours",
+  //     operatingTime: "Flexible",
+  //     departure: "Flexible",
+  //     return: "Flexible",
+  //     location: "Cape Town, South Africa",
+
+  //     clothing: [
+  //       "Comfortable clothing",
+  //       "Closed shoes (no sandals for horse riding)",
+  //       "Sunscreen",
+  //       "Sunglasses",
+  //       "Light jacket depending on weather",
+  //     ],
+
+  //     thingsToBring: ["Valid ID or passport", "Camera"],
+
+  //     passengerPolicy: "",
+  //     sunsetNote: "",
+  //   },
+
+  //   weatherPolicy: {
+  //     summary:
+  //       "All weather conditions – shooting range operates in safe conditions only. Horse riding is weather-dependent.",
+  //     items: [
+  //       { text: "Shooting range operates in safe weather conditions" },
+  //       { text: "Horse riding may be delayed or cancelled for safety reasons" },
+  //       { text: "Final timing confirmed after booking" },
+  //     ],
+  //   },
+
+  //   cancellationPolicy: {
+  //     summary:
+  //       "Private tour bookings require advance confirmation. Horse riding is subject to weather and availability.",
+  //     items: [
+  //       { text: "Private tour bookings require advance confirmation" },
+  //       { text: "Weather may affect horse riding operations" },
+  //       { text: "Final cancellation policy is confirmed upon booking" },
+  //     ],
+  //   },
+
+  //   safetyPolicy: {
+  //     summary:
+  //       "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience. Horse riding involves inherent risks and guests participate at their own risk.",
+  //     items: [
+  //       {
+  //         text: "All safety regulations must be followed at all times during shooting",
+  //       },
+  //       {
+  //         text: "Professional instructors supervise the entire shooting session",
+  //       },
+  //       { text: "Helmets must be worn at all times during horse riding" },
+  //       { text: "Riders must follow all guide instructions" },
+  //       { text: "No racing, sudden movements, or galloping during horse ride" },
+  //       { text: "No riding under the influence of alcohol or drugs" },
+  //       {
+  //         text: "Approach horses calmly — do not stand directly behind a horse",
+  //       },
+  //       {
+  //         text: "Participants must comply with legal requirements for firearms training",
+  //       },
+  //       { text: "Age restrictions and eligibility criteria apply" },
+  //     ],
+  //   },
+
+  //   stops: [
+  //     {
+  //       id: "gun-range",
+  //       name: "Gun Range",
+  //       time: "Flexible",
+  //       duration: "1.5 - 2 hours",
+  //       note: "Professional supervised shooting experience",
+  //       description:
+  //         "Start your adventure with a professionally supervised shooting session. Receive a complete safety briefing before enjoying a handgun or rifle experience suitable for both beginners and experienced shooters.",
+  //       exactLocation: mapLocation({
+  //         label: "Gun Range",
+  //         address: "Cape Town, South Africa",
+  //         query: "Cape Town Gun Range",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "chapmans-peak",
+  //       name: "Chapman's Peak Drive",
+  //       time: "Flexible",
+  //       duration: "45 minutes",
+  //       note: "Scenic coastal drive",
+  //       description:
+  //         "Travel one of the world's most spectacular coastal roads while enjoying panoramic Atlantic Ocean views.",
+  //       exactLocation: mapLocation({
+  //         label: "Chapman's Peak Drive",
+  //         address: "Chapman's Peak, Cape Town, South Africa",
+  //         query: "Chapman's Peak Drive",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "horse-riding",
+  //       name: "Noordhoek Beach Horse Riding",
+  //       time: "Flexible",
+  //       duration: "1 - 2 hours",
+  //       note: "Beach horseback riding experience",
+  //       description:
+  //         "Enjoy a peaceful guided horseback ride along the expansive white sands of Noordhoek Beach surrounded by mountains and ocean views. Suitable for beginners and experienced riders alike.",
+  //       exactLocation: mapLocation({
+  //         label: "Noordhoek Beach",
+  //         address: "Noordhoek, Cape Town, South Africa",
+  //         query: "Noordhoek Beach Horse Riding",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //   ],
+
+  //   routeInformation: {
+  //     title: "Gun Range + Horse Riding Route",
+
+  //     description:
+  //       "Experience the perfect balance of adrenaline and natural beauty. Begin with a shooting session, travel along Chapman's Peak Drive, and enjoy a peaceful horse ride on Noordhoek Beach.",
+
+  //     items: [
+  //       "Professionally supervised shooting range session",
+  //       "Scenic Chapman's Peak Drive",
+  //       "1–2 hour Noordhoek Beach horse ride",
+  //       "Private transport throughout",
+  //     ],
+  //   },
+
+  //   vehicle: {
+  //     name: "",
+  //     class: "",
+  //     doors: null,
+  //     seats: null,
+  //     fuel: "",
+  //     gearbox: "",
+  //     engine: "",
+  //     specifications: [],
+  //   },
+
+  //   securityAndLiability: {
+  //     heading: "",
+  //     cardPreAuthorisation: {
+  //       amount: null,
+  //       currency: "",
+  //       description: "",
+  //       release: "",
+  //     },
+  //     cashDeposit: {
+  //       amountZAR: null,
+  //       alternativeAmountUSD: null,
+  //       paymentMethod: "",
+  //       paidAt: "",
+  //       refundPolicy: "",
+  //     },
+  //   },
+
+  //   needToKnow: [
+  //     { text: "Minimum age: 18 years for shooting" },
+  //     { text: "Minimum age: 6 years for horse riding" },
+  //     { text: "Participants must follow all firearm safety instructions" },
+  //     { text: "Valid identification may be required at the shooting range" },
+  //     { text: "Horse riding is suitable for beginners and experienced riders" },
+  //     { text: "Comfortable clothing and closed shoes are recommended" },
+  //     { text: "Maximum rider weight: 95–100 kg" },
+  //     { text: "No alcohol before shooting" },
+  //     { text: "No galloping or riding ahead of the guide" },
+  //     { text: "Horse riding is subject to weather conditions" },
+  //   ],
+
+  //   faqs: [
+  //     {
+  //       question: "Do I need horse riding experience?",
+  //       answer:
+  //         "No. The experience is suitable for beginners and includes guidance from experienced staff.",
+  //     },
+  //     {
+  //       question: "Is the shooting experience suitable for beginners?",
+  //       answer:
+  //         "Yes. Professional instructors provide a complete safety briefing before the session begins.",
+  //     },
+  //     {
+  //       question: "Is this a private tour?",
+  //       answer:
+  //         "Yes. The tour includes a private vehicle with your own driver-guide throughout the day.",
+  //     },
+  //     {
+  //       question: "How many guests can join?",
+  //       answer:
+  //         "The tour can accommodate 2–7 guests in a private vehicle. Pricing is tiered: R10,260 for 2–4 guests and R14,200 for 5–7 guests.",
+  //     },
+  //     {
+  //       question: "Are meals included?",
+  //       answer:
+  //         "No. Meals are excluded, allowing guests to choose their preferred dining option.",
+  //     },
+  //     {
+  //       question: "What is the weight limit for horse riding?",
+  //       answer:
+  //         "The maximum rider weight is 95–100 kg. Riders may be weighed on arrival if uncertain.",
+  //     },
+  //     {
+  //       question: "What should I wear?",
+  //       answer:
+  //         "Wear comfortable clothing, closed shoes (no sandals for horse riding), and bring sunscreen, sunglasses, and a light jacket depending on the weather.",
+  //     },
+  //   ],
+
+  //   tags: [
+  //     "Gun Range",
+  //     "Horse Riding",
+  //     "Noordhoek Beach",
+  //     "Chapman's Peak",
+  //     "Private Tour",
+  //     "Adventure",
+  //     "Cape Town",
+  //     "Full Day",
+  //     "Combo",
+  //   ],
+  // },
+  // // Gun-Range + Quad-Biking
+  // {
+  //   id: null, // New tour ID to be assigned (e.g., 29)
+  //   type: TOUR_TYPES.ADRENALINE,
+  //   category: TOUR_MODIFIERS.FULL_DAY,
+
+  //   title: "Gun Range + Quad Biking Adventure",
+  //   slug: "gun-range-quad-biking-adventure",
+  //   canonicalPath: "/tours/gun-range-quad-biking-adventure",
+
+  //   seo: {
+  //     title:
+  //       "Gun Range & Quad Biking Adventure in Cape Town | Cape Frontier Tours",
+  //     description:
+  //       "A high‑adrenaline combo perfect for thrill‑seekers, bachelor groups, and adventure travellers. Start with a fully supervised shooting experience followed by a thrilling quad bike ride at the Atlantis Dunes.",
+  //     keywords: [
+  //       "Gun Range Cape Town",
+  //       "Atlantis Dunes Quad Biking",
+  //       "Quad Bike Cape Town",
+  //       "Cape Town Adventure Tour",
+  //       "Private Quad Biking Tour",
+  //       "Cape Town Shooting Experience",
+  //       "Adventure Activities Cape Town",
+  //       "Bachelor Party Cape Town",
+  //     ],
+  //   },
+
+  //   workflow: defaultWorkflow,
+
+  //   image: "/src/assets/images/tours/adrenaline/gun-range-quad-biking/1.webp",
+  //   images: [
+  //     "/src/assets/images/tours/adrenaline/gun-range-quad-biking/1.webp",
+  //     "/src/assets/images/tours/adrenaline/gun-range-quad-biking/2.webp",
+  //     "/src/assets/images/tours/adrenaline/gun-range-quad-biking/3.webp",
+  //   ],
+  //   imageFolder: "adrenaline/gun-range-quad-biking",
+
+  //   videos: [],
+
+  //   location: "Cape Town, South Africa",
+  //   duration: "7 - 8 Hours",
+
+  //   priceBase: 9800,
+  //   minPeople: 2,
+  //   baseCurrency: "ZAR",
+  //   supportedCurrencies: SUPPORTED_CURRENCIES,
+
+  //   pricing: [
+  //     {
+  //       category: "2–4 Guests",
+  //       pricePerPerson: null,
+  //       note: "R9,800 total (private vehicle)",
+  //     },
+  //     {
+  //       category: "5–7 Guests",
+  //       pricePerPerson: null,
+  //       note: "R13,400 total (private vehicle)",
+  //     },
+  //   ],
+
+  //   additionalPricing: [
+  //     {
+  //       category: "Photo & Video Package",
+  //       price: null,
+  //       unit: "per booking",
+  //       currency: "ZAR",
+  //       note: "Available on request",
+  //     },
+  //   ],
+
+  //   groupPricing: {
+  //     enabled: true,
+  //     icon: "/icons/savemore.png",
+  //     tiers: [
+  //       {
+  //         minPeople: 2,
+  //         maxPeople: 4,
+  //         perPerson: null,
+  //         totalPrice: 9800,
+  //         label: "2–4 Guests",
+  //         note: "Private vehicle",
+  //       },
+  //       {
+  //         minPeople: 5,
+  //         maxPeople: 7,
+  //         perPerson: null,
+  //         totalPrice: 13400,
+  //         label: "5–7 Guests",
+  //         note: "Private vehicle",
+  //       },
+  //     ],
+  //   },
+
+  //   rating: null,
+  //   stars: null,
+  //   mainReviewerName: "",
+  //   mainReviewerCountry: "",
+  //   reviewYear: null,
+  //   otherReviews: null,
+  //   mainReview: "",
+
+  //   description:
+  //     "A high‑adrenaline combo perfect for thrill‑seekers, bachelor groups, and adventure travellers. Start with a fully supervised shooting experience at an accredited gun range, followed by a thrilling quad bike ride at the Atlantis Dunes.",
+
+  //   highlights: [
+  //     { text: "Fully supervised accredited shooting experience" },
+  //     { text: "Handgun or rifle shooting package" },
+  //     { text: "1‑hour Atlantis Dunes quad biking adventure" },
+  //     { text: "Private transport throughout" },
+  //     { text: "Ideal for adventure groups and bachelor parties" },
+  //     { text: "Professional instructors and guides" },
+  //   ],
+
+  //   included: [
+  //     { text: "Private transport" },
+  //     { text: "Accredited shooting instructor" },
+  //     { text: "Firearm safety briefing" },
+  //     { text: "Quad bike rental and safety gear" },
+  //     { text: "Bottled water" },
+  //   ],
+
+  //   excluded: [
+  //     { text: "Meals" },
+  //     { text: "Optional photo/video packages" },
+  //     { text: "Personal purchases" },
+  //   ],
+
+  //   pickupOptions: [
+  //     "Cape Town CBD",
+  //     "Sea Point",
+  //     "Camps Bay",
+  //     "V&A Waterfront",
+  //     "Custom pickup on request",
+  //   ],
+
+  //   requirements: [
+  //     { text: "Minimum age: 18 years for shooting" },
+  //     { text: "Minimum age: 16 years for quad biking" },
+  //     { text: "Valid ID or passport required" },
+  //     { text: "No alcohol before shooting or quad biking" },
+  //     { text: "All minors strictly prohibited from handling firearms" },
+  //   ],
+
+  //   arrangements: {
+  //     availability: "Available all year",
+  //     duration: "7 - 8 hours",
+  //     operatingTime: "Flexible",
+  //     departure: "Flexible",
+  //     return: "Flexible",
+  //     location: "Cape Town, South Africa",
+
+  //     clothing: [
+  //       "Comfortable clothing",
+  //       "Closed shoes",
+  //       "Sunscreen",
+  //       "Sunglasses",
+  //       "Light jacket depending on weather",
+  //     ],
+
+  //     thingsToBring: ["Valid ID or passport", "Camera"],
+
+  //     passengerPolicy: "",
+  //     sunsetNote: "",
+  //   },
+
+  //   weatherPolicy: {
+  //     summary:
+  //       "All weather conditions – shooting and quad biking operate in safe conditions only.",
+  //     items: [
+  //       { text: "Shooting range operates in safe weather conditions" },
+  //       { text: "Quad biking may be delayed or cancelled for safety reasons" },
+  //       { text: "Final timing confirmed after booking" },
+  //     ],
+  //   },
+
+  //   cancellationPolicy: {
+  //     summary:
+  //       "Private tour bookings require advance confirmation. Activities are subject to weather and availability.",
+  //     items: [
+  //       { text: "Private tour bookings require advance confirmation" },
+  //       { text: "Weather may affect quad biking operations" },
+  //       { text: "Final cancellation policy is confirmed upon booking" },
+  //     ],
+  //   },
+
+  //   safetyPolicy: {
+  //     summary:
+  //       "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience and quad biking adventure.",
+  //     items: [
+  //       {
+  //         text: "All safety regulations must be followed at all times during shooting",
+  //       },
+  //       {
+  //         text: "Professional instructors supervise the entire shooting session",
+  //       },
+  //       { text: "Quad biking safety briefing provided before the ride" },
+  //       { text: "Safety gear must be worn at all times during quad biking" },
+  //       { text: "Riders must follow all guide instructions" },
+  //       { text: "No riding under the influence of alcohol or drugs" },
+  //       {
+  //         text: "Participants must comply with legal requirements for firearms training",
+  //       },
+  //       { text: "Age restrictions and eligibility criteria apply" },
+  //     ],
+  //   },
+
+  //   stops: [
+  //     {
+  //       id: "gun-range",
+  //       name: "Gun Range",
+  //       time: "Flexible",
+  //       duration: "1.5 - 2 hours",
+  //       note: "Professional supervised shooting experience",
+  //       description:
+  //         "Begin your adventure with a professionally supervised shooting session, complete with a firearm safety briefing and handgun or rifle package. Suitable for beginners and experienced shooters alike.",
+  //       exactLocation: mapLocation({
+  //         label: "Gun Range",
+  //         address: "Cape Town, South Africa",
+  //         query: "Cape Town Gun Range",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "atlantis-dunes",
+  //       name: "Atlantis Dunes Quad Biking",
+  //       time: "Flexible",
+  //       duration: "1 hour",
+  //       note: "Guided dune adventure",
+  //       description:
+  //         "Ride powerful quad bikes across the spectacular white sand dunes of Atlantis on an exciting guided adventure suitable for beginners and experienced riders.",
+  //       exactLocation: mapLocation({
+  //         label: "Atlantis Dunes",
+  //         address: "Atlantis, Cape Town, South Africa",
+  //         query: "Atlantis Dunes Quad Biking",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //   ],
+
+  //   routeInformation: {
+  //     title: "Gun Range + Quad Biking Adventure Route",
+
+  //     description:
+  //       "Experience the ultimate Cape Town adrenaline adventure with a professionally supervised shooting session followed by an exciting quad biking experience at the Atlantis Dunes.",
+
+  //     items: [
+  //       "Professionally supervised shooting range session",
+  //       "Handgun or rifle shooting package",
+  //       "1‑hour Atlantis Dunes quad biking adventure",
+  //       "Private transport throughout",
+  //     ],
+  //   },
+
+  //   vehicle: {
+  //     name: "",
+  //     class: "",
+  //     doors: null,
+  //     seats: null,
+  //     fuel: "",
+  //     gearbox: "",
+  //     engine: "",
+  //     specifications: [],
+  //   },
+
+  //   securityAndLiability: {
+  //     heading: "",
+  //     cardPreAuthorisation: {
+  //       amount: null,
+  //       currency: "",
+  //       description: "",
+  //       release: "",
+  //     },
+  //     cashDeposit: {
+  //       amountZAR: null,
+  //       alternativeAmountUSD: null,
+  //       paymentMethod: "",
+  //       paidAt: "",
+  //       refundPolicy: "",
+  //     },
+  //   },
+
+  //   needToKnow: [
+  //     { text: "Participants must follow all firearm safety instructions" },
+  //     { text: "Valid identification may be required at the shooting range" },
+  //     { text: "Quad biking is suitable for beginners and experienced riders" },
+  //     { text: "Comfortable clothing and closed shoes are recommended" },
+  //     { text: "Minimum age: 18 years for shooting, 16 years for quad biking" },
+  //     { text: "No alcohol before shooting or quad biking" },
+  //     { text: "Quad biking is subject to weather conditions" },
+  //   ],
+
+  //   faqs: [
+  //     {
+  //       question: "Is quad biking suitable for beginners?",
+  //       answer:
+  //         "Yes. Experienced guides provide a full safety briefing before the ride begins.",
+  //     },
+  //     {
+  //       question: "Is the shooting experience suitable for beginners?",
+  //       answer:
+  //         "Yes. Professional instructors supervise the entire session and provide comprehensive safety instruction.",
+  //     },
+  //     {
+  //       question: "Is this a private tour?",
+  //       answer:
+  //         "Yes. The tour includes a private vehicle with your own driver-guide throughout the day.",
+  //     },
+  //     {
+  //       question: "How many guests can join?",
+  //       answer:
+  //         "The tour can accommodate 2–7 guests in a private vehicle. Pricing is tiered: R9,800 for 2–4 guests and R13,400 for 5–7 guests.",
+  //     },
+  //     {
+  //       question: "Are meals included?",
+  //       answer: "No. Meals are excluded from the tour price.",
+  //     },
+  //     {
+  //       question: "What should I wear?",
+  //       answer:
+  //         "Wear comfortable clothing and closed shoes. Bring sunscreen, sunglasses, and a light jacket depending on the weather.",
+  //     },
+  //     {
+  //       question: "Is this tour suitable for bachelor groups?",
+  //       answer:
+  //         "Yes. This high‑adrenaline combo is perfect for bachelor groups, thrill‑seekers, and adventure travellers.",
+  //     },
+  //   ],
+
+  //   tags: [
+  //     "Gun Range",
+  //     "Quad Biking",
+  //     "Atlantis Dunes",
+  //     "Adventure",
+  //     "Private Tour",
+  //     "Cape Town",
+  //     "Full Day",
+  //     "Bachelor Groups",
+  //     "Thrill Seekers",
+  //     "Combo",
+  //   ],
+  // },
   // Horse-Riding + Cape-Point-Boulders-Beach
   {
     id: null, // New tour ID to be assigned (e.g., 30)
@@ -4545,585 +4545,585 @@ export const tours = [
     ],
   },
   // Gun-Range + Cape Peninsula (shooter-range)
-  {
-    id: null, // New tour ID to be assigned (e.g., 31)
-    type: TOUR_TYPES.ADRENALINE,
-    category: TOUR_MODIFIERS.FULL_DAY,
+  // {
+  //   id: null, // New tour ID to be assigned (e.g., 31)
+  //   type: TOUR_TYPES.ADRENALINE,
+  //   category: TOUR_MODIFIERS.FULL_DAY,
 
-    title: "Cape Peninsula Full Day Tour + Shooting Range Experience",
-    slug: "cape-peninsula-shooting-range-tour",
-    canonicalPath: "/tours/cape-peninsula-shooting-range-tour",
+  //   title: "Cape Peninsula Full Day Tour + Shooting Range Experience",
+  //   slug: "cape-peninsula-shooting-range-tour",
+  //   canonicalPath: "/tours/cape-peninsula-shooting-range-tour",
 
-    seo: {
-      title:
-        "Cape Peninsula Full Day Tour + Shooting Range Experience | Cape Frontier Tours",
-      description:
-        "A premium full‑day adventure combining adrenaline, wildlife, world‑class scenery and iconic Cape Town landmarks. Begin with an accredited shooting range experience before continuing along the breathtaking Cape Peninsula.",
-      keywords: [
-        "Cape Peninsula tour",
-        "shooting range Cape Town",
-        "Table Mountain tour",
-        "Cape Point tour",
-        "Boulders Beach penguins",
-        "Chapman's Peak Drive",
-        "Cape of Good Hope",
-        "Cape Town full day tour",
-        "private Cape Town tour",
-      ],
-    },
+  //   seo: {
+  //     title:
+  //       "Cape Peninsula Full Day Tour + Shooting Range Experience | Cape Frontier Tours",
+  //     description:
+  //       "A premium full‑day adventure combining adrenaline, wildlife, world‑class scenery and iconic Cape Town landmarks. Begin with an accredited shooting range experience before continuing along the breathtaking Cape Peninsula.",
+  //     keywords: [
+  //       "Cape Peninsula tour",
+  //       "shooting range Cape Town",
+  //       "Table Mountain tour",
+  //       "Cape Point tour",
+  //       "Boulders Beach penguins",
+  //       "Chapman's Peak Drive",
+  //       "Cape of Good Hope",
+  //       "Cape Town full day tour",
+  //       "private Cape Town tour",
+  //     ],
+  //   },
 
-    workflow: defaultWorkflow,
+  //   workflow: defaultWorkflow,
 
-    image:
-      "/src/assets/images/tours/adrenaline/cape-peninsula-shooting-range/1.webp",
-    images: [
-      "/src/assets/images/tours/adrenaline/cape-peninsula-shooting-range/1.webp",
-      "/src/assets/images/tours/adrenaline/cape-peninsula-shooting-range/2.webp",
-      "/src/assets/images/tours/adrenaline/cape-peninsula-shooting-range/3.webp",
-    ],
-    imageFolder: "adrenaline/cape-peninsula-shooting-range",
+  //   image:
+  //     "/src/assets/images/tours/adrenaline/cape-peninsula-shooting-range/1.webp",
+  //   images: [
+  //     "/src/assets/images/tours/adrenaline/cape-peninsula-shooting-range/1.webp",
+  //     "/src/assets/images/tours/adrenaline/cape-peninsula-shooting-range/2.webp",
+  //     "/src/assets/images/tours/adrenaline/cape-peninsula-shooting-range/3.webp",
+  //   ],
+  //   imageFolder: "adrenaline/cape-peninsula-shooting-range",
 
-    videos: [],
+  //   videos: [],
 
-    location: "Cape Peninsula, Cape Town, South Africa",
-    duration: "Full Day (8 - 9 hours)",
+  //   location: "Cape Peninsula, Cape Town, South Africa",
+  //   duration: "Full Day (8 - 9 hours)",
 
-    priceBase: 6000,
-    minPeople: 1,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
+  //   priceBase: 6000,
+  //   minPeople: 1,
+  //   baseCurrency: "ZAR",
+  //   supportedCurrencies: SUPPORTED_CURRENCIES,
 
-    pricing: [
-      {
-        category: "1 person",
-        pricePerPerson: 6000,
-        note: "",
-      },
-      {
-        category: "2–4 people",
-        pricePerPerson: 5100,
-        note: "15% discount",
-      },
-      {
-        category: "5–7 people",
-        pricePerPerson: 4800,
-        note: "20% discount",
-      },
-      {
-        category: "Children (5–12 years)",
-        pricePerPerson: 2400,
-        note: "",
-      },
-      {
-        category: "Teens (13–17 years)",
-        pricePerPerson: 2600,
-        note: "",
-      },
-    ],
+  //   pricing: [
+  //     {
+  //       category: "1 person",
+  //       pricePerPerson: 6000,
+  //       note: "",
+  //     },
+  //     {
+  //       category: "2–4 people",
+  //       pricePerPerson: 5100,
+  //       note: "15% discount",
+  //     },
+  //     {
+  //       category: "5–7 people",
+  //       pricePerPerson: 4800,
+  //       note: "20% discount",
+  //     },
+  //     {
+  //       category: "Children (5–12 years)",
+  //       pricePerPerson: 2400,
+  //       note: "",
+  //     },
+  //     {
+  //       category: "Teens (13–17 years)",
+  //       pricePerPerson: 2600,
+  //       note: "",
+  //     },
+  //   ],
 
-    additionalPricing: [
-      {
-        category: "Cape Point Flying Dutchman Funicular",
-        price: null,
-        unit: "per person",
-        currency: "ZAR",
-        note: "Optional. Paid directly at Cape Point.",
-      },
-    ],
+  //   additionalPricing: [
+  //     {
+  //       category: "Cape Point Flying Dutchman Funicular",
+  //       price: null,
+  //       unit: "per person",
+  //       currency: "ZAR",
+  //       note: "Optional. Paid directly at Cape Point.",
+  //     },
+  //   ],
 
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 1,
-          maxPeople: 1,
-          perPerson: 6000,
-          label: "1 Guest",
-          note: "Private vehicle • All-inclusive",
-        },
-        {
-          minPeople: 2,
-          maxPeople: 4,
-          perPerson: 5100,
-          label: "2–4 Guests",
-          note: "Private vehicle • 15% discount • All-inclusive",
-        },
-        {
-          minPeople: 5,
-          maxPeople: 7,
-          perPerson: 4800,
-          label: "5–7 Guests",
-          note: "Private vehicle • 20% discount • All-inclusive",
-        },
-      ],
-    },
+  //   groupPricing: {
+  //     enabled: true,
+  //     icon: "/icons/savemore.png",
+  //     tiers: [
+  //       {
+  //         minPeople: 1,
+  //         maxPeople: 1,
+  //         perPerson: 6000,
+  //         label: "1 Guest",
+  //         note: "Private vehicle • All-inclusive",
+  //       },
+  //       {
+  //         minPeople: 2,
+  //         maxPeople: 4,
+  //         perPerson: 5100,
+  //         label: "2–4 Guests",
+  //         note: "Private vehicle • 15% discount • All-inclusive",
+  //       },
+  //       {
+  //         minPeople: 5,
+  //         maxPeople: 7,
+  //         perPerson: 4800,
+  //         label: "5–7 Guests",
+  //         note: "Private vehicle • 20% discount • All-inclusive",
+  //       },
+  //     ],
+  //   },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
+  //   rating: null,
+  //   stars: null,
+  //   mainReviewerName: "",
+  //   mainReviewerCountry: "",
+  //   reviewYear: null,
+  //   otherReviews: null,
+  //   mainReview: "",
 
-    description:
-      "A premium full‑day adventure combining adrenaline, wildlife, world‑class scenery and iconic Cape Town landmarks. This tour begins with an accredited shooting range experience before continuing along the breathtaking Cape Peninsula.",
+  //   description:
+  //     "A premium full‑day adventure combining adrenaline, wildlife, world‑class scenery and iconic Cape Town landmarks. This tour begins with an accredited shooting range experience before continuing along the breathtaking Cape Peninsula.",
 
-    highlights: [
-      { text: "Accredited shooting range experience" },
-      { text: "Table Mountain Cableway" },
-      { text: "Camps Bay photo stop" },
-      { text: "Chapman's Peak Drive" },
-      { text: "Cape Point Ostrich Farm" },
-      { text: "Cape Point Nature Reserve" },
-      { text: "Old Cape Point Lighthouse" },
-      { text: "Cape of Good Hope" },
-      { text: "Boulders Beach Penguin Colony" },
-      { text: "Kalk Bay drive-through" },
-      { text: "Private transport with professional driver-guide" },
-    ],
+  //   highlights: [
+  //     { text: "Accredited shooting range experience" },
+  //     { text: "Table Mountain Cableway" },
+  //     { text: "Camps Bay photo stop" },
+  //     { text: "Chapman's Peak Drive" },
+  //     { text: "Cape Point Ostrich Farm" },
+  //     { text: "Cape Point Nature Reserve" },
+  //     { text: "Old Cape Point Lighthouse" },
+  //     { text: "Cape of Good Hope" },
+  //     { text: "Boulders Beach Penguin Colony" },
+  //     { text: "Kalk Bay drive-through" },
+  //     { text: "Private transport with professional driver-guide" },
+  //   ],
 
-    included: [
-      { text: "Hotel pickup and drop-off" },
-      { text: "Table Mountain entry" },
-      { text: "Cape Point entry" },
-      { text: "Shooting range experience" },
-      { text: "Bottled water" },
-      { text: "Reliable, comfortable vehicle" },
-      { text: "Professional registered guide" },
-      { text: "Accredited firearms instructor" },
-      { text: "Full safety briefing" },
-    ],
+  //   included: [
+  //     { text: "Hotel pickup and drop-off" },
+  //     { text: "Table Mountain entry" },
+  //     { text: "Cape Point entry" },
+  //     { text: "Shooting range experience" },
+  //     { text: "Bottled water" },
+  //     { text: "Reliable, comfortable vehicle" },
+  //     { text: "Professional registered guide" },
+  //     { text: "Accredited firearms instructor" },
+  //     { text: "Full safety briefing" },
+  //   ],
 
-    excluded: [
-      { text: "Lunch" },
-      { text: "Gratuities" },
-      { text: "Personal purchases" },
-      { text: "Cape Point Flying Dutchman Funicular (optional)" },
-      { text: "Ostrich feeding (optional)" },
-    ],
+  //   excluded: [
+  //     { text: "Lunch" },
+  //     { text: "Gratuities" },
+  //     { text: "Personal purchases" },
+  //     { text: "Cape Point Flying Dutchman Funicular (optional)" },
+  //     { text: "Ostrich feeding (optional)" },
+  //   ],
 
-    pickupOptions: [
-      "Cape Town CBD",
-      "Sea Point",
-      "Camps Bay",
-      "V&A Waterfront",
-      "Custom pickup on request",
-    ],
+  //   pickupOptions: [
+  //     "Cape Town CBD",
+  //     "Sea Point",
+  //     "Camps Bay",
+  //     "V&A Waterfront",
+  //     "Custom pickup on request",
+  //   ],
 
-    requirements: [
-      { text: "Minimum age to participate: 18 years for shooting" },
-      { text: "Valid ID or passport required" },
-      { text: "No alcohol before shooting" },
-      { text: "All minors strictly prohibited from handling firearms" },
-    ],
+  //   requirements: [
+  //     { text: "Minimum age to participate: 18 years for shooting" },
+  //     { text: "Valid ID or passport required" },
+  //     { text: "No alcohol before shooting" },
+  //     { text: "All minors strictly prohibited from handling firearms" },
+  //   ],
 
-    arrangements: {
-      availability: "Available all year",
-      duration: "Full Day (8 - 9 hours)",
-      operatingTime: "07:00 – 16:00",
-      departure: "07:00",
-      return: "16:00",
-      location: "Cape Peninsula, Cape Town, South Africa",
+  //   arrangements: {
+  //     availability: "Available all year",
+  //     duration: "Full Day (8 - 9 hours)",
+  //     operatingTime: "07:00 – 16:00",
+  //     departure: "07:00",
+  //     return: "16:00",
+  //     location: "Cape Peninsula, Cape Town, South Africa",
 
-      clothing: [
-        "Comfortable clothing",
-        "Closed shoes",
-        "Sunscreen",
-        "Sunglasses",
-        "Warm jacket depending on weather",
-      ],
+  //     clothing: [
+  //       "Comfortable clothing",
+  //       "Closed shoes",
+  //       "Sunscreen",
+  //       "Sunglasses",
+  //       "Warm jacket depending on weather",
+  //     ],
 
-      thingsToBring: [
-        "Valid ID or passport",
-        "Camera",
-        "Comfortable walking shoes",
-      ],
+  //     thingsToBring: [
+  //       "Valid ID or passport",
+  //       "Camera",
+  //       "Comfortable walking shoes",
+  //     ],
 
-      passengerPolicy: "",
-      sunsetNote: "",
-    },
+  //     passengerPolicy: "",
+  //     sunsetNote: "",
+  //   },
 
-    weatherPolicy: {
-      summary:
-        "Weather-dependent activities include Table Mountain Cableway and Chapman's Peak Drive. Shooting range operates in safe conditions.",
-      items: [
-        {
-          text: "Table Mountain Cableway operates subject to weather. If closed, you may keep your tickets for another day or request a refund.",
-        },
-        { text: "Chapman's Peak Drive access is weather-dependent" },
-        { text: "Shooting range operates in safe weather conditions" },
-        { text: "Final timing confirmed after booking" },
-      ],
-    },
+  //   weatherPolicy: {
+  //     summary:
+  //       "Weather-dependent activities include Table Mountain Cableway and Chapman's Peak Drive. Shooting range operates in safe conditions.",
+  //     items: [
+  //       {
+  //         text: "Table Mountain Cableway operates subject to weather. If closed, you may keep your tickets for another day or request a refund.",
+  //       },
+  //       { text: "Chapman's Peak Drive access is weather-dependent" },
+  //       { text: "Shooting range operates in safe weather conditions" },
+  //       { text: "Final timing confirmed after booking" },
+  //     ],
+  //   },
 
-    cancellationPolicy: {
-      summary:
-        "Cancellations must be made at least 2 days before the scheduled experience. Refunds will be subject to our discretion.",
-      items: [
-        {
-          text: "Cancellations must be made at least 2 days before scheduled date",
-        },
-        { text: "Refunds are subject to our discretion" },
-        { text: "Private tour bookings require advance confirmation" },
-        { text: "Weather may affect cableway and Chapman's Peak operations" },
-      ],
-    },
+  //   cancellationPolicy: {
+  //     summary:
+  //       "Cancellations must be made at least 2 days before the scheduled experience. Refunds will be subject to our discretion.",
+  //     items: [
+  //       {
+  //         text: "Cancellations must be made at least 2 days before scheduled date",
+  //       },
+  //       { text: "Refunds are subject to our discretion" },
+  //       { text: "Private tour bookings require advance confirmation" },
+  //       { text: "Weather may affect cableway and Chapman's Peak operations" },
+  //     ],
+  //   },
 
-    safetyPolicy: {
-      summary:
-        "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience. Keep vehicle windows closed near baboons. Maintain distance and do not feed baboons.",
-      items: [
-        {
-          text: "All safety regulations must be followed at all times during shooting",
-        },
-        {
-          text: "Professional instructors supervise the entire shooting session",
-        },
-        {
-          text: "Participants must comply with legal requirements for firearms training",
-        },
-        { text: "Age restrictions and eligibility criteria apply" },
-        {
-          text: "Be vigilant and observant of what is required when safety briefing is communicated",
-        },
-        { text: "Keep vehicle windows closed near baboons" },
-        { text: "Maintain distance from wildlife" },
-        { text: "Feeding baboons is strictly prohibited" },
-        {
-          text: "Touching or feeding penguins at Boulders Beach is not allowed",
-        },
-      ],
-    },
+  //   safetyPolicy: {
+  //     summary:
+  //       "Participants must adhere to all safety regulations and instructions provided by our instructors during the shooting experience. Keep vehicle windows closed near baboons. Maintain distance and do not feed baboons.",
+  //     items: [
+  //       {
+  //         text: "All safety regulations must be followed at all times during shooting",
+  //       },
+  //       {
+  //         text: "Professional instructors supervise the entire shooting session",
+  //       },
+  //       {
+  //         text: "Participants must comply with legal requirements for firearms training",
+  //       },
+  //       { text: "Age restrictions and eligibility criteria apply" },
+  //       {
+  //         text: "Be vigilant and observant of what is required when safety briefing is communicated",
+  //       },
+  //       { text: "Keep vehicle windows closed near baboons" },
+  //       { text: "Maintain distance from wildlife" },
+  //       { text: "Feeding baboons is strictly prohibited" },
+  //       {
+  //         text: "Touching or feeding penguins at Boulders Beach is not allowed",
+  //       },
+  //     ],
+  //   },
 
-    stops: [
-      {
-        id: "shooting-range",
-        name: "Shooting Range Experience",
-        time: "07:30 – 09:00",
-        duration: "1.5 hours",
-        note: "Accredited shooting range",
-        description:
-          "Begin your day with an exciting, professionally supervised shooting session at an accredited Cape Town gun range. Your instructor will guide you through firearm safety, handling and target shooting. This experience adds a thrilling and memorable start to your Cape Peninsula journey.",
-        exactLocation: mapLocation({
-          label: "Accredited Shooting Range",
-          address: "Cape Town, South Africa",
-          query: "Cape Town Gun Range",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "table-mountain",
-        name: "Table Mountain Cableway",
-        time: "09:15 – 10:00",
-        duration: "45 minutes",
-        note: "Panoramic views",
-        description:
-          "Ascend more than a kilometre above sea level for panoramic views of Cape Town, Robben Island and the Atlantic Ocean. Your guide will share insights into the mountain's geology, flora and fauna, and assist with photos.",
-        exactLocation: mapLocation({
-          label: "Table Mountain Cableway",
-          address: "Table Mountain, Cape Town, South Africa",
-          query: "Table Mountain Cableway",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "camps-bay",
-        name: "Camps Bay",
-        time: "10:15 – 10:30",
-        duration: "15 minutes",
-        note: "Scenic photo stop",
-        description:
-          "Enjoy a short photo stop in Cape Town's glamorous seaside suburb, framed by the Twelve Apostles mountain range and a pristine white‑sand beach. Your guide will highlight landmarks including Lion's Head and Table Mountain.",
-        exactLocation: mapLocation({
-          label: "Camps Bay",
-          address: "Camps Bay, Cape Town, South Africa",
-          query: "Camps Bay Beach",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "hout-bay",
-        name: "Hout Bay (Drive-Through)",
-        time: "10:30 – 10:50",
-        duration: "Drive-through",
-        note: "Coastal town",
-        description:
-          "Pass through this scenic coastal town known for its fishing harbour, seafood restaurants and dramatic mountain surroundings.",
-        exactLocation: mapLocation({
-          label: "Hout Bay",
-          address: "Hout Bay, Cape Town, South Africa",
-          query: "Hout Bay",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "chapmans-peak",
-        name: "Chapman's Peak Drive",
-        time: "10:50 – 11:10",
-        duration: "20 minutes",
-        note: "Spectacular coastal road",
-        description:
-          "Experience one of the world's most spectacular coastal roads. Chapman's Peak offers dramatic cliffside views and multiple photo opportunities.",
-        exactLocation: mapLocation({
-          label: "Chapman's Peak Drive",
-          address: "Chapman's Peak, Cape Town, South Africa",
-          query: "Chapman's Peak Drive",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "ostrich-farm",
-        name: "Cape Point Ostrich Farm",
-        time: "11:15 – 11:30",
-        duration: "15 minutes",
-        note: "Close-range ostrich viewing",
-        description:
-          "Located just before the Cape Point gate, this farm allows close range viewing of ostriches. Your guide can drive you inside for photos and optional feeding.",
-        exactLocation: mapLocation({
-          label: "Cape Point Ostrich Farm",
-          address: "Cape Point, Cape Peninsula, South Africa",
-          query: "Cape Point Ostrich Farm",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "cape-point-nature-reserve",
-        name: "Cape Point Nature Reserve",
-        time: "11:30 – 12:15",
-        duration: "45 minutes",
-        note: "Rich floral kingdom",
-        description:
-          "Explore one of the world's richest floral kingdoms, home to over 2,000 plant species and wildlife including antelope, ostriches, baboons, zebras and diverse birdlife. Your guide will share stories of early explorers and make scenic stops for photos.",
-        exactLocation: mapLocation({
-          label: "Cape Point Nature Reserve",
-          address: "Cape Point, Cape Peninsula, South Africa",
-          query: "Cape Point Nature Reserve",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "cape-point-lighthouse",
-        name: "Old Cape Point Lighthouse",
-        time: "12:15 – 13:00",
-        duration: "45 minutes",
-        note: "Historic lighthouse",
-        description:
-          "Perched more than 400 metres above sea level, this historic lighthouse offers breathtaking views. Reach it via a short hike or take the funicular (optional extra).",
-        exactLocation: mapLocation({
-          label: "Cape Point Lighthouse",
-          address: "Cape Point, Cape Peninsula, South Africa",
-          query: "Cape Point Lighthouse",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "cape-of-good-hope",
-        name: "Cape of Good Hope",
-        time: "13:00 – 13:45",
-        duration: "45 minutes",
-        note: "Most south-western point of Africa",
-        description:
-          "Visit the most south‑western point of the African continent, where Atlantic and Indian Ocean currents meet. Enjoy scenic walks, photo stops and the iconic Cape of Good Hope sign.",
-        exactLocation: mapLocation({
-          label: "Cape of Good Hope",
-          address: "Cape of Good Hope, Cape Peninsula, South Africa",
-          query: "Cape of Good Hope",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "simons-town",
-        name: "Simon's Town & Lunch Stop",
-        time: "13:45 – 14:45",
-        duration: "1 hour",
-        note: "Lunch stop",
-        description:
-          "A charming naval town known for its Victorian architecture, seafood restaurants and coastal views. Enjoy lunch at a restaurant of your choice before continuing to Boulders Beach.",
-        exactLocation: mapLocation({
-          label: "Simon's Town",
-          address: "Simon's Town, Cape Town, South Africa",
-          query: "Simon's Town",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "boulders-beach",
-        name: "Boulders Beach Penguin Colony",
-        time: "14:45 – 15:30",
-        duration: "45 minutes",
-        note: "African penguin colony",
-        description:
-          "Home to the endangered African penguin, Boulders Beach offers safe, close‑range viewing via elevated boardwalks. Touching or feeding penguins is not allowed.",
-        exactLocation: mapLocation({
-          label: "Boulders Beach",
-          address: "Kleintuin Road, Simon's Town, Cape Town, South Africa",
-          query: "Boulders Beach Penguin Colony",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "kalk-bay",
-        name: "Kalk Bay (Drive-Through)",
-        time: "15:30 – 15:45",
-        duration: "Drive-through",
-        note: "Vibrant seaside town",
-        description:
-          "A vibrant seaside town known for its fishing harbour, art galleries, boutique shops and restaurants. Once voted by Forbes as one of the coolest places to live in the world.",
-        exactLocation: mapLocation({
-          label: "Kalk Bay",
-          address: "Kalk Bay, Cape Town, South Africa",
-          query: "Kalk Bay",
-        }),
-        images: [],
-        touristComments: [],
-      },
-    ],
+  //   stops: [
+  //     {
+  //       id: "shooting-range",
+  //       name: "Shooting Range Experience",
+  //       time: "07:30 – 09:00",
+  //       duration: "1.5 hours",
+  //       note: "Accredited shooting range",
+  //       description:
+  //         "Begin your day with an exciting, professionally supervised shooting session at an accredited Cape Town gun range. Your instructor will guide you through firearm safety, handling and target shooting. This experience adds a thrilling and memorable start to your Cape Peninsula journey.",
+  //       exactLocation: mapLocation({
+  //         label: "Accredited Shooting Range",
+  //         address: "Cape Town, South Africa",
+  //         query: "Cape Town Gun Range",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "table-mountain",
+  //       name: "Table Mountain Cableway",
+  //       time: "09:15 – 10:00",
+  //       duration: "45 minutes",
+  //       note: "Panoramic views",
+  //       description:
+  //         "Ascend more than a kilometre above sea level for panoramic views of Cape Town, Robben Island and the Atlantic Ocean. Your guide will share insights into the mountain's geology, flora and fauna, and assist with photos.",
+  //       exactLocation: mapLocation({
+  //         label: "Table Mountain Cableway",
+  //         address: "Table Mountain, Cape Town, South Africa",
+  //         query: "Table Mountain Cableway",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "camps-bay",
+  //       name: "Camps Bay",
+  //       time: "10:15 – 10:30",
+  //       duration: "15 minutes",
+  //       note: "Scenic photo stop",
+  //       description:
+  //         "Enjoy a short photo stop in Cape Town's glamorous seaside suburb, framed by the Twelve Apostles mountain range and a pristine white‑sand beach. Your guide will highlight landmarks including Lion's Head and Table Mountain.",
+  //       exactLocation: mapLocation({
+  //         label: "Camps Bay",
+  //         address: "Camps Bay, Cape Town, South Africa",
+  //         query: "Camps Bay Beach",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "hout-bay",
+  //       name: "Hout Bay (Drive-Through)",
+  //       time: "10:30 – 10:50",
+  //       duration: "Drive-through",
+  //       note: "Coastal town",
+  //       description:
+  //         "Pass through this scenic coastal town known for its fishing harbour, seafood restaurants and dramatic mountain surroundings.",
+  //       exactLocation: mapLocation({
+  //         label: "Hout Bay",
+  //         address: "Hout Bay, Cape Town, South Africa",
+  //         query: "Hout Bay",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "chapmans-peak",
+  //       name: "Chapman's Peak Drive",
+  //       time: "10:50 – 11:10",
+  //       duration: "20 minutes",
+  //       note: "Spectacular coastal road",
+  //       description:
+  //         "Experience one of the world's most spectacular coastal roads. Chapman's Peak offers dramatic cliffside views and multiple photo opportunities.",
+  //       exactLocation: mapLocation({
+  //         label: "Chapman's Peak Drive",
+  //         address: "Chapman's Peak, Cape Town, South Africa",
+  //         query: "Chapman's Peak Drive",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "ostrich-farm",
+  //       name: "Cape Point Ostrich Farm",
+  //       time: "11:15 – 11:30",
+  //       duration: "15 minutes",
+  //       note: "Close-range ostrich viewing",
+  //       description:
+  //         "Located just before the Cape Point gate, this farm allows close range viewing of ostriches. Your guide can drive you inside for photos and optional feeding.",
+  //       exactLocation: mapLocation({
+  //         label: "Cape Point Ostrich Farm",
+  //         address: "Cape Point, Cape Peninsula, South Africa",
+  //         query: "Cape Point Ostrich Farm",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "cape-point-nature-reserve",
+  //       name: "Cape Point Nature Reserve",
+  //       time: "11:30 – 12:15",
+  //       duration: "45 minutes",
+  //       note: "Rich floral kingdom",
+  //       description:
+  //         "Explore one of the world's richest floral kingdoms, home to over 2,000 plant species and wildlife including antelope, ostriches, baboons, zebras and diverse birdlife. Your guide will share stories of early explorers and make scenic stops for photos.",
+  //       exactLocation: mapLocation({
+  //         label: "Cape Point Nature Reserve",
+  //         address: "Cape Point, Cape Peninsula, South Africa",
+  //         query: "Cape Point Nature Reserve",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "cape-point-lighthouse",
+  //       name: "Old Cape Point Lighthouse",
+  //       time: "12:15 – 13:00",
+  //       duration: "45 minutes",
+  //       note: "Historic lighthouse",
+  //       description:
+  //         "Perched more than 400 metres above sea level, this historic lighthouse offers breathtaking views. Reach it via a short hike or take the funicular (optional extra).",
+  //       exactLocation: mapLocation({
+  //         label: "Cape Point Lighthouse",
+  //         address: "Cape Point, Cape Peninsula, South Africa",
+  //         query: "Cape Point Lighthouse",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "cape-of-good-hope",
+  //       name: "Cape of Good Hope",
+  //       time: "13:00 – 13:45",
+  //       duration: "45 minutes",
+  //       note: "Most south-western point of Africa",
+  //       description:
+  //         "Visit the most south‑western point of the African continent, where Atlantic and Indian Ocean currents meet. Enjoy scenic walks, photo stops and the iconic Cape of Good Hope sign.",
+  //       exactLocation: mapLocation({
+  //         label: "Cape of Good Hope",
+  //         address: "Cape of Good Hope, Cape Peninsula, South Africa",
+  //         query: "Cape of Good Hope",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "simons-town",
+  //       name: "Simon's Town & Lunch Stop",
+  //       time: "13:45 – 14:45",
+  //       duration: "1 hour",
+  //       note: "Lunch stop",
+  //       description:
+  //         "A charming naval town known for its Victorian architecture, seafood restaurants and coastal views. Enjoy lunch at a restaurant of your choice before continuing to Boulders Beach.",
+  //       exactLocation: mapLocation({
+  //         label: "Simon's Town",
+  //         address: "Simon's Town, Cape Town, South Africa",
+  //         query: "Simon's Town",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "boulders-beach",
+  //       name: "Boulders Beach Penguin Colony",
+  //       time: "14:45 – 15:30",
+  //       duration: "45 minutes",
+  //       note: "African penguin colony",
+  //       description:
+  //         "Home to the endangered African penguin, Boulders Beach offers safe, close‑range viewing via elevated boardwalks. Touching or feeding penguins is not allowed.",
+  //       exactLocation: mapLocation({
+  //         label: "Boulders Beach",
+  //         address: "Kleintuin Road, Simon's Town, Cape Town, South Africa",
+  //         query: "Boulders Beach Penguin Colony",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "kalk-bay",
+  //       name: "Kalk Bay (Drive-Through)",
+  //       time: "15:30 – 15:45",
+  //       duration: "Drive-through",
+  //       note: "Vibrant seaside town",
+  //       description:
+  //         "A vibrant seaside town known for its fishing harbour, art galleries, boutique shops and restaurants. Once voted by Forbes as one of the coolest places to live in the world.",
+  //       exactLocation: mapLocation({
+  //         label: "Kalk Bay",
+  //         address: "Kalk Bay, Cape Town, South Africa",
+  //         query: "Kalk Bay",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //   ],
 
-    routeInformation: {
-      title: "Cape Peninsula Full Day Tour + Shooting Range Route",
+  //   routeInformation: {
+  //     title: "Cape Peninsula Full Day Tour + Shooting Range Route",
 
-      description:
-        "A premium full‑day adventure combining adrenaline, wildlife, world‑class scenery and iconic Cape Town landmarks.",
+  //     description:
+  //       "A premium full‑day adventure combining adrenaline, wildlife, world‑class scenery and iconic Cape Town landmarks.",
 
-      items: [
-        "Accredited shooting range experience",
-        "Table Mountain Cableway",
-        "Camps Bay photo stop",
-        "Chapman's Peak Drive",
-        "Cape Point Ostrich Farm",
-        "Cape Point Nature Reserve",
-        "Old Cape Point Lighthouse",
-        "Cape of Good Hope",
-        "Simon's Town lunch stop",
-        "Boulders Beach Penguin Colony",
-        "Kalk Bay drive-through",
-      ],
-    },
+  //     items: [
+  //       "Accredited shooting range experience",
+  //       "Table Mountain Cableway",
+  //       "Camps Bay photo stop",
+  //       "Chapman's Peak Drive",
+  //       "Cape Point Ostrich Farm",
+  //       "Cape Point Nature Reserve",
+  //       "Old Cape Point Lighthouse",
+  //       "Cape of Good Hope",
+  //       "Simon's Town lunch stop",
+  //       "Boulders Beach Penguin Colony",
+  //       "Kalk Bay drive-through",
+  //     ],
+  //   },
 
-    vehicle: {
-      name: "",
-      class: "",
-      doors: null,
-      seats: null,
-      fuel: "",
-      gearbox: "",
-      engine: "",
-      specifications: [],
-    },
+  //   vehicle: {
+  //     name: "",
+  //     class: "",
+  //     doors: null,
+  //     seats: null,
+  //     fuel: "",
+  //     gearbox: "",
+  //     engine: "",
+  //     specifications: [],
+  //   },
 
-    securityAndLiability: {
-      heading: "",
-      cardPreAuthorisation: {
-        amount: null,
-        currency: "",
-        description: "",
-        release: "",
-      },
-      cashDeposit: {
-        amountZAR: null,
-        alternativeAmountUSD: null,
-        paymentMethod: "",
-        paidAt: "",
-        refundPolicy: "",
-      },
-    },
+  //   securityAndLiability: {
+  //     heading: "",
+  //     cardPreAuthorisation: {
+  //       amount: null,
+  //       currency: "",
+  //       description: "",
+  //       release: "",
+  //     },
+  //     cashDeposit: {
+  //       amountZAR: null,
+  //       alternativeAmountUSD: null,
+  //       paymentMethod: "",
+  //       paidAt: "",
+  //       refundPolicy: "",
+  //     },
+  //   },
 
-    needToKnow: [
-      { text: "Minimum age to participate: 18 years for shooting" },
-      { text: "Valid ID or passport required" },
-      { text: "No alcohol before shooting" },
-      { text: "All minors strictly prohibited from handling firearms" },
-      {
-        text: "Table Mountain Cableway operates subject to weather. If closed, you may keep your tickets for another day or request a refund.",
-      },
-      { text: "Chapman's Peak Drive access is weather-dependent" },
-      { text: "Keep vehicle windows closed near baboons" },
-      { text: "Maintain distance from wildlife" },
-      { text: "Feeding baboons is strictly prohibited" },
-      { text: "Touching or feeding penguins at Boulders Beach is not allowed" },
-      { text: "Comfortable walking shoes are recommended" },
-      {
-        text: "Lunch is excluded — choose your own restaurant in Simon's Town",
-      },
-    ],
+  //   needToKnow: [
+  //     { text: "Minimum age to participate: 18 years for shooting" },
+  //     { text: "Valid ID or passport required" },
+  //     { text: "No alcohol before shooting" },
+  //     { text: "All minors strictly prohibited from handling firearms" },
+  //     {
+  //       text: "Table Mountain Cableway operates subject to weather. If closed, you may keep your tickets for another day or request a refund.",
+  //     },
+  //     { text: "Chapman's Peak Drive access is weather-dependent" },
+  //     { text: "Keep vehicle windows closed near baboons" },
+  //     { text: "Maintain distance from wildlife" },
+  //     { text: "Feeding baboons is strictly prohibited" },
+  //     { text: "Touching or feeding penguins at Boulders Beach is not allowed" },
+  //     { text: "Comfortable walking shoes are recommended" },
+  //     {
+  //       text: "Lunch is excluded — choose your own restaurant in Simon's Town",
+  //     },
+  //   ],
 
-    faqs: [
-      {
-        question: "Is the shooting experience suitable for beginners?",
-        answer:
-          "Yes. Professional instructors provide a full safety briefing and supervise the entire session.",
-      },
-      {
-        question: "What is the minimum age for the shooting experience?",
-        answer:
-          "The minimum age is 18 years. Valid ID or passport is required.",
-      },
-      {
-        question: "Is Table Mountain Cableway always open?",
-        answer:
-          "The cable car operates subject to weather. If closed, you may keep your tickets for another day or request a refund.",
-      },
-      {
-        question: "Is Chapman's Peak Drive always open?",
-        answer:
-          "Chapman's Peak Drive access is weather-dependent and may close during high winds or rain.",
-      },
-      {
-        question: "Is this a private tour?",
-        answer:
-          "Yes. The tour includes a private vehicle with your own driver-guide.",
-      },
-      {
-        question: "What is included in the tour price?",
-        answer:
-          "The tour includes hotel pickup and drop-off, Table Mountain entry, Cape Point entry, shooting range experience, bottled water, and a professional registered guide.",
-      },
-      {
-        question: "Is lunch included?",
-        answer:
-          "No. Lunch is excluded, allowing guests to choose their restaurant of choice in Simon's Town.",
-      },
-      {
-        question: "Can children participate?",
-        answer:
-          "Children can participate in the sightseeing portion. Children 5–12 years are priced at R2,400 and teens 13–17 years at R2,600. All minors are strictly prohibited from handling firearms.",
-      },
-      {
-        question: "What should I bring?",
-        answer:
-          "Bring your valid ID or passport, camera, comfortable walking shoes, sunscreen, sunglasses, and a warm jacket depending on the weather.",
-      },
-    ],
+  //   faqs: [
+  //     {
+  //       question: "Is the shooting experience suitable for beginners?",
+  //       answer:
+  //         "Yes. Professional instructors provide a full safety briefing and supervise the entire session.",
+  //     },
+  //     {
+  //       question: "What is the minimum age for the shooting experience?",
+  //       answer:
+  //         "The minimum age is 18 years. Valid ID or passport is required.",
+  //     },
+  //     {
+  //       question: "Is Table Mountain Cableway always open?",
+  //       answer:
+  //         "The cable car operates subject to weather. If closed, you may keep your tickets for another day or request a refund.",
+  //     },
+  //     {
+  //       question: "Is Chapman's Peak Drive always open?",
+  //       answer:
+  //         "Chapman's Peak Drive access is weather-dependent and may close during high winds or rain.",
+  //     },
+  //     {
+  //       question: "Is this a private tour?",
+  //       answer:
+  //         "Yes. The tour includes a private vehicle with your own driver-guide.",
+  //     },
+  //     {
+  //       question: "What is included in the tour price?",
+  //       answer:
+  //         "The tour includes hotel pickup and drop-off, Table Mountain entry, Cape Point entry, shooting range experience, bottled water, and a professional registered guide.",
+  //     },
+  //     {
+  //       question: "Is lunch included?",
+  //       answer:
+  //         "No. Lunch is excluded, allowing guests to choose their restaurant of choice in Simon's Town.",
+  //     },
+  //     {
+  //       question: "Can children participate?",
+  //       answer:
+  //         "Children can participate in the sightseeing portion. Children 5–12 years are priced at R2,400 and teens 13–17 years at R2,600. All minors are strictly prohibited from handling firearms.",
+  //     },
+  //     {
+  //       question: "What should I bring?",
+  //       answer:
+  //         "Bring your valid ID or passport, camera, comfortable walking shoes, sunscreen, sunglasses, and a warm jacket depending on the weather.",
+  //     },
+  //   ],
 
-    tags: [
-      "Cape Peninsula",
-      "Shooting Range",
-      "Table Mountain",
-      "Cape Point",
-      "Boulders Beach",
-      "Penguins",
-      "Chapman's Peak",
-      "Cape of Good Hope",
-      "Private Tour",
-      "Adventure",
-      "Cape Town",
-      "Full Day",
-      "Wildlife",
-    ],
-  },
+  //   tags: [
+  //     "Cape Peninsula",
+  //     "Shooting Range",
+  //     "Table Mountain",
+  //     "Cape Point",
+  //     "Boulders Beach",
+  //     "Penguins",
+  //     "Chapman's Peak",
+  //     "Cape of Good Hope",
+  //     "Private Tour",
+  //     "Adventure",
+  //     "Cape Town",
+  //     "Full Day",
+  //     "Wildlife",
+  //   ],
+  // },
 
   // =========================================== HIKING
   // Lions-Head
