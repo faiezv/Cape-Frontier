@@ -4183,21 +4183,21 @@ export const tours = [
     location: "Cape Peninsula, Cape Town, South Africa",
     duration: "8 - 9 Hours",
 
-    priceBase: 11560,
-    minPeople: 1,
+    priceBase: 3850,
+    minPeople: 2,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
-        category: "1–4 Guests",
-        pricePerPerson: null,
-        note: "R11,560 total (private vehicle)",
+        category: "Adult",
+        pricePerPerson: 3850,
+        note: "Minimum of two people required. "
       },
       {
-        category: "5–7 Guests",
-        pricePerPerson: null,
-        note: "R17,300 total (private vehicle)",
+        category: "Children 6 - 11",
+        pricePerPerson: 2150,
+        note: "Horse Riding + All entry fees.",
       },
     ],
 
@@ -4216,19 +4216,28 @@ export const tours = [
       icon: "/icons/savemore.png",
       tiers: [
         {
-          minPeople: 1,
-          maxPeople: 4,
-          perPerson: null,
-          totalPrice: 11560,
-          label: "1–4 Guests",
+          minPeople: 3,
+          maxPeople: 3,
+          perPerson: 3350,
+          totalPrice: perPerson * maxPeople,
+          label: "3 Guests",
+          note: "Private vehicle • All-inclusive",
+        },
+
+        {
+          minPeople: 4,
+          maxPeople: 5,
+          perPerson: 2950,
+          totalPrice: perPerson * maxPeople,
+          label: "4-5 Guests",
           note: "Private vehicle • All-inclusive",
         },
         {
-          minPeople: 5,
+          minPeople: 6,
           maxPeople: 7,
-          perPerson: null,
-          totalPrice: 17300,
-          label: "5–7 Guests",
+          perPerson: 2750,
+          totalPrice: perPerson * maxPeople,
+          label: "4-5 Guests",
           note: "Private vehicle • All-inclusive",
         },
       ],
