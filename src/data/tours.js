@@ -338,7 +338,9 @@ export const tours = [
           address: "Cape Town, South Africa",
           query: "Cape Town South Africa",
         }),
-        images: "/images/tours/shared/pickup/1.webp",
+        images: [
+          "/src/assets/images/tours/shared/pickup/1.webp",
+        ],
         touristComments: [],
       },
       {
@@ -354,8 +356,10 @@ export const tours = [
           address: "Gansbaai, Western Cape, South Africa",
           query: "Gansbaai Western Cape",
         }),
-        images: [],
         touristComments: [],
+        images: [
+          "/src/assets/images/tours/shared/gansbaai/1.webp",
+        ],
       },
       {
         id: "arrival-briefing",

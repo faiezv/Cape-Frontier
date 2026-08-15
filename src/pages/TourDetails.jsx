@@ -1612,7 +1612,7 @@ function ItineraryImageFrame({ stop, index }) {
           {stopImages.slice(1, 4).map((image, imageIndex) => (
             <img
               key={`${stop.name}-${image}-${imageIndex}`}
-              src={image}
+              src={resolveImage(image)}
               alt={`${stop.name} ${imageIndex + 2}`}
               loading="lazy"
               decoding="async"
