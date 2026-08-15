@@ -4147,7 +4147,7 @@ export const tours = [
 
     title: "Horse Riding, Penguins & Cape Point Full‑Day Tour",
     slug: "horse-riding-penguins-cape-point-tour",
-    canonicalPath: "/tours/horse-riding-cape-point-tour",
+    canonicalPath: "/tours/horse-riding-penguins-cape-point-tour",
 
     seo: {
       title:
