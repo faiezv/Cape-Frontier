@@ -7,7 +7,7 @@ import kaap from '/src/assets/images/content/hero/kaap.png'
 import cobra1 from '/src/assets/images/tours/adrenaline/cobra/1.webp'
 import simonsTown from '/src/assets/images/content/hero/1.webp'
 import cobra2 from '/src/assets/images/tours/adrenaline/cobra/2.webp'
-import landing from '/src/assets/images/content/hero/landing.webp'
+import landing from '/src/assets/images/content/hero/2.webp'
 
 gsap.registerPlugin(ScrollTrigger)
 
