@@ -338,7 +338,7 @@ export const tours = [
           address: "Cape Town, South Africa",
           query: "Cape Town South Africa",
         }),
-        images: getCoverImage("adrenaline/shark-cage-diving"),
+        images: "/images/tours/shared/pickup/1.webp",
         touristComments: [],
       },
       {
