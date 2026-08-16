@@ -981,7 +981,7 @@ export default function TourDetails() {
 
             {/* MOBILE / TABLET */}
             <div className="mt-8 lg:hidden">
-              <MobileItineraryCarousel stops={tour.stops} />
+              <MobileItineraryCarousel tour={tour} stops={tour.stops} />
             </div>
 
             <div className="mt-6 lg:hidden">
@@ -1676,14 +1676,16 @@ function ItineraryImageFrame({tour, stop, index }) {
   );
 }
 
-function MobileItineraryCarousel({ stops }) {
+function MobileItineraryCarousel({ tour, stops }) {
   if (!stops.length) return null;
 
   return (
     <div className="-mx-4 overflow-visible sm:-mx-5">
-      <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 touch-pan-x overscroll-x-contain sm:px-5 [scrollbar-width:thin]">
+        {/* <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 overscroll-x-contain touch-pan-x sm:px-5 [scrollbar-width:thin]"> */}
+          <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 sm:px-5 [scrollbar-width:thin]">
         {stops.map((stop, index) => {
-          const mainImage = stop.images?.[0];
+          // const mainImage = stop.images?.[0];
+          const mainImage = `images/tours/${tour.imageFolder}/stops/${index + 1}.webp`;
           const hasMapLink = Boolean(stop.exactLocation?.googleMapsUrl);
 
           return (
