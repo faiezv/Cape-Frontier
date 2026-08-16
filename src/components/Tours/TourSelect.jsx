@@ -101,6 +101,7 @@ const getTourOptions = () => {
       price: null,
       duration: null,
       category: null,
+      type: 'other',
       link: '#tours',
       raw: title,
     }))
@@ -115,6 +116,7 @@ const getTourOptions = () => {
       price: formatTourPrice(tour),
       duration: tour?.duration || null,
       category: tour?.category || tour?.type || null,
+      type: tour?.type || 'other',
       link: getTourLink(tour),
       raw: tour,
     }))
@@ -128,6 +130,7 @@ const getTourOptions = () => {
     price: null,
     duration: null,
     category: null,
+    type: 'other',
     link: '#tours',
     raw: title,
   }))
@@ -198,6 +201,12 @@ function TourSelect() {
   const [searchError, setSearchError] = useState(null)
   const [preventSameDay, setPreventSameDay] = useState(false)
 
+  // Filter state for destination modal
+  const [filterType, setFilterType] = useState('all')
+
+  // Mobile: expanded row index
+  const [expandedIndex, setExpandedIndex] = useState(null)
+
   // ----- NEW: banner visibility state -----
   const [showBanner, setShowBanner] = useState(true)
   const lastScrollY = useRef(0)
@@ -259,8 +268,24 @@ function TourSelect() {
   const titleRef = useRef(null)
   const titleShineRef = useRef(null)
 
+  // Refs for destination modal row animations and title overflow checks
+  const destinationModalRef = useRef(null)
+  const destinationRowRefs = useRef([])
+  const destinationTitleRefs = useRef([])
+
   const isMobileLayout = viewportWidth < 700
   const tourOptions = useMemo(() => getTourOptions(), [])
+
+  // Compute unique tour types for filter
+  const tourTypes = useMemo(() => {
+    const types = new Set(tourOptions.map(t => t.type).filter(Boolean))
+    return ['all', ...Array.from(types)]
+  }, [tourOptions])
+
+  const filteredTours = useMemo(() => {
+    if (filterType === 'all') return tourOptions
+    return tourOptions.filter(t => t.type === filterType)
+  }, [tourOptions, filterType])
 
   const navigate = useLoadingNavigate()
 
@@ -463,6 +488,45 @@ function TourSelect() {
     }, 3600)
     return () => window.clearTimeout(timer)
   }, [searchError?.id])
+
+  // Entrance animation for destination modal rows – fixed flicker
+  useEffect(() => {
+    if (activeModal === 'destination' && destinationModalRef.current) {
+      const rows = destinationRowRefs.current.filter(Boolean)
+      if (rows.length) {
+        // reset to hidden state first to prevent initial flash
+        gsap.set(rows, { opacity: 0, y: 12 })
+        gsap.to(rows, {
+          opacity: 1,
+          y: 0,
+          stagger: 0.05,
+          duration: 0.35,
+          ease: 'power2.out',
+          clearProps: 'opacity'
+        })
+      }
+    }
+  }, [activeModal, filterType]) // re-run when filter changes to animate new list
+
+  // Overflow check for title marquee (desktop only)
+  useEffect(() => {
+    if (isMobileLayout) return
+    // Wait for rows to render
+    const timer = setTimeout(() => {
+      destinationTitleRefs.current.forEach((el) => {
+        if (!el) return
+        const parent = el.closest('.marquee-wrapper')
+        if (!parent) return
+        // Check if text overflows
+        if (el.scrollWidth > parent.clientWidth) {
+          parent.classList.add('marquee-active')
+        } else {
+          parent.classList.remove('marquee-active')
+        }
+      })
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [filteredTours, isMobileLayout])
 
   const getMissingDetails = () => {
     const missing = []
@@ -791,54 +855,312 @@ function TourSelect() {
   }
 
   const modalNode = activeModal && typeof document !== 'undefined' ? createPortal(
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4 backdrop-blur-md" onClick={close}>
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md" onClick={close}>
       <div
-        className={`modal-content flex max-h-[88vh] w-full flex-col overflow-hidden rounded-2xl bg-white font-mont shadow-2xl sm:max-h-[85vh] ${activeModal === 'date' ? 'max-w-md sm:max-w-lg md:max-w-xl' : activeModal === 'participants' ? 'max-w-[94vw] sm:max-w-md' : 'max-w-[94vw] sm:max-w-xl'}`}
+        className={`modal-content flex max-h-[88vh] w-full flex-col overflow-hidden rounded-3xl bg-white/95 shadow-2xl backdrop-blur-sm sm:max-h-[85vh] ${
+          activeModal === 'date' ? 'max-w-md sm:max-w-lg md:max-w-xl' :
+          activeModal === 'participants' ? 'max-w-[94vw] sm:max-w-md' :
+          'max-w-[94vw] sm:max-w-3xl'
+        }`}
         onClick={(e) => e.stopPropagation()}
-        style={{ animation: 'modal-in 0.2s ease both' }}
+        style={{ animation: 'modal-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both' }}
       >
-        <div className="flex items-center justify-end px-3 py-2 text-black sm:px-4">
-          <button type="button" onClick={close} className="flex h-8 w-8 items-center justify-center rounded-full text-black/40 transition-colors hover:bg-gray-100 hover:text-black" aria-label="Close">
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+        {/* ===== STICKY HEADER ===== */}
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-black/5 bg-white/95 px-4 py-3 backdrop-blur-sm">
+          {activeModal === 'destination' && (
+            <span className="font-bitter text-sm font-black uppercase tracking-[0.12em] text-black/60">
+              Select a tour
+            </span>
+          )}
+          {activeModal === 'date' && (
+            <span className="font-bitter text-sm font-black uppercase tracking-[0.12em] text-black/60">
+              Choose a date
+            </span>
+          )}
+          {activeModal === 'participants' && (
+            <span className="font-bitter text-sm font-black uppercase tracking-[0.12em] text-black/60">
+              Guests
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={close}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-black/40 transition-colors hover:bg-black/5 hover:text-black"
+            aria-label="Close"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6 6 18M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {activeModal === 'destination' && (
-          <div
-            className="modal-scrollable max-h-[76vh] overflow-y-auto overscroll-contain touch-pan-y pb-2 sm:max-h-[34rem]"
-            onWheel={(e) => e.stopPropagation()}
-            onTouchMove={(e) => e.stopPropagation()}
-            data-lenis-prevent
-          >
-            {tourOptions.map((tour) => {
-              const selected = destination === tour.title
-              return (
-                <div key={tour.title} className={`mx-2 mb-1.5 rounded-2xl border transition ${selected ? 'border-green-400 bg-green-100' : 'border-black/8 bg-white hover:bg-blue-50/40'}`}>
-                  <div className="flex w-full items-center gap-2.5 p-2 text-left sm:p-2.5">
-                    <button type="button" onClick={() => handleDestinationSelect(tour.title)} className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
-                      <img src={tour.image} className="h-14 w-16 shrink-0 rounded-xl object-cover sm:h-16 sm:w-20" alt="" loading="lazy" decoding="async" />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="line-clamp-2 font-frank text-sm font-black leading-tight text-black/82 sm:text-base">{tour.title}</p>
-                          {selected && <svg className="h-4 w-4 shrink-0 text-green-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>}
-                        </div>
-                        <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                          <span className="line-clamp-1 rounded-full bg-black/[0.04] px-2 py-0.5 font-mont text-[10px] text-black/55">{tour.location}</span>
-                          {tour.duration && <span className="rounded-full bg-blue-50 px-2 py-0.5 font-mont text-[10px] text-blue-800">{tour.duration}</span>}
-                          {tour.price && <span className="rounded-full bg-green-100 px-2 py-0.5 font-bitter text-[10px] font-black text-green-800">From {tour.price}</span>}
-                        </div>
-                      </div>
+          <div className="flex flex-1 overflow-hidden">
+            {/* ===== FILTER SIDEBAR (desktop only) ===== */}
+            {!isMobileLayout && (
+              <div className="w-44 shrink-0 border-r border-black/5 bg-white/50 p-3 backdrop-blur-sm sm:w-52">
+                <p className="mb-2 font-bitter text-[10px] font-black uppercase tracking-[0.12em] text-black/40">
+                  Filter by
+                </p>
+                <div className="flex flex-col gap-1">
+                  {tourTypes.map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setFilterType(type)}
+                      className={`rounded-lg px-3 py-2 text-left font-mont text-sm font-medium capitalize transition-colors ${
+                        filterType === type
+                          ? 'bg-blue-100 text-blue-800 ring-1 ring-blue-300'
+                          : 'text-black/60 hover:bg-black/5'
+                      }`}
+                    >
+                      {type === 'all' ? 'All tours' : type}
                     </button>
-                    <a href={tour.link} onClick={(e) => e.stopPropagation()} className="inline-flex shrink-0 items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1.5 font-bitter text-[9px] font-black uppercase tracking-[0.1em] text-blue-800 transition hover:bg-blue-200">
-                      Details
-                      <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 17 17 7" /><path d="M9 7h8v8" /></svg>
-                    </a>
-                  </div>
+                  ))}
                 </div>
-              )
-            })}
+              </div>
+            )}
+
+            {/* ===== TOUR LIST ===== */}
+            <div
+              ref={destinationModalRef}
+              className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-3 pb-2 sm:p-4"
+              onWheel={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+              data-lenis-prevent
+            >
+              {/* Mobile: filter chips + instruction */}
+              {isMobileLayout && (
+                <>
+                  {/* Horizontal filter chips */}
+                  <div className="mb-3 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    {tourTypes.map((type) => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => setFilterType(type)}
+                        className={`whitespace-nowrap rounded-full px-3 py-1.5 font-mont text-xs font-medium capitalize transition-colors ${
+                          filterType === type
+                            ? 'bg-blue-600 text-white shadow-md'
+                            : 'bg-black/5 text-black/60 hover:bg-black/10'
+                        }`}
+                      >
+                        {type === 'all' ? 'All' : type}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Instruction */}
+                  <div className="mb-3 flex items-center gap-2 text-xs text-black/40">
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M7 13l3 3 7-7" />
+                      <circle cx="12" cy="12" r="10" />
+                    </svg>
+                    <span className="font-mont">Tap a tour to expand and select</span>
+                  </div>
+                </>
+              )}
+
+              {filteredTours.length === 0 ? (
+                <div className="flex h-full items-center justify-center text-black/40">
+                  No tours match this filter.
+                </div>
+              ) : (
+                filteredTours.map((tour, index) => {
+                  const selected = destination === tour.title;
+                  const isExpanded = isMobileLayout && expandedIndex === index;
+
+                  return (
+                    <div
+                      key={tour.title}
+                      ref={el => (destinationRowRefs.current[index] = el)}
+                      className={`
+                        group relative w-full cursor-pointer overflow-hidden rounded-xl border transition-all duration-300
+                        ${!isMobileLayout && 'hover:h-28'}
+                        ${!isMobileLayout ? 'h-20' : isExpanded ? 'h-40' : 'h-20'}
+                        ${selected
+                          ? 'border-green-500 ring-2 ring-green-500/30'
+                          : 'border-black/5 hover:border-blue-200/60 hover:shadow-md'
+                        }
+                      `}
+                      onClick={() => {
+                        if (isMobileLayout) {
+                          // Toggle expansion: close if already open, else open this one
+                          setExpandedIndex(prev => prev === index ? null : index);
+                        } else {
+                          // Desktop: click selects the tour directly
+                          handleDestinationSelect(tour.title);
+                        }
+                      }}
+                    >
+                      {/* --- DESKTOP LAYOUT (hidden on mobile) --- */}
+                      {!isMobileLayout && (
+                        <>
+                          {/* BACKGROUND LAYER (dimmed image + big title) */}
+                          <div className="absolute inset-0 -z-10 transition-opacity duration-300 group-hover:opacity-0">
+                            <img
+                              src={tour.image}
+                              className="h-full w-full object-cover brightness-[0.6]"
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center overflow-hidden px-4">
+                              <div className="marquee-wrapper w-full overflow-hidden whitespace-nowrap">
+                                <div
+                                  ref={el => (destinationTitleRefs.current[index] = el)}
+                                  className="marquee-text inline-block font-frank text-xl font-black uppercase tracking-wide text-white drop-shadow-xl sm:text-2xl"
+                                >
+                                  {tour.title}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* HOVER LAYER (thumbnail + details + button) */}
+                          <div className="absolute inset-0 flex items-center gap-3 bg-white/90 px-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                            <img
+                              src={tour.image}
+                              className="h-14 w-14 shrink-0 rounded-lg object-cover shadow-md"
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate font-frank text-sm font-bold text-black/85">
+                                {tour.title}
+                              </p>
+                              <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                                <span className="inline-flex items-center gap-1 rounded-full bg-black/[0.04] px-2 py-0.5 font-mont text-[10px] text-black/55">
+                                  <svg className="h-3 w-3 text-black/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" />
+                                    <circle cx="12" cy="10" r="3" />
+                                  </svg>
+                                  {tour.location}
+                                </span>
+                                {tour.duration && (
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-blue-50/70 px-2 py-0.5 font-mont text-[10px] text-blue-700">
+                                    <svg className="h-3 w-3 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                      <circle cx="12" cy="12" r="10" />
+                                      <polyline points="12 6 12 12 16 14" />
+                                    </svg>
+                                    {tour.duration}
+                                  </span>
+                                )}
+                                {tour.price && (
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-green-100/80 px-2 py-0.5 font-bitter text-[10px] font-black text-green-800">
+                                    From {tour.price}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <a
+                              href={tour.link}
+                              onClick={(e) => e.stopPropagation()}
+                              className="shrink-0 rounded-full border-2 border-transparent bg-blue-600 px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-white shadow-md transition-all duration-300 hover:border-blue-400 hover:shadow-[0_0_12px_rgba(59,130,246,0.5)]"
+                            >
+                              See details
+                            </a>
+                          </div>
+                        </>
+                      )}
+
+                      {/* --- MOBILE LAYOUT (expandable) --- */}
+                      {isMobileLayout && (
+                        <>
+                          {/* Background layer – dimmed image + big title */}
+                          <div className={`absolute inset-0 transition-opacity duration-300 ${isExpanded ? 'opacity-0' : 'opacity-100'}`}>
+                            <img
+                              src={tour.image}
+                              className="h-full w-full object-cover brightness-[0.6]"
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center overflow-hidden px-4">
+                              <div className="w-full overflow-hidden whitespace-nowrap">
+                                <div className="inline-block font-frank text-xl font-black uppercase tracking-wide text-white drop-shadow-xl">
+                                  {tour.title}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Expanded content – thumbnail, details, buttons */}
+                          <div className={`absolute inset-0 flex items-center gap-3 bg-white/95 px-3 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
+                            <img
+                              src={tour.image}
+                              className="h-14 w-14 shrink-0 rounded-lg object-cover shadow-md"
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate font-frank text-sm font-bold text-black/85">
+                                {tour.title}
+                              </p>
+                              <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                                <span className="inline-flex items-center gap-1 rounded-full bg-black/[0.04] px-2 py-0.5 font-mont text-[10px] text-black/55">
+                                  <svg className="h-3 w-3 text-black/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" />
+                                    <circle cx="12" cy="10" r="3" />
+                                  </svg>
+                                  {tour.location}
+                                </span>
+                                {tour.duration && (
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-blue-50/70 px-2 py-0.5 font-mont text-[10px] text-blue-700">
+                                    <svg className="h-3 w-3 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                      <circle cx="12" cy="12" r="10" />
+                                      <polyline points="12 6 12 12 16 14" />
+                                    </svg>
+                                    {tour.duration}
+                                  </span>
+                                )}
+                                {tour.price && (
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-green-100/80 px-2 py-0.5 font-bitter text-[10px] font-black text-green-800">
+                                    From {tour.price}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex shrink-0 flex-col items-end gap-1">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDestinationSelect(tour.title);
+                                }}
+                                className="rounded-full bg-blue-600 px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-white shadow-md transition-all duration-300 hover:bg-blue-700"
+                              >
+                                Select
+                              </button>
+                              <a
+                                href={tour.link}
+                                onClick={(e) => e.stopPropagation()}
+                                className="rounded-full border border-blue-600 
+                                px-3 py-1.5 font-bitter text-[10px] font-black uppercase 
+                                tracking-[0.08em] text-blue-600 shadow-md transition-all duration-300 hover:bg-blue-700"
+                              >
+                                Details
+                              </a>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {/* Selected checkmark – visible on both layouts */}
+                      {selected && (
+                        <div className="absolute right-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-green-500 shadow-md">
+                          <svg className="h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
         )}
 
@@ -1092,6 +1414,22 @@ function TourSelect() {
           .datepicker-large .react-datepicker__time-name {
             width: 2.2rem; line-height: 2.2rem; margin: 0.1rem; font-size: 0.9rem;
           }
+        }
+
+        /* --- Marquee animation (only when .marquee-active is present) --- */
+        .marquee-wrapper {
+          width: 100%;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+        .marquee-wrapper.marquee-active .marquee-text {
+          display: inline-block;
+          padding-left: 100%;
+          animation: scrollText 12s linear infinite;
+        }
+        @keyframes scrollText {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-100%); }
         }
       `}</style>
     </>

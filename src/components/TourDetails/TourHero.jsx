@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 import TourVideoStrip from "./TourVideoStrip.jsx";
-import { resolveTourImage } from "/src/utils/ImageLoader.js";
+import { resolveImage } from "/src/utils/ImageLoader.js";
 
 const TourHero = ({ tour }) => {
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const TourHero = ({ tour }) => {
    * resolveTourImage() converts all of these into the
    * Vite-generated production asset URL.
    */
-  const heroImage = resolveTourImage(
+  const heroImage = resolveImage(
     tour?.image ||
       tour?.images?.[0] ||
       tour?.imageFolder

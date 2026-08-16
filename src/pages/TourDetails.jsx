@@ -771,58 +771,106 @@ export default function TourDetails() {
 
         {/* ================================================================================================== */}
         {/* SIDEBAR */}
-        <aside className="hidden h-fit lg:block lg:pt-0">
-          <div ref={readyCardRef} className="space-y-4">
+        <aside className="hidden h-fit lg:block">
+          <div ref={readyCardRef} className="space-y-6">
+
+            {/* BACK */}
             <button
               type="button"
               onClick={goBackToPreviousScroll}
-              className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50/80 px-4 py-2 font-bitter text-xs font-bold text-blue-700 transition hover:border-blue-200 hover:bg-blue-100"
+              className="group inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white px-4 py-2 font-bitter text-xs font-bold text-blue-700 transition-all duration-200 hover:border-blue-200 hover:bg-blue-50"
             >
-              <span aria-hidden="true">←</span>
+              <span
+                aria-hidden="true"
+                className="transition-transform duration-200 group-hover:-translate-x-0.5"
+              >
+                ←
+              </span>
               Back to tours
             </button>
 
-            <div className="rounded-[1.35rem] border border-blue-100 bg-blue-50/70 p-5 shadow-[0_18px_50px_rgba(37,99,235,0.08)]"
-            >
-              <span className="inline-flex rounded-full bg-green-200 px-3 py-1 font-bitter text-[10px] font-bold uppercase tracking-[0.14em] text-green-950">
-                current tour
-              </span>
+            {/* RELATED TOURS */}
+            {relatedTours.length > 0 && (
+              <section className="border-t border-neutral-200 pt-5">
+                <div className="flex items-end justify-between">
+                  <div>
+                    <p className="font-bitter text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600">
+                      Explore more
+                    </p>
 
-              <h3 className="mt-3 font-frank text-3xl font-bold leading-none">
-                Request {tour.title}
-              </h3>
-
-              <p className="mt-3 font-bitter text-sm leading-relaxed text-neutral-600">
-                This opens the booking form with <strong>{tour.title}</strong>{" "}
-                already attached.
-              </p>
-
-              <button
-                onClick={scrollToBooking}
-                className="hero-gradient mt-5 flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 font-bitter text-sm font-semibold text-white"
-              >
-                <BookingIcon />
-                Request this tour
-              </button>
-
-              {relatedTours.length > 0 && (
-                <div className="mt-6">
-                  <p className="font-bitter text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600">
-                    Related tours
-                  </p>
-
-                  <div className="mt-3 space-y-2">
-                    {relatedTours.map((item) => (
-                      <RelatedTourCard
-                        key={item.slug}
-                        tour={item}
-                        onClick={() => navigate(`/tours/${item.slug}`)}
-                      />
-                    ))}
+                    <h3 className="mt-1 font-frank text-xl font-bold leading-tight text-neutral-900">
+                      Related tours
+                    </h3>
                   </div>
+
+                  <span className="font-bitter text-[10px] font-semibold text-neutral-400">
+                    {relatedTours.length}
+                  </span>
                 </div>
-              )}
-            </div>
+
+                <div className="mt-3 space-y-2">
+                  {relatedTours.map((item) => (
+                    <RelatedTourCard
+                      key={item.slug}
+                      tour={item}
+                      onClick={() => navigate(`/tours/${item.slug}`)}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* REQUEST CURRENT TOUR */}
+            <section className="relative overflow-hidden rounded-[1.35rem] border 
+            border-blue-100 text-white
+            hero-gradient-bl p-5 shadow-[0_18px_50px_rgba(37,99,235,0.08)]">
+
+              {/* subtle accent */}
+              <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-blue-200/30 blur-2xl" />
+
+              <div className="relative">
+                <div className="flex items-center justify-between">
+                  {/* image */}
+                  <img src={resolveImage(tour.image)} alt="current-tour" 
+                  className="top-0 h-24 w-24 object-cover rounded-full border-white border-2" />
+                  <div className="flex flex-col gap-2 items-start leading-none ">
+                    <span className="rounded-full bg-green-200 px-3 py-1 font-bitter text-[10px] 
+                    font-bold uppercase text-black">
+                      {tour.title}
+                    </span>
+                    <h3 className="font-frank text-2xl font-bold leading-[0.95] text-white">
+                      Request this tour.
+                    </h3>
+                  </div>
+
+                </div>
+
+
+                <p className="mt-3 font-bitter text-sm leading-relaxed text-white">
+                  Ready to go? Start your request for{" "}
+                  <strong className="text-white font-bold">{tour.title}</strong>.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={scrollToBooking}
+                  className="bg-white border-blue-500 border group mt-5 flex w-full items-center justify-center gap-2 
+                  rounded-full px-6 py-3.5 font-bitter text-sm font-semibold text-black/90 shadow-[0_8px_24px_rgba(37,99,235,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(37,99,235,0.24)]"
+                >
+                  <BookingIcon />
+
+                  <span>Request this tour</span>
+
+                  <span
+                    aria-hidden="true"
+                    className="text-base transition-transform duration-200 group-hover:translate-x-0.5"
+                  >
+                    →
+                  </span>
+                </button>
+              </div>
+            </section>
+
           </div>
         </aside>
       </section>
@@ -900,6 +948,7 @@ export default function TourDetails() {
                       className="relative"
                     >
                       <ItineraryImageFrame
+                        tour={tour}
                         stop={stop}
                         index={index}
                       />
@@ -1567,14 +1616,15 @@ function ItineraryTextFrame({ stop, index, activeTime }) {
   );
 }
 
-function ItineraryImageFrame({ stop, index }) {
+function ItineraryImageFrame({tour, stop, index }) {
   const stopImages = stop.images || [];
   const isPickupStop =
     stop.id?.toLowerCase().includes("pickup") ||
     stop.name?.toLowerCase().includes("pickup") ||
     stop.name?.toLowerCase().includes("meeting point");
 
-  const mainImage = stopImages[0];
+  // const mainImage = stopImages[0];
+  const mainImage = `images/tours/${tour.imageFolder}/stops/${index + 1}.webp`;
 
   return (
     <div className="flex h-full flex-col">
@@ -1584,7 +1634,7 @@ function ItineraryImageFrame({ stop, index }) {
         </span>
 
         <span className="inline-flex rounded-full border border-blue-100 bg-white px-3 py-1 font-bitter text-[11px] font-semibold uppercase tracking-[0.16em] text-blue-500 shadow-[0_10px_24px_rgba(37,99,235,0.06)]">
-          {isPickupStop ? "pickup preview" : `${stopImages.length || 0} photos`}
+          {isPickupStop ? "pickup preview": ""}
         </span>
       </div>
 

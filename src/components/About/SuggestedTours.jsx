@@ -2,7 +2,7 @@ import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from '
 import { Link } from 'react-router-dom'
 import { gsap } from 'gsap'
 import tours from '../../data/tours.js'
-import { resolveImage, resolveTourImage } from '../../utils/ImageLoader.js'
+import { resolveImage } from '../../utils/ImageLoader.js'
 
 // -----------------------------------------------------------------------------
 // featured tour selection
@@ -219,17 +219,11 @@ function SuggestedTours() {
 
   // ---------------------------------------------------------------------------
   // Image resolver
-  //
-  // tours.js can continue storing:
-  //
-  // /src/assets/images/tours/...
-  //
-  // The resolver converts that into Vite's generated production asset URL.
   // ---------------------------------------------------------------------------
   const getTourImage = useCallback((tour) => {
     const rawImage = tour?.image || tour?.images?.[0]
 
-    return resolveTourImage(rawImage)
+    return resolveImage(rawImage)
   }, [])
 
   // ---------------------------------------------------------------------------
@@ -336,39 +330,37 @@ function SuggestedTours() {
   )
 
   // ---------------------------------------------------------------------------
-  // initial entrance animation
+  // initial entrance animation – only animates y, no opacity override
   // ---------------------------------------------------------------------------
   useLayoutEffect(() => {
     const cards = cardRefs.current.filter(Boolean)
     const thumbs = thumbRefs.current.filter(Boolean)
 
-    if (
-      (!cards.length && !thumbs.length) ||
-      reduceMotion
-    ) {
+    if ((!cards.length && !thumbs.length) || reduceMotion) {
       return undefined
     }
 
+    const elements = [...cards, ...thumbs]
+
     const ctx = gsap.context(() => {
-      gsap.set([...cards, ...thumbs], {
+      // set initial position and force3D
+      gsap.set(elements, {
         force3D: true,
-        willChange: 'transform, opacity',
+        willChange: 'transform',
+        y: touchDevice ? 0 : 10,
       })
 
-      gsap.fromTo(
-        [...cards, ...thumbs],
-        {
-          y: touchDevice ? 0 : 10,
-          opacity: touchDevice ? 1 : 0,
+      // animate to final position – opacity is left to CSS classes
+      gsap.to(elements, {
+        y: 0,
+        duration: touchDevice ? 0.18 : 0.46,
+        stagger: touchDevice ? 0 : 0.035,
+        ease: 'power2.out',
+        onComplete: () => {
+          // remove any inline opacity that might have been set by other tweens
+          gsap.set(elements, { clearProps: 'opacity' })
         },
-        {
-          y: 0,
-          opacity: 1,
-          duration: touchDevice ? 0.18 : 0.46,
-          stagger: touchDevice ? 0 : 0.035,
-          ease: 'power2.out',
-        }
-      )
+      })
     }, sectionRef)
 
     return () => ctx.revert()
@@ -520,6 +512,15 @@ function SuggestedTours() {
     return undefined
   }, [activeIndex, reduceMotion])
 
+  // ---------------------------------------------------------------------------
+  // set initial active to last tour after first render
+  // ---------------------------------------------------------------------------
+  useLayoutEffect(() => {
+    if (featuredTours.length > 0) {
+      setActiveIndex(featuredTours.length - 1)
+    }
+  }, [featuredTours])
+
   if (!activeTour) return null
 
   return (
@@ -537,57 +538,7 @@ function SuggestedTours() {
       <div className="relative pb-3 pt-4 sm:px-4 sm:pb-5 sm:pt-5 md:px-5 md:pb-5 md:pt-6 lg:px-6 lg:pb-6 lg:pt-6">
 
         {/* ------------------------------------------------------------------- */}
-        {/* heading */}
-        {/* ------------------------------------------------------------------- */}
-        <div className="mb-3 flex flex-col gap-3 px-2.5 text-neutral-950 sm:mb-5 sm:px-0 md:mb-6 md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-5 lg:mb-7">
-
-          <div className="max-w-xl text-center sm:text-left md:max-w-2xl md:rounded-2xl md:border md:border-black/5 md:bg-white/70 md:px-4 md:py-3 md:shadow-[0_14px_34px_rgba(15,23,42,0.05)] md:backdrop-blur-sm lg:px-5">
-
-            <p className="font-bitter text-[10px] font-black uppercase tracking-[0.22em] text-blue-600 md:text-[11px] md:tracking-[0.24em]">
-              Suggested tours
-            </p>
-
-            <h2
-              id="suggested-tours-title"
-              className="mt-1 font-frank text-2xl font-black leading-none tracking-tight sm:text-3xl md:text-[2rem] lg:text-[2.2rem]"
-            >
-              Pick a favourite fast.
-            </h2>
-
-            <p className="mt-2 hidden max-w-xl font-bitter text-sm leading-6 text-neutral-600 sm:block md:text-sm md:leading-6">
-              One tour opens at a time. The rest stay compact so the section stays short and quick
-              to scan.
-            </p>
-          </div>
-
-          <div className="hidden gap-2 sm:flex sm:items-center md:flex-col md:items-stretch lg:flex-row lg:items-center">
-
-            <button
-              type="button"
-              onClick={scrollToTours}
-              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-3 font-bitter text-sm font-black text-white shadow-[0_14px_34px_rgba(0,30,255,0.16)] transition duration-300 hover:-translate-y-0.5 hover:bg-blue-800 sm:px-5"
-              aria-label="Browse all Cape Frontier tours"
-            >
-              Browse all tours
-
-              <ArrowIcon className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={scrollToReviews}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 font-bitter text-sm font-black text-blue-800 backdrop-blur-md transition duration-300 hover:bg-blue-100 hover:text-blue-900 sm:px-5"
-            >
-              See all reviews
-
-              <ArrowIcon className="h-3.5 w-3.5" />
-            </button>
-
-          </div>
-        </div>
-
-        {/* ------------------------------------------------------------------- */}
-        {/* desktop / tablet */}
+        {/* desktop / tablet tour cards */}
         {/* ------------------------------------------------------------------- */}
         <div
           className="hidden h-[22rem] touch-pan-y gap-2.5 md:flex md:gap-3 lg:h-[23rem] lg:gap-3.5"
@@ -615,7 +566,7 @@ function SuggestedTours() {
                 className={`group relative min-w-0 cursor-pointer touch-pan-y overflow-hidden border border-black/5 bg-white shadow-[0_16px_36px_rgba(15,23,42,0.10)] ring-1 ring-black/[0.025] backdrop-blur-sm transition-[flex,opacity] duration-300 ease-out ${
                   isActive
                     ? 'flex-[4.2] rounded-xl opacity-100'
-                    : 'flex-[0.82] rounded-xl opacity-80 hover:flex-[1.02] hover:opacity-100'
+                    : 'flex-[0.82] rounded-xl opacity-50 hover:flex-[1.02] hover:opacity-90'
                 }`}
                 onClick={() => setActiveIndex(index)}
                 aria-label={`Open ${tour.title}`}
@@ -643,15 +594,9 @@ function SuggestedTours() {
 
                 {!isActive && (
                   <div className="absolute inset-x-0 bottom-0 p-3">
-
-                    <div className="mb-2 h-8 w-8 rounded-full border border-white/20 bg-black/30 text-center font-bitter text-xs font-black leading-8 text-white backdrop-blur-md">
-                      {index + 1}
-                    </div>
-
                     <h3 className="[writing-mode:vertical-rl] rotate-180 font-frank text-lg font-black leading-none text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.35)]">
                       {tour.title}
                     </h3>
-
                   </div>
                 )}
 
@@ -676,27 +621,25 @@ function SuggestedTours() {
 
                     <div
                       data-animate-line
-                      className="mt-3 flex flex-wrap items-center gap-3"
+                      className="mt-3 flex flex-col items-start gap-1.5"
                     >
-                      <StarRating
-                        stars={tour.stars}
-                        rating={tour.rating}
-                      />
-
-                      <span className="font-frank text-white/68">
-                        ({tour.otherReviews || 0})
-                      </span>
-
                       <div className="inline-flex items-center gap-2 rounded-lg bg-black/24 px-3 py-2 ring-1 ring-white/12 backdrop-blur-sm">
-
                         <span className="font-bitter text-[10px] font-black uppercase tracking-[0.14em] text-white/86">
                           From
                         </span>
-
                         <span className="font-frank text-[1.7rem] font-black leading-none text-white lg:text-[1.95rem]">
                           {price}
                         </span>
+                      </div>
 
+                      <div className="flex items-center gap-3">
+                        <StarRating
+                          stars={tour.stars}
+                          rating={tour.rating}
+                        />
+                        <span className="font-frank text-white/68">
+                          ({tour.otherReviews || 0})
+                        </span>
                       </div>
                     </div>
 
@@ -712,19 +655,6 @@ function SuggestedTours() {
 
                         <ArrowIcon className="h-3 w-3" />
                       </Link>
-
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          scrollToTours()
-                        }}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/18 bg-black/24 px-4 py-2.5 font-bitter text-xs font-black uppercase tracking-[0.12em] text-white backdrop-blur-md transition hover:bg-white hover:text-blue-900"
-                      >
-                        All tours
-
-                        <ArrowIcon className="h-3 w-3" />
-                      </button>
                     </div>
 
                   </div>
@@ -735,15 +665,28 @@ function SuggestedTours() {
         </div>
 
         {/* ------------------------------------------------------------------- */}
-        {/* desktop review pill */}
+        {/* desktop review pill + "See all tours" button */}
         {/* ------------------------------------------------------------------- */}
-        <div className="hidden px-0 pt-3 md:block">
+        <div className="hidden px-0 pt-3 md:flex md:items-center md:gap-3">
 
           <p className="mb-2 hidden font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500 [@media(pointer:coarse)]:block">
             swipe left or right to preview tours
           </p>
 
-          <ReviewPill onClick={scrollToReviews} />
+          <div className="flex-1">
+            <ReviewPill onClick={scrollToReviews} />
+          </div>
+
+          <button
+            type="button"
+            onClick={scrollToTours}
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-700 px-5 py-2.5 font-bitter text-sm font-black text-white shadow-[0_14px_34px_rgba(0,30,255,0.16)] transition duration-300 hover:-translate-y-0.5 hover:bg-blue-800"
+            aria-label="Browse all Cape Frontier tours"
+          >
+            See all tours
+
+            <ArrowIcon className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+          </button>
 
         </div>
 
@@ -807,24 +750,21 @@ function SuggestedTours() {
 
                   <div
                     data-animate-line
-                    className="mt-3 flex flex-wrap items-center gap-3"
+                    className="mt-3 flex flex-col items-start gap-1.5"
                   >
+                    <div className="inline-flex items-center gap-2 rounded-lg bg-black/24 px-3 py-2 ring-1 ring-white/12 backdrop-blur-sm">
+                      <span className="font-bitter text-[10px] font-black uppercase tracking-[0.14em] text-white/86">
+                        From
+                      </span>
+                      <span className="font-frank text-[1.7rem] font-black leading-none text-white">
+                        {price}
+                      </span>
+                    </div>
+
                     <StarRating
                       stars={tour.stars}
                       rating={tour.rating}
                     />
-
-                    <div className="inline-flex items-center gap-2 rounded-lg bg-black/24 px-3 py-2 ring-1 ring-white/12 backdrop-blur-sm">
-
-                      <span className="font-bitter text-[10px] font-black uppercase tracking-[0.14em] text-white/86">
-                        From
-                      </span>
-
-                      <span className="font-frank text-[1.7rem] font-black leading-none text-white">
-                        {price}
-                      </span>
-
-                    </div>
                   </div>
                 </div>
               </article>
@@ -871,7 +811,7 @@ function SuggestedTours() {
                     className={`relative h-20 min-w-[6.35rem] overflow-hidden rounded-xl border transition duration-200 ${
                       isActive
                         ? 'border-blue-300 shadow-[0_10px_24px_rgba(59,130,246,0.16)]'
-                        : 'border-black/10 opacity-85'
+                        : 'border-black/10 opacity-50'
                     }`}
                     aria-label={`Open ${tour.title}`}
                     aria-pressed={isActive}
@@ -917,11 +857,6 @@ function SuggestedTours() {
                 <ArrowIcon className="h-3 w-3" />
               </button>
 
-            </div>
-
-            {/* hidden full-width trust/review CTA */}
-            <div className="mt-2.5 hidden">
-              <ReviewPill onClick={scrollToReviews} />
             </div>
 
           </div>

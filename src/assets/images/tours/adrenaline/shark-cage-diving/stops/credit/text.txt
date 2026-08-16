@@ -1,0 +1,9 @@
+2 - https://commons.wikimedia.org/w/index.php?search=gansbaai&title=Special%3AMediaSearch&type=image
+3 - public domain
+4 - client sent. cant find credit
+5 - https://commons.wikimedia.org/w/index.php?search=hot+drinks&title=Special%3AMediaSearch&type=image :
+6 - check tours.js
+7 - https://commons.wikimedia.org/w/index.php?search=hotel+drop-off&title=Special%3AMediaSearch&type=image
+
+
+

@@ -1196,9 +1196,9 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: getCoverImage("adrenaline/cobra"),
-    images: getTourImages("adrenaline/cobra", 3),
-    imageFolder: "adrenaline/cobra",
+    image: getCoverImage("adrenaline/cobra/cobra-2hr"),
+    images: getTourImages("adrenaline/cobra/cobra-2hr", 3),
+    imageFolder: "adrenaline/cobra/cobra-2hr",
 
     videos: [
       "/videos/tours/adrenaline/cobra/Vid 1.mp4",
@@ -1395,7 +1395,6 @@ export const tours = [
           address: "Foreshore, Cape Town, 8001, South Africa",
           query: "Foreshore Cape Town",
         }),
-        images: getTourImages("adrenaline/cobra"),
         touristComments: [],
       },
       {
@@ -1620,13 +1619,9 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: "/src/assets/images/tours/adrenaline/cobra/3.webp",
-    images: [
-      "/src/assets/images/tours/adrenaline/cobra/1.webp",
-      "/src/assets/images/tours/adrenaline/cobra/2.webp",
-      "/src/assets/images/tours/adrenaline/cobra/3.webp",
-    ],
-    imageFolder: "adrenaline/cobra",
+    image: getCoverImage("adrenaline/cobra/cobra-24hr"),
+    images: getTourImages("adrenaline/cobra/cobra-24hr", 3),
+    imageFolder: "adrenaline/cobra/cobra-24hr",
 
     videos: [],
 
@@ -2010,13 +2005,9 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: "/src/assets/images/tours/adrenaline/cobra/2.webp",
-    images: [
-      "/src/assets/images/tours/adrenaline/cobra/1.webp",
-      "/src/assets/images/tours/adrenaline/cobra/2.webp",
-      "/src/assets/images/tours/adrenaline/cobra/3.webp",
-    ],
-    imageFolder: "adrenaline/cobra",
+    image: getCoverImage("adrenaline/cobra/cobra-8hr"),
+    images: getTourImages("adrenaline/cobra/cobra-8hr", 3),
+    imageFolder: "adrenaline/cobra/cobra-8hr",
 
     videos: [],
 
@@ -2405,14 +2396,10 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: "/src/assets/images/tours/adrenaline/horse-riding-dunes/1.webp",
-    images: [
-      "/src/assets/images/tours/adrenaline/horse-riding-dunes/1.webp",
-      "/src/assets/images/tours/adrenaline/horse-riding-dunes/2.webp",
-      "/src/assets/images/tours/adrenaline/horse-riding-dunes/3.webp",
-    ],
-    imageFolder: "adrenaline/horse-riding-dunes",
 
+    image: getCoverImage("adrenaline/horse-riding-dunes"),
+    images: getTourImages("adrenaline/horse-riding-dunes", 3),
+    imageFolder: "adrenaline/horse-riding-dunes",
     videos: [],
 
     location: "Cape Dunes, Cape Town, South Africa",
@@ -2607,40 +2594,6 @@ export const tours = [
         touristComments: [],
       },
     ],
-
-    routeInformation: {
-      title: "",
-      description: "",
-      items: [],
-    },
-
-    vehicle: {
-      name: "",
-      class: "",
-      doors: null,
-      seats: null,
-      fuel: "",
-      gearbox: "",
-      engine: "",
-      specifications: [],
-    },
-
-    securityAndLiability: {
-      heading: "",
-      cardPreAuthorisation: {
-        amount: null,
-        currency: "",
-        description: "",
-        release: "",
-      },
-      cashDeposit: {
-        amountZAR: null,
-        alternativeAmountUSD: null,
-        paymentMethod: "",
-        paidAt: "",
-        refundPolicy: "",
-      },
-    },
 
     needToKnow: [
       { text: "Minimum age: 6 years old" },
@@ -4174,14 +4127,10 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: "/src/assets/images/tours/adrenaline/horse-riding-cape-point/1.webp",
-    images: [
-      "/src/assets/images/tours/adrenaline/horse-riding-cape-point/1.webp",
-      "/src/assets/images/tours/adrenaline/horse-riding-cape-point/2.webp",
-      "/src/assets/images/tours/adrenaline/horse-riding-cape-point/3.webp",
-    ],
-    imageFolder: "adrenaline/horse-riding-cape-point",
 
+    image: getCoverImage("adrenaline/horse-riding-cape-point"),
+    images: getTourImages("adrenaline/horse-riding-cape-point", 3),
+    imageFolder: "adrenaline/horse-riding-cape-point",
     videos: [],
 
     location: "Cape Peninsula, Cape Town, South Africa",
@@ -5162,7 +5111,7 @@ export const tours = [
 
     image: getCoverImage("hiking/lions-head"),
     images: getTourImages("hiking/lions-head", 3),
-
+    imageFolder: "hiking/lions-head",
     location: "Lion’s Head, Cape Town",
     duration: "3 - 4 hours",
 
@@ -5331,7 +5280,7 @@ export const tours = [
 
     image: getCoverImage("hiking/platteklip"),
     images: getTourImages("hiking/platteklip", 3),
-
+    imageFolder: "hiking/platteklip",
     location: "Table Mountain, Cape Town",
     duration: "4 - 5 hours",
 
@@ -5416,7 +5365,6 @@ export const tours = [
           address: "Table Mountain, Cape Town, South Africa",
           query: "Platteklip Gorge Trail Start Cape Town",
         }),
-        images: getTourImages("hiking/platteklip", 1),
         touristComments: [],
       },
       {
@@ -5432,7 +5380,6 @@ export const tours = [
           address: "Table Mountain, Cape Town, South Africa",
           query: "Table Mountain Summit Cape Town",
         }),
-        images: getTourImages("hiking/platteklip", 3),
         touristComments: [
           {
             name: "Emma",
@@ -5479,13 +5426,13 @@ export const tours = [
   // =========================================== HISTORICAL
   // Langa
   {
-    id: null, // New tour ID to be assigned (e.g., 32)
+    id: 7, // New tour ID to be assigned (e.g., 32)
     type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.HALF_DAY,
 
     title: "Langa Township Cultural Experience",
     slug: "langa-township-cultural-experience",
-    canonicalPath: "/tours/langatownship-cultural-experience",
+    canonicalPath: "/tours/langa-township-cultural-experience",
 
     seo: {
       title: "Langa Township Cultural Experience | Cape Frontier Tours",
@@ -5505,14 +5452,9 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: "/src/assets/images/tours/historical/langa/1.webp",
-    images: [
-      "/src/assets/images/tours/historical/langa/1.webp",
-      "/src/assets/images/tours/historical/langa/2.webp",
-      "/src/assets/images/tours/historical/langa/3.webp",
-    ],
+    image: getCoverImage("historical/langa"),
+    images: getTourImages("historical/langa", 3),
     imageFolder: "historical/langa",
-
     videos: [],
 
     location: "Langa, Cape Town, South Africa",
@@ -5529,21 +5471,7 @@ export const tours = [
         pricePerPerson: 1300,
         note: "Standard rate",
       },
-      {
-        category: "Adults (4–6 guests)",
-        pricePerPerson: 1170,
-        note: "10% small‑group discount",
-      },
-      {
-        category: "Adults (7–10 guests)",
-        pricePerPerson: 1105,
-        note: "15% discount",
-      },
-      {
-        category: "Adults (11–14 guests)",
-        pricePerPerson: 1040,
-        note: "20% best value for large groups",
-      },
+
       {
         category: "Children (4–12 years, 2–3 guests)",
         pricePerPerson: 650,
@@ -5580,13 +5508,7 @@ export const tours = [
       enabled: true,
       icon: "/icons/savemore.png",
       tiers: [
-        {
-          minPeople: 2,
-          maxPeople: 3,
-          perPerson: 1300,
-          label: "2–3 Guests",
-          note: "Standard rate • All-inclusive",
-        },
+
         {
           minPeople: 4,
           maxPeople: 6,
@@ -5812,34 +5734,6 @@ export const tours = [
       ],
     },
 
-    vehicle: {
-      name: "",
-      class: "",
-      doors: null,
-      seats: null,
-      fuel: "",
-      gearbox: "",
-      engine: "",
-      specifications: [],
-    },
-
-    securityAndLiability: {
-      heading: "",
-      cardPreAuthorisation: {
-        amount: null,
-        currency: "",
-        description: "",
-        release: "",
-      },
-      cashDeposit: {
-        amountZAR: null,
-        alternativeAmountUSD: null,
-        paymentMethod: "",
-        paidAt: "",
-        refundPolicy: "",
-      },
-    },
-
     needToKnow: [
       {
         text: "Langa is considered one of the safer townships when visited with local guides",
@@ -5919,7 +5813,7 @@ export const tours = [
 
   // Robben-Island
   {
-    id: null, // New tour ID to be assigned (e.g., 33)
+    id: 8, // New tour ID to be assigned (e.g., 33)
     type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.HALF_DAY,
 
@@ -5945,14 +5839,10 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: "/src/assets/images/tours/historical/robben-island/1.webp",
-    images: [
-      "/src/assets/images/tours/historical/robben-island/1.webp",
-      "/src/assets/images/tours/historical/robben-island/2.webp",
-      "/src/assets/images/tours/historical/robben-island/3.webp",
-    ],
-    imageFolder: "historical/robben-island",
 
+    image: getCoverImage("historical/robben-island"),
+    images: getTourImages("historical/robben-island", 3),
+    imageFolder: "historical/robben-island",
     videos: [],
 
     location: "Robben Island, Cape Town, South Africa",
@@ -6095,72 +5985,7 @@ export const tours = [
       ],
     },
 
-    stops: [
-      {
-        id: "pickup",
-        name: "Hotel Pickup",
-        time: "Flexible",
-        duration: "30 minutes",
-        note: "Air‑conditioned transfer to V&A Waterfront",
-        description:
-          "Enjoy convenient hotel pickup from Cape Town CBD, Green Point, or Sea Point before travelling to the Nelson Mandela Gateway at the V&A Waterfront.",
-        exactLocation: mapLocation({
-          label: "Cape Town Pickup Area",
-          address: "Cape Town, South Africa",
-          query: "Cape Town",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "nelson-mandela-gateway",
-        name: "Nelson Mandela Gateway",
-        time: "Flexible",
-        duration: "30 minutes",
-        note: "Ferry departure terminal",
-        description:
-          "Arrive at the Nelson Mandela Gateway at the V&A Waterfront. Board the ferry for the 30-minute crossing to Robben Island. Departure times: 09:00, 11:00, or 13:00.",
-        exactLocation: mapLocation({
-          label: "Nelson Mandela Gateway",
-          address: "V&A Waterfront, Cape Town, South Africa",
-          query: "Nelson Mandela Gateway V&A Waterfront",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "robben-island",
-        name: "Robben Island Museum",
-        time: "Flexible",
-        duration: "3 - 4 hours",
-        note: "UNESCO World Heritage Site",
-        description:
-          "Explore the former maximum-security prison, visit Nelson Mandela's prison cell, enjoy an island bus tour, and learn about South Africa's history from expert guides and former political prisoners where available. Discover Robert Sobukwe House, Lime Quarry, WWII bunkers, Leper Church, and the Maximum Security Prison.",
-        exactLocation: mapLocation({
-          label: "Robben Island Museum",
-          address: "Robben Island, Cape Town, South Africa",
-          query: "Robben Island Museum",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "dropoff",
-        name: "Hotel Drop-off",
-        time: "Flexible",
-        duration: "30 minutes",
-        note: "End of tour",
-        description:
-          "After returning from Robben Island, relax during the transfer back to your original Cape Town hotel.",
-        exactLocation: mapLocation({
-          label: "Cape Town Drop-off Area",
-          address: "Cape Town, South Africa",
-          query: "Cape Town",
-        }),
-        images: [],
-        touristComments: [],
-      },
-    ],
+
 
     routeInformation: {
       title: "Robben Island Half Day Tour Route",
@@ -6180,34 +6005,6 @@ export const tours = [
         "Return ferry crossing",
         "Hotel drop-off",
       ],
-    },
-
-    vehicle: {
-      name: "",
-      class: "",
-      doors: null,
-      seats: null,
-      fuel: "",
-      gearbox: "",
-      engine: "",
-      specifications: [],
-    },
-
-    securityAndLiability: {
-      heading: "",
-      cardPreAuthorisation: {
-        amount: null,
-        currency: "",
-        description: "",
-        release: "",
-      },
-      cashDeposit: {
-        amountZAR: null,
-        alternativeAmountUSD: null,
-        paymentMethod: "",
-        paidAt: "",
-        refundPolicy: "",
-      },
     },
 
     needToKnow: [
@@ -6283,7 +6080,7 @@ export const tours = [
 
   // Mannenburg
   {
-    id: null, // New tour ID to be assigned (e.g., 34)
+    id: 9, // New tour ID to be assigned (e.g., 34)
     type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.FULL_DAY,
 
@@ -6313,15 +6110,10 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image:
-      "/src/assets/images/tours/historical/heritage-faith-cape-flats/1.webp",
-    images: [
-      "/src/assets/images/tours/historical/heritage-faith-cape-flats/1.webp",
-      "/src/assets/images/tours/historical/heritage-faith-cape-flats/2.webp",
-      "/src/assets/images/tours/historical/heritage-faith-cape-flats/3.webp",
-    ],
-    imageFolder: "historical/heritage-faith-cape-flats",
 
+    image: getCoverImage("historical/cape-flats-heritage-faith"),
+    images: getTourImages("historical/cape-flats-heritage-faith", 3),
+    imageFolder: "historical/cape-flats-heritage-faith",
     videos: [],
 
     location: "Cape Town, South Africa (Bo-Kaap, CBD, Grassy Park, Manenberg)",
@@ -6595,34 +6387,6 @@ export const tours = [
       ],
     },
 
-    vehicle: {
-      name: "",
-      class: "",
-      doors: null,
-      seats: null,
-      fuel: "",
-      gearbox: "",
-      engine: "",
-      specifications: [],
-    },
-
-    securityAndLiability: {
-      heading: "",
-      cardPreAuthorisation: {
-        amount: null,
-        currency: "",
-        description: "",
-        release: "",
-      },
-      cashDeposit: {
-        amountZAR: null,
-        alternativeAmountUSD: null,
-        paymentMethod: "",
-        paidAt: "",
-        refundPolicy: "",
-      },
-    },
-
     needToKnow: [
       {
         text: "Bo-Kaap is one of the oldest residential neighbourhoods in South Africa, with homes dating back to the 1760s",
@@ -6715,515 +6479,6 @@ export const tours = [
     ],
   },
 
-  // Cape Flats
-  // {
-  //   id: null, // New tour ID to be assigned (e.g., 35)
-  //   type: TOUR_TYPES.HISTORICAL,
-  //   category: TOUR_MODIFIERS.FULL_DAY,
-
-  //   title: "Full‑Day Cape Flats Community, Heritage and Faith Tour",
-  //   slug: "cape-flats-heritage-faith-tour",
-  //   canonicalPath: "/tours/cape-flats-heritage-faith-tour",
-
-  //   seo: {
-  //     title:
-  //       "Full‑Day Cape Flats Community, Heritage and Faith Tour | Cape Frontier Tours",
-  //     description:
-  //       "Experience Cape Town's Coloured heritage in a powerful, immersive way — from deep Islamic and Christian roots to the legacy of slavery, forced removals, and modern community life. Includes traditional Cape Malay lunch and hands‑on community upliftment through food distribution.",
-  //     keywords: [
-  //       "Cape Flats tour",
-  //       "Manenberg tour",
-  //       "Bo-Kaap tour",
-  //       "Cape Malay heritage",
-  //       "Coloured heritage Cape Town",
-  //       "Cape Town cultural tour",
-  //       "Slave Lodge tour",
-  //       "Auwal Masjid",
-  //       "District Six forced removals",
-  //       "community upliftment tour",
-  //       "Cape Town township tour",
-  //       "Sherwood Park tour",
-  //       "meaningful travel Cape Town",
-  //     ],
-  //   },
-
-  //   workflow: defaultWorkflow,
-
-  //   image:
-  //     "/src/assets/images/tours/historical/cape-flats-heritage-faith/1.webp",
-  //   images: [
-  //     "/src/assets/images/tours/historical/cape-flats-heritage-faith/1.webp",
-  //     "/src/assets/images/tours/historical/cape-flats-heritage-faith/2.webp",
-  //     "/src/assets/images/tours/historical/cape-flats-heritage-faith/3.webp",
-  //   ],
-  //   imageFolder: "historical/cape-flats-heritage-faith",
-
-  //   videos: [],
-
-  //   location:
-  //     "Cape Town, South Africa (Bo-Kaap, CBD, Sherwood Park, Manenberg)",
-  //   duration: "7 hours (09:00 – 16:00)",
-
-  //   priceBase: 2500,
-  //   minPeople: 2,
-  //   baseCurrency: "ZAR",
-  //   supportedCurrencies: SUPPORTED_CURRENCIES,
-
-  //   pricing: [
-  //     {
-  //       category: "2–3 Guests",
-  //       pricePerPerson: 2500,
-  //       note: "Full‑day transport, guide, museums, lunch, outreach",
-  //     },
-  //     {
-  //       category: "4–6 Guests",
-  //       pricePerPerson: 2300,
-  //       note: "Full‑day transport, guide, museums, lunch, outreach",
-  //     },
-  //     {
-  //       category: "Private Group (up to 6 guests)",
-  //       pricePerPerson: null,
-  //       note: "R13,500 total • Private vehicle, guide, museums, lunch, outreach",
-  //     },
-  //     {
-  //       category: "Medium Group (7–12 guests)",
-  //       pricePerPerson: null,
-  //       note: "R22,000 total • Private vehicle, guide, museums, lunch, outreach",
-  //     },
-  //     {
-  //       category: "Large Group (13–20 guests)",
-  //       pricePerPerson: null,
-  //       note: "R36,000 total • Private vehicle, guide, museums, lunch, outreach",
-  //     },
-  //   ],
-
-  //   additionalPricing: [
-  //     {
-  //       category: "Children Under 12",
-  //       price: 0,
-  //       unit: "per child",
-  //       currency: "ZAR",
-  //       note: "Free of charge when accompanied by an adult",
-  //     },
-  //   ],
-
-  //   groupPricing: {
-  //     enabled: true,
-  //     icon: "/icons/savemore.png",
-  //     tiers: [
-  //       {
-  //         minPeople: 2,
-  //         maxPeople: 3,
-  //         perPerson: 2500,
-  //         label: "2–3 Guests",
-  //         note: "Full‑day transport, guide, museums, lunch, outreach",
-  //       },
-  //       {
-  //         minPeople: 4,
-  //         maxPeople: 6,
-  //         perPerson: 2300,
-  //         label: "4–6 Guests",
-  //         note: "Full‑day transport, guide, museums, lunch, outreach",
-  //       },
-  //       {
-  //         minPeople: 1,
-  //         maxPeople: 6,
-  //         perPerson: null,
-  //         totalPrice: 13500,
-  //         label: "Private Group (up to 6)",
-  //         note: "Private vehicle, guide, museums, lunch, outreach",
-  //       },
-  //       {
-  //         minPeople: 7,
-  //         maxPeople: 12,
-  //         perPerson: null,
-  //         totalPrice: 22000,
-  //         label: "Medium Group (7–12)",
-  //         note: "Private vehicle, guide, museums, lunch, outreach",
-  //       },
-  //       {
-  //         minPeople: 13,
-  //         maxPeople: 20,
-  //         perPerson: null,
-  //         totalPrice: 36000,
-  //         label: "Large Group (13–20)",
-  //         note: "Private vehicle, guide, museums, lunch, outreach",
-  //       },
-  //     ],
-  //   },
-
-  //   rating: null,
-  //   stars: null,
-  //   mainReviewerName: "",
-  //   mainReviewerCountry: "",
-  //   reviewYear: null,
-  //   otherReviews: null,
-  //   mainReview: "",
-
-  //   description:
-  //     "Experience Cape Town's Coloured heritage in a powerful, immersive way — from deep Islamic and Christian roots to the legacy of slavery, forced removals, and modern community life. Enjoy a traditional Cape Malay lunch and take part in hands‑on community upliftment through food distribution. This is tourism with purpose: every booking directly strengthens food‑support programmes in a Coloured community, and your involvement helps improve daily life for local families. Travel meaningfully. Leave a positive footprint. Every booking directly supports underprivileged families.",
-
-  //   highlights: [
-  //     { text: "Bo-Kaap cultural introduction and photography" },
-  //     { text: "Auwal Masjid — South Africa's oldest mosque (1794)" },
-  //     { text: "Slave Lodge Museum — slavery, colonialism, and human rights" },
-  //     { text: "Sendingkerk (Sendinggestig) — historic mission church" },
-  //     { text: "Traditional Cape Malay lunch in Sherwood Park" },
-  //     { text: "Manenberg community visit and food distribution" },
-  //     { text: "Hands‑on community upliftment through food distribution" },
-  //     { text: "Every booking directly supports underprivileged families" },
-  //     { text: "Guided by respectful, ethical tourism principles" },
-  //   ],
-
-  //   included: [
-  //     { text: "Reliable driver and transport" },
-  //     { text: "Hotel pickup and drop-off" },
-  //     { text: "Bottled water" },
-  //     { text: "Breakfast on the go (light snack)" },
-  //     { text: "Lunch (traditional Cape Malay or Cape Town home-style dishes)" },
-  //     { text: "Community engagement and briefing" },
-  //     { text: "All entry fees" },
-  //     { text: "Professional registered guide" },
-  //   ],
-
-  //   excluded: [{ text: "Personal purchases" }, { text: "Gratuities" }],
-
-  //   pickupOptions: [
-  //     "Cape Town CBD",
-  //     "Green Point",
-  //     "Sea Point",
-  //     "V&A Waterfront",
-  //     "Custom pickup on request",
-  //   ],
-
-  //   requirements: [
-  //     { text: "Comfortable walking shoes recommended" },
-  //     { text: "Respectful behaviour towards the local community is expected" },
-  //     { text: "Modest attire recommended for mosque visits" },
-  //     { text: "Guests must be physically able to walk for extended periods" },
-  //   ],
-
-  //   arrangements: {
-  //     availability: "Available all year",
-  //     duration: "7 hours",
-  //     operatingTime: "09:00 – 16:00",
-  //     departure: "09:00",
-  //     return: "16:00",
-  //     location: "Cape Town, South Africa",
-
-  //     clothing: [
-  //       "Comfortable clothing",
-  //       "Comfortable walking shoes",
-  //       "Sunscreen",
-  //       "Hat",
-  //       "Modest attire for mosque visits",
-  //     ],
-
-  //     thingsToBring: ["Camera", "Cash for personal purchases", "Water bottle"],
-
-  //     passengerPolicy: "",
-  //     sunsetNote: "",
-  //   },
-
-  //   weatherPolicy: {
-  //     summary:
-  //       "Tour operates in all weather conditions. Cape Town weather can change quickly — bring an umbrella or rain jacket.",
-  //     items: [
-  //       { text: "Tour operates in all weather conditions" },
-  //       { text: "Bring an umbrella or rain jacket if rain is forecast" },
-  //       { text: "Some outdoor portions may be adjusted in extreme weather" },
-  //     ],
-  //   },
-
-  //   cancellationPolicy: {
-  //     summary:
-  //       "Private tour bookings require advance confirmation. Route adjustments may occur when necessary.",
-  //     items: [
-  //       { text: "Private bookings require advance confirmation" },
-  //       { text: "Route adjustments may occur when necessary" },
-  //       { text: "Final cancellation policy is confirmed upon booking" },
-  //     ],
-  //   },
-
-  //   safetyPolicy: {
-  //     summary:
-  //       "Cape Frontier Travel & Tours operates under full compliance with South African tourism and transport regulations. All tours are conducted with structured risk planning, pre-visit area assessments, guided movement, and emergency readiness protocols.",
-  //     items: [
-  //       { text: "Tourism Act 3 of 2014 — full compliance" },
-  //       { text: "City of Cape Town Community Tourism Guidelines followed" },
-  //       {
-  //         text: "Passenger Transport Regulations and licensing requirements met",
-  //       },
-  //       { text: "Public Liability & Passenger Liability Insurance maintained" },
-  //       { text: "Roadworthy & Operating Licence Requirements compliant" },
-  //       { text: "Pre-visit area assessments conducted" },
-  //       {
-  //         text: "Guided movement only — guests follow guide-led navigation at all times",
-  //       },
-  //       { text: "Emergency readiness protocols in place" },
-  //       { text: "Continuous situational awareness maintained" },
-  //       {
-  //         text: "All outreach activities conducted with verified community organisations",
-  //       },
-  //       {
-  //         text: "Guests receive a pre-tour briefing on movement protocols and respectful behavioural expectations",
-  //       },
-  //       {
-  //         text: "All staff trained in cultural sensitivity, conflict de-escalation, first-aid basics, and ethical tourism practices",
-  //       },
-  //       {
-  //         text: "Food distribution conducted in a controlled, hygienic, and dignified manner with proper food handling, crowd management, and community supervision",
-  //       },
-  //       {
-  //         text: "Ethical tourism principles: respectful storytelling, non-exploitation, ensuring community benefit from every booking",
-  //       },
-  //     ],
-  //   },
-
-  //   stops: [
-  //     {
-  //       id: "bo-kaap",
-  //       name: "Bo-Kaap Arrival & Orientation",
-  //       time: "09:00",
-  //       duration: "1 hour",
-  //       note: "Guided cultural introduction",
-  //       description:
-  //         "Bo-Kaap sits on the slopes of Signal Hill, just above the CBD. It is instantly recognisable by its brightly painted houses, cobblestone streets, and the sound of the Adhaan (call to prayer) from its historic mosques. The area is one of the oldest residential neighbourhoods in South Africa, with homes dating back to the 1760s. Bo-Kaap is deeply tied to the history of the Cape Malay community — descendants of enslaved people and political exiles. Enjoy a guided cultural introduction, photography moments, and a short walk through the iconic colourful neighbourhood.",
-  //       exactLocation: mapLocation({
-  //         label: "Bo-Kaap",
-  //         address: "Bo-Kaap, Cape Town, South Africa",
-  //         query: "Bo-Kaap Cape Town",
-  //       }),
-  //       images: [],
-  //       touristComments: [],
-  //     },
-  //     {
-  //       id: "auwal-masjid",
-  //       name: "Auwal Masjid",
-  //       time: "10:15",
-  //       duration: "30 minutes",
-  //       note: "South Africa's oldest mosque (1794)",
-  //       description:
-  //         "Visit South Africa's oldest mosque, established in 1794. Learn about early Islamic education, community formation, and cultural preservation in the Cape Malay community.",
-  //       exactLocation: mapLocation({
-  //         label: "Auwal Masjid",
-  //         address: "Bo-Kaap, Cape Town, South Africa",
-  //         query: "Auwal Masjid Cape Town",
-  //       }),
-  //       images: [],
-  //       touristComments: [],
-  //     },
-  //     {
-  //       id: "slave-lodge",
-  //       name: "Slave Lodge Museum",
-  //       time: "11:00",
-  //       duration: "1 hour",
-  //       note: "Slavery, colonialism, and human rights",
-  //       description:
-  //         "A deep historical experience covering slavery, colonialism, and human rights. The Slave Lodge is one of Cape Town's oldest buildings and provides powerful insights into South Africa's complex history of slavery and forced labour.",
-  //       exactLocation: mapLocation({
-  //         label: "Slave Lodge Museum",
-  //         address: "Adderley Street, Cape Town, South Africa",
-  //         query: "Slave Lodge Museum Cape Town",
-  //       }),
-  //       images: [],
-  //       touristComments: [],
-  //     },
-  //     {
-  //       id: "sendingkerk",
-  //       name: "Sendingkerk (Sendinggestig)",
-  //       time: "12:00",
-  //       duration: "30 minutes",
-  //       note: "Historic mission church",
-  //       description:
-  //         "Explore the historic mission church connected to education and upliftment. The Sendingkerk played an important role in the spiritual and educational development of the Cape's diverse communities.",
-  //       exactLocation: mapLocation({
-  //         label: "Sendinggestig",
-  //         address: "Cape Town, South Africa",
-  //         query: "Sendinggestig Cape Town",
-  //       }),
-  //       images: [],
-  //       touristComments: [],
-  //     },
-  //     {
-  //       id: "sherwood-park-lunch",
-  //       name: "Lunch in Sherwood Park",
-  //       time: "13:00",
-  //       duration: "1 hour",
-  //       note: "Traditional Cape Malay lunch",
-  //       description:
-  //         "Enjoy Cape Malay or Cape Town home‑style dishes at a local eatery in Sherwood Park. Experience the rich flavours of Cape Malay cuisine, a fusion of Malay, Indonesian, and Cape Dutch influences.",
-  //       exactLocation: mapLocation({
-  //         label: "Sherwood Park",
-  //         address: "Cape Flats, Cape Town, South Africa",
-  //         query: "Sherwood Park Cape Town",
-  //       }),
-  //       images: [],
-  //       touristComments: [],
-  //     },
-  //     {
-  //       id: "manenberg",
-  //       name: "Manenberg Community Visit & Food Distribution",
-  //       time: "14:20",
-  //       duration: "1 hour",
-  //       note: "Respectful community outreach",
-  //       description:
-  //         "Guests assist in handing out prepared food to families in a Coloured community. This is a respectful, guided outreach focused on dignity and upliftment. Manenberg is a large township on the Cape Flats, created in the late 1960s as part of apartheid's Group Areas Act. It is known for strong family networks, deep Cape Coloured cultural roots, active community organisations, and a mix of hardship, hope, and ongoing upliftment work. Despite decades of social challenges, Manenberg remains a place of identity, pride, and community strength.",
-  //       exactLocation: mapLocation({
-  //         label: "Manenberg",
-  //         address: "Manenberg, Cape Town, South Africa",
-  //         query: "Manenberg Cape Town",
-  //       }),
-  //       images: [],
-  //       touristComments: [],
-  //     },
-  //   ],
-
-  //   routeInformation: {
-  //     title: "Cape Flats Community, Heritage and Faith Tour Route",
-
-  //     description:
-  //       "A powerful cultural immersion into Cape Town's Coloured heritage — exploring Islamic and Christian roots, slavery, forced removals, and modern community life.",
-
-  //     items: [
-  //       "Bo-Kaap — guided cultural introduction and photography",
-  //       "Auwal Masjid — South Africa's oldest mosque (1794)",
-  //       "Slave Lodge Museum — slavery, colonialism, and human rights",
-  //       "Sendingkerk (Sendinggestig) — historic mission church",
-  //       "Lunch in Sherwood Park — traditional Cape Malay cuisine",
-  //       "Manenberg Community Visit — food distribution and community engagement",
-  //     ],
-  //   },
-
-  //   vehicle: {
-  //     name: "",
-  //     class: "",
-  //     doors: null,
-  //     seats: null,
-  //     fuel: "",
-  //     gearbox: "",
-  //     engine: "",
-  //     specifications: [],
-  //   },
-
-  //   securityAndLiability: {
-  //     heading: "",
-  //     cardPreAuthorisation: {
-  //       amount: null,
-  //       currency: "",
-  //       description: "",
-  //       release: "",
-  //     },
-  //     cashDeposit: {
-  //       amountZAR: null,
-  //       alternativeAmountUSD: null,
-  //       paymentMethod: "",
-  //       paidAt: "",
-  //       refundPolicy: "",
-  //     },
-  //   },
-
-  //   needToKnow: [
-  //     {
-  //       text: "Bo-Kaap is one of the oldest residential neighbourhoods in South Africa, with homes dating back to the 1760s",
-  //     },
-  //     {
-  //       text: "Manenberg was built by the apartheid government as a relocation zone for Coloured families forcibly removed from District Six, Bo‑Kaap, and Manenberg",
-  //     },
-  //     {
-  //       text: "Manenberg is not defined by crime — it is defined by history and resilience",
-  //     },
-  //     { text: "The community did not choose its location — it was forced" },
-  //     {
-  //       text: "Upliftment projects are a response to decades of structural inequality",
-  //     },
-  //     {
-  //       text: "The people of Manenberg carry a rich cultural identity shaped by survival and strength",
-  //     },
-  //     {
-  //       text: "Every booking directly supports underprivileged families through community upliftment",
-  //     },
-  //     { text: "Modest attire recommended for mosque visits" },
-  //     { text: "Respectful behaviour towards the local community is expected" },
-  //     { text: "Comfortable walking shoes are recommended" },
-  //     { text: "Children under 12 are free of charge" },
-  //   ],
-
-  //   faqs: [
-  //     {
-  //       question: "What is the historical significance of Bo-Kaap?",
-  //       answer:
-  //         "Bo-Kaap is one of the oldest residential neighbourhoods in South Africa, with homes dating back to the 1760s. It is deeply tied to the history of the Cape Malay community — descendants of enslaved people and political exiles.",
-  //     },
-  //     {
-  //       question: "What is Auwal Masjid?",
-  //       answer:
-  //         "Auwal Masjid is South Africa's oldest mosque, established in 1794. It played a crucial role in early Islamic education, community formation, and cultural preservation.",
-  //     },
-  //     {
-  //       question: "Why does Manenberg exist?",
-  //       answer:
-  //         "Manenberg was built by the apartheid government in the late 1960s as a relocation zone for Coloured families forcibly removed from District Six, Bo‑Kaap, and other areas under the Group Areas Act.",
-  //     },
-  //     {
-  //       question: "Is Manenberg safe to visit?",
-  //       answer:
-  //         "Yes. All township visits are conducted with structured risk planning, pre-visit area assessments, guided movement only, and continuous situational awareness. Tours are led by experienced guides with strong community partnerships.",
-  //     },
-  //     {
-  //       question: "What is the food distribution activity?",
-  //       answer:
-  //         "Guests assist in handing out prepared food to families in the Manenberg community. This is a respectful, guided outreach focused on dignity and upliftment. All food distribution is conducted in a controlled, hygienic, and dignified manner.",
-  //     },
-  //     {
-  //       question: "Is lunch included?",
-  //       answer:
-  //         "Yes. A traditional Cape Malay or Cape Town home‑style lunch is included in the tour price.",
-  //     },
-  //     {
-  //       question: "Are children free?",
-  //       answer:
-  //         "Yes. Children under 12 are free of charge when accompanied by an adult.",
-  //     },
-  //     {
-  //       question: "What should I wear?",
-  //       answer:
-  //         "Wear comfortable clothing and walking shoes. Modest attire is recommended for mosque visits. Bring sunscreen, a hat, and a jacket depending on the weather.",
-  //     },
-  //     {
-  //       question: "How does this tour benefit the community?",
-  //       answer:
-  //         "Every booking directly supports underprivileged families through community upliftment and food distribution. The tour operates on ethical tourism principles: respectful storytelling, non‑exploitation, and ensuring community benefit from every booking.",
-  //     },
-  //     {
-  //       question: "Can I book this tour for a large group?",
-  //       answer:
-  //         "Yes. The tour can accommodate groups of up to 20 guests. Private group pricing is available for 1–6 guests (R13,500 total), medium groups 7–12 (R22,000 total), and large groups 13–20 (R36,000 total).",
-  //     },
-  //   ],
-
-  //   tags: [
-  //     "Cape Flats",
-  //     "Heritage",
-  //     "Faith",
-  //     "Bo-Kaap",
-  //     "Manenberg",
-  //     "Sherwood Park",
-  //     "Cape Malay",
-  //     "Coloured Heritage",
-  //     "Slavery",
-  //     "Forced Removals",
-  //     "Community",
-  //     "Upliftment",
-  //     "Cultural Tour",
-  //     "Full Day",
-  //     "Cape Town",
-  //     "Historical",
-  //     "Community Engagement",
-  //     "Meaningful Travel",
-  //   ],
-  // },
-
   // =========================================== PACKAGES
   // PenTour 1 - Mother City
   {
@@ -7231,7 +6486,7 @@ export const tours = [
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.FULL_DAY,
 
-    title: "Cape Peninsula Tour",
+    title: "Mother City Tour",
     slug: "peninsula-tour-1",
     canonicalPath: "/tours/peninsula-tour-1",
 
@@ -7249,7 +6504,7 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: getCoverImage(`${PENINSULA_PACKAGE_ONE_BASE}/cape-point`),
+    image: getCoverImage(`${PENINSULA_PACKAGE_ONE_BASE}`),
     images: packageGallery(
       PENINSULA_PACKAGE_ONE_BASE,
       PENINSULA_1_DESTINATIONS,
@@ -7346,7 +6601,6 @@ export const tours = [
           address: "Cape Town, South Africa",
           query: "Cape Town South Africa",
         }),
-        images: PICKUP_IMAGES,
         touristComments: [],
       },
       {
@@ -7362,7 +6616,7 @@ export const tours = [
           address: "Victoria Road, Camps Bay, Cape Town",
           query: "Maiden's Cove Camps Bay Cape Town",
         }),
-        images: getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/maidens-cove`, 3),
+        images: getTourImages(`shared/maidens-cove`, 3),
         touristComments: [
           {
             name: "Lucas",
@@ -7384,7 +6638,7 @@ export const tours = [
           address: "Harbour Road, Hout Bay, Cape Town",
           query: "Hout Bay Harbour Cape Town",
         }),
-        images: getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/hout-bay`, 3),
+        images: getTourImages(`shared/hout-bay`, 3),
         touristComments: [],
       },
       {
@@ -7400,7 +6654,7 @@ export const tours = [
           address: "Noordhoek, Cape Town, South Africa",
           query: "Noordhoek Beach Cape Town",
         }),
-        images: getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/noordhoek`, 3),
+        images: getTourImages(`shared/noordhoek`, 3),
         touristComments: [],
       },
       {
@@ -7416,7 +6670,7 @@ export const tours = [
           address: "Cape Point, Cape Peninsula, South Africa",
           query: "Cape Point Cape Town",
         }),
-        images: getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/cape-point`, 3),
+        images: getTourImages(`shared/cape-point`, 3),
         touristComments: [
           {
             name: "Aisha",
@@ -7438,7 +6692,7 @@ export const tours = [
           address: "Cape Point Road, Cape Peninsula, South Africa",
           query: "Cape Point Ostrich Farm",
         }),
-        images: getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/ostrich-farm`, 3),
+        images: getTourImages(`shared/ostrich-farm`, 2),
         touristComments: [],
       },
       {
@@ -7455,7 +6709,7 @@ export const tours = [
           query: "Boulders Beach Penguin Colony Cape Town",
         }),
         images: getTourImages(
-          `${PENINSULA_PACKAGE_ONE_BASE}/boulders-beach`,
+          `shared/boulders-beach`,
           3,
         ),
         touristComments: [
@@ -7479,7 +6733,6 @@ export const tours = [
           address: "Simon’s Town, Cape Town, South Africa",
           query: "Simon's Town Cape Town",
         }),
-        images: getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/simons-town`, 3),
         touristComments: [],
       },
       {
@@ -7495,7 +6748,6 @@ export const tours = [
           address: "Muizenberg Beach, Cape Town, South Africa",
           query: "Muizenberg Beach Huts Cape Town",
         }),
-        images: getTourImages(`${PENINSULA_PACKAGE_ONE_BASE}/muizenberg`, 3),
         touristComments: [],
       },
     ],
@@ -7539,7 +6791,7 @@ export const tours = [
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.FULL_DAY,
 
-    title: "Mother City Tour",
+    title: "Cape Peninsula Tour",
     slug: "peninsula-tour-2",
     canonicalPath: "/tours/peninsula-tour-2",
 
@@ -7557,7 +6809,7 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: getCoverImage(`${PENINSULA_PACKAGE_TWO_BASE}/chapmans-peak`),
+    image: getCoverImage(`${PENINSULA_PACKAGE_TWO_BASE}`), 
     images: packageGallery(
       PENINSULA_PACKAGE_TWO_BASE,
       PENINSULA_2_DESTINATIONS,
@@ -7655,7 +6907,7 @@ export const tours = [
           address: "Sea Point, Cape Town, South Africa",
           query: "Sea Point Promenade Cape Town",
         }),
-        images: getTourImages(`${PENINSULA_PACKAGE_TWO_BASE}/sea-point`, 3),
+        images: getTourImages(`shared/sea-point`, 3),
         touristComments: [],
       },
       {
@@ -7671,7 +6923,7 @@ export const tours = [
           address: "Camps Bay, Cape Town, South Africa",
           query: "Camps Bay Beach Cape Town",
         }),
-        images: getTourImages(`${PENINSULA_PACKAGE_TWO_BASE}/camps-bay`, 3),
+        images: getTourImages(`shared/camps-bay`, 3),
         touristComments: [],
       },
       {
@@ -7687,7 +6939,6 @@ export const tours = [
           address: "Hout Bay / Noordhoek, Cape Town, South Africa",
           query: "Chapman's Peak Drive Cape Town",
         }),
-        images: getTourImages(`${PENINSULA_PACKAGE_TWO_BASE}/chapmans-peak`, 3),
         touristComments: [
           {
             name: "Grace",
@@ -7709,7 +6960,7 @@ export const tours = [
           address: "Cape Point, Cape Peninsula, South Africa",
           query: "Cape Point Cape Town",
         }),
-        images: getTourImages(`${PENINSULA_PACKAGE_TWO_BASE}/cape-point`, 3),
+        images: getTourImages(`shared/cape-point`, 2),
         touristComments: [],
       },
       {
@@ -7725,7 +6976,7 @@ export const tours = [
           query: "Boulders Beach Penguin Colony Cape Town",
         }),
         images: getTourImages(
-          `${PENINSULA_PACKAGE_TWO_BASE}/boulders-beach`,
+          `shared/boulders-beach`,
           3,
         ),
         touristComments: [
@@ -7749,7 +7000,6 @@ export const tours = [
           address: "Simon’s Town, Cape Town, South Africa",
           query: "Simon's Town Cape Town",
         }),
-        images: getTourImages(`${PENINSULA_PACKAGE_TWO_BASE}/simons-town`, 3),
         touristComments: [],
       },
     ],
@@ -7843,6 +7093,7 @@ export const tours = [
       STELLENBOSCH_WINE_DESTINATIONS,
       3,
     ),
+    imageFolder: "packages/stellenbosch-wine-farms",
 
     location: "Stellenbosch, South Africa",
     duration: "Full Day",
@@ -7929,7 +7180,6 @@ export const tours = [
           address: "Helshoogte Road, Stellenbosch, South Africa",
           query: "Delaire Graff Estate Stellenbosch",
         }),
-        images: getTourImages(`${STELLENBOSCH_WINE_BASE}/delaire`, 3),
         touristComments: [
           {
             name: "Isabella",
@@ -7995,7 +7245,6 @@ export const tours = [
           address: "Helshoogte Road, Stellenbosch, South Africa",
           query: "Tokara Wine Estate Stellenbosch",
         }),
-        images: getTourImages(`${STELLENBOSCH_WINE_BASE}/tokara`, 3),
         touristComments: [
           {
             name: "Liam",
@@ -8083,14 +7332,9 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: "/src/assets/images/tours/historical/robben-island-langa/1.webp",
-    images: [
-      "/src/assets/images/tours/historical/robben-island-langa/1.webp",
-      "/src/assets/images/tours/historical/robben-island-langa/2.webp",
-      "/src/assets/images/tours/historical/robben-island-langa/3.webp",
-    ],
+    image: getCoverImage("historical/robben-island-langa"),
+    images: getTourImages("historical/robben-island-langa", 3),
     imageFolder: "historical/robben-island-langa",
-
     videos: [],
 
     location: "Cape Town, South Africa (V&A Waterfront, Robben Island, Langa)",
@@ -8376,33 +7620,7 @@ export const tours = [
       ],
     },
 
-    vehicle: {
-      name: "",
-      class: "",
-      doors: null,
-      seats: null,
-      fuel: "",
-      gearbox: "",
-      engine: "",
-      specifications: [],
-    },
 
-    securityAndLiability: {
-      heading: "",
-      cardPreAuthorisation: {
-        amount: null,
-        currency: "",
-        description: "",
-        release: "",
-      },
-      cashDeposit: {
-        amountZAR: null,
-        alternativeAmountUSD: null,
-        paymentMethod: "",
-        paidAt: "",
-        refundPolicy: "",
-      },
-    },
 
     needToKnow: [
       { text: "Ferry departures are weather dependent" },
@@ -8519,14 +7737,9 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: "/src/assets/images/tours/historical/district-six-langa/1.webp",
-    images: [
-      "/src/assets/images/tours/historical/district-six-langa/1.webp",
-      "/src/assets/images/tours/historical/district-six-langa/2.webp",
-      "/src/assets/images/tours/historical/district-six-langa/3.webp",
-    ],
+    image: getCoverImage("historical/district-six-langa"),
+    images: getTourImages("historical/district-six-langa", 3),
     imageFolder: "historical/district-six-langa",
-
     videos: [],
 
     location: "Cape Town, South Africa (District Six, Langa)",
@@ -8543,19 +7756,10 @@ export const tours = [
         pricePerPerson: 2300,
         note: "Full rate",
       },
-      {
-        category: "Adults (4 Guests)",
-        pricePerPerson: 2000,
-        note: "Reduced rate for 4 guests",
-      },
-      {
-        category: "Adults (5–7 Guests)",
-        pricePerPerson: 1700,
-        note: "15% discount",
-      },
+
       {
         category: "Teens (13–17 years)",
-        pricePerPerson: null,
+        pricePerPerson: 2300,
         note: "Adult rate depending on group size",
       },
       {
@@ -8815,34 +8019,6 @@ export const tours = [
         "Guga S'thebe Arts & Culture Centre — art studios, ceramic workshops, craft markets, murals",
         "Guided Cultural Walk — traditional hostels, local entrepreneurship, daily life, community initiatives",
       ],
-    },
-
-    vehicle: {
-      name: "",
-      class: "",
-      doors: null,
-      seats: null,
-      fuel: "",
-      gearbox: "",
-      engine: "",
-      specifications: [],
-    },
-
-    securityAndLiability: {
-      heading: "",
-      cardPreAuthorisation: {
-        amount: null,
-        currency: "",
-        description: "",
-        release: "",
-      },
-      cashDeposit: {
-        amountZAR: null,
-        alternativeAmountUSD: null,
-        paymentMethod: "",
-        paidAt: "",
-        refundPolicy: "",
-      },
     },
 
     needToKnow: [

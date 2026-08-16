@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { resolveImage } from "../../utils/ImageLoader";
 
 const ALL_TOUR_IMAGES = import.meta.glob(
   "/src/assets/images/tours/**/*.{webp,WEBP,png,PNG,jpg,JPG,jpeg,JPEG}",
@@ -67,24 +68,43 @@ const TourGallery = ({
     const folderPath =
       `/src/assets/images/tours/${normalizedFolder}/`;
 
-    return Object.entries(ALL_TOUR_IMAGES)
-      .filter(([path]) => {
+    return Object.keys(ALL_TOUR_IMAGES)
+      .filter((path) => {
         const normalizedPath = path
           .replace(/\\/g, "/")
           .toLowerCase();
 
-        return normalizedPath.startsWith(
-          folderPath
+        // Must be inside the requested tour folder
+        if (!normalizedPath.startsWith(folderPath)) {
+          return false;
+        }
+
+        // Exclude everything inside /stops/
+        const relativePath = normalizedPath.slice(
+          folderPath.length
         );
+
+        return !relativePath.startsWith("stops/");
       })
-      .sort(([pathA], [pathB]) =>
+      .sort((pathA, pathB) =>
         pathA.localeCompare(pathB, undefined, {
           numeric: true,
           sensitivity: "base",
         })
       )
-      .map(([, image]) => image);
+      .map((path) => {
+        // Convert the actual filesystem path into the
+        // path expected by resolveImage()
+        const imagePath = path.replace(
+          "/src/assets/",
+          ""
+        );
+
+        return resolveImage(imagePath);
+      })
+      .filter(Boolean);
   }, [imageFolder]);
+
 
   /*
    * Reset gallery state when changing tours.
