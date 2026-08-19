@@ -118,7 +118,7 @@ const defaultWorkflow = {
 const ADRENALINE_BASE = "adrenaline";
 const PENINSULA_PACKAGE_ONE_BASE = "packages/peninsula-tour-1";
 const PENINSULA_PACKAGE_TWO_BASE = "packages/peninsula-tour-2";
-const STELLENBOSCH_WINE_BASE = "packages/stellenbosch-wine-farms";
+const STELLENBOSCH_WINE_BASE = "packages/wine-farms";
 const CITY_TOUR_BASE = "packages/gun-range+city-tour";
 const HIKING_BASE = "hiking";
 const PENINSULA_1_DESTINATIONS = [
@@ -826,7 +826,7 @@ export const tours = [
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.HALF_DAY,
 
-    title: "Paragliding Experience – Cape Town",
+    title: "Paragliding – Cape Town",
     slug: "paragliding-experience-cape-town",
     canonicalPath: "/tours/paragliding-experience-cape-town",
 
@@ -1983,7 +1983,7 @@ export const tours = [
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.FULL_DAY,
 
-    title: "Full Day Self‑Drive Cobra Experience",
+    title: "8hr Self‑Drive Cobra Experience",
     slug: "full-day-self-drive-cobra-experience",
     canonicalPath: "/tours/full-day-self-drive-cobra-experience",
 
@@ -4102,7 +4102,7 @@ export const tours = [
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.FULL_DAY,
 
-    title: "Horse Riding, Penguins & Cape Point Full‑Day Tour",
+    title: "Horse Riding, Penguins & Cape Point Tour",
     slug: "horse-riding-penguins-cape-point-tour",
     canonicalPath: "/tours/horse-riding-penguins-cape-point-tour",
 
@@ -6084,7 +6084,7 @@ export const tours = [
     type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.FULL_DAY,
 
-    title: "Full‑Day Heritage, Faith & Cape Flats Community Tour",
+    title: "Heritage, Faith & Cape Flats Community Tour",
     slug: "heritage-faith-cape-flats-community-tour",
     canonicalPath: "/tours/heritage-faith-cape-flats-community-tour",
 
@@ -6809,7 +6809,7 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: getCoverImage(`${PENINSULA_PACKAGE_TWO_BASE}`), 
+    image: getCoverImage(`${PENINSULA_PACKAGE_TWO_BASE}`),
     images: packageGallery(
       PENINSULA_PACKAGE_TWO_BASE,
       PENINSULA_2_DESTINATIONS,
@@ -7056,7 +7056,7 @@ export const tours = [
 
     tags: ["Package", "Full Day", "Premium Route", "Cape Peninsula"],
   },
-  // Wine-Estate
+  // Stellenbosch Wine-Estate
   {
     id: 11,
     type: TOUR_TYPES.PACKAGES,
@@ -7093,7 +7093,7 @@ export const tours = [
       STELLENBOSCH_WINE_DESTINATIONS,
       3,
     ),
-    imageFolder: "packages/stellenbosch-wine-farms",
+    imageFolder: "packages/wine-farms",
 
     location: "Stellenbosch, South Africa",
     duration: "Full Day",
@@ -7306,7 +7306,7 @@ export const tours = [
     type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.FULL_DAY,
 
-    title: "Full‑Day Robben Island & Langa Cultural Experience",
+    title: "Robben Island & Langa Cultural Experience",
     slug: "robben-island-langa-cultural-experience",
     canonicalPath: "/tours/robben-island-langa-cultural-experience",
 
@@ -10515,6 +10515,1789 @@ export const tours = [
       "Family Friendly",
       "Wildlife",
       "Adventure",
+    ],
+  },
+  // Cool-Runnings Toboggan Park, Winelands & Adventure Loop
+  {
+    id: null,
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.FULL_DAY,
+
+    title: "Cool Runnings Toboggan Park, Winelands & Adventure Loop",
+    slug: "",
+    canonicalPath: "",
+
+    seo: {
+      title: "",
+      description:
+        "A full-day guided experience from Cape Town combining adventure, wildlife, artisanal chocolate tasting, scenic Winelands views, Franschhoek village exploration, and Babylonstoren Farm & Gardens.",
+      keywords: [],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "",
+    images: [],
+    imageFolder: "packages/wine-routes/",
+    videos: [],
+
+    location: "Cape Town → Winelands → Cape Town",
+    duration: "Full Day",
+
+    priceBase: 1865,
+    minPeople: 1,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "Adult",
+        pricePerPerson: 1865,
+        note: "",
+      },
+      {
+        category: "Child (4–12 years)",
+        pricePerPerson: 1110,
+        note: "",
+      },
+      {
+        category: "Infant (0–3 years)",
+        pricePerPerson: 0,
+        note: "Free",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Babylonstoren Wine Tasting",
+        price: null,
+        note: "Optional. Charged separately by the estate unless requested to be added to the tour pricing.",
+      },
+    ],
+
+    groupPricing: {
+      enabled: false,
+      icon: "",
+      tiers: [],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "A full-day guided experience starting and ending in Cape Town. Guests enjoy a mix of adrenaline, animal encounters, artisanal chocolate tasting, scenic Winelands views, Franschhoek village exploration, and the world-famous Babylonstoren gardens. Perfect for families, couples, and small groups.",
+
+    highlights: [
+      {
+        text: "Cool Runnings Toboggan Park – adventure start with gravity-powered toboggan rides",
+      },
+      {
+        text: "The Alpaca Loom Coffee Shop & Weaving Studio – alpaca encounters, coffee, and weaving",
+      },
+      {
+        text: "Franschhoek Village – scenic exploration, cafés, galleries, and optional wine tasting",
+      },
+      {
+        text: "Huguenot Fine Chocolates – Belgian-style artisanal chocolate tasting",
+      },
+      {
+        text: "Babylonstoren Farm & Gardens – gardens, farm experience, and optional wine tasting",
+      },
+    ],
+
+    included: [
+      {
+        text: "Professional driver-guide",
+      },
+      {
+        text: "Entrance fees",
+      },
+      {
+        text: "Air-conditioned vehicle",
+      },
+      {
+        text: "Bottled water",
+      },
+      {
+        text: "All transport between stops",
+      },
+    ],
+
+    excluded: [
+      {
+        text: "Lunch",
+      },
+      {
+        text: "Personal purchases",
+      },
+      {
+        text: "Babylonstoren wine tasting unless requested to be added to the pricing",
+      },
+    ],
+
+    pickupOptions: [
+      "Cape Town",
+    ],
+
+    requirements: [],
+
+    arrangements: {
+      availability: "",
+      duration: "Full Day",
+      operatingTime: "",
+      departure: "08:00",
+      return: "17:00",
+      location: "Cape Town → Winelands → Cape Town",
+
+      clothing: [],
+
+      thingsToBring: [],
+
+      passengerPolicy: "",
+      notes: [],
+    },
+
+    weatherPolicy: {
+      summary: "",
+      items: [],
+    },
+
+    cancellationPolicy: {
+      summary: "",
+      items: [],
+    },
+
+    safetyPolicy: {
+      summary: "",
+      items: [],
+    },
+
+    /*
+     * FULL-DAY ITINERARY / STOPS
+     */
+    stops: [
+      {
+        stop: 1,
+        title: "Cool Runnings Toboggan Park",
+        subtitle: "Adventure Start",
+        location: "",
+        time: "08:30 – 10:00",
+        duration: "1.5 hours",
+        type: "adventure",
+        optional: false,
+
+        description:
+          "Cool Runnings is South Africa's only outdoor toboggan track, offering a gravity-powered ride down a steel half-pipe. Set against the backdrop of Tyger Valley's rolling hills, the attraction combines fun, speed, and safety. Guests control their own speed, allowing the experience to be as thrilling or relaxed as they choose.",
+
+        highlights: [
+          {
+            text: "Safety briefing followed by multiple exhilarating runs",
+          },
+          {
+            text: "Smooth, scenic descent with panoramic views",
+          },
+          {
+            text: "Fun, competitive atmosphere as guests race each other",
+          },
+          {
+            text: "Photo opportunities at the track",
+          },
+        ],
+
+        image: "",
+      },
+
+      {
+        stop: 2,
+        title: "The Alpaca Loom Coffee Shop & Weaving Studio",
+        subtitle: "Animals & Coffee",
+        location: "Paarl",
+        time: "10:30 – 11:30",
+        duration: "1 hour",
+        type: "wildlife",
+        optional: false,
+
+        description:
+          "Nestled in the rural outskirts of Paarl, The Alpaca Loom is a tranquil farm experience where guests meet gentle alpacas and learn about the craft of weaving. The farm showcases the process of transforming alpaca fleece into luxurious textiles, while the coffee shop overlooks the paddocks.",
+
+        highlights: [
+          {
+            text: "Feeding and interacting with friendly alpacas",
+          },
+          {
+            text: "Watching skilled artisans weave alpaca fibre",
+          },
+          {
+            text: "Enjoying freshly brewed coffee and homemade treats",
+          },
+          {
+            text: "Browsing a boutique shop with scarves, blankets, and handmade goods",
+          },
+        ],
+
+        image: "",
+      },
+
+      {
+        stop: 3,
+        title: "Franschhoek Village Exploration",
+        subtitle: "Scenic Exploration",
+        location: "Franschhoek",
+        time: "12:00 – 14:00",
+        duration: "2 hours",
+        type: "scenic",
+        optional: false,
+
+        description:
+          "Franschhoek is one of South Africa's oldest towns, founded by French Huguenots in the 17th century. Today it is a world-renowned culinary and wine destination surrounded by dramatic mountain ranges and vineyards. The village blends European charm with South African hospitality.",
+
+        highlights: [
+          {
+            text: "Scenic walk through the village's main street",
+          },
+          {
+            text: "Optional wine tasting at nearby estates",
+          },
+          {
+            text: "Lunch at one of Franschhoek's cafés or bistros",
+          },
+          {
+            text: "Visits to art galleries, craft shops, and heritage landmarks",
+          },
+        ],
+
+        image: "",
+      },
+
+      {
+        stop: 4,
+        title: "Huguenot Fine Chocolates",
+        subtitle: "Belgian Chocolate Tasting",
+        location: "Franschhoek",
+        time: "14:00 – 14:30",
+        duration: "30 minutes",
+        type: "food",
+        optional: false,
+
+        description:
+          "Huguenot Fine Chocolates is a boutique chocolate studio run by Belgian-trained chocolatiers. Located on Franschhoek's main road, it offers handcrafted pralines, truffles, and chocolate bars made using traditional European techniques.",
+
+        highlights: [
+          {
+            text: "Guided chocolate tasting with curated selections",
+          },
+          {
+            text: "Insight into Belgian chocolate-making traditions",
+          },
+          {
+            text: "Opportunity to purchase artisanal chocolates",
+          },
+          {
+            text: "Optional demonstrations depending on the day's schedule",
+          },
+        ],
+
+        image: "",
+      },
+
+      {
+        stop: 5,
+        title: "Babylonstoren Farm & Gardens",
+        subtitle: "Gardens, Wine & Farm Experience",
+        location: "Simondium",
+        time: "14:45 – 16:00",
+        duration: "1 hour 15 minutes",
+        type: "wine",
+        optional: false,
+
+        description:
+          "Babylonstoren is a historic Cape Dutch farm transformed into a world-class lifestyle estate. Its expansive gardens are inspired by the Company's Garden of the 1600s, featuring fruit orchards, vegetable patches, water canals, and medicinal plants. The estate includes a greenhouse restaurant, wine cellar, bakery, spa, and farm shop.",
+
+        highlights: [
+          {
+            text: "Self-guided walk through the iconic gardens",
+          },
+          {
+            text: "Visits to the greenhouse, farm shop, and bakery",
+          },
+          {
+            text: "Optional wine tasting at the Babylonstoren cellar",
+          },
+          {
+            text: "Beautiful landscapes for photography and relaxation",
+          },
+        ],
+
+        image: "",
+      },
+
+      {
+        stop: 6,
+        title: "Return to Cape Town",
+        subtitle: "Scenic Return",
+        location: "Cape Town",
+        time: "16:00 – 17:00",
+        duration: "1 hour",
+        type: "transfer",
+        optional: false,
+
+        description:
+          "Return transport from Babylonstoren to Cape Town.",
+
+        highlights: [],
+
+        image: "",
+      },
+    ],
+
+    vehicle: {
+      type: "Air-conditioned vehicle",
+      description: "",
+    },
+
+    securityAndLiability: null,
+
+    accommodation: {
+      included: false,
+      type: "",
+      description: "",
+    },
+
+    needToKnow: [
+      {
+        text: "Lunch is not included in the tour price.",
+      },
+      {
+        text: "Babylonstoren wine tasting is optional and charged separately by the estate unless requested to be added to the tour pricing.",
+      },
+      {
+        text: "The tour starts and ends in Cape Town.",
+      },
+      {
+        text: "Perfect for families, couples, and small groups.",
+      },
+    ],
+
+    faqs: [],
+
+    tags: [
+      "Full Day",
+      "Cool Runnings",
+      "Toboggan",
+      "Winelands",
+      "Franschhoek",
+      "Babylonstoren",
+      "Alpaca",
+      "Chocolate Tasting",
+      "Adventure",
+      "Family Friendly",
+      "Cape Town",
+    ],
+  },
+  // Family-Wine-Tour
+  {
+    id: null,
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.DAY_TOUR,
+
+    title: "Family Wine Tour with Kids Activities – Stellenbosch Region",
+    slug: "full-day-family-wine-tour-stellenbosch",
+    canonicalPath: "/tours/full-day-family-wine-tour-stellenbosch",
+
+    seo: {
+      title: "Family Wine Tour in Stellenbosch with Kids Activities",
+      description:
+        "Enjoy a family-friendly Stellenbosch wine tour from Cape Town with wine tasting, kids activities, wildlife encounters, a Stellenbosch town walk, scenic mountain views and seasonal strawberry picking.",
+      keywords: [
+        "family wine tour Stellenbosch",
+        "Stellenbosch family tour",
+        "Cape Town family wine tour",
+        "wine tour with kids",
+        "Stellenbosch wine tour",
+        "family-friendly Cape Winelands tour",
+        "kids activities Stellenbosch",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "",
+    images: [],
+    imageFolder: "packages/wine-farms",
+    videos: [],
+
+    location: "Stellenbosch, Cape Winelands, South Africa",
+    duration: "Full day (08:00–17:30)",
+
+    priceBase: 1950,
+    minPeople: 2,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "Adults (18+)",
+        pricePerPerson: 1950,
+        note: "Includes wine tasting, private transport and bottled water.",
+      },
+      {
+        category: "Teens (14–17)",
+        pricePerPerson: 1550,
+        note: "All activities except wine tasting.",
+      },
+      {
+        category: "Children (4–13)",
+        pricePerPerson: 1050,
+        note: "Includes animal park access, attractions and transport.",
+      },
+      {
+        category: "Infants (0–3)",
+        pricePerPerson: 0,
+        note: "Free. No charges apply.",
+      },
+    ],
+
+    additionalPricing: [],
+
+    groupPricing: {
+      enabled: true,
+      icon: "",
+      tiers: [
+        {
+          minPeople: 2,
+          maxPeople: 4,
+          perPerson: null,
+          label: "2–4 guests",
+          discountPercent: 10,
+          note: "10% off the overall total.",
+        },
+        {
+          minPeople: 5,
+          maxPeople: 7,
+          perPerson: null,
+          discountPercent: 15,
+          label: "5–7 guests",
+          note: "15% off the overall total.",
+        },
+        {
+          minPeople: 8,
+          maxPeople: null,
+          perPerson: null,
+          discountPercent: null,
+          label: "8+ guests",
+          note: "Custom quote based on group size and requirements.",
+        },
+      ],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "This full-day family-friendly experience combines the beauty of the Stellenbosch Winelands with activities designed to keep children entertained. Adults can enjoy a premium wine tasting at Vredenheim while children explore the Big Cats Park, farm animals, jungle gym and gardens. The day continues with a choice of Butterfly World or Giraffe House, a relaxed lunch in Stellenbosch, a historic town walk, scenic views along Helshoogte Pass and seasonal strawberry picking at Mooiberge. With comfortable private transport, bottled water and structured timing, this tour offers a relaxed and memorable Cape Winelands experience for the whole family.",
+
+    highlights: [
+      {
+        text: "Premium wine tasting at Vredenheim Wine Farm",
+      },
+      {
+        text: "Big Cats Park, farm animals and jungle gym for children",
+      },
+      {
+        text: "Choice of Butterfly World or Giraffe House",
+      },
+      {
+        text: "Relaxed lunch stop in Stellenbosch",
+      },
+      {
+        text: "Historic Stellenbosch town walk",
+      },
+      {
+        text: "Scenic drive through Helshoogte Pass",
+      },
+      {
+        text: "Seasonal strawberry picking at Mooiberge",
+      },
+      {
+        text: "Private transport with driver-guide and bottled water",
+      },
+    ],
+
+    included: [
+      {
+        text: "Private vehicle and driver-guide",
+      },
+      {
+        text: "Bottled water",
+      },
+      {
+        text: "Wine tasting at Vredenheim",
+      },
+      {
+        text: "Transport between scheduled attractions",
+      },
+      {
+        text: "Scenic stops",
+      },
+    ],
+
+    excluded: [
+      {
+        text: "Lunch",
+      },
+      {
+        text: "Entry fees for Butterfly World or Giraffe House",
+      },
+      {
+        text: "Optional second wine tasting at Tokara",
+      },
+      {
+        text: "Gratuities",
+      },
+      {
+        text: "Personal purchases",
+      },
+    ],
+
+    pickupOptions: [
+      {
+        type: "hotel",
+        label: "Cape Town hotel pickup",
+        description: "Pickup from your Cape Town hotel at approximately 08:00.",
+      },
+    ],
+
+    requirements: [
+      "Children must be accompanied by a parent or responsible adult.",
+      "Wine tasting is available to adults aged 18 and over.",
+      "Please provide accurate passenger ages when booking.",
+    ],
+
+    arrangements: {
+      availability:
+        "Available year-round, subject to attraction and venue availability.",
+      duration: "Approximately 9.5 hours",
+      operatingTime: "08:00–17:30",
+      departure: "08:00 from Cape Town",
+      return: "Approximately 17:30 in Cape Town",
+      location:
+        "Cape Town pickup with a full-day route through Stellenbosch and the surrounding Winelands.",
+
+      clothing: [
+        "Comfortable clothing suitable for walking and outdoor activities",
+        "Comfortable walking shoes",
+        "A light jacket for cooler weather",
+      ],
+
+      thingsToBring: [
+        "Sun protection",
+        "Hat",
+        "Sunscreen",
+        "Camera",
+      ],
+
+      passengerPolicy:
+        "Children and infants are welcome. Children must be accompanied by a parent or responsible adult.",
+
+      notes: [
+        "Lunch is not included.",
+        "Butterfly World or Giraffe House is selected based on family preference and availability.",
+        "Mooiberge strawberry picking is seasonal, generally from September to December.",
+        "If strawberry picking is unavailable, this time becomes additional Stellenbosch exploration or a second wine estate.",
+        "An optional second wine tasting at Tokara may be available for adults.",
+      ],
+    },
+
+    weatherPolicy: {
+      summary:
+        "The tour operates in most weather conditions, although outdoor activities may be adjusted when conditions are unsuitable.",
+      items: [
+        {
+          text: "Outdoor activities may be modified or replaced due to severe weather.",
+        },
+        {
+          text: "Seasonal activities such as strawberry picking depend on weather and availability.",
+        },
+        {
+          text: "The driver-guide will advise on suitable alternatives when necessary.",
+        },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary: "",
+      items: [],
+    },
+
+    safetyPolicy: {
+      summary:
+        "This is a family-friendly experience with structured timing and activities suitable for children.",
+      items: [
+        {
+          text: "Children must remain under the supervision of their parent or responsible adult.",
+        },
+        {
+          text: "Follow all safety instructions provided at wildlife and attraction venues.",
+        },
+        {
+          text: "The itinerary may be adjusted to maintain a comfortable and safe experience.",
+        },
+      ],
+    },
+
+    /*
+     * FULL-DAY TOUR
+     * Uses stops rather than the multi-day itinerary structure.
+     */
+    itinerary: null,
+
+    stops: [
+      {
+        title: "Pickup from Cape Town",
+        description:
+          "Your driver-guide collects you from your Cape Town hotel. Bottled water is provided for the journey.",
+        time: "08:00",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Vredenheim Wine Farm",
+        description:
+          "Adults enjoy a premium wine tasting while children explore the Big Cats Park, farm animals, jungle gym and large gardens.",
+        time: "09:00",
+        duration: "±2 hours",
+        type: "wine",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Butterfly World OR Giraffe House",
+        description:
+          "Choose one family attraction. Butterfly World features a tropical butterfly house, reptiles and birds, while Giraffe House offers wildlife education and encounters with giraffes, zebras and reptiles.",
+        time: "11:15",
+        duration: "±1 hour",
+        type: "wildlife",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Lunch in Stellenbosch",
+        description:
+          "Enjoy a relaxed lunch at a family-friendly restaurant in Stellenbosch. Suggested options include Schoon Bakery, Hudsons, De Warenmarkt or Spur.",
+        time: "12:30",
+        duration: "±1 hour",
+        type: "meal",
+        optional: true,
+        image: "",
+      },
+
+      {
+        title: "Stellenbosch Town Walk",
+        description:
+          "Explore historic Stellenbosch with stops along Dorp Street, Oom Samie se Winkel, artisan chocolate shops and scenic photo locations.",
+        time: "13:45",
+        duration: "±45 minutes",
+        type: "culture",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Helshoogte Pass Scenic Drive",
+        description:
+          "Enjoy spectacular mountain scenery along Helshoogte Pass with safe viewpoints for photographs. Adults can optionally enjoy a second wine tasting at Tokara.",
+        time: "14:45",
+        duration: "±30 minutes",
+        type: "scenic",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Mooiberge Strawberry Farm",
+        description:
+          "During strawberry season, enjoy strawberry picking, the play area and colourful scarecrows. If strawberries are out of season, this time becomes additional Stellenbosch exploration or a second wine estate.",
+        time: "15:30",
+        duration: "±45 minutes",
+        type: "family",
+        optional: true,
+        image: "",
+      },
+
+      {
+        title: "Return to Cape Town",
+        description:
+          "Depart the Stellenbosch area and return to Cape Town for hotel drop-off.",
+        time: "16:30",
+        duration: "±1 hour",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Cape Town Hotel Drop-Off",
+        description:
+          "Arrive back at your Cape Town hotel at approximately 17:30.",
+        time: "17:30",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+    ],
+
+    vehicle: {
+      type: "Private vehicle",
+      description:
+        "Comfortable private transport with a driver-guide and bottled water.",
+    },
+
+    securityAndLiability: null,
+
+    accommodation: {
+      included: false,
+      type: "",
+      description:
+        "No accommodation is included. This is a full-day tour from Cape Town.",
+    },
+
+    needToKnow: [
+      {
+        text: "This is a full-day tour and takes approximately 9.5 hours.",
+      },
+      {
+        text: "Wine tasting is available only to guests aged 18 and over.",
+      },
+      {
+        text: "Lunch is not included.",
+      },
+      {
+        text: "Entry fees for Butterfly World or Giraffe House are not included.",
+      },
+      {
+        text: "Butterfly World and Giraffe House are alternative attractions; the family chooses one.",
+      },
+      {
+        text: "Mooiberge strawberry picking is seasonal, generally from September to December.",
+      },
+      {
+        text: "The optional Tokara wine tasting is for adults and subject to availability.",
+      },
+      {
+        text: "If strawberry picking is unavailable, the itinerary will be adjusted accordingly.",
+      },
+    ],
+
+    faqs: [
+      {
+        question: "Is this tour suitable for children?",
+        answer:
+          "Yes. The tour is specifically designed for families and includes animal encounters, children's play areas, wildlife attractions and family-friendly sightseeing.",
+      },
+      {
+        question: "Can children participate in the wine tasting?",
+        answer:
+          "No. Wine tasting is for guests aged 18 and over. Children can enjoy the family activities at Vredenheim instead.",
+      },
+      {
+        question: "Is lunch included?",
+        answer:
+          "No. Lunch is not included. There is a dedicated lunch stop in Stellenbosch where guests can choose from family-friendly restaurants.",
+      },
+      {
+        question: "Can we choose between Butterfly World and Giraffe House?",
+        answer:
+          "Yes. The family can choose either Butterfly World or Giraffe House, subject to availability.",
+      },
+      {
+        question: "Is strawberry picking available all year?",
+        answer:
+          "No. Strawberry picking at Mooiberge is seasonal, generally from September to December. Outside the season, the tour includes additional Stellenbosch exploration or another wine estate.",
+      },
+      {
+        question: "Is the second wine tasting at Tokara included?",
+        answer:
+          "No. The optional second wine tasting is not included and is available to adults subject to availability.",
+      },
+      {
+        question: "Do you provide hotel pickup?",
+        answer:
+          "Yes. Private pickup from your Cape Town hotel is included, with pickup scheduled for approximately 08:00.",
+      },
+      {
+        question: "What time will we return to Cape Town?",
+        answer:
+          "The tour leaves the Stellenbosch area at approximately 16:30, with hotel drop-off around 17:30.",
+      },
+    ],
+
+    tags: [
+      "family",
+      "wine",
+      "stellenbosch",
+      "cape-winelands",
+      "kids",
+      "wildlife",
+      "private-tour",
+      "cape-town",
+      "day-tour",
+    ],
+  },
+  // Stellenbosch & Franschhoek Winelands
+  {
+    id: null,
+    type: TOUR_TYPES.WINE_ROUTES,
+    category: TOUR_MODIFIERS.DAY_TOUR,
+
+    title: "Stellenbosch & Franschhoek Winelands Tour",
+    slug: "full-day-stellenbosch-franschhoek-winelands-tour",
+    canonicalPath: "/tours/full-day-stellenbosch-franschhoek-winelands-tour",
+
+    seo: {
+      title: "Full-Day Stellenbosch & Franschhoek Winelands Tour",
+      description:
+        "Enjoy a private full-day tour through Stellenbosch and Franschhoek with three premium wine tastings, scenic Winelands landscapes, the Franschhoek Wine Tram and private transport from Cape Town.",
+      keywords: [
+        "Stellenbosch Franschhoek wine tour",
+        "Cape Town Winelands tour",
+        "Franschhoek Wine Tram tour",
+        "Stellenbosch wine tour",
+        "Franschhoek wine tour",
+        "private Winelands tour",
+        "Cape Town wine tour",
+        "full-day Winelands tour",
+        "Franschhoek Wine Tram",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "",
+    images: [],
+    imageFolder: "wine-routes/stellenbosch-franschhoek-winelands",
+    videos: [],
+
+    location: "Stellenbosch & Franschhoek, Western Cape, South Africa",
+    duration: "8.5–9 hours",
+
+    priceBase: 1850,
+    minPeople: 1,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "1 Guest (Solo Traveller)",
+        pricePerPerson: 4500,
+        note: "Includes 3 standard wine tastings and the Franschhoek Wine Tram.",
+      },
+      {
+        category: "2 Guests (Couple Rate)",
+        pricePerPerson: 3200,
+        note: "Private couple experience.",
+      },
+      {
+        category: "3 Guests",
+        pricePerPerson: 2650,
+        note: "Standard wine tastings included.",
+      },
+      {
+        category: "4 Guests",
+        pricePerPerson: 2250,
+        note: "Recommended website rate.",
+      },
+      {
+        category: "5 Guests",
+        pricePerPerson: 2150,
+        note: "All standard tastings included.",
+      },
+      {
+        category: "6 Guests",
+        pricePerPerson: 1950,
+        note: "Group discounted rate.",
+      },
+      {
+        category: "7–10 Guests",
+        pricePerPerson: 1850,
+        note: "Larger private group rate.",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Optional cheese pairing",
+        pricePerPerson: null,
+        note: "Available at Zevenwacht. Additional charge applies.",
+      },
+      {
+        category: "Optional biltong pairing",
+        pricePerPerson: null,
+        note: "Available at Marianne Wine Estate. Additional charge applies.",
+      },
+      {
+        category: "Optional chocolate pairing",
+        pricePerPerson: null,
+        note: "Available at Rickety Bridge. Additional charge applies.",
+      },
+    ],
+
+    groupPricing: {
+      enabled: false,
+      icon: "",
+      tiers: [],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "A luxurious private full-day journey through the Stellenbosch and Franschhoek Winelands, combining three curated wine tastings, breathtaking mountain and vineyard scenery, and the iconic Franschhoek Wine Tram. The experience begins with comfortable pickup in Cape Town before travelling through the Winelands with commentary from your professional driver-guide. Visit Zevenwacht Wine Estate, Marianne Wine Estate and Rickety Bridge Wine Estate before enjoying lunch in Franschhoek and a scenic open-air Wine Tram experience. Perfect for couples, families and wine lovers looking for a relaxed, scenic and memorable Cape Winelands experience.",
+
+    highlights: [
+      {
+        text: "Three standard wine tastings included",
+      },
+      {
+        text: "Visit Zevenwacht Wine Estate in Stellenbosch",
+      },
+      {
+        text: "Visit Marianne Wine Estate",
+      },
+      {
+        text: "Visit Rickety Bridge Wine Estate in Franschhoek",
+      },
+      {
+        text: "Franschhoek Wine Tram ticket included",
+      },
+      {
+        text: "Scenic Stellenbosch and Franschhoek landscapes",
+      },
+      {
+        text: "Private vehicle and professional driver-guide",
+      },
+      {
+        text: "Cultural commentary while passing Langa",
+      },
+      {
+        text: "Bottled water and transport costs included",
+      },
+    ],
+
+    included: [
+      {
+        text: "Private vehicle and professional driver-guide",
+      },
+      {
+        text: "Standard wine tasting at Zevenwacht Wine Estate",
+      },
+      {
+        text: "Standard wine tasting at Marianne Wine Estate",
+      },
+      {
+        text: "Standard wine tasting at Rickety Bridge Wine Estate",
+      },
+      {
+        text: "Franschhoek Wine Tram ticket",
+      },
+      {
+        text: "Bottled water",
+      },
+      {
+        text: "All scheduled transport costs",
+      },
+    ],
+
+    excluded: [
+      {
+        text: "Lunch in Franschhoek",
+      },
+      {
+        text: "Optional cheese pairing at Zevenwacht",
+      },
+      {
+        text: "Optional biltong pairing at Marianne Wine Estate",
+      },
+      {
+        text: "Optional chocolate pairing at Rickety Bridge",
+      },
+      {
+        text: "Additional wine purchases",
+      },
+    ],
+
+    pickupOptions: [
+      {
+        type: "hotel",
+        label: "Cape Town accommodation pickup",
+        description:
+          "Private pickup from your Cape Town accommodation between approximately 08:30 and 09:00.",
+      },
+    ],
+
+    requirements: [
+      "Guests must be of legal drinking age to participate in wine tastings.",
+      "Please provide accurate passenger information when booking.",
+      "Guests should bring suitable identification where required by wine estates.",
+    ],
+
+    arrangements: {
+      availability:
+        "Available year-round, subject to wine estate and Franschhoek Wine Tram availability.",
+      duration: "8.5–9 hours",
+      operatingTime: "Approximately 08:30–18:00",
+      departure: "08:30–09:00 from Cape Town accommodation",
+      return: "Approximately 18:00 to Cape Town",
+      location:
+        "Cape Town → Stellenbosch → Franschhoek → Cape Town",
+
+      clothing: [
+        "Comfortable clothing",
+        "Comfortable walking shoes",
+        "Light jacket for cooler weather",
+      ],
+
+      thingsToBring: [
+        "Identification",
+        "Sun protection",
+        "Hat",
+        "Sunscreen",
+        "Camera",
+      ],
+
+      passengerPolicy:
+        "Wine tasting is subject to the legal drinking age and venue requirements.",
+
+      notes: [
+        "Lunch is not included and is at the guest's own cost.",
+        "Wine estate visits and tasting availability are subject to venue operating conditions.",
+        "Optional cheese, biltong and chocolate pairings are available at additional cost.",
+        "The Franschhoek Wine Tram ticket is included.",
+        "The itinerary may be adjusted slightly to accommodate venue or tram operating schedules.",
+      ],
+    },
+
+    weatherPolicy: {
+      summary:
+        "The tour operates in most weather conditions, although specific outdoor activities may be adjusted when necessary.",
+      items: [
+        {
+          text: "Wine estate visits generally continue in light or moderate weather conditions.",
+        },
+        {
+          text: "Outdoor and scenic activities may be adjusted due to severe weather.",
+        },
+        {
+          text: "Wine Tram operations are subject to the operator's weather and safety conditions.",
+        },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary: "",
+      items: [],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Guests are expected to follow the safety and venue guidelines provided by the driver-guide and each wine estate.",
+      items: [
+        {
+          text: "Guests must follow all instructions provided by wine estates and the Wine Tram operator.",
+        },
+        {
+          text: "Responsible alcohol consumption is expected throughout the experience.",
+        },
+        {
+          text: "Guests should remain with the group during scheduled transfers and activities.",
+        },
+      ],
+    },
+
+    /*
+     * FULL-DAY TOUR
+     * Uses stops rather than the multi-day itinerary structure.
+     */
+    itinerary: null,
+
+    stops: [
+      {
+        title: "Pick-Up in Cape Town",
+        description:
+          "Private vehicle collection from your Cape Town accommodation. Bottled water is provided for the journey.",
+        time: "08:30–09:00",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Drive Past Langa",
+        description:
+          "Travel along the N2 while your driver-guide provides commentary on Langa, Cape Town's oldest township, including its history and cultural significance. There is no stop or entry.",
+        time: "09:00",
+        duration: "±15 minutes",
+        type: "culture",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Zevenwacht Wine Estate",
+        description:
+          "Begin the Winelands experience with a standard wine tasting at Zevenwacht. Enjoy beautiful dam and vineyard views, with an optional cheese pairing available at additional cost.",
+        time: "09:40",
+        duration: "±1 hour",
+        type: "wine",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Marianne Wine Estate",
+        description:
+          "Visit this boutique French-style wine estate for a standard wine tasting. An optional biltong pairing is available at additional cost.",
+        time: "10:55",
+        duration: "±50 minutes",
+        type: "wine",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Rickety Bridge Wine Estate",
+        description:
+          "Enjoy a standard wine tasting at this historic Franschhoek estate, surrounded by a spectacular mountain backdrop. An optional chocolate pairing is available.",
+        time: "12:05",
+        duration: "±55 minutes",
+        type: "wine",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Lunch in Franschhoek",
+        description:
+          "Enjoy lunch at a restaurant of your choice in Franschhoek. Guests select and pay for their own lunch.",
+        time: "13:05",
+        duration: "±1 hour",
+        type: "meal",
+        optional: true,
+        image: "",
+      },
+
+      {
+        title: "Franschhoek Wine Tram",
+        description:
+          "Enjoy a scenic open-air hop-on hop-off tram experience through Franschhoek's vineyards and mountains. The Wine Tram ticket is included.",
+        time: "14:20",
+        duration: "±2 hours",
+        type: "wine-tram",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Return to Cape Town",
+        description:
+          "Begin the comfortable journey back to Cape Town through the surrounding mountain passes and farmlands.",
+        time: "16:30",
+        duration: "±1.5 hours",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Cape Town Drop-Off",
+        description:
+          "Arrive back at your Cape Town accommodation at approximately 18:00.",
+        time: "18:00",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+    ],
+
+    vehicle: {
+      type: "Private vehicle",
+      description:
+        "Comfortable private vehicle with a professional driver-guide and bottled water.",
+    },
+
+    securityAndLiability: null,
+
+    accommodation: {
+      included: false,
+      type: "",
+      description:
+        "No accommodation is included. This is a private full-day tour from Cape Town.",
+    },
+
+    needToKnow: [
+      {
+        text: "This is a private full-day experience lasting approximately 8.5–9 hours.",
+      },
+      {
+        text: "Three standard wine tastings are included in the tour price.",
+      },
+      {
+        text: "Optional cheese, biltong and chocolate pairings are not included.",
+      },
+      {
+        text: "Lunch in Franschhoek is not included.",
+      },
+      {
+        text: "Additional wine purchases are not included.",
+      },
+      {
+        text: "Wine tasting is subject to legal drinking age requirements.",
+      },
+      {
+        text: "The Franschhoek Wine Tram ticket is included.",
+      },
+      {
+        text: "The drive past Langa is a commentary experience only; there is no stop or entry.",
+      },
+      {
+        text: "Wine estate and Wine Tram schedules are subject to availability.",
+      },
+    ],
+
+    faqs: [
+      {
+        question: "How many wine tastings are included?",
+        answer:
+          "Three standard wine tastings are included: one at Zevenwacht, one at Marianne Wine Estate and one at Rickety Bridge.",
+      },
+      {
+        question: "Is the Franschhoek Wine Tram included?",
+        answer:
+          "Yes. The Franschhoek Wine Tram ticket is included in the tour price.",
+      },
+      {
+        question: "Is lunch included?",
+        answer:
+          "No. Lunch is at the guest's own cost, and you can choose your preferred restaurant in Franschhoek.",
+      },
+      {
+        question: "Are wine pairings included?",
+        answer:
+          "No. Optional cheese, biltong and chocolate pairings are available at the respective estates at an additional cost.",
+      },
+      {
+        question: "Is this a private tour?",
+        answer:
+          "Yes. The experience includes a private vehicle and professional driver-guide.",
+      },
+      {
+        question: "Do we stop at Langa?",
+        answer:
+          "No. Langa is a place of interest during the drive, and your guide provides cultural and historical commentary without a stop or entry.",
+      },
+      {
+        question: "What time does the tour return to Cape Town?",
+        answer:
+          "The tour is expected to return to Cape Town at approximately 18:00.",
+      },
+      {
+        question: "Who is this tour suitable for?",
+        answer:
+          "The experience is ideal for couples, families and wine lovers looking for a relaxed private day through the Stellenbosch and Franschhoek Winelands.",
+      },
+    ],
+
+    tags: [
+      "wine",
+      "stellenbosch",
+      "franschhoek",
+      "winelands",
+      "wine-tram",
+      "cape-town",
+      "private-tour",
+      "day-tour",
+      "wine-tasting",
+    ],
+  },
+  // Cape Town Gems - Kirstenbosch & Constantia
+  {
+    id: null,
+    type: TOUR_TYPES.WINE_ROUTES,
+    category: TOUR_MODIFIERS.DAY_TOUR,
+
+    title: "Cape Town Gems – Kirstenbosch & Constantia Winelands Experience",
+    slug: "full-day-cape-town-gems-kirstenbosch-constantia-winelands",
+    canonicalPath:
+      "/tours/full-day-cape-town-gems-kirstenbosch-constantia-winelands",
+
+    seo: {
+      title:
+        "Cape Town Gems: Kirstenbosch & Constantia Winelands Full-Day Tour",
+      description:
+        "Explore AfroGem, Kirstenbosch and the historic Constantia Winelands on a private Cape Town tour featuring Groot Constantia, Klein Constantia and Constantia Glen with two wine tastings included for adults and teens.",
+      keywords: [
+        "Cape Town gems tour",
+        "Kirstenbosch tour",
+        "Constantia wine tour",
+        "Constantia Winelands tour",
+        "Groot Constantia tour",
+        "Klein Constantia tour",
+        "Constantia Glen wine tasting",
+        "Cape Town private tour",
+        "Cape Town wine tour",
+        "Kirstenbosch and Constantia",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "",
+    images: [],
+    imageFolder: "wine-routes/cape-town-gems-kirstenbosch-constantia",
+    videos: [],
+
+    location: "Cape Town CBD, Kirstenbosch & Constantia, South Africa",
+    duration: "7–8 hours",
+
+    priceBase: 1950,
+    minPeople: 1,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "Adults (18+)",
+        pricePerPerson: 1950,
+        note: "Includes all listed entry fees and 2 standard wine tastings.",
+      },
+      {
+        category: "Teens (13–17)",
+        pricePerPerson: 1950,
+        note: "Includes all listed entry fees and 2 standard wine tastings.",
+      },
+      {
+        category: "Children (6–12)",
+        pricePerPerson: 850,
+        note: "Includes Kirstenbosch entry only.",
+      },
+      {
+        category: "Infants (0–5)",
+        pricePerPerson: 0,
+        note: "Free. No entry fees.",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        category: "Klein Constantia wine tasting",
+        pricePerPerson: null,
+        note: "Optional tasting available at an additional cost.",
+      },
+    ],
+
+    groupPricing: {
+      enabled: false,
+      icon: "",
+      tiers: [],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "This curated Cape Town experience blends African craftsmanship, botanical beauty and the historic Constantia wine valley, the birthplace of South African winemaking. The journey begins in the CBD at AfroGem, where guests explore African gemstones and jewellery artistry. From there, travel to Kirstenbosch National Botanical Garden to discover indigenous fynbos, proteas, sculptures, the iconic Boomslang walkway and spectacular mountain scenery. The route continues into Constantia, where guests visit the historic Groot Constantia estate, learn about Klein Constantia and the legendary Vin de Constance, and finish with a standard wine tasting at boutique Constantia Glen. With private transport, bottled water and entry fees included, this is a relaxed and scenic experience combining culture, nature, wine and heritage.",
+
+    highlights: [
+      {
+        text: "African gemstone and jewellery experience at AfroGem",
+      },
+      {
+        text: "Explore Kirstenbosch National Botanical Garden",
+      },
+      {
+        text: "Walk the iconic Boomslang canopy walkway",
+      },
+      {
+        text: "Visit historic Groot Constantia",
+      },
+      {
+        text: "Standard wine tasting at Groot Constantia",
+      },
+      {
+        text: "Explore Klein Constantia and the history of Vin de Constance",
+      },
+      {
+        text: "Standard wine tasting at Constantia Glen",
+      },
+      {
+        text: "Scenic Table Mountain and Constantia Valley landscapes",
+      },
+      {
+        text: "Private vehicle and professional driver-guide",
+      },
+    ],
+
+    included: [
+      {
+        text: "Kirstenbosch National Botanical Garden entry",
+      },
+      {
+        text: "Standard wine tasting at Groot Constantia",
+      },
+      {
+        text: "Klein Constantia estate visit",
+      },
+      {
+        text: "Standard wine tasting at Constantia Glen",
+      },
+      {
+        text: "Private vehicle and professional driver-guide",
+      },
+      {
+        text: "Bottled water",
+      },
+      {
+        text: "All scheduled transport costs",
+      },
+    ],
+
+    excluded: [
+      {
+        text: "Lunch",
+      },
+      {
+        text: "Optional Klein Constantia wine tasting",
+      },
+      {
+        text: "Optional wine purchases",
+      },
+      {
+        text: "Gratuities",
+      },
+    ],
+
+    pickupOptions: [
+      {
+        type: "hotel",
+        label: "Cape Town CBD pickup",
+        description:
+          "Private collection from your Cape Town CBD hotel or residence at approximately 08:30.",
+      },
+    ],
+
+    requirements: [
+      "Guests participating in wine tastings must meet the applicable legal drinking age requirements.",
+      "Please provide accurate passenger ages when booking.",
+      "Comfortable walking shoes are recommended for Kirstenbosch.",
+    ],
+
+    arrangements: {
+      availability:
+        "Available year-round, subject to attraction and wine estate availability.",
+      duration: "7–8 hours",
+      operatingTime: "Approximately 08:30–16:00",
+      departure: "08:30 from Cape Town CBD",
+      return: "Approximately 16:00 to Cape Town CBD",
+      location:
+        "Cape Town CBD → AfroGem → Kirstenbosch → Groot Constantia → Klein Constantia → Constantia Glen → Cape Town CBD",
+
+      clothing: [
+        "Comfortable clothing",
+        "Comfortable walking shoes",
+        "Light jacket for changing weather",
+      ],
+
+      thingsToBring: [
+        "Sun protection",
+        "Hat",
+        "Sunscreen",
+        "Camera",
+      ],
+
+      passengerPolicy:
+        "Children are welcome. Wine tasting is subject to applicable age requirements.",
+
+      notes: [
+        "Lunch is not included.",
+        "Klein Constantia wine tasting is optional and charged separately.",
+        "Children aged 6–12 are priced at the child rate and include Kirstenbosch entry only.",
+        "Infants aged 0–5 are free.",
+        "Wine estate visits and tastings are subject to venue availability.",
+      ],
+    },
+
+    weatherPolicy: {
+      summary:
+        "The experience operates in most weather conditions, although outdoor activities may be adjusted when necessary.",
+      items: [
+        {
+          text: "Kirstenbosch activities are weather dependent.",
+        },
+        {
+          text: "Outdoor walking routes may be adjusted during severe weather.",
+        },
+        {
+          text: "Wine estate visits may continue in light or moderate weather conditions.",
+        },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary: "",
+      items: [],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Guests should follow instructions from the driver-guide and venue staff throughout the experience.",
+      items: [
+        {
+          text: "Follow all safety instructions at Kirstenbosch and the wine estates.",
+        },
+        {
+          text: "Children should remain under the supervision of a parent or responsible adult.",
+        },
+        {
+          text: "Guests participating in wine tastings should consume alcohol responsibly.",
+        },
+      ],
+    },
+
+    /*
+     * FULL-DAY TOUR
+     * Uses stops rather than the multi-day itinerary structure.
+     */
+    itinerary: null,
+
+    stops: [
+      {
+        title: "Pick-Up in Cape Town CBD",
+        description:
+          "Private collection from your Cape Town CBD hotel or residence. Bottled water is provided.",
+        time: "08:30",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "AfroGem Jewellery Experience",
+        description:
+          "Explore African diamonds, tanzanite, gemstones and local jewellery craftsmanship at AfroGem.",
+        time: "09:00",
+        duration: "±1 hour",
+        type: "culture",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Kirstenbosch National Botanical Garden",
+        description:
+          "Explore indigenous gardens, fynbos, proteas, sculptures and the iconic Boomslang canopy walkway beneath the eastern slopes of Table Mountain.",
+        time: "10:20",
+        duration: "±1 hour 40 minutes",
+        type: "nature",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Groot Constantia Wine Estate",
+        description:
+          "Visit the historic Groot Constantia estate and enjoy a standard wine tasting. Adults and teens receive the included tasting according to the supplied pricing structure.",
+        time: "12:15",
+        duration: "±45 minutes",
+        type: "wine",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Lunch in Constantia",
+        description:
+          "Enjoy a relaxed lunch break at your choice of restaurant. Suggested options include Jonkershuis Restaurant, Simons Restaurant or Constantia Glen Restaurant.",
+        time: "13:00",
+        duration: "±1 hour",
+        type: "meal",
+        optional: true,
+        image: "",
+      },
+
+      {
+        title: "Klein Constantia Wine Estate",
+        description:
+          "Explore the historic estate and learn about the legacy of Vin de Constance. A wine tasting is available optionally at additional cost.",
+        time: "14:00",
+        duration: "±30 minutes",
+        type: "wine",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Constantia Glen Wine Estate",
+        description:
+          "Finish the Winelands experience at this boutique estate with panoramic views over the Constantia Valley. A standard wine tasting is included.",
+        time: "14:40",
+        duration: "±40 minutes",
+        type: "wine",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Return to Cape Town CBD",
+        description:
+          "Enjoy a comfortable return journey to the Cape Town CBD.",
+        time: "15:30",
+        duration: "±30 minutes",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+
+      {
+        title: "Cape Town CBD Drop-Off",
+        description:
+          "Arrive back at your Cape Town CBD hotel or residence at approximately 16:00.",
+        time: "16:00",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+    ],
+
+    vehicle: {
+      type: "Private vehicle",
+      description:
+        "Comfortable private vehicle with a professional driver-guide and bottled water.",
+    },
+
+    securityAndLiability: null,
+
+    accommodation: {
+      included: false,
+      type: "",
+      description:
+        "No accommodation is included. This is a full-day Cape Town experience.",
+    },
+
+    needToKnow: [
+      {
+        text: "This is a private 7–8 hour experience.",
+      },
+      {
+        text: "All listed entry fees are included according to the applicable passenger category.",
+      },
+      {
+        text: "Two standard wine tastings are included for adults and teens.",
+      },
+      {
+        text: "Klein Constantia wine tasting is optional and charged separately.",
+      },
+      {
+        text: "Lunch is not included.",
+      },
+      {
+        text: "Optional wine purchases and gratuities are not included.",
+      },
+      {
+        text: "Children aged 6–12 receive the child rate and Kirstenbosch entry only.",
+      },
+      {
+        text: "Infants aged 0–5 travel free with no entry fees.",
+      },
+      {
+        text: "Wine tastings are subject to applicable age requirements.",
+      },
+    ],
+
+    faqs: [
+      {
+        question: "How many wine tastings are included?",
+        answer:
+          "Two standard wine tastings are included: one at Groot Constantia and one at Constantia Glen.",
+      },
+      {
+        question: "Is the Klein Constantia wine tasting included?",
+        answer:
+          "No. The Klein Constantia estate visit is included, but the wine tasting is optional and available at an additional cost.",
+      },
+      {
+        question: "Is lunch included?",
+        answer:
+          "No. Lunch is not included. Guests can choose from several recommended restaurants in the Constantia area.",
+      },
+      {
+        question: "Is Kirstenbosch entry included?",
+        answer:
+          "Yes. Kirstenbosch entry is included in the tour price. Children have a separate child rate that includes Kirstenbosch entry.",
+      },
+      {
+        question: "Is this tour suitable for children?",
+        answer:
+          "Yes. The experience has a family-friendly structure, with discounted pricing for children aged 6–12 and free entry for infants aged 0–5.",
+      },
+      {
+        question: "Is the tour private?",
+        answer:
+          "Yes. The experience includes a private vehicle and professional driver-guide.",
+      },
+      {
+        question: "What areas does the tour visit?",
+        answer:
+          "The route runs from Cape Town CBD to AfroGem, Kirstenbosch, Groot Constantia, Klein Constantia and Constantia Glen before returning to the CBD.",
+      },
+      {
+        question: "What time does the tour return to Cape Town?",
+        answer:
+          "The scheduled return to the Cape Town CBD is approximately 16:00.",
+      },
+    ],
+
+    tags: [
+      "cape-town",
+      "kirstenbosch",
+      "constantia",
+      "groot-constantia",
+      "klein-constantia",
+      "constantia-glen",
+      "wine",
+      "heritage",
+      "nature",
+      "family",
+      "private-tour",
+      "day-tour",
     ],
   },
 ];
