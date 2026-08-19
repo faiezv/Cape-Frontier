@@ -1977,7 +1977,7 @@ export const tours = [
       "Cape Town",
     ],
   },
-  // Cobra (Full day)
+  // Cobra (8hr)
   {
     id: null, // New tour ID to be assigned (e.g., 24)
     type: TOUR_TYPES.ADRENALINE,
@@ -2257,7 +2257,7 @@ export const tours = [
       heading: "Security & Liability Holding Fee",
 
       cardPreAuthorisation: {
-        amount: 15000,
+        amount: 20000,
         currency: "ZAR",
         description:
           "A temporary holding fee covering insurance excess, vehicle damage, traffic fines, recovery costs, or breaches of the rental agreement.",
@@ -2375,7 +2375,7 @@ export const tours = [
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.HALF_DAY,
 
-    title: "Horse Riding at the Cape Dunes",
+    title: "The Dunes Beach Horse Riding - Noordhoek",
     slug: "horse-riding-at-the-cape-dunes",
     canonicalPath: "/tours/horse-riding-at-the-cape-dunes",
 
@@ -4102,7 +4102,7 @@ export const tours = [
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.FULL_DAY,
 
-    title: "Horse Riding, Penguins & Cape Point Tour",
+    title: "The Dunes Beach Horse-Riding, with Boulder's Beach & Cape Point Tour",
     slug: "horse-riding-penguins-cape-point-tour",
     canonicalPath: "/tours/horse-riding-penguins-cape-point-tour",
 
@@ -5126,14 +5126,14 @@ export const tours = [
         pricePerPerson: 1900,
       },
       {
-        category: "Children (5–17 years)",
-        pricePerPerson: null,
+        category: "Children (12–17 years)",
+        pricePerPerson: 1500,
         note: "No discounts for children. Age and eligibility rules apply.",
       },
     ],
 
     groupPricing: {
-      enabled: true,
+      enabled: false,
       icon: "/icons/savemore.png",
       tiers: [
         {
@@ -5292,7 +5292,7 @@ export const tours = [
     pricing: [
       {
         category: "Adults",
-        pricePerPerson: 1900,
+        pricePerPerson: 1500,
       },
       // {
       //   category: "Children",
@@ -5301,7 +5301,7 @@ export const tours = [
     ],
 
     groupPricing: {
-      enabled: true,
+      enabled: false,
       icon: "/icons/savemore.png",
       tiers: [
         {
