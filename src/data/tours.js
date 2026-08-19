@@ -5482,16 +5482,6 @@ export const tours = [
         pricePerPerson: 585,
         note: "10% small‑group discount",
       },
-      {
-        category: "Children (4–12 years, 7–10 guests)",
-        pricePerPerson: 555,
-        note: "15% discount",
-      },
-      {
-        category: "Children (4–12 years, 11–14 guests)",
-        pricePerPerson: 520,
-        note: "20% best value for large groups",
-      },
     ],
 
     additionalPricing: [
