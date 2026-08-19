@@ -497,44 +497,64 @@ function TourSelect() {
     return () => window.clearTimeout(timer)
   }, [searchError?.id])
 
-  // Entrance animation for destination modal rows – fixed flicker
+  // ===========================================================================
+  // FIX: Entrance animation for destination modal rows – now glitch‑free
+  // ===========================================================================
   useEffect(() => {
     if (activeModal === 'destination' && destinationModalRef.current) {
-      const rows = destinationRowRefs.current.filter(Boolean)
-      if (rows.length) {
-        // reset to hidden state first to prevent initial flash
-        gsap.set(rows, { opacity: 0, y: 12 })
+      // 1. Clear any stale refs from previous filter
+      destinationRowRefs.current = destinationRowRefs.current.slice(0, filteredTours.length);
+
+      // 2. Use requestAnimationFrame to ensure DOM is fully painted
+      const rafId = requestAnimationFrame(() => {
+        const rows = destinationRowRefs.current.filter(Boolean);
+        if (!rows.length) return;
+
+        // 3. Reset to hidden state
+        gsap.set(rows, {
+          opacity: 0,
+          y: 12,
+          willChange: 'transform, opacity',
+        });
+
+        // 4. Animate in with a slight stagger
         gsap.to(rows, {
           opacity: 1,
           y: 0,
           stagger: 0.05,
-          duration: 0.35,
+          duration: 0.4,
           ease: 'power2.out',
-          clearProps: 'opacity'
-        })
-      }
-    }
-  }, [activeModal, filterType]) // re-run when filter changes to animate new list
+          clearProps: 'opacity',
+          onComplete: () => {
+            // 5. After animation, remove will‑change to free resources
+            rows.forEach(el => el.style.willChange = 'auto');
+          }
+        });
+      });
 
-  // Overflow check for title marquee (desktop only)
+      return () => cancelAnimationFrame(rafId);
+    }
+  }, [activeModal, filterType, filteredTours.length]);
+
+  // Overflow check for title marquee (desktop only) – now deferred until after animation
   useEffect(() => {
-    if (isMobileLayout) return
-    // Wait for rows to render
+    if (isMobileLayout || activeModal !== 'destination') return;
+    // Wait for the animation to finish (400ms + stagger) plus a buffer
     const timer = setTimeout(() => {
       destinationTitleRefs.current.forEach((el) => {
-        if (!el) return
-        const parent = el.closest('.marquee-wrapper')
-        if (!parent) return
+        if (!el) return;
+        const parent = el.closest('.marquee-wrapper');
+        if (!parent) return;
         // Check if text overflows
         if (el.scrollWidth > parent.clientWidth) {
-          parent.classList.add('marquee-active')
+          parent.classList.add('marquee-active');
         } else {
-          parent.classList.remove('marquee-active')
+          parent.classList.remove('marquee-active');
         }
-      })
-    }, 100)
-    return () => clearTimeout(timer)
-  }, [filteredTours, isMobileLayout])
+      });
+    }, 700); // 400ms animation + 300ms buffer
+    return () => clearTimeout(timer);
+  }, [filteredTours, isMobileLayout, activeModal]);
 
   const getMissingDetails = () => {
     const missing = []
