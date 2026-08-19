@@ -2,7 +2,8 @@
 // Do not trust only the frontend price.
 
 import CheckoutSummary from '../components/CheckoutSummary';
-
+import TourOptions from '../components/TourDetails/TourOptions.jsx'
+import AdditionalPricing from '../components/TourDetails/AdditionalPricing';
 
 import React, {
   useEffect,
@@ -528,6 +529,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
     mobile: "",
     email: "",
     date: "",
+    selectedExtras: {}, // will hold { category: quantity/boolean }
     adults: "1",
     children: "0",
     participants: "1",
@@ -1280,6 +1282,10 @@ const Booking = ({ embeddedTour, bookingData }) => {
 
   if (!tour) return null;
 
+useEffect(() => {
+  console.log('formData changed:', formData);
+}, [formData]);
+
   return (
     <div
       ref={pageRef}
@@ -1834,6 +1840,18 @@ const Booking = ({ embeddedTour, bookingData }) => {
               </div>
             </div>
 
+            {Array.isArray(tour?.options) &&
+              tour.options.length > 0 && (
+              <TourOptions
+                tour={tour}                     // ✅ pass the whole tour object
+                selectedOption={formData?.selectedOption}
+                onOptionChange={(optionId) => {
+                  setFormData((prev) => ({ ...prev, selectedOption: optionId }));
+                }}
+              /> 
+            )}
+            
+            
             <div
               ref={rightRef}
               className={`group/right transition-colors duration-500 ${
@@ -2364,6 +2382,15 @@ const Booking = ({ embeddedTour, bookingData }) => {
                     icon="C"
                     onClick={() => handleToggleOption("isCustom")}
                   />
+                  {Array.isArray(tour?.additionalPricing) && tour.additionalPricing.length > 0 && (
+                    <AdditionalPricing
+                      additionalPricing={tour.additionalPricing}
+                      selectedExtras={formData.selectedExtras}
+                      onExtrasChange={(newExtras) =>
+                        setFormData((prev) => ({ ...prev, selectedExtras: newExtras }))
+                      }
+                    />
+                  )}
                   </div>
             </div>
           </div>
@@ -2377,6 +2404,9 @@ const Booking = ({ embeddedTour, bookingData }) => {
               tour={tour}
               adultCount={adultCount}
               childCount={childCount}
+              selectedOption={formData?.selectedOption}
+              selectedExtras={formData.selectedExtras}      // add this
+              additionalPricing={tour.additionalPricing}    // add this 
               formData={formData}
               contactDetailsComplete={contactDetailsComplete}
               dateDetailsComplete={dateDetailsComplete}

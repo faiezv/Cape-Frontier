@@ -550,7 +550,8 @@ const Navbar = () => {
           >
             <img
               className="h-11 max-w-[4.25rem] shrink-0 object-contain sm:h-10 sm:max-w-none md:h-12"
-              src="/icons/navLogo.png"
+              // src="/icons/navLogo.png"
+              src="/assets/brand/logo.png"
               alt="Cape Frontier logo"
             />
 

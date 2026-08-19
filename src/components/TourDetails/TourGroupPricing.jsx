@@ -52,24 +52,35 @@ const TourGroupPricing = ({ groupPricing }) => {
                 )}
               </div>
 
-              {/* PRICE */}
-              <div className="flex shrink-0 items-baseline gap-2">
-                <strong className="font-bitter text-lg font-bold text-emerald-700 sm:text-xl">
-                  R
-                  {Number(tier.perPerson).toLocaleString(
-                    "en-ZA",
-                    {
+            {/* PRICE */}
+            <div className="flex shrink-0 items-baseline gap-2">
+              {tier.perPerson != null ? (
+                <>
+                  <strong className="font-bitter text-lg font-bold text-emerald-700 sm:text-xl">
+                    R
+                    {Number(tier.perPerson).toLocaleString("en-ZA", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
-                    }
-                  )}
-                </strong>
+                    })}
+                  </strong>
 
-                <span className="font-bitter text-xs font-medium text-neutral-500">
-                  per person
-                </span>
-              </div>
-            </article>
+                  <span className="font-bitter text-xs font-medium text-neutral-500">
+                    per person
+                  </span>
+                </>
+              ) : tier.discountPercent != null ? (
+                <>
+                  <strong className="font-bitter text-lg font-bold text-emerald-700 sm:text-xl">
+                    {Number(tier.discountPercent)}% OFF
+                  </strong>
+
+                  <span className="font-bitter text-xs font-medium text-neutral-500">
+                    of total
+                  </span>
+                </>
+              ) : null}
+            </div>
+                        </article>
           ))}
         </div>
       </div>
