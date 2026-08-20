@@ -327,6 +327,41 @@ export default function TourCard({
             className="flex min-h-0 flex-col bg-white"
           >
             <div className="flex min-h-0 flex-1 flex-col justify-start gap-3 p-4 sm:gap-4 sm:p-5 md:p-6 xl:gap-5 xl:p-8">
+            {/* =====================================================
+                FOOTER
+            ===================================================== */}
+
+            <div className="shrink-0 overflow-hidden">
+              <div className="flex items-center justify-between gap-3 border-t border-black/5 bg-neutral-50 px-3 py-3 sm:px-5 sm:py-4 md:px-6 xl:px-8">
+
+                {/* DETAILS */}
+                <button
+                  type="button"
+                  onClick={goToTourPage}
+                  className="flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 font-bitter text-sm font-medium text-neutral-600 transition-all duration-200 hover:border-red-300 hover:text-red-400 active:scale-95"
+                >
+                  {CTA_LABELS.fullDetails ||
+                    "Details"}
+                </button>
+
+                {/* BOOKING */}
+                <button
+                  type="button"
+                  onClick={goToBooking}
+                  className="hero-gradient flex items-center justify-center gap-2 rounded-full px-5 py-2 font-bitter text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:opacity-90 active:scale-95"
+                >
+                  {CTA_LABELS.requestTrip ||
+                    "Request Trip"}
+
+                  <img
+                    src="/icons/go.png"
+                    alt=""
+                    className="h-4 w-4 object-contain"
+                  />
+                </button>
+              </div>
+            </div>
+
 
               {/* =================================================
                   PRICE ROW
@@ -554,6 +589,29 @@ export default function TourCard({
               </div>
 
               {/* =================================================
+                  EXTRA INFO
+              ================================================= */}
+
+              {!isMobile && (
+                <div className="cf-mobile-info grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <div className="rounded-2xl bg-green-200/80 px-3 py-2 font-bitter text-xs font-semibold leading-snug text-green-950">
+                    {getBestGroupDiscount(
+                      tour
+                    )}
+                  </div>
+
+                  {getPickupSummary(tour) && (
+                    <div className="rounded-2xl bg-neutral-100 px-3 py-2 font-bitter text-xs font-semibold leading-snug text-neutral-700">
+                      {getPickupSummary(
+                        tour
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+              {/* =================================================
                   REVIEW
               ================================================= */}
 
@@ -748,63 +806,7 @@ export default function TourCard({
                 )}
               </div>
 
-              {/* =================================================
-                  EXTRA INFO
-              ================================================= */}
 
-              {!isMobile && (
-                <div className="cf-mobile-info grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  <div className="rounded-2xl bg-green-200/80 px-3 py-2 font-bitter text-xs font-semibold leading-snug text-green-950">
-                    {getBestGroupDiscount(
-                      tour
-                    )}
-                  </div>
-
-                  {getPickupSummary(tour) && (
-                    <div className="rounded-2xl bg-neutral-100 px-3 py-2 font-bitter text-xs font-semibold leading-snug text-neutral-700">
-                      {getPickupSummary(
-                        tour
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* =====================================================
-                FOOTER
-            ===================================================== */}
-
-            <div className="shrink-0 overflow-hidden">
-              <div className="flex items-center justify-between gap-3 border-t border-black/5 bg-neutral-50 px-3 py-3 sm:px-5 sm:py-4 md:px-6 xl:px-8">
-
-                {/* DETAILS */}
-                <button
-                  type="button"
-                  onClick={goToTourPage}
-                  className="flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 font-bitter text-sm font-medium text-neutral-600 transition-all duration-200 hover:border-red-300 hover:text-red-400 active:scale-95"
-                >
-                  {CTA_LABELS.fullDetails ||
-                    "Details"}
-                </button>
-
-                {/* BOOKING */}
-                <button
-                  type="button"
-                  onClick={goToBooking}
-                  className="hero-gradient flex items-center justify-center gap-2 rounded-full px-5 py-2 font-bitter text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:opacity-90 active:scale-95"
-                >
-                  {CTA_LABELS.requestTrip ||
-                    "Request Trip"}
-
-                  <img
-                    src="/icons/go.png"
-                    alt=""
-                    className="h-4 w-4 object-contain"
-                  />
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </div>

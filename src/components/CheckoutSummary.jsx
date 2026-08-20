@@ -124,46 +124,63 @@ const CheckoutSummary = ({
     }
 
     if (matchedGroupTier) {
-      const hasPerPersonPrice =
-        matchedGroupTier.perPerson != null &&
-        Number.isFinite(Number(matchedGroupTier.perPerson));
-      const hasDiscountPercent =
-        matchedGroupTier.discountPercent != null &&
-        Number.isFinite(Number(matchedGroupTier.discountPercent));
+      // ----- NEW: check for groupTotal first -----
+      const groupTotal =
+        matchedGroupTier.groupTotal != null
+          ? Number(matchedGroupTier.groupTotal)
+          : null;
 
-      if (hasPerPersonPrice) {
-        groupPricingType = "perPerson";
-        const groupAdultPrice = Math.max(0, Number(matchedGroupTier.perPerson));
-        const discountedAdultSubtotal = adults * groupAdultPrice;
-        const unchangedChildSubtotal = children * childBasePrice;
-        discountedSubtotal = discountedAdultSubtotal + unchangedChildSubtotal;
-        groupDiscountAmount = Math.max(0, originalSubtotal - discountedSubtotal);
-        groupDiscountPercent =
-          originalSubtotal > 0 ? (groupDiscountAmount / originalSubtotal) * 100 : 0;
-        hasDiscount = groupDiscountAmount > 0;
-      } else if (hasDiscountPercent) {
-        groupPricingType = "discountPercent";
-        const requestedDiscountPercent = Number(matchedGroupTier.discountPercent);
-        const safeDiscountPercent = Math.min(Math.max(requestedDiscountPercent, 0), 100);
-
-        if (applyGroupDiscountToChildren) {
-          groupDiscountAmount = originalSubtotal * (safeDiscountPercent / 100);
-          discountedSubtotal = originalSubtotal - groupDiscountAmount;
-        } else {
-          const discountedAdultSubtotal = adultBaseSubtotal * (1 - safeDiscountPercent / 100);
-          discountedSubtotal = discountedAdultSubtotal + childBaseSubtotal;
-          groupDiscountAmount = originalSubtotal - discountedSubtotal;
-        }
-        groupDiscountPercent =
-          originalSubtotal > 0 ? (groupDiscountAmount / originalSubtotal) * 100 : 0;
-        hasDiscount = groupDiscountAmount > 0;
-      } else {
-        groupPricingType = "custom";
-        isCustomQuote = true;
-        discountedSubtotal = originalSubtotal;
+      if (groupTotal !== null && groupTotal > 0) {
+        // Fixed group total takes precedence
+        groupPricingType = "groupTotal";
+        discountedSubtotal = groupTotal;
         groupDiscountAmount = 0;
         groupDiscountPercent = 0;
-        hasDiscount = false;
+        hasDiscount = true; // group pricing is active (even if not a discount)
+        isCustomQuote = false;
+      } else {
+        // Existing logic: perPerson or discountPercent
+        const hasPerPersonPrice =
+          matchedGroupTier.perPerson != null &&
+          Number.isFinite(Number(matchedGroupTier.perPerson));
+        const hasDiscountPercent =
+          matchedGroupTier.discountPercent != null &&
+          Number.isFinite(Number(matchedGroupTier.discountPercent));
+
+        if (hasPerPersonPrice) {
+          groupPricingType = "perPerson";
+          const groupAdultPrice = Math.max(0, Number(matchedGroupTier.perPerson));
+          const discountedAdultSubtotal = adults * groupAdultPrice;
+          const unchangedChildSubtotal = children * childBasePrice;
+          discountedSubtotal = discountedAdultSubtotal + unchangedChildSubtotal;
+          groupDiscountAmount = Math.max(0, originalSubtotal - discountedSubtotal);
+          groupDiscountPercent =
+            originalSubtotal > 0 ? (groupDiscountAmount / originalSubtotal) * 100 : 0;
+          hasDiscount = groupDiscountAmount > 0;
+        } else if (hasDiscountPercent) {
+          groupPricingType = "discountPercent";
+          const requestedDiscountPercent = Number(matchedGroupTier.discountPercent);
+          const safeDiscountPercent = Math.min(Math.max(requestedDiscountPercent, 0), 100);
+
+          if (applyGroupDiscountToChildren) {
+            groupDiscountAmount = originalSubtotal * (safeDiscountPercent / 100);
+            discountedSubtotal = originalSubtotal - groupDiscountAmount;
+          } else {
+            const discountedAdultSubtotal = adultBaseSubtotal * (1 - safeDiscountPercent / 100);
+            discountedSubtotal = discountedAdultSubtotal + childBaseSubtotal;
+            groupDiscountAmount = originalSubtotal - discountedSubtotal;
+          }
+          groupDiscountPercent =
+            originalSubtotal > 0 ? (groupDiscountAmount / originalSubtotal) * 100 : 0;
+          hasDiscount = groupDiscountAmount > 0;
+        } else {
+          groupPricingType = "custom";
+          isCustomQuote = true;
+          discountedSubtotal = originalSubtotal;
+          groupDiscountAmount = 0;
+          groupDiscountPercent = 0;
+          hasDiscount = false;
+        }
       }
     }
 
@@ -232,7 +249,7 @@ const CheckoutSummary = ({
       // Amount saved through group pricing
       discountAmount: Number(groupDiscountAmount),
 
-      // Tour price after group discount
+      // Tour price after group discount (or fixed group total)
       discountedTourTotal: Number(discountedSubtotal),
 
       // Additional tour fees
@@ -467,6 +484,13 @@ const CheckoutSummary = ({
                     <span className="text-sm font-bold text-blue-700">Select an option</span>
                   ) : isCustomQuote ? (
                     <span className="text-sm font-bold text-blue-700">Custom quote</span>
+                  ) : groupPricingType === "groupTotal" ? (
+                    <span className="text-sm font-bold text-neutral-900">
+                      {displayDiscountedTourSubtotal}
+                      <span className="ml-2 text-xs font-normal text-neutral-500">
+                        (Fixed group rate)
+                      </span>
+                    </span>
                   ) : hasDiscount ? (
                     <>
                       <span className="text-sm font-bold text-red-500 line-through">
@@ -504,6 +528,8 @@ const CheckoutSummary = ({
                 >
                   {isCustomQuote
                     ? matchedGroupTier?.note || "Custom quote required."
+                    : groupPricingType === "groupTotal"
+                    ? `Fixed group rate · ${displayDiscountedTourSubtotal}`
                     : hasDiscount
                     ? groupPricingType === "perPerson"
                       ? `-${displayGroupDiscountAmount} · Adult group rate`

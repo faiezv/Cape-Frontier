@@ -46,7 +46,7 @@ const Home = () => {
     hidden = false;
 
     gsap.to(tourSelectSectionRef.current, {
-      y: 72,
+      y: 80,
       autoAlpha: 1,
       duration: 0.35,
       ease: "power3.out",
@@ -245,14 +245,14 @@ const Home = () => {
       ref={pageRef}
       className="relative flex flex-col overflow-x-hidden bg-white text-white"
     >
-<section
-  ref={tourSelectSectionRef}
-  className="fixed z-25 w-full overflow-x-hidden overflow-y-visible"
->
-  <div ref={tourSelectRef} className="mx-auto max-w-5xl">
-    <TourSelect />
-  </div>
-</section>
+      <section
+        ref={tourSelectSectionRef}
+        className="fixed z-25 w-full overflow-x-hidden overflow-y-visible"
+      >
+        <div ref={tourSelectRef} className="mx-auto max-w-5xl">
+          <TourSelect />
+        </div>
+      </section>
 
       <section
         id="home"

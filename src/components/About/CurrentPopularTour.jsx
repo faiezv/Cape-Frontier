@@ -6,6 +6,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 import imageOfTour from  "/src/assets/images/tours/hiking/platteklip/1.webp"
 
+
 const ClassicTourBanner = () => {
   const bannerRef = useRef(null)
   const imageWrapRef = useRef(null)
@@ -142,7 +143,7 @@ const ClassicTourBanner = () => {
             <div className="flex justify-center lg:justify-start">
               <img
                 ref={logoRef}
-                src="./icons/navLogoDark.png"
+                src="/assets/brand/logo-removebg.png"
                 className="max-h-20 object-contain sm:max-h-24 lg:max-h-28"
                 alt="Cape Frontier"
               />

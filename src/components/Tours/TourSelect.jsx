@@ -761,7 +761,7 @@ function TourSelect() {
               <button
                 type="button"
                 onClick={() => setMobileStep(Math.min(index, recommendedStep))}
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-bitter text-[11px] font-black tracking-normal transition-all duration-300 ${isDone ? 'bg-green-300 text-green-950 shadow-[0_0_0_3px_rgba(134,239,172,0.35)]' : isActive ? 'bg-blue-600 text-white shadow-[0_10px_24px_rgba(37,99,235,0.22)]' : 'bg-black/7 text-black/40'}`}
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-bitter text-[11px] font-black tracking-normal transition-all duration-300 ${isDone ? 'bg-green-300 text-green-950 shadow-[0_0_0_3px_rgba(134,239,172,0.35)]' : isActive ? 'bg-blue-600 text-white -[0_10px_24px_rgba(37,99,235,0.22)]' : 'bg-black/7 text-black/40'}`}
                 aria-label={`Go to step ${stepNumber}`}
               >
                 {stepNumber}
@@ -885,7 +885,8 @@ function TourSelect() {
   const modalNode = activeModal && typeof document !== 'undefined' ? createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md" onClick={close}>
       <div
-        className={`modal-content flex max-h-[88vh] w-full flex-col overflow-hidden rounded-3xl bg-white/95 shadow-2xl backdrop-blur-sm sm:max-h-[85vh] ${
+        className={`modal-content flex max-h-[88vh] w-full flex-col overflow-hidden rounded-3xl bg-white/95 
+           sm:max-h-[85vh] ${
           activeModal === 'date' ? 'max-w-md sm:max-w-lg md:max-w-xl' :
           activeModal === 'participants' ? 'max-w-[94vw] sm:max-w-md' :
           'max-w-[94vw] sm:max-w-3xl'
@@ -894,7 +895,8 @@ function TourSelect() {
         style={{ animation: 'modal-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both' }}
       >
         {/* ===== STICKY HEADER ===== */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-black/5 bg-white/95 px-4 py-3 backdrop-blur-sm">
+        <div className="sticky top-0 z-10 flex items-center justify-between 
+        border-b border-black/5 bg-white/95 px-4 py-3 backdrop-blur-sm">
           {activeModal === 'destination' && (
             <span className="font-bitter text-sm font-black uppercase tracking-[0.12em] text-black/60">
               Select a tour
@@ -1511,16 +1513,15 @@ function TourSelect() {
   return (
     <>
 
+      {/* top of container */}
+      <div className="relative mx-auto w-full max-w-5xl overflow-visible rounded-[26px] 
+       p-3 sm:rounded-[28px] sm:p-4">
 
-      <div className="relative mx-auto w-full max-w-5xl overflow-visible rounded-[26px] border border-black/0 -white/92 p-3 shadow-[0_18px_50px_rgba(15,23,42,0.10)] sm:rounded-[28px] sm:p-4">
 
 
-        <div className="mb-3 px-4">
-          <StepProgress />
-        </div>
 
         {isMobileLayout ? (
-          <div className="rounded-[22px]  p-2">
+          <div className="rounded-[22px] p-2">
             <button
               ref={mobileCardRef}
               type="button"
@@ -1549,6 +1550,9 @@ function TourSelect() {
               </div>
             </button>
 
+      {/* <div className="mb-3 px-4">
+        <StepProgress />
+      </div> */}
             <div className="m-2 flex items-center justify-between gap-3">
               <button
                 type="button"
@@ -1568,7 +1572,9 @@ function TourSelect() {
               </button>
             </div>
 
-            {/* ===== BANNER WRAPPER (scroll hide/show) ===== */}
+
+
+            {/* ===== BANNER WRAPPER (Travel and Tours && Save more pills) ===== */}
             <div className="overflow-hidden">
               <div
                 className={`mt-3 flex w-full max-w-5xl flex-wrap items-center justify-between gap-2 rounded-2xl order border-white/16 g-white px- py-2 shadow-[0_10px_30px_rgba(0,0,0,0.06)] backdrop-blur-sm sm:flex-nowrap sm:px- sm:py-2.5 transition-all duration-300 ${showBanner
@@ -1604,7 +1610,8 @@ function TourSelect() {
             {/* ===== END BANNER ===== */}
           </div>
         ) : (
-          <div className="grid max-w-full overflow-hidden rounded-[22px] border border-black/8 bg-white min-[700px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_190px] min-[1100px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_220px]">
+          <div className="grid max-w-full overflow-hidden rounded-[22px] 
+          border-4 border-blue-500 bg-white min-[700px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_190px] min-[1100px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_220px]">
             {cards.slice(0, 3).map((card, index) => (
               <button
                 key={card.key}

@@ -30,8 +30,8 @@ const DESKTOP = {
 const MOBILE = {
   NAV_OFFSET: 4,
   CARD_HEIGHT: 600,        // increased from 560 to avoid clipping
-  HOLD_DISTANCE: 300,
-  TRANSITION_DISTANCE: 500,
+  HOLD_DISTANCE: 150, // default 300
+  TRANSITION_DISTANCE: 300,
   STAGE_TOP: "5rem",
   ACTIVE_DETECTION_OFFSET: 250,
 };

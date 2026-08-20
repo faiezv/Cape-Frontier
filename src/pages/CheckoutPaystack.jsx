@@ -1,3 +1,5 @@
+// src/components/CheckoutPaystack.jsx
+
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
@@ -7,8 +9,38 @@ import vehicles from "../data/vehicles.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// ─── Constants ────────────────────────────────────────────────────────
 const DEFAULT_PRIVATE_TOUR_FEE_ZAR = 750;
 const DEFAULT_CUSTOM_TRIP_FEE_ZAR = 500;
+
+// ─── Helpers (copied from CheckoutSummary) ──────────────────────────
+
+// Helper to get private/custom fees
+const getFee = (tour, type) => {
+  const defaults = {
+    private: 750,
+    custom: 500,
+  };
+
+  if (Array.isArray(tour?.additionalPricing)) {
+    const match = tour.additionalPricing.find((item) =>
+      item.category?.toLowerCase().includes(type)
+    );
+    if (match) {
+      const amount = match.pricePerPerson ?? match.price ?? match.amount ?? 0;
+      if (Number(amount) > 0) return Number(amount);
+    }
+  }
+
+  if (type === "private" && tour?.privateFee !== undefined)
+    return Number(tour.privateFee) || 0;
+  if (type === "custom" && tour?.customFee !== undefined)
+    return Number(tour.customFee) || 0;
+
+  return defaults[type] || 0;
+};
+
+// ─── Other helpers (unchanged) ──────────────────────────────────────
 
 const getTourReturnPath = (tour) => {
   const rawSlug =
@@ -123,6 +155,8 @@ const getPickupTime = (tour, bookingDetails) => {
 
   return firstTimedStop?.time ? formatDisplayTime(firstTimedStop.time) : "To be confirmed";
 };
+
+// ─── UI components (unchanged) ──────────────────────────────────────
 
 const InfoPill = ({ children, tone = "neutral" }) => {
   const tones = {
@@ -292,6 +326,8 @@ const RevealPanel = ({ open, children }) => {
   );
 };
 
+// ─── Payment helpers ──────────────────────────────────────────────────
+
 const generateBookingReference = () => {
   const random = Math.random().toString(36).slice(2, 10).toUpperCase();
   return `TOUR-${random}`;
@@ -342,6 +378,8 @@ const buildPaystackBookingPayload = ({
     finalPickupVehicleOperationallyConfirmed: true,
   },
 });
+
+// ─── CheckoutForm (unchanged) ──────────────────────────────────────
 
 const CheckoutForm = ({
   totalAmountLabel,
@@ -550,6 +588,8 @@ const CheckoutForm = ({
   );
 };
 
+// ─── Main CheckoutPaystack component ──────────────────────────────
+
 const CheckoutPaystack = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -571,7 +611,7 @@ const CheckoutPaystack = () => {
   const [paymentCompact, setPaymentCompact] = useState(false);
   const [showMobileBackTop, setShowMobileBackTop] = useState(false);
   const [openPanels, setOpenPanels] = useState({
-    trip: true,
+    trip: false,
     custom: false,
     vehicles: false,
     summary: true,
@@ -588,6 +628,8 @@ const CheckoutPaystack = () => {
   const currency = useMemo(() => {
     return String(selectedCurrency || tour?.baseCurrency || "ZAR").toUpperCase();
   }, [selectedCurrency, tour]);
+
+  // ─── Back/scroll handlers (unchanged) ─────────────────────────────
 
   const handleBackToBooking = () => {
     if (window.lenis?.start) {
@@ -654,6 +696,8 @@ const CheckoutPaystack = () => {
       behavior: "auto",
     });
   };
+
+  // ─── Effects (unchanged) ──────────────────────────────────────────
 
   useEffect(() => {
     if (!tour || !bookingDetails) {
@@ -739,13 +783,8 @@ const CheckoutPaystack = () => {
     return () => ctx.revert();
   }, [tour, bookingDetails, loadingSession, checkoutError]);
 
-  /*
-    Manual GSAP pin for the payment column.
-    This avoids ScrollTrigger's built-in pin mechanics, which can fail in this
-    project because of transformed smooth-scroll wrappers, grid layout, and Paystack
-    iframes. We use GSAP to set the payment column to relative / fixed / absolute
-    based on scroll position. This has proven more reliable than CSS sticky here.
-  */
+  // ─── Pin effect (unchanged) ───────────────────────────────────────
+
   useLayoutEffect(() => {
     if (!tour || !bookingDetails || loadingSession || checkoutError) return;
     if (
@@ -893,78 +932,224 @@ const CheckoutPaystack = () => {
     };
   }, [tour, bookingDetails, loadingSession, checkoutError, paymentCompact]);
 
-  const basePriceZar = useMemo(() => {
-    return getBasePriceZar(tour);
-  }, [tour]);
+  // ─── 🆕 PRICING CALCULATION (now recomputed from scratch) ─────────
 
-  const participants = useMemo(() => {
+  // Extract adult and child counts from bookingDetails
+  const adultCount = useMemo(() => {
+    const raw = bookingDetails?.adultCount ?? bookingDetails?.adults;
+    const parsed = parseInt(raw, 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+  }, [bookingDetails]);
+
+  const childCount = useMemo(() => {
+    const raw = bookingDetails?.childCount ?? bookingDetails?.children;
+    const parsed = parseInt(raw, 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+  }, [bookingDetails]);
+
+  // If no adult/child counts, fallback to total participants (assume all adults)
+  const fallbackParticipants = useMemo(() => {
     const parsed = parseInt(bookingDetails?.participants, 10);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
   }, [bookingDetails]);
 
-  const pricePerPerson = useMemo(() => {
-    return convertFromZar(basePriceZar, currency);
-  }, [basePriceZar, currency]);
+  const effectiveAdults = adultCount > 0 || childCount > 0 ? adultCount : fallbackParticipants;
+  const effectiveChildren = childCount > 0 ? childCount : 0;
 
-  const pricingOptions = bookingDetails?.pricingOptions || {};
+  // ─── Get selected option from bookingDetails ──────────────────────
+  const selectedOptionId = bookingDetails?.selectedOption || bookingDetails?.optionId;
+  const selectedOption = useMemo(() => {
+    if (!selectedOptionId || !tour?.options) return null;
+    return tour.options.find(opt => opt.id === selectedOptionId) || null;
+  }, [selectedOptionId, tour]);
 
-  const isPrivate = Boolean(bookingDetails?.isPrivate || pricingOptions?.isPrivate);
-  const isCustom = Boolean(bookingDetails?.isCustom || pricingOptions?.isCustom);
+  // ─── Adult price: first from selected option, then from pricing ──
+  const adultPrice = useMemo(() => {
+    // If a specific option is selected, use its price
+    if (selectedOption && typeof selectedOption.pricePerPerson === 'number') {
+      return convertFromZar(selectedOption.pricePerPerson, currency);
+    }
+
+    // Otherwise fallback to pricing array (look for "adult" or first entry)
+    if (!tour?.pricing || tour.pricing.length === 0) return 0;
+    const adultEntry = tour.pricing.find(p =>
+      p.category?.toLowerCase().includes("adult")
+    ) || tour.pricing[0];
+    const basePrice = Number(adultEntry?.pricePerPerson) || 0;
+    return convertFromZar(basePrice, currency);
+  }, [selectedOption, tour, currency]);
+
+  // ─── Child price: same fallback ──────────────────────────────────
+  const childPrice = useMemo(() => {
+    if (!tour?.pricing) return 0;
+    const childEntry = tour.pricing.find(p =>
+      p.category?.toLowerCase().includes("child")
+    );
+    if (!childEntry) return 0;
+    return convertFromZar(Number(childEntry.pricePerPerson) || 0, currency);
+  }, [tour, currency]);
+
+  // ─── Option name for display ──────────────────────────────────────
+  const selectedOptionName = selectedOption?.name || null;
+
+  // ─── Total participants (unchanged) ──────────────────────────────
+  const participants = effectiveAdults + effectiveChildren;
+
+
+  // ─── Group pricing logic (recomputed from scratch) ────────────────
+
+  const {
+    subtotalBeforeDiscount,
+    groupDiscountPercent,
+    groupDiscountAmount,
+    discountedTourSubtotal,
+    matchedGroupTier,
+    groupPricingType,
+    hasDiscount,
+    isCustomQuote,
+  } = useMemo(() => {
+    // Always recompute original subtotal from adult and child prices
+    let originalSubtotal = effectiveAdults * adultPrice + effectiveChildren * childPrice;
+    let discounted = originalSubtotal;
+    let discountAmt = 0;
+    let discountPct = 0;
+    let matchedTier = null;
+    let pricingType = null;
+    let hasDisc = false;
+    let custom = false;
+
+    // Find matching group tier (if enabled)
+    if (
+      tour?.groupPricing?.enabled &&
+      Array.isArray(tour.groupPricing.tiers) &&
+      tour.groupPricing.tiers.length > 0
+    ) {
+      matchedTier = tour.groupPricing.tiers.find((tier) => {
+        const minPeople = Number(tier.minPeople) || 0;
+        const maxPeople = tier.maxPeople == null ? Infinity : Number(tier.maxPeople);
+        return participants >= minPeople && participants <= maxPeople;
+      }) || null;
+    }
+
+    if (matchedTier) {
+      const groupTotal =
+        matchedTier.groupTotal != null ? Number(matchedTier.groupTotal) : null;
+
+      if (groupTotal !== null && groupTotal > 0) {
+        // Fixed group total
+        pricingType = "groupTotal";
+        discounted = groupTotal;
+        discountAmt = Math.max(0, originalSubtotal - discounted);
+        discountPct = originalSubtotal > 0 ? (discountAmt / originalSubtotal) * 100 : 0;
+        hasDisc = true; // group pricing is active
+        custom = false;
+      } else {
+        const hasPerPerson =
+          matchedTier.perPerson != null && Number.isFinite(Number(matchedTier.perPerson));
+        const hasDiscountPct =
+          matchedTier.discountPercent != null && Number.isFinite(Number(matchedTier.discountPercent));
+
+        if (hasPerPerson) {
+          pricingType = "perPerson";
+          const groupAdultPrice = Math.max(0, Number(matchedTier.perPerson));
+          const discountedAdultSubtotal = effectiveAdults * groupAdultPrice;
+          const unchangedChildSubtotal = effectiveChildren * childPrice;
+          discounted = discountedAdultSubtotal + unchangedChildSubtotal;
+          discountAmt = Math.max(0, originalSubtotal - discounted);
+          discountPct = originalSubtotal > 0 ? (discountAmt / originalSubtotal) * 100 : 0;
+          hasDisc = discountAmt > 0;
+        } else if (hasDiscountPct) {
+          pricingType = "discountPercent";
+          const requested = Number(matchedTier.discountPercent);
+          const safe = Math.min(Math.max(requested, 0), 100);
+          // applyGroupDiscountToChildren is true by default in CheckoutSummary
+          discountAmt = originalSubtotal * (safe / 100);
+          discounted = originalSubtotal - discountAmt;
+          discountPct = originalSubtotal > 0 ? (discountAmt / originalSubtotal) * 100 : 0;
+          hasDisc = discountAmt > 0;
+        } else {
+          pricingType = "custom";
+          custom = true;
+          discounted = originalSubtotal;
+          discountAmt = 0;
+          discountPct = 0;
+          hasDisc = false;
+        }
+      }
+    }
+
+    return {
+      subtotalBeforeDiscount: originalSubtotal,
+      groupDiscountPercent: discountPct,
+      groupDiscountAmount: discountAmt,
+      discountedTourSubtotal: discounted,
+      matchedGroupTier: matchedTier,
+      groupPricingType: pricingType,
+      hasDiscount: hasDisc || discountAmt > 0,
+      isCustomQuote: custom,
+    };
+  }, [
+    effectiveAdults,
+    effectiveChildren,
+    adultPrice,
+    childPrice,
+    participants,
+    tour,
+  ]);
+
+  // ─── Fees ──────────────────────────────────────────────────────────
+
+  const isPrivate = Boolean(bookingDetails?.isPrivate || bookingDetails?.pricingOptions?.isPrivate);
+  const isCustom = Boolean(bookingDetails?.isCustom || bookingDetails?.pricingOptions?.isCustom);
 
   const privateFee = useMemo(() => {
     if (!isPrivate) return 0;
-
-    const fee = Number(pricingOptions?.privateFee);
-    if (Number.isFinite(fee) && fee > 0) return fee;
-
-    return convertFromZar(DEFAULT_PRIVATE_TOUR_FEE_ZAR, currency);
-  }, [isPrivate, pricingOptions?.privateFee, currency]);
+    const fee = getFee(tour, "private");
+    return convertFromZar(fee, currency);
+  }, [isPrivate, tour, currency]);
 
   const customFee = useMemo(() => {
     if (!isCustom) return 0;
+    const fee = getFee(tour, "custom");
+    return convertFromZar(fee, currency);
+  }, [isCustom, tour, currency]);
 
-    const fee = Number(pricingOptions?.customFee);
-    if (Number.isFinite(fee) && fee > 0) return fee;
+  // ─── Extras ──────────────────────────────────────────────────────
 
-    return convertFromZar(DEFAULT_CUSTOM_TRIP_FEE_ZAR, currency);
-  }, [isCustom, pricingOptions?.customFee, currency]);
+  const extrasTotal = useMemo(() => {
+    const selectedExtras = bookingDetails?.selectedExtras || {};
+    const additionalPricing = bookingDetails?.additionalPricing || tour?.additionalPricing || [];
 
-  const subtotalBeforeDiscount = useMemo(() => {
-    const provided = Number(pricingOptions?.subtotalBeforeGroupDiscount);
-    if (Number.isFinite(provided) && provided > 0) return provided;
+    if (!Array.isArray(additionalPricing) || additionalPricing.length === 0) {
+      return 0;
+    }
 
-    return pricePerPerson * participants;
-  }, [pricingOptions?.subtotalBeforeGroupDiscount, pricePerPerson, participants]);
+    let total = 0;
 
-  const groupDiscountPercent = useMemo(() => {
-    const provided = Number(pricingOptions?.groupDiscountPercent);
-    return Number.isFinite(provided) && provided > 0 ? provided : 0;
-  }, [pricingOptions?.groupDiscountPercent]);
+    additionalPricing.forEach((extra) => {
+      const { type, category, price } = extra;
+      const value = selectedExtras[category];
+      if (value === undefined || value === null || value === false) return;
 
-  const groupDiscountAmount = useMemo(() => {
-    const provided = Number(pricingOptions?.groupDiscountAmount);
-    if (Number.isFinite(provided) && provided > 0) return provided;
+      if (type === "quantity") {
+        const qty = Number(value) || 0;
+        if (qty <= 0) return;
+        total += (Number(price) || 0) * qty;
+      } else if (type === "fixed") {
+        total += Number(price) || 0;
+      }
+      // type === "request" is ignored (free)
+    });
 
-    return groupDiscountPercent > 0
-      ? subtotalBeforeDiscount * (groupDiscountPercent / 100)
-      : 0;
-  }, [pricingOptions?.groupDiscountAmount, groupDiscountPercent, subtotalBeforeDiscount]);
+    // Convert from ZAR to selected currency
+    return convertFromZar(total, currency);
+  }, [bookingDetails, tour, currency]);
 
-  const discountedTourSubtotal = useMemo(() => {
-    const provided = Number(pricingOptions?.discountedTourSubtotal);
-    if (Number.isFinite(provided) && provided >= 0) return provided;
-
-    return Math.max(subtotalBeforeDiscount - groupDiscountAmount, 0);
-  }, [pricingOptions?.discountedTourSubtotal, subtotalBeforeDiscount, groupDiscountAmount]);
-
-  const subtotalTours = discountedTourSubtotal;
+  // ─── Total price ──────────────────────────────────────────────────
 
   const totalPrice = useMemo(() => {
-    const provided = Number(pricingOptions?.estimatedTotal);
-    if (Number.isFinite(provided) && provided > 0) return provided;
-
-    return discountedTourSubtotal + privateFee + customFee;
-  }, [pricingOptions?.estimatedTotal, discountedTourSubtotal, privateFee, customFee]);
+    return discountedTourSubtotal + privateFee + customFee + extrasTotal;
+  }, [discountedTourSubtotal, privateFee, customFee, extrasTotal]);
 
   const totalAmountLabel = useMemo(() => {
     return formatMoney(totalPrice, currency);
@@ -973,6 +1158,8 @@ const CheckoutPaystack = () => {
   const totalMinorUnit = useMemo(() => {
     return toMinorUnit(totalPrice, currency);
   }, [totalPrice, currency]);
+
+  // ─── Other derived data (unchanged) ──────────────────────────────
 
   const participantEmails = useMemo(() => {
     return normalizeEmails(
@@ -1016,6 +1203,8 @@ const CheckoutPaystack = () => {
     return vehicles.slice(0, 3);
   }, []);
 
+  // ─── Enriched booking details ─────────────────────────────────────
+
   const enrichedBookingDetails = useMemo(
     () => ({
       ...bookingDetails,
@@ -1025,16 +1214,18 @@ const CheckoutPaystack = () => {
       isCustom,
       pickupTimeLabel,
       pricingOptions: {
-        ...pricingOptions,
+        ...bookingDetails?.pricingOptions,
         currency,
-        basePriceZar,
-        pricePerPerson,
+        adults: effectiveAdults,
+        children: effectiveChildren,
+        adultPrice,
+        childPrice,
         participants,
         subtotalBeforeDiscount,
         groupDiscountPercent,
         groupDiscountAmount,
         discountedTourSubtotal,
-        subtotalTours,
+        extrasTotal,
         isPrivate,
         privateFee,
         isCustom,
@@ -1051,16 +1242,17 @@ const CheckoutPaystack = () => {
       isPrivate,
       isCustom,
       pickupTimeLabel,
-      pricingOptions,
       currency,
-      basePriceZar,
-      pricePerPerson,
+      effectiveAdults,
+      effectiveChildren,
+      adultPrice,
+      childPrice,
       participants,
       subtotalBeforeDiscount,
       groupDiscountPercent,
       groupDiscountAmount,
       discountedTourSubtotal,
-      subtotalTours,
+      extrasTotal,
       privateFee,
       customFee,
       totalPrice,
@@ -1072,14 +1264,16 @@ const CheckoutPaystack = () => {
   const pricingSummary = useMemo(
     () => ({
       currency,
-      basePriceZar,
-      pricePerPerson,
+      adults: effectiveAdults,
+      children: effectiveChildren,
+      adultPrice,
+      childPrice,
       participants,
       subtotalBeforeDiscount,
       groupDiscountPercent,
       groupDiscountAmount,
       discountedTourSubtotal,
-      subtotalTours,
+      extrasTotal,
       isPrivate,
       privateFee,
       isCustom,
@@ -1090,14 +1284,16 @@ const CheckoutPaystack = () => {
     }),
     [
       currency,
-      basePriceZar,
-      pricePerPerson,
+      effectiveAdults,
+      effectiveChildren,
+      adultPrice,
+      childPrice,
       participants,
       subtotalBeforeDiscount,
       groupDiscountPercent,
       groupDiscountAmount,
       discountedTourSubtotal,
-      subtotalTours,
+      extrasTotal,
       isPrivate,
       privateFee,
       isCustom,
@@ -1107,6 +1303,8 @@ const CheckoutPaystack = () => {
       totalAmountLabel,
     ]
   );
+
+  // ─── Validation ──────────────────────────────────────────────────
 
   useEffect(() => {
     if (!tour || !bookingDetails) return;
@@ -1120,6 +1318,8 @@ const CheckoutPaystack = () => {
     setCheckoutError("");
     setLoadingSession(false);
   }, [tour, bookingDetails, totalMinorUnit]);
+
+  // ─── Loading / error states ──────────────────────────────────────
 
   if (!tour || !bookingDetails) return null;
 
@@ -1180,6 +1380,8 @@ const CheckoutPaystack = () => {
     );
   }
 
+  // ─── Main render ──────────────────────────────────────────────────
+
   return (
     <div
       ref={pageRef}
@@ -1221,12 +1423,11 @@ const CheckoutPaystack = () => {
           </div>
 
           <div ref={checkoutGridRef} className="grid overflow-visible gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.82fr)] lg:items-start lg:gap-6">
-            {/* LEFT COLUMN – unchanged */}
+            {/* LEFT COLUMN – summary with updated pricing breakdown */}
             <section
               ref={leftRef}
               className="order-2 overflow-hidden rounded-[1.65rem] bg-white/92 shadow-[0_20px_60px_rgba(7,31,79,0.08)] lg:order-1 lg:rounded-[2rem]"
             >
-              {/* ... (same as before, exactly as provided) ... */}
               <div className="relative min-h-[190px] overflow-hidden bg-slate-900 sm:min-h-[230px] md:min-h-[290px]">
                 <img
                   src={tour.image}
@@ -1249,68 +1450,16 @@ const CheckoutPaystack = () => {
                     {tour.duration && <InfoPill>{tour.duration}</InfoPill>}
                     {tour.location && <InfoPill>{tour.location}</InfoPill>}
                     <InfoPill tone="green">
-                      {participants} guest{participants > 1 ? "s" : ""}
+                      {effectiveAdults} adult{effectiveAdults !== 1 ? "s" : ""}
+                      {effectiveChildren > 0 &&
+                        ` · ${effectiveChildren} child${effectiveChildren !== 1 ? "ren" : ""}`}
                     </InfoPill>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-4 p-4 md:p-6 lg:p-7">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {/* <div className="rounded-[1.5rem] bg-[#071f4f] p-4 text-white shadow-[0_16px_38px_rgba(7,31,79,0.16)] sm:p-5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">
-                      Pickup
-                    </p>
-
-                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                      <div>
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/65">
-                          Time
-                        </p>
-
-                        <div className="mt-1 break-words font-frank text-4xl font-bold leading-[0.9] md:text-5xl">
-                          {pickupTimeLabel}
-                        </div>
-                      </div>
-
-                      <div className="rounded-[1.15rem] bg-white/10 p-3">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/65">
-                          Date
-                        </p>
-
-                        <div className="mt-1 break-words font-frank text-2xl font-bold leading-none">
-                          {bookingDetails.date || "Date TBC"}
-                        </div>
-                      </div>
-                    </div>
-                  </div> */}
-
-                  {/* <div className="rounded-[1.5rem] bg-white p-4 shadow-[0_14px_34px_rgba(7,31,79,0.05)] sm:p-5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                      Main participants
-                    </p>
-
-                    <p className="mt-2 font-frank text-2xl leading-none text-slate-950">
-                      {bookingDetails.fullName || "Not provided"}
-                    </p>
-
-                    <p className="mt-2 break-words text-sm font-semibold text-slate-600">
-                      {bookingDetails.email || "No email"}
-                    </p>
-
-                    <p className="mt-1 text-sm font-bold text-slate-900">
-                      {bookingDetails.mobile || "No mobile"}
-                    </p>
-
-                    {participantEmails.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-2 border-t border-black/5 pt-3">
-                        {participantEmails.map((email) => (
-                          <EmailChip key={email} email={email} />
-                        ))}
-                      </div>
-                    )}
-                  </div> */}
-                </div>
+                {/* Hidden grid (commented out) — same as original */}
 
                 {Object.values(openPanels).some(Boolean) && (
                   <div className="rounded-2xl border border-green-200 bg-green-50 p-3 text-center text-xs font-bold leading-5 text-green-900 sm:hidden">
@@ -1355,7 +1504,8 @@ const CheckoutPaystack = () => {
                   />
                 </div>
 
-                {/* Panels (same as before) */}
+                {/* ─── Panels ────────────────────────────────────── */}
+
                 <RevealPanel open={openPanels.trip}>
                   <div className="grid gap-4 lg:grid-cols-[1fr_0.8fr]">
                     <div className="rounded-[1.5rem] bg-stone-50 p-5">
@@ -1542,25 +1692,29 @@ const CheckoutPaystack = () => {
 
                       <div className="mt-4 space-y-3">
                         <SummaryRow
-                          label="Guests"
-                          value={`${participants} guest${participants > 1 ? "s" : ""}`}
+                          label="Adults"
+                          value={`${effectiveAdults} × ${formatMoney(adultPrice, currency)}`}
                         />
-                        <SummaryRow
-                          label="Per person"
-                          value={formatMoney(pricePerPerson, currency)}
-                        />
+                        {effectiveChildren > 0 && (
+                          <SummaryRow
+                            label="Children"
+                            value={`${effectiveChildren} × ${formatMoney(childPrice, currency)}`}
+                          />
+                        )}
                         <SummaryRow
                           label="Tour subtotal"
-                          value={`${formatMoney(pricePerPerson, currency)} × ${participants} = ${formatMoney(subtotalBeforeDiscount, currency)}`}
+                          value={formatMoney(subtotalBeforeDiscount, currency)}
                         />
-                        <SummaryRow
-                          label="Group discount"
-                          value={
-                            groupDiscountAmount > 0
-                              ? `-${formatMoney(groupDiscountAmount, currency)} · ${groupDiscountPercent}% saved`
-                              : "No group discount applied"
-                          }
-                        />
+                        {hasDiscount && groupDiscountAmount > 0 && (
+                          <SummaryRow
+                            label="Group discount"
+                            value={
+                              groupPricingType === "groupTotal"
+                                ? `Fixed group rate · -${formatMoney(groupDiscountAmount, currency)}`
+                                : `-${formatMoney(groupDiscountAmount, currency)} · ${groupDiscountPercent.toFixed(1)}% off`
+                            }
+                          />
+                        )}
                         <SummaryRow
                           label="Discounted tour total"
                           value={formatMoney(discountedTourSubtotal, currency)}
@@ -1574,9 +1728,34 @@ const CheckoutPaystack = () => {
                           label="Custom trip fee"
                           value={isCustom ? formatMoney(customFee, currency) : "Not added"}
                         />
+                        <SummaryRow
+                          label="Optional extras"
+                          value={extrasTotal > 0 ? formatMoney(extrasTotal, currency) : "None"}
+                        />
+
+                        {/* 🆕 Show selected request extras (free) */}
+                        {(() => {
+                          const selectedExtras = bookingDetails?.selectedExtras || {};
+                          const additionalPricing = bookingDetails?.additionalPricing || tour?.additionalPricing || [];
+                          const requestExtras = additionalPricing
+                            .filter(extra => extra.type === "request")
+                            .filter(extra => {
+                              const val = selectedExtras[extra.category];
+                              return val !== undefined && val !== null && val !== false;
+                            })
+                            .map(extra => extra.category);
+
+                          if (requestExtras.length === 0) return null;
+                          return (
+                            <SummaryRow
+                              label="Requested extras"
+                              value={requestExtras.join(', ')}
+                            />
+                          );
+                        })()}
                       </div>
 
-                      {groupDiscountAmount > 0 && (
+                      {hasDiscount && groupDiscountAmount > 0 && (
                         <div className="mt-4 rounded-[1.35rem] border border-green-200 bg-green-50 p-4">
                           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-green-700">
                             Group saving
@@ -1587,7 +1766,7 @@ const CheckoutPaystack = () => {
                           </div>
 
                           <p className="mt-1 text-xs font-semibold text-green-900/70">
-                            {groupDiscountPercent}% discount for {participants} guest{participants > 1 ? "s" : ""}
+                            {groupDiscountPercent.toFixed(1)}% discount for {participants} guest{participants !== 1 ? "s" : ""}
                           </p>
                         </div>
                       )}
@@ -1602,7 +1781,9 @@ const CheckoutPaystack = () => {
                         </div>
 
                         <p className="mt-1 text-xs font-semibold text-white/55">
-                          {participants} guest{participants > 1 ? "s" : ""} · {currency}
+                          {effectiveAdults} adult{effectiveAdults !== 1 ? "s" : ""}
+                          {effectiveChildren > 0 && ` · ${effectiveChildren} child${effectiveChildren !== 1 ? "ren" : ""}`}
+                          {" · "}{currency}
                         </p>
                       </div>
                     </div>
@@ -1649,7 +1830,7 @@ const CheckoutPaystack = () => {
               </div>
             </section>
 
-            {/* RIGHT COLUMN – UPDATED with header */}
+            {/* RIGHT COLUMN – payment with header */}
             <div ref={rightColumnRef} className="order-1 relative min-h-[1px] w-full self-start lg:order-2">
               <div ref={rightPinRef} className="relative h-fit w-full">
                 <aside
@@ -1657,7 +1838,7 @@ const CheckoutPaystack = () => {
                   onWheel={handlePaymentPanelWheel}
                   className="h-fit max-h-[calc(100svh-1rem)] overflow-visible rounded-[1.5rem] border border-white/75 bg-white/95 shadow-[0_20px_56px_rgba(7,31,79,0.085)] backdrop-blur-xl lg:rounded-[2rem]"
                 >
-                  {/* --- NEW HEADER: Pickup + Main Participant --- */}
+                  {/* Header: Pickup + Main Participant */}
                   <div className="border-b border-slate-100/90 bg-white/80 px-4 py-3 sm:px-5 sm:py-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="flex items-center gap-2">
@@ -1688,7 +1869,7 @@ const CheckoutPaystack = () => {
                     </div>
                   </div>
 
-                  {/* --- PAYMENT FORM (unchanged) --- */}
+                  {/* Payment Form */}
                   <div
                     onPointerDown={() => setPaymentCompact(true)}
                     onMouseEnter={() => setPaymentCompact(true)}

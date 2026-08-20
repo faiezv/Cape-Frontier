@@ -209,7 +209,7 @@ const Navbar = () => {
   const megaPanelRef = useRef(null)
   const mobileMenuContentRef = useRef(null)
   const megaCloseTimerRef = useRef(null)
-  const lastScrollY = useRef(0)
+  // const lastScrollY = useRef(0) // Uncomment for hiding navabr.
 
   const activeMegaData = activeMega ? megaMenus[activeMega] : null
 
@@ -363,47 +363,40 @@ const Navbar = () => {
     return () => timers.forEach((timer) => window.clearTimeout(timer))
   }, [location.pathname, pendingSection])
 
-  useEffect(() => {
-    if (isCheckout || isBooking) return
-
-    const onScroll = () => {
-      if (!navbarRef.current) return
-
-      const currentY = window.scrollY
-      const reachedBottom =
-        currentY + window.innerHeight >= document.documentElement.scrollHeight - 5
-
-      if (reachedBottom && !menuOpen && !activeMega) {
-        gsap.to(navbarRef.current, {
-          y: '-100%',
-          duration: 0.35,
-          ease: 'power2.inOut',
-        })
-
-        return
-      }
-
-      if (currentY > lastScrollY.current && currentY > 80 && !menuOpen && !activeMega) {
-        gsap.to(navbarRef.current, {
-          y: '-100%',
-          duration: 0.35,
-          ease: 'power3.out',
-        })
-      } else {
-        gsap.to(navbarRef.current, {
-          y: '0%',
-          duration: 0.28,
-          ease: 'power3.out',
-        })
-      }
-
-      lastScrollY.current = currentY
-    }
-
-    window.addEventListener('scroll', onScroll)
-
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [isCheckout, isBooking, menuOpen, activeMega])
+  // HIDE NAV ON SCROLL (commented out, kept as is)
+  // useEffect(() => {
+  //   if (isCheckout || isBooking) return
+  //   const onScroll = () => {
+  //     if (!navbarRef.current) return
+  //     const currentY = window.scrollY
+  //     const reachedBottom =
+  //       currentY + window.innerHeight >= document.documentElement.scrollHeight - 5
+  //     if (reachedBottom && !menuOpen && !activeMega) {
+  //       gsap.to(navbarRef.current, {
+  //         y: '-100%',
+  //         duration: 0.35,
+  //         ease: 'power2.inOut',
+  //       })
+  //       return
+  //     }
+  //     if (currentY > lastScrollY.current && currentY > 80 && !menuOpen && !activeMega) {
+  //       gsap.to(navbarRef.current, {
+  //         y: '-100%',
+  //         duration: 0.35,
+  //         ease: 'power3.out',
+  //       })
+  //     } else {
+  //       gsap.to(navbarRef.current, {
+  //         y: '0%',
+  //         duration: 0.28,
+  //         ease: 'power3.out',
+  //       })
+  //     }
+  //     lastScrollY.current = currentY
+  //   }
+  //   window.addEventListener('scroll', onScroll)
+  //   return () => window.removeEventListener('scroll', onScroll)
+  // }, [isCheckout, isBooking, menuOpen, activeMega])
 
   useEffect(() => {
     if (!accentRef.current) return
@@ -534,55 +527,42 @@ const Navbar = () => {
     <>
       <header
         ref={navbarRef}
-        onMouseLeave={scheduleCloseMega}
-        onMouseEnter={keepMegaOpen}
         className="fixed inset-x-0 top-0 z-9990 w-screen max-w-[100dvw] overflow-x-clip border-white/10 
-        bg-[linear-gradient(180deg,rgba(8,43,138,0.78)_0%,rgba(8,43,138,0.50)_100%) 
-        bg-non hero-gradient
-         text-white backdrop-blur-xl"
+        bg-[linear-gradient(180deg,rgba(8,43,138,0.78)_0%,rgba(8,43,138,0.50)_100%) backdrop-blur-xl"
+        // 👇 No mouse events on the header – only on buttons
       >
-        <div className="mx-auto flex w-full max-w-[100dvw] min-w-0 items-center justify-between gap-1.5 px-2 py-2 sm:gap-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-[100dvw] min-w-0 items-center justify-between gap-1.5 
+        px-2 py-2 sm:gap-3 sm:px-4 md:px-6 lg:px-8">
+          {/* logo */}
           <button
             type="button"
             onClick={(event) => handleNavClick('Home', event)}
             onMouseEnter={() => openMega('Home', 0)}
+            onMouseLeave={scheduleCloseMega}
             className="flex min-w-0 flex-1 shrink items-center gap-2 overflow-hidden sm:gap-3"
           >
             <img
-              className="h-11 max-w-[4.25rem] shrink-0 object-contain sm:h-10 sm:max-w-none md:h-12"
-              // src="/icons/navLogo.png"
-              src="/assets/brand/logo.png"
+              className="h-11 max-w-[4.25rem] shrink-0 object-contain sm:h-10 sm:max-w-none md:h-16"
+              src="/assets/brand/logo-removebg.png"
               alt="Cape Frontier logo"
             />
-
-            <div className="min-w-0 overflow-hidden text-left leading-none">
-              <div className="hidden truncate text-[10px] font-black uppercase tracking-[0.22em] text-white/75 min-[430px]:block sm:text-[11px]">
-                Cape Town
-              </div>
-
-              <div className="hidden truncate text-xs font-extrabold sm:inline sm:text-sm md:text-base">
-                Travel and Tours
-              </div>
-
-              <div
-                ref={accentRef}
-                className="mt-1 hidden h-[2px] w-10 rounded-full bg-white/80 min-[430px]:block"
-              />
-            </div>
           </button>
 
-          <nav className="hidden min-w-0 items-center gap-1 md:flex lg:gap-2">
+          {/* nav items */}
+          <nav className="hidden min-w-0 items-center gap-1 md:flex lg:gap-2 
+          bg-blue-600 rounded-full px-8 shadow-[0_8px_30px_rgba(0,0,0,0.16)]"
+          >
             {navItems.map((item, index) => (
               <button
                 key={item.label}
                 type="button"
                 onClick={(event) => handleNavClick(item.label, event)}
                 onMouseEnter={() => openMega(item.label, index)}
-                className="rounded-full px-3 py-2 text-sm font-bold text-white/90 transition-all duration-300 hover:bg-white/12 hover:text-white lg:px-4"
+                onMouseLeave={scheduleCloseMega}
+                className="rounded-full px-3 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-white/20 hover:text-white lg:px-4"
               >
                 <span className="relative inline-flex items-center">
                   {item.label}
-
                   <span
                     className={`absolute -bottom-1 left-0 h-[2px] rounded-full bg-white transition-all duration-300 ${
                       hoverIndex === index ? 'w-full opacity-100' : 'w-0 opacity-0'
@@ -593,33 +573,22 @@ const Navbar = () => {
             ))}
           </nav>
 
+          {/* faq button */}
           <div className="hidden shrink-0 items-center gap-2 sm:flex md:gap-3">
-            <button
-              type="button"
-              onClick={() => setLanguage((prev) => (prev === 'EN' ? 'FR' : 'EN'))}
-              className="flex items-center gap-2 rounded-full border border-white/14 bg-white/8 px-3 py-2 text-xs font-bold text-white/90 backdrop-blur-sm transition hover:bg-white/14"
-            >
-              <img
-                src="/icons/globe.png"
-                className="h-4 w-4 sm:h-5 sm:w-5"
-                alt="Language"
-              />
-
-              <span>{language}</span>
-            </button>
-
             <button
               type="button"
               onClick={(event) => handleNavClick('Contact', event)}
               onMouseEnter={() => openMega('Contact', navItems.length - 1)}
-              className="flex items-center gap-2 rounded-full border border-white/14 bg-[linear-gradient(135deg,rgba(255,255,255,0.20)_0%,rgba(255,255,255,0.10)_100%)] px-3 py-2 text-xs font-extrabold text-white shadow-[0_8px_30px_rgba(0,0,0,0.16)] transition duration-300 hover:-translate-y-0.5 hover:bg-white/20"
+              onMouseLeave={scheduleCloseMega}
+              className="flex items-center gap-2 rounded-full border border-white/14 
+              bg-white
+              px-3 py-1 text-xs font-extrabold text-blue-600 shadow-[0_8px_30px_rgba(0,0,0,0.16)] transition duration-300 hover:-translate-y-0.5 hover:bg-white/20"
             >
               <img
-                src="/icons/faqBubble.png"
+                src="/icons/faqBlue.png"
                 className="h-4 w-4 sm:h-5 sm:w-5"
                 alt="FAQ"
               />
-
               <span>FAQ</span>
             </button>
           </div>

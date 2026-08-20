@@ -1261,6 +1261,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
           participants: String(participantCount),
           participantEmails: normalizedParticipantEmails,
           ccParticipantEmails: formData.ccParticipants ? normalizedParticipantEmails : [],
+          selectedExtras: formData.selectedExtras || {},
           pricingOptions: {
             isPrivate: formData.isPrivate,
             isCustom: formData.isCustom,
@@ -2027,7 +2028,7 @@ useEffect(() => {
                           {participantCount} total
                         </p>
                         <p className="mt-1 text-xs leading-5 text-neutral-500">
-<b>{tour.minPeople} guests minimum. </b>
+                          <b>{tour.minPeople} guests minimum. </b>
                           {adultCount} adult{adultCount === 1 ? "" : "s"} - 
                           {childCount > 0
                             ? ` · ${childCount} child${childCount === 1 ? "" : "ren"}`
@@ -2044,7 +2045,7 @@ useEffect(() => {
                           onClick={() => {
                             setGroupSnapshot({
                               adults: formData.adults,
-                              children: formData.children,
+                              children: formData.children, 
                               participantEmails: [...(formData.participantEmails || [])],
                               ccParticipants: formData.ccParticipants,
                             });
@@ -2074,17 +2075,29 @@ useEffect(() => {
                             decreaseDisabled={adultCount <= 1 || (adultCount - 1 + childCount) < minParticipants}
                             increaseDisabled={adultCount + childCount >= 8}
                         />
+                        {/* Children column – with disclaimer above */}
+                          <div>
+                            {tour.childFriendly === false && (
+                              <div className="mb-2 flex items-center gap-2 rounded-lg border border-amber-200/80 bg-amber-50/70 px-3 py-2 text-xs text-amber-800">
+                                <span className="text-base" aria-hidden="true">⚠️</span>
+                                <span>This tour is not child‑friendly. Children cannot be added.</span>
+                              </div>
+                            )}
 
-                        <GuestStepper
-                          label="Children"
-                          value={childCount}
-                          hint="Optional. Leave at 0 when there are no children."
-                          onDecrease={() => adjustGuestCount("children", -1)}
-                          onIncrease={() => adjustGuestCount("children", 1)}
-                          decreaseDisabled={childCount <= 0 || (adultCount + childCount - 1) < minParticipants}
-                          increaseDisabled={adultCount + childCount >= 8}
-                          inactive={childCount === 0}
-                        />
+                            <GuestStepper
+                              label="Children"
+                              value={childCount}
+                              hint="Optional. Leave at 0 when there are no children."
+                              onDecrease={() => adjustGuestCount("children", -1)}
+                              onIncrease={() => adjustGuestCount("children", 1)}
+                              decreaseDisabled={childCount <= 0 || (adultCount + childCount - 1) < minParticipants}
+                              increaseDisabled={
+                                adultCount + childCount >= 8 ||
+                                (tour.childFriendly === false)
+                              }
+                              inactive={childCount === 0}
+                            />
+                          </div>
                       </div>
 
                       

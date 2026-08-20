@@ -606,6 +606,7 @@ export const tours = [
     id: null, // New tour ID to be assigned (e.g., 21)
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.HALF_DAY,
+    childFriendly: false,
 
     title: "Shooting Experience Packages",
     slug: "shooting-experience-packages",
@@ -1256,6 +1257,7 @@ export const tours = [
     id: 4,
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.HALF_DAY,
+    childFriendly: false,
 
     title: "Cobra Sundowner Self‑Drive",
     slug: "cobra-sundowner",
@@ -1679,6 +1681,7 @@ export const tours = [
     id: null, // New tour ID to be assigned (e.g., 23)
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.FULL_DAY,
+    childFriendly: false,
 
     title: "24‑Hour Self‑Drive Cobra Experience",
     slug: "24-hour-self-drive-cobra-experience",
@@ -2067,6 +2070,7 @@ export const tours = [
     id: null, // New tour ID to be assigned (e.g., 24)
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.FULL_DAY,
+    childFriendly: false,
 
     title: "8hr Self‑Drive Cobra Experience",
     slug: "full-day-self-drive-cobra-experience",
@@ -3774,12 +3778,12 @@ export const tours = [
       {
         category: "Adults",
         pricePerPerson: 2500,
-        note: "Please contact us for pricing",
+        note: "Minimum 2 participants.",
       },
       {
         category: "Children under 12",
         pricePerPerson: 0,
-        note: "Please contact us for pricing",
+        note: "Minimum 1 Adult participants.",
       },
     ],
 
@@ -3802,8 +3806,26 @@ export const tours = [
           maxPeople: 6,
           perPerson: 2300,
           discountPercent: null,
-          label: "2-3 Guests",
+          label: "4-6 Guests",
           note: "• All-inclusive",
+        },
+        {
+          minPeople: 6,
+          maxPeople: 6,
+          perPerson: null,
+          groupTotal: 13500,
+          discountPercent: null,
+          label: "4-6 Guests",
+          note: "Group total • All-inclusive",
+        },
+        {
+          minPeople: 7,
+          maxPeople: 12,
+          perPerson: null,
+          groupTotal: 22000,
+          discountPercent: null,
+          label: "4-6 Guests",
+          note: "Group total • All-inclusive",
         },
       ],
     },
