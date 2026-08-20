@@ -119,8 +119,6 @@ const ADRENALINE_BASE = "adrenaline";
 const PENINSULA_PACKAGE_ONE_BASE = "packages/peninsula-tour-1";
 const PENINSULA_PACKAGE_TWO_BASE = "packages/peninsula-tour-2";
 const STELLENBOSCH_WINE_BASE = "packages/wine-farms";
-const CITY_TOUR_BASE = "packages/gun-range+city-tour";
-const HIKING_BASE = "hiking";
 const PENINSULA_1_DESTINATIONS = [
   "boulders-beach",
   "cape-point",
@@ -156,6 +154,130 @@ packages -
 */
 
 export const tours = [
+  // TEMAPLTE
+  // {
+  //   id: null,
+  //   type: TOUR_TYPES.PACKAGES,
+  //   category: TOUR_MODIFIERS.MULTI_DAY,
+
+  //   title: "",
+  //   slug: "",
+  //   canonicalPath: "",
+
+  //   seo: {
+  //     title: "",
+  //     description: "",
+  //     keywords: [],
+  //   },
+
+  //   workflow: defaultWorkflow,
+
+  //   image: "",
+  //   images: [],
+  //   imageFolder: "",
+  //   videos: [],
+
+  //   location: "",
+  //   duration: "",
+
+  //   priceBase: 0,
+  //   minPeople: 1,
+  //   baseCurrency: "ZAR",
+  //   supportedCurrencies: SUPPORTED_CURRENCIES,
+
+  //   pricing: [],
+
+  //   additionalPricing: [],
+
+  //   groupPricing: {
+  //     enabled: false,
+  //     icon: "",
+  //     tiers: [],
+  //   },
+
+  //   rating: null,
+  //   stars: null,
+  //   mainReviewerName: "",
+  //   mainReviewerCountry: "",
+  //   reviewYear: null,
+  //   otherReviews: null,
+  //   mainReview: "",
+
+  //   description: "",
+
+  //   highlights: [],
+  //   included: [],
+  //   excluded: [],
+
+  //   pickupOptions: [],
+  //   requirements: [],
+
+  //   arrangements: {
+  //     availability: "",
+  //     duration: "",
+  //     operatingTime: "",
+  //     departure: "",
+  //     return: "",
+  //     location: "",
+  //     clothing: [],
+  //     thingsToBring: [],
+  //     passengerPolicy: "",
+  //     notes: [],
+  //   },
+
+  //   weatherPolicy: {
+  //     summary: "",
+  //     items: [],
+  //   },
+
+  //   cancellationPolicy: {
+  //     summary: "",
+  //     items: [],
+  //   },
+
+  //   safetyPolicy: {
+  //     summary: "",
+  //     items: [],
+  //   },
+
+  //   itinerary: {
+  //     intro: {
+  //       title: "",
+  //       description: "",
+  //     },
+
+  //     route: {
+  //       title: "",
+  //       description: "",
+  //     },
+
+  //     days: [],
+  //   },
+
+  //   stops: null,
+
+  //   // routeInformation: {
+  //   //   title: "",
+  //   //   description: "",
+  //   //   items: [],
+  //   // },
+
+  //   vehicle: null,
+
+  //   securityAndLiability: null,
+
+  //   accommodation: {
+  //     included: false,
+  //     type: "",
+  //     description: "",
+  //   },
+
+  //   needToKnow: [],
+
+  //   faqs: [],
+
+  //   tags: [],
+  // },
   // =========================================== ADRENALINE
   // HALF_DAY
   //Shark-cage-diving
@@ -219,7 +341,6 @@ export const tours = [
         note: "Free of charge for children under 5 years old.",
       },
     ],
-
 
     additionalPricing: [],
 
@@ -339,9 +460,7 @@ export const tours = [
           address: "Cape Town, South Africa",
           query: "Cape Town South Africa",
         }),
-        images: [
-          "/src/assets/images/tours/shared/pickup/1.webp",
-        ],
+        images: ["/src/assets/images/tours/shared/pickup/1.webp"],
         touristComments: [],
       },
       {
@@ -358,9 +477,7 @@ export const tours = [
           query: "Gansbaai Western Cape",
         }),
         touristComments: [],
-        images: [
-          "/src/assets/images/tours/shared/gansbaai/1.webp",
-        ],
+        images: ["/src/assets/images/tours/shared/gansbaai/1.webp"],
       },
       {
         id: "arrival-briefing",
@@ -2365,7 +2482,6 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-
     image: getCoverImage("adrenaline/horse-riding-dunes"),
     images: getTourImages("adrenaline/horse-riding-dunes", 3),
     imageFolder: "adrenaline/horse-riding-dunes",
@@ -3039,7 +3155,6 @@ export const tours = [
       enabled: true,
       icon: "/icons/savemore.png",
       tiers: [
-
         {
           minPeople: 4,
           maxPeople: 6,
@@ -3373,7 +3488,6 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-
     image: getCoverImage("historical/robben-island"),
     images: getTourImages("historical/robben-island", 3),
     imageFolder: "historical/robben-island",
@@ -3519,8 +3633,6 @@ export const tours = [
       ],
     },
 
-
-
     routeInformation: {
       title: "Robben Island Half Day Tour Route",
 
@@ -3614,7 +3726,7 @@ export const tours = [
 
   // Mannenburg
   {
-    id: 'heritage-tour', // New tour ID to be assigned (e.g., 34)
+    id: "heritage-tour", // New tour ID to be assigned (e.g., 34)
     type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.FULL_DAY,
 
@@ -3644,13 +3756,13 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-
     image: getCoverImage("historical/cape-flats-heritage-faith"),
     images: getTourImages("historical/cape-flats-heritage-faith", 3),
     imageFolder: "historical/cape-flats-heritage-faith",
     videos: [],
 
-    location: "Cape Town, South Africa (Bo-Kaap, CBD, Sherwood Park, Manenberg)",
+    location:
+      "Cape Town, South Africa (Bo-Kaap, CBD, Sherwood Park, Manenberg)",
     duration: "7 hours (09:00 – 16:00)",
 
     priceBase: null, // Price not specified in the brief
@@ -3677,7 +3789,6 @@ export const tours = [
       enabled: true,
       icon: "/icons/savemore.png",
       tiers: [
-
         {
           minPeople: 2,
           maxPeople: 3,
@@ -4033,7 +4144,682 @@ export const tours = [
   // =========================================== PACKAGES
   // PenTour 1 - Mother City - removed
   // Cape Town City Tour
+  {
+    id: 23,
 
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.FULL_DAY,
+
+    title: "Cape Town City Tour",
+    slug: "full-day-cape-town-city-tour",
+    canonicalPath: "/tours/full-day-cape-town-city-tour",
+
+    seo: {
+      title: "Full-Day Cape Town City Tour | Cape Frontier Tours",
+      description:
+        "Explore Cape Town's history, culture and iconic landmarks on a private full-day city tour visiting Truth Coffee, District Six Museum, Slave Lodge, Castle of Good Hope, Bo-Kaap, Afrogem and Table Mountain.",
+      keywords: [
+        "Cape Town city tour",
+        "full day Cape Town tour",
+        "Cape Town private tour",
+        "Cape Town historical tour",
+        "District Six Museum",
+        "Slave Lodge Cape Town",
+        "Castle of Good Hope",
+        "Bo-Kaap tour",
+        "Table Mountain tour",
+        "Cape Town cultural tour",
+        "Cape Town family tour",
+        "Cape Town sightseeing",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+
+    image: getCoverImage(`${PENINSULA_PACKAGE_ONE_BASE}`),
+    // image: 'src/assets/images/tours/packages/peninsula-tour-1/3.webp',
+    images: packageGallery(
+      PENINSULA_PACKAGE_ONE_BASE,
+      PENINSULA_1_DESTINATIONS,
+      3,
+    ),
+    imageFolder: "packages/peninsula-tour-1",
+    destinationGalleries: packageDestinationGalleries(
+      PENINSULA_PACKAGE_ONE_BASE,
+      PENINSULA_1_DESTINATIONS,
+      3,
+    ),
+    videos: [],
+
+
+    location: "Cape Town, South Africa",
+    duration: "Full Day / Approximately 9 Hours",
+
+    priceBase: 5200,
+    minPeople: 1,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "Private Tour — 1–3 Guests",
+        pricePerPerson: 5200,
+        note: "R5,200 total private tour price. Includes all adult/child entry fees.",
+      },
+      {
+        category: "Private Tour — 4–7 Guests",
+        pricePerPerson: 6200,
+        note: "R6,200 total private tour price. Most popular option. Includes all entry fees.",
+      },
+      {
+        category: "Private Tour — 8–12 Guests",
+        pricePerPerson: 9200,
+        note: "R9,200 total private tour price. Includes all entry fees.",
+      },
+    ],
+
+    additionalPricing: [],
+
+    /*
+     * NOTE:
+     * The supplied prices are TOTAL GROUP PRICES, not per-person prices.
+     * Your current groupPricing schema uses `perPerson`.
+     *
+     * If your checkout supports total group pricing, use:
+     *
+     * pricingMode: "total"
+     *
+     * and rename `perPerson` to `totalPrice`.
+     */
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+
+      tiers: [
+        {
+          minPeople: 1,
+          maxPeople: 3,
+          perPerson: 5200,
+          label: "1–3 Guests",
+          note: "R5,200 total. Includes ALL adult/child entry fees.",
+        },
+        {
+          minPeople: 4,
+          maxPeople: 7,
+          perPerson: 6200,
+          label: "4–7 Guests",
+          note: "R6,200 total. Most popular option. Includes ALL entry fees.",
+        },
+        {
+          minPeople: 8,
+          maxPeople: 12,
+          perPerson: 9200,
+          label: "8–12 Guests",
+          note: "R9,200 total. Includes ALL entry fees.",
+        },
+      ],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "Discover the history, culture and iconic landmarks of Cape Town on a private full-day city experience. Begin with artisan coffee at the famous Truth Coffee before exploring some of the city's most important heritage sites, including District Six Museum, the Slave Lodge and the Castle of Good Hope. Continue through the colourful streets of Bo-Kaap, experience South Africa's gemstone industry at Afrogem, and finish the day at Table Mountain for panoramic views across Cape Town, the Atlantic Ocean and surrounding mountains. This experience combines Cape Town's complex history, vibrant communities, creative culture and spectacular scenery into one comprehensive private city tour.",
+
+    highlights: [
+      {
+        text: "Truth Coffee — artisan coffee and iconic steampunk interior",
+      },
+      {
+        text: "District Six Museum — powerful stories of forced removals, displacement and community resilience",
+      },
+      {
+        text: "Slave Lodge — explore the history of slavery and its impact on South African society",
+      },
+      {
+        text: "Adderley Street Flower Market — colourful historic flower market and local vendors",
+      },
+      {
+        text: "Castle of Good Hope — South Africa's oldest surviving colonial building",
+      },
+      {
+        text: "Bo-Kaap — colourful streets, Cape Malay heritage and Auwal Masjid",
+      },
+      {
+        text: "Afrogem — South African gemstone education, jewellery craftsmanship and showroom",
+      },
+      {
+        text: "Table Mountain — cableway experience and panoramic views over Cape Town",
+      },
+    ],
+
+    included: [
+      {
+        text: "Private vehicle",
+      },
+      {
+        text: "Professional driver-guide",
+      },
+      {
+        text: "Bottled water",
+      },
+      {
+        text: "ALL entry fees for every person",
+      },
+      {
+        text: "All listed attraction visits",
+      },
+    ],
+
+    excluded: [
+      {
+        text: "Lunch",
+      },
+      {
+        text: "Snacks",
+      },
+      {
+        text: "Drinks at Truth Coffee",
+      },
+      {
+        text: "Personal purchases",
+      },
+      {
+        text: "Flowers",
+      },
+      {
+        text: "Souvenirs",
+      },
+      {
+        text: "Jewellery at Afrogem",
+      },
+      {
+        text: "Additional snacks or beverages",
+      },
+    ],
+
+    pickupOptions: [
+      "Cape Town CBD",
+      "Green Point",
+      "Sea Point",
+      "V&A Waterfront",
+      "Custom pickup on request",
+    ],
+
+    requirements: [],
+
+    arrangements: {
+      availability: "Available year-round",
+      duration: "Approximately 9 hours",
+      operatingTime: "08:00 – 17:00",
+      departure: "08:00",
+      return: "17:00",
+      location: "Cape Town City Centre and surrounding areas",
+
+      clothing: [
+        "Comfortable walking shoes",
+        "Light jacket",
+        "Sunscreen",
+        "Hat",
+        "Camera or phone",
+        "Optional small backpack",
+      ],
+
+      thingsToBring: [
+        "Camera or phone",
+        "Sunscreen",
+        "Hat",
+        "Comfortable walking shoes",
+        "Small backpack",
+      ],
+
+      passengerPolicy: "",
+
+      notes: [
+        "Table Mountain Cableway is weather-dependent",
+        "Some attractions involve walking and uneven surfaces",
+        "Lunch is not included",
+        "Attraction opening hours may affect the exact itinerary",
+      ],
+    },
+
+    weatherPolicy: {
+      summary:
+        "The tour operates in most weather conditions, but Table Mountain Cableway is weather-dependent. Cape Town weather can change quickly, so guests should bring a light jacket and sun protection.",
+
+      items: [
+        {
+          text: "Table Mountain Cableway is weather-dependent",
+        },
+        {
+          text: "Cape Town weather can change quickly",
+        },
+        {
+          text: "Bring a light jacket and sun protection",
+        },
+        {
+          text: "Walking portions may be adjusted depending on weather conditions",
+        },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Cancellations should be made at least 24 hours before the tour. Late cancellations may result in forfeiture of the refund.",
+
+      items: [
+        {
+          text: "Cancellations must be made at least 24 hours before departure",
+        },
+        {
+          text: "Late cancellations may result in forfeiture of the refund",
+        },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Guests should follow the instructions of their driver-guide and attraction staff throughout the tour, particularly during walking sections and at Table Mountain.",
+
+      items: [
+        {
+          text: "Follow instructions from your driver-guide",
+        },
+        {
+          text: "Follow attraction safety instructions",
+        },
+        {
+          text: "Take care on uneven and cobbled surfaces",
+        },
+        {
+          text: "Bo-Kaap includes steep and cobbled streets",
+        },
+        {
+          text: "Castle of Good Hope includes uneven historic surfaces",
+        },
+        {
+          text: "Table Mountain conditions can change quickly",
+        },
+      ],
+    },
+
+    stops: [
+      {
+        id: "Truth Coffee",
+        name: "Truth Coffee Stop",
+        description:
+          "Truth Coffee is consistently ranked among the world's best coffee shops. Its striking steampunk interior, featuring brass pipes, vintage machinery and leather seating, creates a theatrical atmosphere and reflects Cape Town's modern creative culture.",
+
+        time: "08:00",
+        duration: "35 min",
+
+        type: "food",
+        optional: false,
+
+        image: "",
+
+        highlights: [
+          "Freshly roasted artisan coffee",
+          "Insight into Cape Town's contemporary food and design scene",
+          "Relaxed introduction to the day's historical experiences",
+          "Photo opportunities inside the iconic steampunk décor",
+        ],
+      },
+
+      {
+        title: "District Six Museum",
+        name: "District Six Museum",
+        description:
+          "District Six Museum preserves the stories of one of Cape Town's most important historic communities. The museum documents the forced removal of more than 60,000 residents during apartheid through personal artefacts, street signs, maps and oral histories.",
+
+        time: "08:35",
+        duration: "1 hr 25 min",
+
+        type: "heritage",
+        optional: false,
+
+        image: "",
+
+        highlights: [
+          "Stories of former District Six residents",
+          "Original street maps and community history",
+          "Personal artefacts and oral histories",
+          "Insight into forced removals and community resilience",
+        ],
+      },
+
+      {
+        title: "Slave Lodge",
+        name: "Slave Lodge",
+        description:
+          "The Slave Lodge is one of South Africa's oldest buildings and explores the history and experiences of enslaved people brought to the Cape from East Africa, Madagascar, India and Southeast Asia.",
+
+        time: "10:00",
+        duration: "1 hr 10 min",
+
+        type: "heritage",
+        optional: false,
+
+        image: "",
+
+        highlights: [
+          "Exhibitions on slavery and identity",
+          "Artefacts showing the daily lives of enslaved people",
+          "Multimedia displays explaining global slave routes",
+          "Educational reflection on colonial history",
+        ],
+      },
+
+      {
+        title: "Adderley Street Flower Market",
+        name: "Adderley Street Flower Market",
+        description:
+          "Visit one of Cape Town's historic flower markets and experience the colourful stalls and generations-old tradition of local flower sellers in the city centre.",
+
+        time: "11:10",
+        duration: "30 min",
+
+        type: "culture",
+        optional: false,
+
+        image: "",
+
+        highlights: [
+          "Roses, proteas, fynbos and seasonal flowers",
+          "Interaction with local flower sellers",
+          "Colourful street-level photography",
+          "Opportunity to support local vendors",
+        ],
+      },
+
+      {
+        title: "Castle of Good Hope",
+        name: "Castle of Good Hope",
+        description:
+          "Built between 1666 and 1679, the Castle of Good Hope is the oldest surviving colonial building in South Africa. Explore its courtyard, bastions and historic rooms while learning about early Cape settlement and military history.",
+
+        time: "11:40",
+        duration: "1 hr 20 min",
+
+        type: "heritage",
+        optional: false,
+
+        image: "",
+
+        highlights: [
+          "Historic courtyard and bastions",
+          "Early Dutch settlement history",
+          "Military history of the Cape",
+          "Historic architecture and photography",
+          "Optional dungeon experience",
+        ],
+      },
+
+      {
+        title: "Lunch Break",
+        name: "Lunch Break",
+        description:
+          "Enjoy a relaxed lunch break at one of Cape Town's popular eateries. Guests can choose from Cape Malay, international or casual dining options.",
+
+        time: "13:00",
+        duration: "1 hour",
+
+        type: "meal",
+        optional: true,
+
+        image: "",
+
+        options: [
+          "Eastern Food Bazaar",
+          "Bo-Kaap Kombuis",
+          "Company's Garden Restaurant",
+          "Swan Café",
+        ],
+
+        highlights: [
+          "Choice of Cape Malay, international or casual dining",
+          "Time to rest after the morning's historical experiences",
+          "Opportunity to explore local flavours",
+        ],
+      },
+
+      {
+        name: "Bo-Kaap Walking Tour",
+        title: "Bo-Kaap Walking Tour",
+        description:
+          "Explore the colourful streets of Bo-Kaap, the heart of Cape Malay culture. Discover the neighbourhood's Islamic heritage, colourful houses, cobbled streets and cultural traditions.",
+
+        time: "14:10",
+        duration: "1 hour",
+
+        type: "culture",
+        optional: false,
+
+        image: "",
+
+        highlights: [
+          "Walking tour through colourful streets",
+          "Visit to Auwal Masjid",
+          "Cape Malay cultural storytelling",
+          "Photography at iconic houses",
+        ],
+
+        optionalActivities: ["Bo-Kaap Museum"],
+      },
+
+      {
+        title: "Afrogem",
+        name: "Afrogem",
+        description:
+          "Visit Afrogem, a South African gemstone and jewellery manufacturer showcasing locally sourced gems including diamonds, tanzanite and semi-precious stones.",
+
+        time: "15:10",
+        duration: "40 min",
+
+        type: "shopping",
+        optional: false,
+
+        image: "",
+
+        highlights: [
+          "Gemstone education",
+          "Showroom experience",
+          "Jewellery crafting demonstrations",
+          "South African gemstone industry insight",
+          "Shopping opportunity",
+        ],
+      },
+
+      {
+        title: "Table Mountain",
+        name: "Table Mountain",
+        description:
+          "Finish the day at Cape Town's most iconic landmark. Ride the Table Mountain Cableway to the summit and enjoy panoramic views over Cape Town, Robben Island, Lion's Head, Camps Bay and the Twelve Apostles.",
+
+        time: "15:50",
+        duration: "1 hr 10 min",
+
+        type: "scenic",
+        optional: false,
+
+        image: "",
+
+        highlights: [
+          "Table Mountain Cableway",
+          "360-degree panoramic views",
+          "Scenic viewpoints",
+          "Light walking at the summit",
+          "Excellent photography opportunities",
+        ],
+
+        notes: ["Weather-dependent experience"],
+      },
+
+      {
+        name: "Hotel Drop-off",
+        title: "Drop-off",
+        description:
+          "Return to the agreed drop-off location in Cape Town after completing the city tour.",
+
+        time: "17:00",
+        duration: "",
+
+        type: "transfer",
+        optional: false,
+
+        image: "",
+      },
+    ],
+    // routeInformation: {
+    //   title: "Cape Town City Tour Route",
+    //   description:
+    //     "A private full-day Cape Town experience combining heritage, culture, shopping and Table Mountain.",
+    //   items: [
+    //     "Truth Coffee",
+    //     "District Six Museum",
+    //     "Slave Lodge",
+    //     "Adderley Street Flower Market",
+    //     "Castle of Good Hope",
+    //     "Bo-Kaap",
+    //     "Afrogem",
+    //     "Table Mountain",
+    //   ],
+    // },
+    accommodation: {
+      included: false,
+      type: "",
+      description: "",
+    },
+
+    needToKnow: [
+      {
+        text: "Table Mountain Cableway is weather-dependent",
+      },
+      {
+        text: "Lunch is not included in the tour price",
+      },
+      {
+        text: "Drinks at Truth Coffee are not included",
+      },
+      {
+        text: "Personal purchases, flowers, souvenirs and jewellery are not included",
+      },
+      {
+        text: "Bo-Kaap includes steep and cobbled streets",
+      },
+      {
+        text: "Castle of Good Hope includes uneven historic surfaces",
+      },
+      {
+        text: "Table Mountain requires light walking at the summit",
+      },
+      {
+        text: "Optional visit to Bo-Kaap Museum",
+      },
+      {
+        text: "The itinerary may be adjusted according to attraction operating hours and weather",
+      },
+    ],
+
+    faqs: [
+      {
+        question: "How long is the Cape Town City Tour?",
+
+        answer:
+          "The tour operates approximately from 08:00 to 17:00, making it a full-day Cape Town experience.",
+      },
+
+      {
+        question: "What is included in the tour price?",
+
+        answer:
+          "The tour includes a private vehicle, professional driver-guide, bottled water, all entry fees and all listed attraction visits.",
+      },
+
+      {
+        question: "Is lunch included?",
+
+        answer:
+          "No. Lunch is not included. Guests can choose from several recommended restaurants and cafés during the scheduled lunch break.",
+      },
+
+      {
+        question: "Is Truth Coffee included?",
+
+        answer:
+          "The visit to Truth Coffee is included, but drinks and personal purchases are not included.",
+      },
+
+      {
+        question: "Is Table Mountain included?",
+
+        answer:
+          "Yes. The Table Mountain Cableway experience is included in the tour price, subject to weather and cableway operating conditions.",
+      },
+
+      {
+        question: "Can children join the tour?",
+
+        answer:
+          "Yes. The private group prices include both adult and child entry fees.",
+      },
+
+      {
+        question: "Is this a private tour?",
+
+        answer:
+          "Yes. This is a private tour with a dedicated vehicle and professional driver-guide.",
+      },
+
+      {
+        question: "What should I wear?",
+
+        answer:
+          "Wear comfortable walking shoes and bring a light jacket, sunscreen and a hat. A small backpack is optional.",
+      },
+
+      {
+        question: "Is the tour wheelchair friendly?",
+
+        answer:
+          "Several attractions are wheelchair accessible, including Truth Coffee, the Slave Lodge, the Flower Market, Afrogem and the Table Mountain Cableway. District Six Museum and the Castle of Good Hope have some accessibility limitations, while Bo-Kaap has steep and cobbled streets.",
+      },
+
+      {
+        question: "Can we visit the Bo-Kaap Museum?",
+
+        answer:
+          "Yes. A visit to the Bo-Kaap Museum can be included as an optional stop depending on timing and operating hours.",
+      },
+    ],
+
+    tags: [
+      "Cape Town",
+      "Cape Town City Tour",
+      "Full Day",
+      "Private Tour",
+      "District Six",
+      "Slave Lodge",
+      "Castle of Good Hope",
+      "Bo-Kaap",
+      "Table Mountain",
+      "Truth Coffee",
+      "Afrogem",
+      "Cape Malay",
+      "History",
+      "Heritage",
+      "Culture",
+      "Family Friendly",
+      "Wheelchair Accessible",
+      "Sightseeing",
+    ],
+  },
   // PenTour 2 -Peninsula Tour
   {
     id: 10,
@@ -4224,10 +5010,7 @@ export const tours = [
           address: "Kleintuin Road, Simon’s Town, Cape Town",
           query: "Boulders Beach Penguin Colony Cape Town",
         }),
-        images: getTourImages(
-          `shared/boulders-beach`,
-          3,
-        ),
+        images: getTourImages(`shared/boulders-beach`, 3),
         touristComments: [
           {
             name: "Noah",
@@ -4877,8 +5660,6 @@ export const tours = [
         "Hotel drop-off",
       ],
     },
-
-
 
     needToKnow: [
       { text: "Ferry departures are weather dependent" },
@@ -7913,9 +8694,7 @@ export const tours = [
       },
     ],
 
-    pickupOptions: [
-      "Cape Town",
-    ],
+    pickupOptions: ["Cape Town"],
 
     requirements: [],
 
@@ -8119,8 +8898,7 @@ export const tours = [
         type: "transfer",
         optional: false,
 
-        description:
-          "Return transport from Babylonstoren to Cape Town.",
+        description: "Return transport from Babylonstoren to Cape Town.",
 
         highlights: [],
 
@@ -8372,12 +9150,7 @@ export const tours = [
         "A light jacket for cooler weather",
       ],
 
-      thingsToBring: [
-        "Sun protection",
-        "Hat",
-        "Sunscreen",
-        "Camera",
-      ],
+      thingsToBring: ["Sun protection", "Hat", "Sunscreen", "Camera"],
 
       passengerPolicy:
         "Children and infants are welcome. Children must be accompanied by a parent or responsible adult.",
@@ -8844,8 +9617,7 @@ export const tours = [
       operatingTime: "Approximately 08:30–18:00",
       departure: "08:30–09:00 from Cape Town accommodation",
       return: "Approximately 18:00 to Cape Town",
-      location:
-        "Cape Town → Stellenbosch → Franschhoek → Cape Town",
+      location: "Cape Town → Stellenbosch → Franschhoek → Cape Town",
 
       clothing: [
         "Comfortable clothing",
@@ -9311,12 +10083,7 @@ export const tours = [
         "Light jacket for changing weather",
       ],
 
-      thingsToBring: [
-        "Sun protection",
-        "Hat",
-        "Sunscreen",
-        "Camera",
-      ],
+      thingsToBring: ["Sun protection", "Hat", "Sunscreen", "Camera"],
 
       passengerPolicy:
         "Children are welcome. Wine tasting is subject to applicable age requirements.",
@@ -9453,8 +10220,7 @@ export const tours = [
 
       {
         title: "Return to Cape Town CBD",
-        description:
-          "Enjoy a comfortable return journey to the Cape Town CBD.",
+        description: "Enjoy a comfortable return journey to the Cape Town CBD.",
         time: "15:30",
         duration: "±30 minutes",
         type: "transport",
