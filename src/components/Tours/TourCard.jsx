@@ -1,4 +1,9 @@
-import { useRef, useState, useEffect, useMemo } from "react";
+import {
+  useState,
+  useEffect,
+  useMemo,
+} from "react";
+
 import { useLoadingNavigate } from "../useLoadingNavigate.jsx";
 
 import {
@@ -8,10 +13,8 @@ import {
 
 import {
   toText,
-  StarRating,
   getPickupSummary,
   getBestGroupDiscount,
-  getReviewInitials,
   FallbackImage,
   getTourImageSources,
   formatMoney,
@@ -31,30 +34,38 @@ export default function TourCard({
 }) {
   const navigate = useLoadingNavigate();
 
-  const [currency, setCurrency] = useState(
-    () =>
-      tour?.baseCurrency ||
-      SUPPORTED_CURRENCIES[0] ||
-      "ZAR"
-  );
+  /*
+   * ---------------------------------------------------------
+   * CURRENCY
+   * ---------------------------------------------------------
+   */
 
-  const [reviewOpen, setReviewOpen] = useState(false);
-
-  const [mobileInfoOpen, setMobileInfoOpen] = useState(null);
+  const [currency, setCurrency] =
+    useState(
+      () =>
+        tour?.baseCurrency ||
+        SUPPORTED_CURRENCIES[0] ||
+        "ZAR"
+    );
 
   /*
-   * Resolve all tour images through imageLoader.
-   *
-   * This is important for production because:
-   *
-   * /src/assets/images/...
-   *
-   * is a source path, not a final browser URL.
-   *
-   * Vite transforms imported assets during build.
+   * ---------------------------------------------------------
+   * MOBILE INFO
+   * ---------------------------------------------------------
    */
+
+  const [mobileInfoOpen, setMobileInfoOpen] =
+    useState(null);
+
+  /*
+   * ---------------------------------------------------------
+   * IMAGE SOURCES
+   * ---------------------------------------------------------
+   */
+
   const imageSources = useMemo(() => {
-    const sources = getTourImageSources(tour);
+    const sources =
+      getTourImageSources(tour);
 
     if (!Array.isArray(sources)) {
       return [];
@@ -62,141 +73,49 @@ export default function TourCard({
 
     return sources
       .filter(Boolean)
-      .map((source) => resolveTourImage(source))
+      .map((source) =>
+        resolveTourImage(source)
+      )
       .filter(Boolean);
   }, [tour]);
 
-  const supportedCurrencies = getSupportedCurrencies(tour);
+  /*
+   * ---------------------------------------------------------
+   * SUPPORTED CURRENCIES
+   * ---------------------------------------------------------
+   */
+
+  const supportedCurrencies =
+    getSupportedCurrencies(tour);
 
   /*
-   * Close mobile information popup when the user actually scrolls.
+   * ---------------------------------------------------------
+   * CLOSE MOBILE INFO WHEN SCROLLING
+   * ---------------------------------------------------------
    */
-  useEffect(() => {
-    if (!mobileInfoOpen) return;
 
-    let lastScrollY = window.scrollY;
+  useEffect(() => {
+    if (!mobileInfoOpen) {
+      return;
+    }
+
+    let lastScrollY =
+      window.scrollY;
 
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+      const currentScrollY =
+        window.scrollY;
 
-      if (Math.abs(currentScrollY - lastScrollY) > 4) {
+      if (
+        Math.abs(
+          currentScrollY -
+            lastScrollY
+        ) > 4
+      ) {
         setMobileInfoOpen(null);
       }
 
       lastScrollY = currentScrollY;
-    };
-
-    window.addEventListener("scroll", handleScroll, {
-      passive: true,
-    });
-
-    return () => {
-      window.removeEventListener(
-        "scroll",
-        handleScroll
-      );
-    };
-  }, [mobileInfoOpen]);
-
-  /*
-   * Make sure the selected currency is still supported
-   * by the current tour.
-   */
-  useEffect(() => {
-    if (!supportedCurrencies.includes(currency)) {
-      setCurrency(
-        tour?.baseCurrency ||
-          supportedCurrencies[0] ||
-          "ZAR"
-      );
-    }
-  }, [
-    currency,
-    supportedCurrencies,
-    tour?.baseCurrency,
-  ]);
-
-  /*
-   * Tour URL.
-   */
-  const getTourPath = (tourData) => {
-    return `/tours/${tourData?.slug || tourData?.id || ""}`;
-  };
-
-  /*
-   * Base price in the tour's native currency.
-   */
-  const basePrice = Number(
-    tour?.priceBase ?? tour?.price ?? 0
-  );
-
-  const categoryLabel = getCategoryText(tour);
-  const typeLabel = getTypeText(tour);
-  const locationText = getLocationText(tour);
-
-  /*
-   * Convert the base price into the currently selected currency.
-   */
-  const displayPrice = formatMoney(
-    convertPrice(basePrice, currency),
-    currency
-  );
-
-  /*
-   * Navigate to full tour page.
-   */
-  const goToTourPage = () => {
-    navigate(getTourPath(tour), {
-      state: {
-        tour,
-        selectedCurrency: currency,
-      },
-    });
-  };
-
-  /*
-   * Navigate directly to booking section.
-   */
-  const goToBooking = () => {
-    navigate(`${getTourPath(tour)}#booking`, {
-      state: {
-        tour: {
-          ...tour,
-          priceBase: basePrice,
-        },
-        selectedCurrency: currency,
-        scrollToBooking: true,
-      },
-    });
-  };
-
-  /*
-   * Track scroll direction.
-   */
-  const [scrollDirection, setScrollDirection] =
-    useState("up");
-
-  const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-
-      if (
-        Math.abs(
-          currentY - lastScrollY.current
-        ) < 4
-      ) {
-        return;
-      }
-
-      setScrollDirection(
-        currentY > lastScrollY.current
-          ? "down"
-          : "up"
-      );
-
-      lastScrollY.current = currentY;
     };
 
     window.addEventListener(
@@ -213,55 +132,237 @@ export default function TourCard({
         handleScroll
       );
     };
-  }, []);
+  }, [mobileInfoOpen]);
+
+  /*
+   * ---------------------------------------------------------
+   * VALIDATE CURRENCY
+   * ---------------------------------------------------------
+   */
+
+  useEffect(() => {
+    if (
+      !supportedCurrencies.includes(
+        currency
+      )
+    ) {
+      setCurrency(
+        tour?.baseCurrency ||
+          supportedCurrencies[0] ||
+          "ZAR"
+      );
+    }
+  }, [
+    currency,
+    supportedCurrencies,
+    tour?.baseCurrency,
+  ]);
+
+  /*
+   * ---------------------------------------------------------
+   * TOUR PATH
+   * ---------------------------------------------------------
+   */
+
+  const getTourPath = (
+    tourData
+  ) => {
+    return `/tours/${
+      tourData?.slug ||
+      tourData?.id ||
+      ""
+    }`;
+  };
+
+  /*
+   * ---------------------------------------------------------
+   * PRICE
+   * ---------------------------------------------------------
+   */
+
+  const basePrice = Number(
+    tour?.priceBase ??
+      tour?.price ??
+      0
+  );
+
+  const displayPrice =
+    formatMoney(
+      convertPrice(
+        basePrice,
+        currency
+      ),
+      currency
+    );
+
+  /*
+   * ---------------------------------------------------------
+   * TOUR INFORMATION
+   * ---------------------------------------------------------
+   */
+
+  const categoryLabel =
+    getCategoryText(tour);
+
+  const typeLabel =
+    getTypeText(tour);
+
+  const locationText =
+    getLocationText(tour);
+
+  /*
+   * ---------------------------------------------------------
+   * NAVIGATION
+   * ---------------------------------------------------------
+   */
+
+  const goToTourPage = () => {
+    navigate(
+      getTourPath(tour),
+      {
+        state: {
+          tour,
+          selectedCurrency:
+            currency,
+        },
+      }
+    );
+  };
+
+  const goToBooking = () => {
+    navigate(
+      `${getTourPath(
+        tour
+      )}#booking`,
+      {
+        state: {
+          tour: {
+            ...tour,
+            priceBase:
+              basePrice,
+          },
+
+          selectedCurrency:
+            currency,
+
+          scrollToBooking: true,
+        },
+      }
+    );
+  };
+
+  /*
+   * ---------------------------------------------------------
+   * CARD HEIGHT
+   *
+   * IMPORTANT:
+   *
+   * cardHeight is intentionally NOT applied here.
+   *
+   * The right-side content determines the natural height
+   * of the card.
+   *
+   * On desktop the image is stretched by CSS Grid to the
+   * exact same height as the content column.
+   *
+   * On mobile the image gets a smaller fixed visual height
+   * because the image sits above the content.
+   * ---------------------------------------------------------
+   */
 
   return (
     <article
-      key={tour?.id || tour?.slug}
-      className={`cf-pinned-tour-card relative m-4 w-auto overflow-hidden rounded-[1.5rem] border border-black/5 bg-white shadow-[0_14px_42px_rgba(0,0,0,0.08)] transition-all duration-500 ease-out lg:m-0 lg:w-full sm:rounded-[2rem] sm:shadow-[0_18px_60px_rgba(0,0,0,0.08)]
-        ${
-          scrollDirection === "up"
-            ? "translate-y-8 opacity-100"
-            : "translate-y-0 opacity-100"
-        }
-      `}
+      key={
+        tour?.id ||
+        tour?.slug
+      }
+      className="
+        cf-pinned-tour-card
+        relative
+        m-4
+        overflow-hidden
+        rounded-[1.5rem]
+        border
+        border-black/5
+        bg-white
+        shadow-[0_14px_42px_rgba(0,0,0,0.08)]
+        sm:rounded-[2rem]
+        sm:shadow-[0_18px_60px_rgba(0,0,0,0.08)]
+        lg:m-0
+      "
       data-tour-card
-      style={{
-        "--cf-card-height": `${cardHeight}px`,
-      }}
     >
-      <div className="relative h-full">
+      <div
+        className="
+          relative
+          w-full
+          overflow-hidden
+        "
+      >
         <div
           data-card-grid
-          className="grid h-full grid-cols-1 bg-white font-bitter text-black md:grid-cols-2 md:min-h-[390px] xl:min-h-[420px]"
+          className="
+            grid
+            w-full
+            grid-cols-1
+            bg-white
+            font-bitter
+            text-black
+            md:grid-cols-2
+            md:items-stretch
+          "
         >
-
           {/* =====================================================
               IMAGE PANEL
           ===================================================== */}
 
           <div
             data-card-image-panel
-            className="relative min-h-[210px] overflow-hidden bg-neutral-900 sm:min-h-[260px] md:min-h-[360px] xl:min-h-[420px]"
+            className="
+              relative
+              h-[180px]
+              overflow-hidden
+              bg-neutral-900
+              sm:h-[210px]
+              md:h-auto
+              md:min-h-0
+            "
           >
             <FallbackImage
               data-card-image
-              sources={imageSources}
+              sources={
+                imageSources
+              }
               alt={
                 tour?.title ||
                 "Cape Frontier tour"
               }
-              className="absolute inset-0 h-full w-full object-cover"
+              className="
+                absolute
+                inset-0
+                h-full
+                w-full
+                object-cover
+              "
               loading="lazy"
               decoding="async"
-              onFinalError={(event) => {
+              onFinalError={(
+                event
+              ) => {
                 event.currentTarget.style.display =
                   "none";
 
-                event.currentTarget.parentNode.style.background =
-                  "linear-gradient(135deg,#0f2027,#203a43,#2c5364)";
+                if (
+                  event.currentTarget
+                    .parentNode
+                ) {
+                  event.currentTarget.parentNode.style.background =
+                    "linear-gradient(135deg,#0f2027,#203a43,#2c5364)";
+                }
               }}
             />
+
+            {/* IMAGE GRADIENT */}
 
             <div
               className="absolute inset-0 z-10"
@@ -271,13 +372,17 @@ export default function TourCard({
               }}
             />
 
+            {/* DECORATION */}
+
             <div className="absolute -right-24 -top-24 z-10 h-56 w-56 rounded-full bg-green-200/20 blur-3xl" />
 
             <div className="absolute -bottom-20 -left-20 z-10 h-52 w-52 rounded-full bg-blue-300/10 blur-3xl" />
 
-            {/* IMAGE HEADER */}
-            <div className="absolute left-4 right-4 top-4 z-20 flex items-start justify-between gap-2 sm:left-5 sm:right-5 sm:top-5 sm:gap-3">
+            {/* =================================================
+                IMAGE HEADER
+            ================================================= */}
 
+            <div className="absolute left-4 right-4 top-4 z-20 flex items-start justify-between gap-2 sm:left-5 sm:right-5 sm:top-5 sm:gap-3">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full border border-white/25 bg-green-200/95 px-3 py-1.5 font-bitter text-[11px] font-semibold text-green-950 shadow-lg sm:px-4 sm:text-xs">
                   {categoryLabel}
@@ -291,7 +396,8 @@ export default function TourCard({
               <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-2xl border border-white/20 bg-white/15 shadow-lg backdrop-blur-md sm:h-14 sm:w-14">
                 <span className="font-frank text-xl font-bold leading-none text-white">
                   {Number(
-                    tour?.rating || 4.8
+                    tour?.rating ||
+                      4.8
                   ).toFixed(1)}
                 </span>
 
@@ -301,11 +407,15 @@ export default function TourCard({
               </div>
             </div>
 
-            {/* IMAGE TITLE */}
+            {/* =================================================
+                IMAGE TITLE
+            ================================================= */}
+
             <div className="absolute bottom-0 left-0 right-0 z-20 p-4 sm:p-6 md:p-7 xl:p-8">
               <div className="relative">
                 <span className="font-bitter text-[11px] uppercase tracking-[0.22em] text-white/55">
-                  {categoryLabel} · {typeLabel}
+                  {categoryLabel} ·{" "}
+                  {typeLabel}
                 </span>
 
                 <h3 className="mt-2 max-w-[12ch] font-frank text-2xl font-bold leading-[0.9] text-white drop-shadow-lg sm:text-4xl xl:text-5xl">
@@ -324,44 +434,65 @@ export default function TourCard({
 
           <div
             data-card-content-panel
-            className="flex min-h-0 flex-col bg-white"
+            className="
+              flex
+              min-w-0
+              flex-col
+              bg-white
+            "
           >
-            <div className="flex min-h-0 flex-1 flex-col justify-start gap-3 p-4 sm:gap-4 sm:p-5 md:p-6 xl:gap-5 xl:p-8">
-            {/* =====================================================
-                FOOTER
-            ===================================================== */}
+            <div
+              className="
+                flex
+                w-full
+                flex-col
+                gap-3
+                p-4
+                sm:gap-4
+                sm:p-5
+                md:p-6
+                xl:gap-5
+                xl:p-8
+              "
+            >
+              {/* =================================================
+                  FOOTER / CTA
+              ================================================= */}
 
-            <div className="shrink-0 overflow-hidden">
-              <div className="flex items-center justify-between gap-3 border-t border-black/5 bg-neutral-50 px-3 py-3 sm:px-5 sm:py-4 md:px-6 xl:px-8">
+              <div className="shrink-0 overflow-hidden">
+                <div className="flex items-center justify-between gap-3 border-b border-black/5 bg-neutral-50 px-3 py-3 sm:px-5 sm:py-4 md:px-6 xl:px-8">
+                  {/* DETAILS */}
 
-                {/* DETAILS */}
-                <button
-                  type="button"
-                  onClick={goToTourPage}
-                  className="flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 font-bitter text-sm font-medium text-neutral-600 transition-all duration-200 hover:border-red-300 hover:text-red-400 active:scale-95"
-                >
-                  {CTA_LABELS.fullDetails ||
-                    "Details"}
-                </button>
+                  <button
+                    type="button"
+                    onClick={
+                      goToTourPage
+                    }
+                    className="flex flex-1 items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 font-bitter text-sm font-medium text-neutral-600 transition-all duration-200 hover:border-red-300 hover:text-red-400 active:scale-95"
+                  >
+                    See Details
+                  </button>
 
-                {/* BOOKING */}
-                <button
-                  type="button"
-                  onClick={goToBooking}
-                  className="hero-gradient flex items-center justify-center gap-2 rounded-full px-5 py-2 font-bitter text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:opacity-90 active:scale-95"
-                >
-                  {CTA_LABELS.requestTrip ||
-                    "Request Trip"}
+                  {/* BOOKING */}
 
-                  <img
-                    src="/icons/go.png"
-                    alt=""
-                    className="h-4 w-4 object-contain"
-                  />
-                </button>
+                  <button
+                    type="button"
+                    onClick={
+                      goToBooking
+                    }
+                    className="hero-gradient flex flex-2 items-center justify-center gap-2 rounded-full px-5 py-2 font-bitter text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:opacity-90 active:scale-95"
+                  >
+                    {CTA_LABELS.requestTrip ||
+                      "Request Trip"}
+
+                    <img
+                      src="/icons/go.png"
+                      alt=""
+                      className="h-4 w-4 object-contain"
+                    />
+                  </button>
+                </div>
               </div>
-            </div>
-
 
               {/* =================================================
                   PRICE ROW
@@ -369,7 +500,7 @@ export default function TourCard({
 
               <div
                 data-card-stagger-item
-                className="flex items-start justify-between gap-3"
+                className="flex shrink-0 items-start justify-between gap-3"
               >
                 <div className="min-w-0">
                   <span className="block font-bitter text-[11px] uppercase leading-none tracking-[0.2em] text-red-400">
@@ -379,7 +510,9 @@ export default function TourCard({
                   <div className="mt-0.5">
                     <p className="flex items-end gap-2">
                       <span className="font-frank text-2xl font-bold leading-none tracking-tight text-neutral-950 sm:text-4xl xl:text-5xl">
-                        {displayPrice}
+                        {
+                          displayPrice
+                        }
                       </span>
 
                       <span className="mb-1 font-bitter text-sm text-neutral-400">
@@ -390,13 +523,19 @@ export default function TourCard({
                 </div>
 
                 <div className="flex shrink-0 items-start gap-2">
-
                   {/* CURRENCY */}
+
                   <select
-                    value={currency}
-                    onChange={(event) =>
+                    value={
+                      currency
+                    }
+                    onChange={(
+                      event
+                    ) =>
                       setCurrency(
-                        event.target.value
+                        event
+                          .target
+                          .value
                       )
                     }
                     className="flex w-fit shrink-0 items-center justify-center rounded-2xl border border-black/10 bg-neutral-50 p-2.5 font-bitter text-sm text-neutral-700 transition-colors hover:border-red-300 focus:border-red-400 sm:p-3 sm:text-base"
@@ -404,28 +543,35 @@ export default function TourCard({
                     {supportedCurrencies.map(
                       (code) => (
                         <option
-                          key={code}
-                          value={code}
+                          key={
+                            code
+                          }
+                          value={
+                            code
+                          }
                         >
-                          {code}
+                          {
+                            code
+                          }
                         </option>
                       )
                     )}
                   </select>
 
-                  {/* =================================================
-                      MOBILE ICONS
-                  ================================================= */}
+                  {/* MOBILE ICONS */}
 
                   <div className="flex items-center gap-2 sm:hidden">
-
                     {/* LOCATION */}
+
                     <button
                       type="button"
                       onClick={() =>
                         setMobileInfoOpen(
-                          (prev) =>
-                            prev === "location"
+                          (
+                            previous
+                          ) =>
+                            previous ===
+                            "location"
                               ? null
                               : "location"
                         )
@@ -440,12 +586,16 @@ export default function TourCard({
                     </button>
 
                     {/* DURATION */}
+
                     <button
                       type="button"
                       onClick={() =>
                         setMobileInfoOpen(
-                          (prev) =>
-                            prev === "duration"
+                          (
+                            previous
+                          ) =>
+                            previous ===
+                            "duration"
                               ? null
                               : "duration"
                         )
@@ -475,11 +625,11 @@ export default function TourCard({
               </div>
 
               {/* =================================================
-                  MOBILE INFO PANEL
+                  MOBILE INFO
               ================================================= */}
 
               <div
-                className={`overflow-hidden transition-all duration-300 sm:hidden ${
+                className={`shrink-0 overflow-hidden transition-all duration-300 sm:hidden ${
                   mobileInfoOpen
                     ? "max-h-24 opacity-100"
                     : "max-h-0 opacity-0"
@@ -487,20 +637,24 @@ export default function TourCard({
               >
                 <div className="rounded-2xl border border-green-100 bg-green-50/60 px-3 py-3">
                   <p className="font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-neutral-400">
-                    {mobileInfoOpen ===
-                    "location"
-                      ? "Location"
-                      : "Duration"}
+                    {
+                      mobileInfoOpen ===
+                      "location"
+                        ? "Location"
+                        : "Duration"
+                    }
                   </p>
 
                   <p className="mt-1 font-bitter text-sm leading-relaxed text-neutral-700">
-                    {mobileInfoOpen ===
-                    "location"
-                      ? locationText
-                      : toText(
-                          tour?.duration,
-                          "Flexible"
-                        )}
+                    {
+                      mobileInfoOpen ===
+                      "location"
+                        ? locationText
+                        : toText(
+                            tour?.duration,
+                            "Flexible"
+                          )
+                    }
                   </p>
                 </div>
               </div>
@@ -511,11 +665,11 @@ export default function TourCard({
 
               <div
                 data-card-stagger-item
-                className="hidden grid-cols-2 gap-2 sm:grid sm:gap-3"
+                className="hidden shrink-0 grid-cols-2 gap-2 sm:grid sm:gap-3"
               >
-
                 {/* LOCATION */}
-                <div className="group rounded-2xl border border-black/5 bg-neutral-50 px-3 py-2.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-green-300 hover:bg-green-200 sm:px-4 sm:py-4">
+
+                <div className="group min-h-0 rounded-2xl border border-black/5 bg-neutral-50 px-3 py-2.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-green-300 hover:bg-green-200 sm:px-4 sm:py-4">
                   <div className="flex items-center gap-2 text-neutral-400 transition-colors group-hover:text-green-900">
                     <img
                       src="/icons/mapPin.png"
@@ -529,12 +683,15 @@ export default function TourCard({
                   </div>
 
                   <p className="mt-1 font-bitter text-xs leading-snug text-neutral-700 transition-colors group-hover:text-green-950 sm:mt-2 sm:text-sm">
-                    {locationText}
+                    {
+                      locationText
+                    }
                   </p>
                 </div>
 
                 {/* DURATION */}
-                <div className="group rounded-2xl border border-black/5 bg-neutral-50 px-3 py-2.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-green-300 hover:bg-green-200 sm:px-4 sm:py-4">
+
+                <div className="group min-h-0 rounded-2xl border border-black/5 bg-neutral-50 px-3 py-2.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-green-300 hover:bg-green-200 sm:px-4 sm:py-4">
                   <div className="flex items-center gap-2 text-neutral-400 transition-colors group-hover:text-green-900">
                     <svg
                       width="15"
@@ -574,7 +731,7 @@ export default function TourCard({
 
               <div
                 data-card-stagger-item
-                className="cf-card-description rounded-2xl border border-black/5 bg-white px-3 py-2.5 sm:px-4 sm:py-3"
+                className="min-h-0 shrink-0 overflow-hidden rounded-2xl border border-black/5 bg-white px-3 py-2.5 sm:px-4 sm:py-3"
               >
                 <p className="font-bitter text-[10px] font-black uppercase tracking-[0.18em] text-neutral-400">
                   About this tour
@@ -593,14 +750,16 @@ export default function TourCard({
               ================================================= */}
 
               {!isMobile && (
-                <div className="cf-mobile-info grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="grid shrink-0 grid-cols-1 gap-2 sm:grid-cols-2">
                   <div className="rounded-2xl bg-green-200/80 px-3 py-2 font-bitter text-xs font-semibold leading-snug text-green-950">
                     {getBestGroupDiscount(
                       tour
                     )}
                   </div>
 
-                  {getPickupSummary(tour) && (
+                  {getPickupSummary(
+                    tour
+                  ) && (
                     <div className="rounded-2xl bg-neutral-100 px-3 py-2 font-bitter text-xs font-semibold leading-snug text-neutral-700">
                       {getPickupSummary(
                         tour
@@ -609,204 +768,15 @@ export default function TourCard({
                   )}
                 </div>
               )}
-            </div>
 
               {/* =================================================
-                  REVIEW
+                  NO FLEXIBLE SPACER
+                  
+                  IMPORTANT:
+                  Removed the flex-1 spacer because it was
+                  contributing to the forced card height.
               ================================================= */}
-
-              <div
-                data-card-stagger-item
-                className="cf-card-review"
-              >
-                {isMobile ? (
-                  !reviewOpen ? (
-                    /* MOBILE COLLAPSED REVIEW */
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() =>
-                        setReviewOpen(true)
-                      }
-                      onKeyDown={(e) =>
-                        e.key === "Enter" &&
-                        setReviewOpen(true)
-                      }
-                      className="flex w-full cursor-pointer items-center justify-between rounded-2xl border border-green-100 bg-green-50/70 px-3 py-2.5 transition-colors duration-300 hover:border-green-300 hover:bg-green-200"
-                    >
-                      <div className="flex min-w-0 items-center gap-2">
-                        <StarRating
-                          count={
-                            tour?.stars || 5
-                          }
-                        />
-
-                        <span className="text-sm font-semibold text-neutral-800">
-                          {Number(
-                            tour?.rating || 4.8
-                          ).toFixed(1)}
-                        </span>
-
-                        <span className="truncate text-xs text-neutral-500">
-                          Reviewed by{" "}
-                          {toText(
-                            tour?.mainReviewerName,
-                            "Traveller"
-                          )}
-                        </span>
-                      </div>
-
-                      <span className="ml-2 shrink-0 text-xs text-neutral-500">
-                        Read review
-                      </span>
-                    </div>
-                  ) : (
-                    /* MOBILE EXPANDED REVIEW */
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setReviewOpen(false)
-                      }
-                      className="w-full rounded-2xl border border-green-100 bg-green-50/70 px-3 py-2.5 text-left transition-colors duration-300 hover:border-green-300 hover:bg-green-200 sm:rounded-3xl sm:px-5 sm:py-4"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <StarRating
-                            count={
-                              tour?.stars || 5
-                            }
-                          />
-
-                          <span className="text-sm font-semibold text-neutral-800">
-                            {Number(
-                              tour?.rating || 4.8
-                            ).toFixed(1)}
-                          </span>
-                        </div>
-
-                        <span className="font-bitter text-xs text-neutral-500">
-                          Close review
-                        </span>
-                      </div>
-
-                      <p className="mt-1.5 line-clamp-3 font-bitter text-xs italic leading-relaxed text-neutral-600 sm:mt-3 sm:text-sm">
-                        “
-                        {toText(
-                          tour?.mainReview,
-                          "A highly rated Cape Town experience."
-                        )}
-                        ”
-                      </p>
-
-                      <div className="mt-2 flex items-center justify-between gap-2 sm:mt-4 sm:gap-3">
-                        <p className="truncate font-bitter text-xs text-neutral-500">
-                          Reviewed by{" "}
-                          <span className="text-neutral-700">
-                            {toText(
-                              tour?.mainReviewerName,
-                              "Traveller"
-                            )}
-                          </span>
-
-                          {tour?.mainReviewerCountry
-                            ? ` · ${tour.mainReviewerCountry}`
-                            : ""}
-                        </p>
-
-                        <div className="flex shrink-0 items-center gap-2">
-                          <span className="grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-green-100 text-[10px] font-bold text-green-800 shadow-sm">
-                            {getReviewInitials(
-                              tour
-                            )}
-                          </span>
-
-                          <span className="whitespace-nowrap font-bitter text-xs text-neutral-600">
-                            +{tour?.otherReviews || 0}
-                          </span>
-                        </div>
-                      </div>
-                    </button>
-                  )
-                ) : (
-                  /* DESKTOP REVIEW */
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setReviewOpen(
-                        (value) => !value
-                      )
-                    }
-                    className="w-full rounded-2xl border border-green-100 bg-green-50/70 px-3 py-2.5 text-left transition-colors duration-300 hover:border-green-300 hover:bg-green-200 sm:rounded-3xl sm:px-5 sm:py-4"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2">
-                        <StarRating
-                          count={
-                            tour?.stars || 5
-                          }
-                        />
-
-                        <span className="text-sm font-semibold text-neutral-800">
-                          {Number(
-                            tour?.rating || 4.8
-                          ).toFixed(1)}
-                        </span>
-                      </div>
-
-                      <span className="font-bitter text-xs text-neutral-500">
-                        {reviewOpen
-                          ? "Close review"
-                          : "Read review"}
-                      </span>
-                    </div>
-
-                    <p
-                      className={`mt-1.5 font-bitter text-xs italic leading-relaxed text-neutral-600 transition-all duration-300 sm:mt-3 sm:text-sm ${
-                        reviewOpen
-                          ? "line-clamp-3"
-                          : "line-clamp-2"
-                      }`}
-                    >
-                      “
-                      {toText(
-                        tour?.mainReview,
-                        "A highly rated Cape Town experience."
-                      )}
-                      ”
-                    </p>
-
-                    <div className="mt-2 flex items-center justify-between gap-2 sm:mt-4 sm:gap-3">
-                      <p className="truncate font-bitter text-xs text-neutral-500">
-                        Reviewed by{" "}
-                        <span className="text-neutral-700">
-                          {toText(
-                            tour?.mainReviewerName,
-                            "Traveller"
-                          )}
-                        </span>
-
-                        {tour?.mainReviewerCountry
-                          ? ` · ${tour.mainReviewerCountry}`
-                          : ""}
-                      </p>
-
-                      <div className="flex shrink-0 items-center gap-2">
-                        <span className="grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-green-100 text-[10px] font-bold text-green-800 shadow-sm">
-                          {getReviewInitials(
-                            tour
-                          )}
-                        </span>
-
-                        <span className="whitespace-nowrap font-bitter text-xs text-neutral-600">
-                          +{tour?.otherReviews || 0}
-                        </span>
-                      </div>
-                    </div>
-                  </button>
-                )}
-              </div>
-
-
+            </div>
           </div>
         </div>
       </div>

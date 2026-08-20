@@ -603,7 +603,7 @@ export const tours = [
   },
   // Gun-Range
   {
-    id: null, // New tour ID to be assigned (e.g., 21)
+    id: 2, // New tour ID to be assigned (e.g., 21)
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.HALF_DAY,
     childFriendly: false,
@@ -942,7 +942,7 @@ export const tours = [
   },
   // Paragliding
   {
-    id: null, // New tour ID to be assigned (e.g., 22)
+    id: 3, // New tour ID to be assigned (e.g., 22)
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.HALF_DAY,
 
@@ -1678,7 +1678,7 @@ export const tours = [
   },
   // Cobra (24hr)
   {
-    id: null, // New tour ID to be assigned (e.g., 23)
+    id: 5, // New tour ID to be assigned (e.g., 23)
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.FULL_DAY,
     childFriendly: false,
@@ -2067,7 +2067,7 @@ export const tours = [
   },
   // Cobra (8hr)
   {
-    id: null, // New tour ID to be assigned (e.g., 24)
+    id: 6, // New tour ID to be assigned (e.g., 24)
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.FULL_DAY,
     childFriendly: false,
@@ -2461,7 +2461,7 @@ export const tours = [
   },
   // Horse-Riding
   {
-    id: null, // New tour ID to be assigned (e.g., 25)
+    id: 7, // New tour ID to be assigned (e.g., 25)
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.HALF_DAY,
 
@@ -2754,7 +2754,7 @@ export const tours = [
   // =========================================== HIKING
   // Lions-Head
   {
-    id: 5,
+    id: 8,
     type: TOUR_TYPES.HIKING,
     category: TOUR_MODIFIERS.HALF_DAY,
 
@@ -2923,7 +2923,7 @@ export const tours = [
   },
   // Platteklip
   {
-    id: 6,
+    id: 9,
     type: TOUR_TYPES.HIKING,
     category: TOUR_MODIFIERS.HALF_DAY,
 
@@ -3092,7 +3092,7 @@ export const tours = [
   // =========================================== HISTORICAL
   // Langa
   {
-    id: 7, // New tour ID to be assigned (e.g., 32)
+    id: 10, // New tour ID to be assigned (e.g., 32)
     type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.HALF_DAY,
 
@@ -3466,7 +3466,7 @@ export const tours = [
 
   // Robben-Island
   {
-    id: 8, // New tour ID to be assigned (e.g., 33)
+    id: 11, // New tour ID to be assigned (e.g., 33)
     type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.HALF_DAY,
 
@@ -3730,7 +3730,7 @@ export const tours = [
 
   // Mannenburg
   {
-    id: "heritage-tour", // New tour ID to be assigned (e.g., 34)
+    id: 12 || "heritage-tour", // New tour ID to be assigned (e.g., 34)
     type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.FULL_DAY,
 
@@ -4167,7 +4167,7 @@ export const tours = [
   // PenTour 1 - Mother City - removed
   // Cape Town City Tour
   {
-    id: 23,
+    id: 13,
 
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.FULL_DAY,
@@ -4844,7 +4844,7 @@ export const tours = [
   },
   // PenTour 2 -Peninsula Tour
   {
-    id: 10,
+    id: 14,
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.FULL_DAY,
 
@@ -5112,7 +5112,7 @@ export const tours = [
   },
   // Stellenbosch Wine-Estate
   {
-    id: 11,
+    id: 15,
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.FULL_DAY,
 
@@ -5356,7 +5356,7 @@ export const tours = [
   },
   // Robben-Island + Langa
   {
-    id: null, // New tour ID to be assigned (e.g., 36)
+    id: 16, // New tour ID to be assigned (e.g., 36)
     type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.FULL_DAY,
 
@@ -5770,7 +5770,7 @@ export const tours = [
   },
   // District-Six + Langa
   {
-    id: null, // New tour ID to be assigned (e.g., 37)
+    id: 17, // New tour ID to be assigned (e.g., 37)
     type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.HALF_DAY,
 
@@ -6175,7 +6175,7 @@ export const tours = [
   },
   // 3Day - Garden Route
   {
-    id: null, // New tour ID to be assigned (e.g., 38)
+    id: 18, // New tour ID to be assigned (e.g., 38)
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.MULTI_DAY,
 
@@ -6795,7 +6795,7 @@ export const tours = [
   },
   // 5Day - Botliersklop
   {
-    id: null, // New tour ID to be assigned (e.g., 39)
+    id: 19, // New tour ID to be assigned (e.g., 39)
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.MULTI_DAY,
 
@@ -7681,7 +7681,7 @@ export const tours = [
   },
   // 5Day - Garden Route
   {
-    id: null, // New tour ID to be assigned (e.g., 40)
+    id: 20, // New tour ID to be assigned (e.g., 40)
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.MULTI_DAY,
 
@@ -8594,7 +8594,7 @@ export const tours = [
   },
   // Cool-Runnings Toboggan Park, Winelands & Adventure Loop
   {
-    id: null,
+    id: 21,
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.FULL_DAY,
 
@@ -8974,7 +8974,7 @@ export const tours = [
   },
   // Family-Wine-Tour
   {
-    id: null,
+    id: 22,
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.DAY_TOUR,
 
@@ -9429,7 +9429,7 @@ export const tours = [
   },
   // Stellenbosch & Franschhoek Winelands
   {
-    id: null,
+    id: 23,
     type: TOUR_TYPES.WINE_ROUTES,
     category: TOUR_MODIFIERS.DAY_TOUR,
 
@@ -9913,7 +9913,7 @@ export const tours = [
   },
   // Cape Town Gems - Kirstenbosch & Constantia
   {
-    id: null,
+    id: 24,
     type: TOUR_TYPES.WINE_ROUTES,
     category: TOUR_MODIFIERS.DAY_TOUR,
 

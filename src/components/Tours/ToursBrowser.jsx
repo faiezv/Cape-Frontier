@@ -15,28 +15,8 @@ import FixedCategoryNav from "./FixedCategoryNav.jsx";
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-// --------------------------------------------------
-// CONFIG
-// --------------------------------------------------
-const DESKTOP = {
-  NAV_OFFSET: 6,
-  CARD_HEIGHT: 680,
-  HOLD_DISTANCE: 700,
-  TRANSITION_DISTANCE: 1100,
-  STAGE_TOP: "10rem",
-  ACTIVE_DETECTION_OFFSET: 450,
-};
-
-const MOBILE = {
-  NAV_OFFSET: 4,
-  CARD_HEIGHT: 600,        // increased from 560 to avoid clipping
-  HOLD_DISTANCE: 150, // default 300
-  TRANSITION_DISTANCE: 300,
-  STAGE_TOP: "5rem",
-  ACTIVE_DETECTION_OFFSET: 250,
-};
-
 const BREAKPOINT = 768;
+const BUTTON_ROW_HEIGHT = 52;
 
 export default function ToursBrowser() {
   const containerRef = useRef(null);
@@ -45,36 +25,92 @@ export default function ToursBrowser() {
   const mobileNavScrollerRef = useRef(null);
   const mobileCategoryItemRefs = useRef({});
 
+  const triggerRefs = useRef([]);
+  const tourScrollTriggers = useRef([]);
+
   const [activeCategory, setActiveCategory] = useState("adrenaline");
   const [currentTourIndex, setCurrentTourIndex] = useState(0);
   const [currentTourTotal, setCurrentTourTotal] = useState(1);
+  const [currentGlobalIndex, setCurrentGlobalIndex] = useState(0);
   const [pinned, setPinned] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  const CONFIG = useMemo(() => (isMobile ? MOBILE : DESKTOP), [isMobile]);
-  const {
-    NAV_OFFSET,
-    CARD_HEIGHT,
-    HOLD_DISTANCE,
-    TRANSITION_DISTANCE,
-    STAGE_TOP,
-    ACTIVE_DETECTION_OFFSET,
-  } = CONFIG;
-  const TOTAL_DISTANCE = HOLD_DISTANCE + TRANSITION_DISTANCE;
+  // Sizing state
+  const [cardHeight, setCardHeight] = useState(400);
+  const [stageHeight, setStageHeight] = useState(652);
+  const [stageTop, setStageTop] = useState("80px");
+  const [holdDistance, setHoldDistance] = useState(700);
+  const [transitionDistance, setTransitionDistance] = useState(1100);
+  const [totalDistance, setTotalDistance] = useState(1800);
+  const [activeDetectionOffset, setActiveDetectionOffset] = useState(450);
+  const [navOffset, setNavOffset] = useState(6);
 
-  // Responsive listener
-  const handleResize = useCallback(() => {
-    setIsMobile(window.innerWidth < BREAKPOINT);
+  const [navHeight, setNavHeight] = useState(120);
+  const isScrollingRef = useRef(false);
+
+  // ─── Dynamic sizing ─────────────────────────────────────────────
+  const computeSizes = useCallback(() => {
+    const mobile = window.innerWidth < BREAKPOINT;
+    setIsMobile(mobile);
+
+    if (mobile) {
+      const topMargin = 70;
+      const bottomMargin = 12;
+      const availableHeight = window.innerHeight - topMargin - bottomMargin;
+      const calculatedCardHeight = Math.max(420, availableHeight - BUTTON_ROW_HEIGHT);
+
+      setStageTop(`${topMargin}px`);
+      setCardHeight(calculatedCardHeight);
+      setStageHeight(calculatedCardHeight + BUTTON_ROW_HEIGHT);
+      setHoldDistance(150);
+      setTransitionDistance(300);
+      setTotalDistance(450);
+      setActiveDetectionOffset(250);
+      setNavOffset(4);
+      return;
+    }
+
+    // Desktop
+    const topMargin = 80;
+    const bottomMargin = 20;
+    const availableHeight = window.innerHeight - topMargin - bottomMargin;
+    const calculatedCardHeight = Math.min(680, Math.max(450, availableHeight - BUTTON_ROW_HEIGHT));
+    const calculatedStageHeight = calculatedCardHeight + BUTTON_ROW_HEIGHT;
+    const ratio = calculatedCardHeight / 680;
+    const hold = Math.max(200, 700 * ratio);
+    const transition = Math.max(300, 1100 * ratio);
+
+    setStageTop(`${topMargin}px`);
+    setCardHeight(calculatedCardHeight);
+    setStageHeight(calculatedStageHeight);
+    setHoldDistance(hold);
+    setTransitionDistance(transition);
+    setTotalDistance(hold + transition);
+    setActiveDetectionOffset(Math.min(450, hold * 0.6));
+    setNavOffset(6);
   }, []);
-  useEffect(() => {
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [handleResize]);
 
-  // --------------------------------------------------
-  // CATEGORY GROUPING
-  // --------------------------------------------------
+  useEffect(() => {
+    computeSizes();
+    window.addEventListener("resize", computeSizes);
+    return () => window.removeEventListener("resize", computeSizes);
+  }, [computeSizes]);
+
+  // ─── Measure nav height ────────────────────────────────────────
+  useEffect(() => {
+    const navEl = mobileNavRef.current;
+    if (!navEl) return;
+
+    const updateHeight = () => {
+      setNavHeight(navEl.offsetHeight || 120);
+    };
+
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, [activeCategory]);
+
+  // ─── Category grouping ──────────────────────────────────────────
   const categorySections = useMemo(() => {
     const grouped = {
       adrenaline: tours.filter((t) => t.type === TOUR_TYPES.ADRENALINE),
@@ -84,57 +120,66 @@ export default function ToursBrowser() {
         (t) => t.type === TOUR_TYPES.PACKAGES || t.type === TOUR_TYPES.WINE_ROUTES
       ),
     };
-    return Object.entries(grouped).map(([id, tours]) => ({
+    return Object.entries(grouped).map(([id, tourList]) => ({
       id,
       label: id.charAt(0).toUpperCase() + id.slice(1),
-      tours,
+      tours: tourList,
     }));
   }, []);
 
-  // --------------------------------------------------
-  // FLATTEN TOURS
-  // --------------------------------------------------
-  const allTours = useMemo(
-    () =>
-      categorySections.flatMap((section) =>
-        section.tours.map((tour, i) => ({
-          ...tour,
-          categoryId: section.id,
-          categoryLabel: section.label,
-          tourIndex: i,
-          totalInCategory: section.tours.length,
-        }))
-      ),
-    [categorySections]
+  // ─── Flatten all tours ──────────────────────────────────────────
+  const allTours = useMemo(() => {
+    return categorySections.flatMap((section) =>
+      section.tours.map((tour, index) => ({
+        ...tour,
+        categoryId: section.id,
+        categoryLabel: section.label,
+        tourIndex: index,
+        totalInCategory: section.tours.length,
+      }))
+    );
+  }, [categorySections]);
+
+  // ─── Update active tour from scroll (blocked during programmatic scroll) ──
+  const updateActiveTour = useCallback(
+    (tour) => {
+      if (isScrollingRef.current) return;
+      if (!tour) return;
+      setActiveCategory(tour.categoryId);
+      setCurrentTourIndex(tour.tourIndex);
+      setCurrentTourTotal(tour.totalInCategory);
+
+      const globalIndex = allTours.findIndex((item) => item.id === tour.id);
+      if (globalIndex !== -1) {
+        setCurrentGlobalIndex(globalIndex);
+      }
+    },
+    [allTours]
   );
 
-  // --------------------------------------------------
-  // GSAP SETUP
-  // --------------------------------------------------
+  // ─── GSAP + ScrollTrigger setup ─────────────────────────────────
   useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      // 1. Kill all previous triggers to avoid build-up
-      // ScrollTrigger.getAll().forEach((st) => st.kill());
+    if (!containerRef.current) return;
 
-      const wrappers = gsap.utils.toArray(
-        containerRef.current.querySelectorAll(".tour-trigger")
-      );
+    const ctx = gsap.context(() => {
+      const wrappers = triggerRefs.current.filter(Boolean);
       const cards = gsap.utils.toArray(
         containerRef.current.querySelectorAll(".tour-stage-card")
       );
 
-      // 2. Full reset – start with all cards visible, stacked off‑screen
+      tourScrollTriggers.current = [];
+
       gsap.set(cards, { clearProps: "all" });
+
       cards.forEach((card, index) => {
         gsap.set(card, {
           yPercent: index === 0 ? 0 : 115,
           scale: index === 0 ? 1 : 0.985,
           zIndex: 1000 - index,
-          autoAlpha: 1,          // ensure all start visible
+          autoAlpha: 1,
         });
       });
 
-      // 3. Pin the fixed category nav
       ScrollTrigger.create({
         trigger: containerRef.current,
         start: "top top",
@@ -149,10 +194,9 @@ export default function ToursBrowser() {
         onLeaveBack: () => setPinned(false),
       });
 
-      // 4. Pin the card stage (responsive top)
       ScrollTrigger.create({
         trigger: containerRef.current,
-        start: `top top+=${NAV_OFFSET}`,
+        start: "top top",
         endTrigger: ".scroll-end",
         end: "bottom bottom",
         pin: stageRef.current,
@@ -160,102 +204,144 @@ export default function ToursBrowser() {
         anticipatePin: 1,
       });
 
-      // 5. Tour transitions with auto‑fade fix
       wrappers.forEach((wrapper, index) => {
         const currentCard = cards[index];
         const nextCard = cards[index + 1];
         const currentTour = allTours[index];
+        if (!currentTour) return;
 
-        // Active tour detection
-        ScrollTrigger.create({
+        const activeTrigger = ScrollTrigger.create({
           trigger: wrapper,
-          start: `top top+=${ACTIVE_DETECTION_OFFSET}`,
-          end: `+=${TOTAL_DISTANCE}`,
+          start: `top top+=${activeDetectionOffset}`,
+          end: `+=${totalDistance}`,
           onEnter: () => updateActiveTour(currentTour),
           onEnterBack: () => updateActiveTour(currentTour),
         });
+        tourScrollTriggers.current[index] = activeTrigger;
 
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: wrapper,
-            start: `top top+=${NAV_OFFSET}`,
-            end: `+=${TOTAL_DISTANCE}`,
+            start: `top top+=${navOffset}`,
+            end: `+=${totalDistance}`,
             scrub: 1.1,
           },
         });
 
-        // Hold phase
-        tl.to({}, { duration: HOLD_DISTANCE / TOTAL_DISTANCE });
+        tl.to({}, { duration: holdDistance / totalDistance });
 
-        // Transition phase (if there is a next card)
         if (nextCard) {
-          // Bring next card to front
           tl.set(nextCard, { zIndex: 3000 + index }, 0);
-
-          // Slide next card into view
           tl.to(nextCard, {
             yPercent: 0,
             scale: 1,
             ease: "power3.out",
-            duration: TRANSITION_DISTANCE / TOTAL_DISTANCE,
+            duration: transitionDistance / totalDistance,
           });
-
-          // 🔥 FIX: fade out the old card once it's fully covered
-          // Starts at 98% of the total scroll distance (almost the very end)
-          tl.to(
-            currentCard,
-            {
-              autoAlpha: 0,         // fades out & sets visibility:hidden
-              duration: 0.02,       // quick fade, scrub will reverse it
-            },
-            0.98                   // position in timeline
-          );
-
-          // (optional) also demote its z-index for extra safety
-          tl.call(
-            () => gsap.set(currentCard, { zIndex: 1 }),
-            null,
-            0.98
-          );
+          tl.to(currentCard, { autoAlpha: 0, duration: 0.02 }, 0.98);
+          tl.call(() => {
+            gsap.set(currentCard, { zIndex: 1 });
+          }, null, 0.98);
         }
       });
 
       ScrollTrigger.refresh();
     }, containerRef);
 
-    return () => ctx.revert();
-  }, [allTours, NAV_OFFSET, TOTAL_DISTANCE, ACTIVE_DETECTION_OFFSET]);
-
-  const updateActiveTour = useCallback((tour) => {
-    setActiveCategory(tour.categoryId);
-    setCurrentTourIndex(tour.tourIndex);
-    setCurrentTourTotal(tour.totalInCategory);
-  }, []);
-
-  // Scroll direction (optional – kept for any future use)
-  const [scrollDirection, setScrollDirection] = useState("up");
-  const lastScrollY = useRef(0);
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      if (Math.abs(currentY - lastScrollY.current) < 4) return;
-      setScrollDirection(currentY > lastScrollY.current ? "down" : "up");
-      lastScrollY.current = currentY;
+    return () => {
+      ctx.revert();
+      tourScrollTriggers.current = [];
     };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [
+    allTours,
+    navOffset,
+    totalDistance,
+    activeDetectionOffset,
+    holdDistance,
+    transitionDistance,
+    updateActiveTour,
+    stageHeight,
+  ]);
 
-  // --------------------------------------------------
-  // RENDER
-  // --------------------------------------------------
+  // ─── Navigation: scroll to a specific tour ──────────────────────
+  const goToTour = useCallback(
+    (index) => {
+      if (index < 0 || index >= allTours.length) return;
+
+      const wrapper = triggerRefs.current[index];
+      if (!wrapper) {
+        console.warn(`No wrapper element found for index ${index}`);
+        return;
+      }
+
+      ScrollTrigger.refresh();
+
+      // Block ScrollTrigger updates during the scroll
+      isScrollingRef.current = true;
+
+      // Calculate target scroll position so the wrapper's top is at navHeight + 5 from viewport top
+      const rect = wrapper.getBoundingClientRect();
+      const targetY = rect.top + window.scrollY - navHeight + 5;
+
+      gsap.to(window, {
+        duration: 0.9,
+        ease: "power3.inOut",
+        scrollTo: { y: targetY, autoKill: true },
+        onComplete: () => {
+          isScrollingRef.current = false;
+        },
+        onInterrupt: () => {
+          isScrollingRef.current = false;
+        },
+      });
+    },
+    [allTours.length, navHeight]
+  );
+
+  // ─── Tour change handler (called from FixedCategoryNav) ────────
+  const handleTourChange = useCallback(
+    (categoryIndex) => {
+      const category = categorySections.find((s) => s.id === activeCategory);
+      if (!category) return;
+      const tour = category.tours[categoryIndex];
+      if (!tour) return;
+      const globalIndex = allTours.findIndex((t) => t.id === tour.id);
+      if (globalIndex !== -1) {
+        // Instant highlight
+        setCurrentTourIndex(categoryIndex);
+        setCurrentGlobalIndex(globalIndex);
+        goToTour(globalIndex);
+      }
+    },
+    [activeCategory, categorySections, allTours, goToTour]
+  );
+
+  // ─── Tours for the active category ──────────────────────────────
+  const activeCategoryTours = useMemo(() => {
+    const section = categorySections.find((s) => s.id === activeCategory);
+    return section ? section.tours : [];
+  }, [categorySections, activeCategory]);
+
+  // ─── Global Previous / Next ─────────────────────────────────────
+  const handlePrev = useCallback(() => {
+    if (currentGlobalIndex > 0) {
+      goToTour(currentGlobalIndex - 1);
+    }
+  }, [currentGlobalIndex, goToTour]);
+
+  const handleNext = useCallback(() => {
+    if (currentGlobalIndex < allTours.length - 1) {
+      goToTour(currentGlobalIndex + 1);
+    }
+  }, [currentGlobalIndex, allTours.length, goToTour]);
+
+  const isFirst = currentGlobalIndex === 0;
+  const isLast = currentGlobalIndex === allTours.length - 1;
+
+  // ─── Render ──────────────────────────────────────────────────────
   return (
     <main className="w-full overflow-x-hidden bg-gradient-to-br from-white to-blue-600 text-white">
-      <section
-        ref={containerRef}
-        className="relative mx-auto w-full max-w-5xl px-3 md:px-4"
-      >
-        {/* Fixed category nav */}
+      <section ref={containerRef} className="relative mx-auto w-full max-w-5xl px-3 md:px-4">
         <div className="first-panel absolute left-0 top-0 z-[5000] w-full pointer-events-none">
           <FixedCategoryNav
             activeCategory={activeCategory}
@@ -272,51 +358,78 @@ export default function ToursBrowser() {
               mobileTop: 12,
             }}
             onSelect={(categoryId) => {
-              const target = document.querySelector(`[data-category="${categoryId}"]`);
-              if (!target) return;
-              gsap.to(window, {
-                duration: 1,
-                ease: "power3.out",
-                scrollTo: { y: target, offsetY: NAV_OFFSET },
-              });
+              setActiveCategory(categoryId);
+              setCurrentTourIndex(0);
+              const index = allTours.findIndex(
+                (tour) => tour.categoryId === categoryId
+              );
+              if (index !== -1) {
+                setCurrentGlobalIndex(index);
+                goToTour(index);
+              }
             }}
+            onTourChange={handleTourChange}
+            categoryTours={activeCategoryTours}
           />
         </div>
 
-        {/* Scroll track (spacers) */}
-        <div className="relative" style={{ paddingTop: `${NAV_OFFSET}px` }}>
-          {allTours.map((tour) => (
+        <div className="relative" style={{ paddingTop: `${navOffset}px` }}>
+          {allTours.map((tour, index) => (
             <section
               key={tour.id}
+              ref={(el) => { triggerRefs.current[index] = el; }}
               className="tour-trigger relative"
               data-category={tour.categoryId}
-              style={{ height: `${TOTAL_DISTANCE}px` }}
+              data-tour-index={index}
+              style={{ height: `${totalDistance}px` }}
             />
           ))}
         </div>
 
-        {/* Shared card stage */}
         <div
           ref={stageRef}
-          className="absolute left-0 z-[100] w-full overflow-visible pointer-events-none"
-          style={{ top: STAGE_TOP }}
+          className="absolute left-0 z-[100] w-full pointer-events-none"
+          style={{
+            top: stageTop,
+            height: `${stageHeight}px`,
+          }}
         >
-          <div
-            className="relative overflow-hidden"
-            style={{ height: `${CARD_HEIGHT}px` }}
-          >
-            {allTours.map((tour) => (
-              <div
-                key={tour.id}
-                className="tour-stage-card absolute left-0 top-0 w-full will-change-transform pointer-events-auto"
+          <div className="flex h-full w-full flex-col">
+            <div
+              className="flex shrink-0 items-center justify-center gap-4 pointer-events-auto"
+              style={{ height: `${BUTTON_ROW_HEIGHT}px` }}
+            >
+              <button
+                type="button"
+                onClick={handlePrev}
+                disabled={isFirst}
+                className="rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                <TourCard
-                  tour={tour}
-                  cardHeight={CARD_HEIGHT}
-                  isMobile={isMobile}
-                />
-              </div>
-            ))}
+                ‹ Previous
+              </button>
+              <span className="min-w-[55px] text-center text-sm font-medium text-white/70">
+                {currentGlobalIndex + 1} / {allTours.length}
+              </span>
+              <button
+                type="button"
+                onClick={handleNext}
+                disabled={isLast}
+                className="rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Next ›
+              </button>
+            </div>
+
+            <div className="relative min-h-0 flex-1 overflow-hidden">
+              {allTours.map((tour) => (
+                <div
+                  key={tour.id}
+                  className="tour-stage-card absolute inset-0 h-full w-full will-change-transform pointer-events-auto"
+                >
+                  <TourCard tour={tour} cardHeight={cardHeight} isMobile={isMobile} />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { resolveImage } from '../../utils/ImageLoader';
 
 const TOUR_CATEGORIES_ICON = {
   adrenaline: "/icons/catIcons/adrenaline.svg",
@@ -9,59 +10,9 @@ const TOUR_CATEGORIES_ICON = {
   wineRoutes: "/icons/catIcons/wine-routes.svg",
 };
 
-function CategoryProgressDots({
-  total = 0,
-  activeIndex = 0,
-  orientation = "horizontal",
-}) {
-  if (!total) return null;
-
-  const safeIndex = Math.max(0, Math.min(activeIndex, total - 1));
-  const isVertical = orientation === "vertical";
-
-  return (
-    <div
-      className={`flex ${
-        isVertical ? "flex-col items-center" : "items-center"
-      } gap-2`}
-      aria-label={`Tour ${safeIndex + 1} of ${total}`}
-    >
-      {Array.from({ length: total }).map((_, index) => {
-        const complete = index <= safeIndex;
-        const current = index === safeIndex;
-
-        return (
-          <span
-            key={index}
-            className={`block rounded-full border transition-colors duration-200 ${
-              isVertical ? "h-3 w-3" : "h-2.5 w-2.5"
-            } ${
-              complete
-                ? "border-green-300 bg-green-200 shadow-[0_0_0_3px_rgba(187,247,208,0.18)]"
-                : "border-white/15 bg-white/12"
-            } ${current ? "scale-110" : "scale-100"}`}
-          />
-        );
-      })}
-    </div>
-  );
-}
-
-function BrowseButton({
-  section,
-  index,
-  active,
-  onClick,
-  compact = false,
-}) {
-  const icon =
-    section.icon ||
-    TOUR_CATEGORIES_ICON[section.id] ||
-    "/icons/default.svg";
-
-  // Use section.label if available, otherwise fallback to section.title or "Untitled"
+function BrowseButton({ section, index, active, onClick, compact = false }) {
+  const icon = section.icon || TOUR_CATEGORIES_ICON[section.id] || "/icons/default.svg";
   const displayTitle = section.label || section.title || "Untitled";
-
   return (
     <button
       type="button"
@@ -89,34 +40,22 @@ function BrowseButton({
             }`}
             alt={displayTitle}
             draggable={false}
-            onError={(event) => {
-              event.currentTarget.style.display = "none";
-            }}
+            onError={(event) => event.currentTarget.style.display = "none"}
           />
         </div>
-
         <div className="min-w-0 flex-1">
-          {/* Number badge – grey when inactive, neutral when active */}
-          <p
-            className={`text-[9px] font-bitter uppercase leading-none tracking-[0.14em] ${
-              active ? "text-neutral-400" : "text-white/35"
-            }`}
-          >
+          <p className={`text-[9px] font-bitter uppercase leading-none tracking-[0.14em] ${
+            active ? "text-neutral-400" : "text-white/35"
+          }`}>
             0{index + 1}
           </p>
-
-          {/* Category title – red only when active, otherwise grey/white */}
-          <p
-            className={`mt-0.5 truncate font-bitter text-[12px] font-semibold leading-tight ${
-              active ? "text-black/80" : "text-white/60"
-            }`}
-          >
+          <p className={`mt-0.5 truncate font-bitter text-[12px] font-semibold leading-tight ${
+            active ? "text-black/80" : "text-white/60"
+          }`}>
             {displayTitle}
           </p>
         </div>
       </div>
-
-      {/* Active indicator dot – only visible for active category */}
       {active && (
         <span className="absolute right-3 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-red-400" />
       )}
@@ -129,14 +68,15 @@ export default function FixedCategoryNav({
   currentTourIndex,
   currentTourTotal,
   onSelect,
+  onTourChange,
   sections,
   mobileNavRef,
   mobileNavScrollerRef,
   mobileCategoryItemRefs,
   metrics,
   pinned,
+  categoryTours = [],
 }) {
-  const navigate = useNavigate();
   const [scrollDirection, setScrollDirection] = useState("up");
   const lastScrollY = useRef(0);
 
@@ -147,41 +87,42 @@ export default function FixedCategoryNav({
       setScrollDirection(currentY > lastScrollY.current ? "down" : "up");
       lastScrollY.current = currentY;
     };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-useEffect(() => {
-  const container = mobileNavScrollerRef?.current;
-  const activeItem =
-    mobileCategoryItemRefs?.current?.[activeCategory];
+  useEffect(() => {
+    const container = mobileNavScrollerRef?.current;
+    const activeItem = mobileCategoryItemRefs?.current?.[activeCategory];
+    if (!container || !activeItem) return;
+    const containerRect = container.getBoundingClientRect();
+    const itemRect = activeItem.getBoundingClientRect();
+    const targetScroll = activeItem.offsetLeft - containerRect.width / 2 + itemRect.width / 2;
+    container.scrollTo({ left: targetScroll, behavior: "smooth" });
+  }, [activeCategory]);
 
-  if (!container || !activeItem) return;
+  const totalTours = categoryTours.length;
+  const safeIndex = Math.min(Math.max(0, currentTourIndex), totalTours - 1);
 
-  const containerRect = container.getBoundingClientRect();
-  const itemRect = activeItem.getBoundingClientRect();
+  const handlePrevTour = () => {
+    if (safeIndex > 0) onTourChange(safeIndex - 1);
+  };
+  const handleNextTour = () => {
+    if (safeIndex < totalTours - 1) onTourChange(safeIndex + 1);
+  };
+  const handleCircleClick = (index) => {
+    if (index !== safeIndex) onTourChange(index);
+  };
 
-  const itemLeft = activeItem.offsetLeft;
-  const itemWidth = itemRect.width;
-
-  const targetScroll =
-    itemLeft -
-    containerRect.width / 2 +
-    itemWidth / 2;
-
-  container.scrollTo({
-    left: targetScroll,
-    behavior: "smooth",
-  });
-}, [activeCategory]);
+  console.log('categoryTours for activeCategory:', categoryTours);
 
   return (
     <div
+      key={activeCategory}   // 🔥 Forces full remount on category change
       ref={mobileNavRef}
       data-mobile-category-nav
       className={`
-        w-auto lg:w-full max-w-3xl mx-4  z-[220] mt-12
+        w-auto lg:w-full max-w-3xl mx-4 z-[220] mt-12
         sm:max-w-xl sm:mx-auto
         md:max-w-2xl md:mx-auto
         pointer-events-auto
@@ -196,17 +137,10 @@ useEffect(() => {
       }}
     >
       <div className="rounded-[1.25rem] border border-white/10 bg-black/72 p-1.5 shadow-[0_12px_35px_rgba(0,0,0,0.16)] backdrop-blur-md sm:p-2">
+        {/* Category row */}
         <div
           ref={mobileNavScrollerRef}
-          className="
-            flex snap-x snap-mandatory gap-1.5
-            overflow-x-auto scroll-smooth pb-0.5
-            [-ms-overflow-style:none]
-            [scrollbar-width:none]
-            md:grid md:grid-cols-4
-            md:overflow-visible md:pb-0
-            [&::-webkit-scrollbar]:hidden
-          "
+          className="flex snap-x snap-mandatory gap-1.5 overflow-x-auto scroll-smooth pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] md:grid md:grid-cols-4 md:overflow-visible md:pb-0 [&::-webkit-scrollbar]:hidden"
         >
           {sections.map((section, index) => (
             <div
@@ -227,22 +161,80 @@ useEffect(() => {
           ))}
         </div>
 
-        <div className="mt-1.5 rounded-2xl border border-white/10 bg-white/[0.07] px-2.5 py-1.5">
-          <div className="flex items-center justify-between gap-3">
-            <div className="relative flex flex-1 items-center overflow-hidden py-0.5">
-              <span className="absolute left-1 right-1 top-1/2 h-px -translate-y-1/2 bg-white/12" />
-              <div className="relative z-10">
-                <CategoryProgressDots
-                  total={currentTourTotal}
-                  activeIndex={currentTourIndex}
-                />
+        {/* Tour navigation bar */}
+        <div className="mt-1.5 rounded-2xl border border-white/10 bg-white/[0.07] px-3 py-2">
+          <div className="flex items-center gap-2">
+            {/* Previous */}
+            <button
+              type="button"
+              onClick={handlePrevTour}
+              disabled={safeIndex === 0}
+              className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors duration-200 ${
+                safeIndex === 0
+                  ? "cursor-not-allowed opacity-30"
+                  : "hover:bg-white/10 active:bg-white/20"
+              }`}
+              aria-label="Previous tour"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+              <span className="hidden sm:inline">Previous</span>
+            </button>
+
+            {/* Circle row */}
+            <div className="flex-1 overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="flex gap-1.5">
+                {categoryTours.map((tour, idx) => (
+                  <button
+                    key={`${activeCategory}-${tour.id}`}
+                    onClick={() => handleCircleClick(idx)}
+                    className={`relative h-8 w-8 shrink-0 overflow-hidden rounded-full border-2 transition-all duration-200 ${
+                      idx === safeIndex
+                        ? "border-green-300 scale-110 shadow-[0_0_0_3px_rgba(187,247,208,0.18)]"
+                        : "border-white/20 hover:border-white/40"
+                    }`}
+                  >
+                    <img
+                      src={tour.image ? resolveImage(tour.image) : ''}
+                      alt={`Tour ${idx + 1}`}
+                      className="h-full w-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        const parent = e.currentTarget.parentElement;
+                        const fallback = parent?.querySelector('.fallback');
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                      style={{ display: tour.image ? 'block' : 'none' }}
+                    />
+                    <div
+                      className="fallback flex h-full w-full items-center justify-center bg-blue-600 text-white text-xs font-bold"
+                      style={{ display: tour.image ? 'none' : 'flex' }}
+                    >
+                      {idx + 1}
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
 
-            <span className="shrink-0 rounded-full bg-green-200 px-2 py-0.5 font-bitter text-[9px] font-bold text-green-950">
-              {String(currentTourIndex + 1).padStart(2, "0")} /{" "}
-              {String(currentTourTotal || 1).padStart(2, "0")}
-            </span>
+            {/* Next */}
+            <button
+              type="button"
+              onClick={handleNextTour}
+              disabled={safeIndex === totalTours - 1}
+              className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors duration-200 ${
+                safeIndex === totalTours - 1
+                  ? "cursor-not-allowed opacity-30"
+                  : "hover:bg-white/10 active:bg-white/20"
+              }`}
+              aria-label="Next tour"
+            >
+              <span className="hidden sm:inline">Next</span>
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
