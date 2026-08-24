@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { gsap } from 'gsap'
 
 const CONTACT_EMAIL = 'admin@capefrontier.co.za'
+const CONTACT_NUMBER = '(+27)00 000 0000';
 
 const socialLinks = [
   {
@@ -296,19 +297,19 @@ const Contact = () => {
       ref={sectionRef}
       className="relative min-h-[var(--contact-vh,100svh)] overflow-hidden bg-[#eef7f6] text-black"
     >
-      {/* Background artwork */}
+      {/* Background artwork
       <img
-        src="/assets/content/clip-art/section3-bg.png"
+        // src="/assets/content/clip-art/section3-bg.png"
         alt=""
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover opacity-55"
-      />
+      /> */}
 
       <img
         src="/assets/content/clip-art/contact-clip.png"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-10 h-full w-full object-cover opacity-50"
+        className="pointer-events-none absolute inset-0 z-10 h-full w-full object-cover opacity-100"
       />
 
       {/* Soft colour wash */}
@@ -322,38 +323,63 @@ const Contact = () => {
 
       <div className="relative z-30 mx-auto flex min-h-[var(--contact-vh,100svh)] w-full max-w-7xl flex-col px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-7">
 
-        {/* Top control */}
-        <div className="flex shrink-0 justify-end">
-          <button
-            type="button"
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            className="group flex h-10 w-10 items-center justify-center rounded-2xl border border-white/50 bg-white/70 shadow-[0_10px_25px_rgba(0,0,0,0.08)] backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:bg-green-200 sm:h-11 sm:w-11"
-          >
-            <img
-              src="/icons/upArrowDark.png"
-              alt=""
-              className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5"
-            />
-          </button>
-        </div>
-
         {/* Main content */}
         <div className="grid flex-1 items-center gap-7 py-5 sm:gap-9 sm:py-7 lg:grid-cols-[0.75fr_1.25fr] lg:gap-16 lg:py-8">
 
-          {/* Logo */}
-          <div className="order-1 flex justify-center lg:justify-start">
+          {/* Logo + Back to top */}
+          <div className="flex flex-col items-center">
+            {/* Logo */}
             <div
               ref={logoRef}
-              className="relative w-full max-w-[8rem] sm:max-w-[11rem] lg:max-w-[20rem]"
+              className="relative w-full max-w-[rem] sm:max-w-[rem] lg:max-w-[rem]"
             >
               <img
-                src="/assets/brand/logo.png"
+                src="/assets/brand/logo-removebg.png"
                 alt="Cape Frontier"
                 className="relative z-10 h-auto w-full object-contain opacity-[0.98] drop-shadow-[0_18px_40px_rgba(0,0,0,0.16)]"
               />
 
               <div className="absolute inset-x-8 bottom-3 h-8 rounded-full bg-blue-950/10 blur-2xl" />
+            </div>
+
+            {/* Back to top */}
+            <div className="mt-5 flex items-center justify-end gap-3">
+              <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-900/55">
+                Back to top
+              </span>
+
+              <button
+                type="button"
+                onClick={scrollToTop}
+                aria-label="Back to top"
+                className="
+                  group
+                  flex h-10 w-10 shrink-0 items-center justify-center
+                  border border-slate-900/15
+                  bg-white/50
+                  backdrop-blur-sm
+                  transition-all duration-300 ease-out
+                  hover:-translate-y-1
+                  hover:border-slate-900/40
+                  hover:bg-white/90
+                  focus:outline-none
+                  focus-visible:ring-2
+                  focus-visible:ring-slate-900/20
+                  sm:h-11 sm:w-11
+                "
+              >
+                <img
+                  src="/icons/upArrowDark.png"
+                  alt=""
+                  className="
+                    h-3.5 w-3.5
+                    opacity-70
+                    transition-all duration-300 ease-out
+                    group-hover:-translate-y-0.5
+                    group-hover:opacity-100
+                  "
+                />
+              </button>
             </div>
           </div>
 
@@ -365,40 +391,92 @@ const Contact = () => {
 
             {/* Heading */}
             <div>
-              <p className="font-bitter text-[10px] font-black uppercase tracking-[0.28em] text-blue-500 sm:text-xs">
+              {/* <p className="font-bitter text-[10px] font-black uppercase tracking-[0.28em] text-blue-500 sm:text-xs">
                 Contact Cape Frontier
-              </p>
+              </p> */}
 
-              <h2 className="mt-2 font-frank text-[2.6rem] font-bold leading-[0.88] tracking-[-0.03em] text-[#071f4f] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
+              {/* <h2 className="mt-2 font-frank font-bold leading-[0.88] tracking-[-0.03em] text-[#071f4f] 
+              text-4xl sm:text-4xl md:text-4xl lg:text-4xl xl:text-4xl">
                 Have a question?
               </h2>
 
               <p className="mx-auto mt-3 max-w-2xl font-bitter text-[13px] leading-6 text-neutral-600 sm:text-base sm:leading-7 lg:mx-0 lg:text-lg">
-                Message us about tours, pickup details, private
-                trips, custom routes, or booking support. We will
-                help you choose the right Cape Town experience.
-              </p>
+                Message us about tours, pickup details, private trips, custom routes, or booking support. We will help you choose the right Cape Town experience.
+              </p> */}
             </div>
 
             {/* Contact area */}
-            <div className="grid w-full gap-4 lg:grid-cols-[1fr_auto]">
+            <div className="flex w-full gap-4">
+
+              
+
+              {/* Right: Full-height QR */}
+              <div
+                ref={(el) => {
+                  cardsRef.current[1] = el
+                }}
+                className="flex-1 flex w-full flex-col items-center justify-center rounded-[1.5rem] border border-white/0 bg-white/0 p- 
+                text-center hadow-[0_10px_30px_rgba(7,31,79,0.06)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-white/88 
+                hover:shadow-[0_18px_40px_rgba(7,31,79,0.10)] 
+                "
+              >
+                <a
+                  href="https://www.instagram.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Follow Cape Frontier on Instagram"
+                  className="flex h-full w-full flex-col items-center justify-center"
+                >
+                  {/* QR Code */}
+                  <div className="flex min-h-0 flex-1 items-center justify-center">
+                    <div className="relative overflow-hidden rounded-2xl border border-black/5 bg-white/70 p-2 
+                    shadow-[0_8px_24px_rgba(7,31,79,0.06)] transition duration-300 hover:shadow-[0_14px_32px_rgba(7,31,79,0.12)]">
+                      <img
+                        src="/assets/brand/content.webp"
+                        alt="Scan to follow Cape Frontier on Instagram"
+                        className="h-auto w-full max-w-[16rem] object-contain"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Text below QR */}
+                  {/* <div className="mt-3 shrink-0">
+                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-blue-500">
+                      Instagram
+                    </p>
+
+                    <p className="mt-1 text-xs font-semibold leading-4 text-[#071f4f]">
+                      Scan to follow us
+                    </p>
+                  </div> */}
+                </a>
+              </div>
 
               {/* Left: Email + buttons */}
-              <div className="flex flex-col gap-4">
+              <div className="flex-1 flex flex-col gap-4">
 
                 {/* Email */}
                 <div
                   ref={(el) => {
                     cardsRef.current[0] = el
                   }}
-                  className="rounded-[1.5rem] border border-white/70 bg-white/72 p-4 text-left shadow-[0_10px_30px_rgba(7,31,79,0.06)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-white/88 hover:shadow-[0_18px_40px_rgba(7,31,79,0.10)] sm:p-5"
+                  className="relative w-full rounded-3xl border border-white/70 bg-white/72 p-4 text-left shadow-[0_10px_30px_rgba(7,31,79,0.06)] 
+                  backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-white/88 hover:shadow-[0_18px_40px_rgba(7,31,79,0.10)] sm:p-5"
                 >
                   <p className="text-[10px] font-black uppercase tracking-[0.22em] text-blue-500">
                     Email
                   </p>
 
-                  <p className="mt-2 break-words text-sm font-bold leading-5 text-[#071f4f] sm:text-[15px]">
+                  <p className="wrap-break-word text-sm font-bold leading-5 text-[#071f4f] sm:text-[15px]">
                     {CONTACT_EMAIL}
+                  </p>
+                  <div className='my-3 w-full border border-blue-200/50'/>
+                  <p className="mt-2 text-[10px] font-black uppercase tracking-[0.22em] text-blue-500">
+                    Number
+                  </p>
+                    
+                  <p className="wrap-break-word text-sm font-bold leading-5 text-[#071f4f] sm:text-[15px]">
+                    {CONTACT_NUMBER}
                   </p>
 
                   <p className="mt-1 text-xs leading-5 text-neutral-500">
@@ -407,7 +485,7 @@ const Contact = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="w-full flex flex-col gap-3 sm:flex-row sm:items-center">
                   <button
                     type="button"
                     onClick={openContact}
@@ -425,44 +503,6 @@ const Contact = () => {
                   </button>
                 </div>
               </div>
-
-              {/* Right: Full-height QR */}
-              <div
-                ref={(el) => {
-                  cardsRef.current[1] = el
-                }}
-                className="flex min-h-[220px] w-full flex-col items-center justify-center rounded-[1.5rem] border border-white/70 bg-white/72 p-4 text-center shadow-[0_10px_30px_rgba(7,31,79,0.06)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-white/88 hover:shadow-[0_18px_40px_rgba(7,31,79,0.10)] sm:p-5 lg:min-h-0 lg:w-[13rem]"
-              >
-                <a
-                  href="https://www.instagram.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Follow Cape Frontier on Instagram"
-                  className="flex h-full w-full flex-col items-center justify-center"
-                >
-                  {/* QR Code */}
-                  <div className="flex min-h-0 flex-1 items-center justify-center">
-                    <div className="relative overflow-hidden rounded-2xl border border-black/5 bg-white p-2 shadow-[0_8px_24px_rgba(7,31,79,0.06)] transition duration-300 hover:shadow-[0_14px_32px_rgba(7,31,79,0.12)]">
-                      <img
-                        src="/assets/brand/content.webp"
-                        alt="Scan to follow Cape Frontier on Instagram"
-                        className="h-auto w-full max-w-[10rem] object-contain"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Text below QR */}
-                  <div className="mt-3 shrink-0">
-                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-blue-500">
-                      Instagram
-                    </p>
-
-                    <p className="mt-1 text-xs font-semibold leading-4 text-[#071f4f]">
-                      Scan to follow us
-                    </p>
-                  </div>
-                </a>
-              </div>
             </div>
           </div>
         </div>
@@ -479,7 +519,7 @@ const Contact = () => {
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500">
-                  Information
+                  {/* Information */}
                 </p>
 
                 <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs sm:justify-end sm:text-sm">
@@ -510,7 +550,7 @@ const Contact = () => {
             </div>
 
             {/* Copyright */}
-            <div className="border-t border-black/5 bg-[#071f4f] px-4 py-4 sm:px-6">
+            <div className="border-t border-black/5 bg-blue-800 px-4 py-4 sm:px-6">
               <div className="flex flex-col gap-4 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
 
                 <div className="flex items-center justify-center gap-3 sm:justify-start">
@@ -536,15 +576,15 @@ const Contact = () => {
 
                 <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
                   <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold text-green-200 backdrop-blur-md">
-                    premium routes
+                    Premium routes
                   </span>
 
                   <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold text-green-200 backdrop-blur-md">
-                    secure booking
+                    Secure booking
                   </span>
 
                   <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold text-green-200 backdrop-blur-md">
-                    local experiences
+                    Local experiences
                   </span>
                 </div>
 

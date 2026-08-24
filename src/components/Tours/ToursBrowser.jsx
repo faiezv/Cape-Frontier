@@ -931,46 +931,190 @@ export default function ToursBrowser() {
           <div className="flex h-full w-full flex-col">
 
             {/* ───────────────────────────────────────────────
-                Previous / Next controls
-            ─────────────────────────────────────────────── */}
+    Previous / Next / Contact / Back to start
+    Desktop: one row
+    Mobile: navigation row + CTA row
+    ─────────────────────────────────────────────── */}
 
-            <div className="mt-30"></div>
-            <div
-              className="flex m-2 shrink-0 items-center justify-center gap-3 md:gap-4 pointer-events-auto"
-            >
-              <button
-                type="button"
-                onClick={handlePrev}
-                disabled={isFirst}
-                aria-label="Previous tour"
-                className={
-                  isMobile
-                    ? "flex items-center gap-1.5 rounded-full bg-white text-blue-700 px-6 py-3 text-base font-bold shadow-lg shadow-black/20 transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
-                    : "rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
-                }
-              >
-                ‹ Previous
-              </button>
+<div className="mt-30"></div>
 
-              <span className="min-w-[55px] text-center text-sm font-medium text-white/70">
-                {currentGlobalIndex + 1} /{" "}
-                {allTours.length}
-              </span>
+<div
+  className="
+    m-2
+    shrink-0
+    pointer-events-auto
+    flex
+    flex-col
+    items-center
+    justify-center
+    gap-3
+    md:flex-row
+    md:gap-5
+  "
+>
+  {/* Previous / Counter / Next */}
+  <div className="flex items-center justify-center gap-3 md:gap-5">
+    {/* Previous */}
+    <button
+      type="button"
+      onClick={handlePrev}
+      disabled={isFirst}
+      aria-label="Previous tour"
+      className={
+        isMobile
+          ? "flex items-center gap-1.5 rounded-full bg-white px-5 py-3 text-base font-bold text-blue-700 shadow-lg shadow-black/20 transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+          : "rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
+      }
+    >
+      ‹ Previous
+    </button>
 
-              <button
-                type="button"
-                onClick={handleNext}
-                disabled={isLast}
-                aria-label="Next tour"
-                className={
-                  isMobile
-                    ? "flex items-center gap-1.5 rounded-full bg-white text-blue-700 px-6 py-3 text-base font-bold shadow-lg shadow-black/20 transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
-                    : "rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
-                }
-              >
-                Next ›
-              </button>
-            </div>
+    {/* Counter */}
+    <span className="min-w-[55px] text-center text-sm font-medium text-white/70">
+      {currentGlobalIndex + 1} / {allTours.length}
+    </span>
+
+    {/* Next */}
+    <button
+      type="button"
+      onClick={handleNext}
+      disabled={isLast}
+      aria-label="Next tour"
+      className={
+        isMobile
+          ? "flex items-center gap-1.5 rounded-full bg-white px-5 py-3 text-base font-bold text-blue-700 shadow-lg shadow-black/20 transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+          : "rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
+      }
+    >
+      Next ›
+    </button>
+  </div>
+
+  {/* Secondary actions */}
+  <div className="flex items-center justify-center gap-5 md:gap-4">
+    {/* Contact CTA */}
+    <button
+      type="button"
+      onClick={() => {
+        const contact = document.querySelector("#contact");
+
+        if (!contact) return;
+
+        contact.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }}
+      className="
+        group
+        inline-flex
+        items-center
+        gap-2
+        whitespace-nowrap
+        text-xs
+        font-medium
+        tracking-wide
+        text-white/80
+        transition-colors
+        duration-300
+        hover:text-white
+        md:ml-2
+        md:text-sm
+      "
+    >
+      <span className="relative">
+        Need help? Contact us now
+
+        <span
+          className="
+            absolute
+            -bottom-1
+            left-0
+            h-px
+            w-full
+            bg-white/60
+            transition-all
+            duration-300
+            group-hover:bg-white
+          "
+        />
+      </span>
+
+      <span
+        aria-hidden="true"
+        className="
+          text-sm
+          transition-transform
+          duration-300
+          group-hover:translate-x-1
+        "
+      >
+        →
+      </span>
+    </button>
+
+    {/* Back to start */}
+    <button
+      type="button"
+      onClick={() => {
+        gsap.to(window, {
+          duration: 1,
+          ease: "power3.inOut",
+          scrollTo: {
+            y: 0,
+            autoKill: true,
+          },
+        });
+      }}
+      aria-label="Back to start"
+      className="
+        group
+        inline-flex
+        items-center
+        gap-2
+        whitespace-nowrap
+        text-xs
+        font-medium
+        tracking-wide
+        text-white/55
+        transition-colors
+        duration-300
+        hover:text-white
+        md:text-sm
+      "
+    >
+      <span
+        aria-hidden="true"
+        className="
+          text-sm
+          transition-transform
+          duration-300
+          group-hover:-translate-y-0.5
+        "
+      >
+        ↑
+      </span>
+
+      <span className="relative">
+        Back to start
+
+        <span
+          className="
+            absolute
+            -bottom-1
+            left-0
+            h-px
+            w-full
+            bg-white/40
+            transition-colors
+            duration-300
+            group-hover:bg-white
+          "
+        />
+      </span>
+    </button>
+  </div>
+</div>
 
             {/* ───────────────────────────────────────────────
                 Cards

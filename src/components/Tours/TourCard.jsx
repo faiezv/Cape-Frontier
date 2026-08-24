@@ -447,12 +447,9 @@ export default function TourCard({
                 w-full
                 flex-col
                 gap-3
-                p-4
                 sm:gap-4
-                sm:p-5
-                md:p-6
                 xl:gap-5
-                xl:p-8
+                p-4
               "
             >
               {/* =================================================
@@ -460,7 +457,7 @@ export default function TourCard({
               ================================================= */}
 
               <div className="shrink-0 overflow-hidden">
-                <div className="flex items-center justify-between gap-3 border-b border-black/5 bg-neutral-50 px-3 sm:px-5 sm:py-2 md:px-6 xl:px-8">
+                <div className="flex items-center justify-between gap-3 border-b border-black/5 bg-neutral-50 px-3 sm:px-5 md:px-6 xl:px-8">
                   {/* DETAILS */}
 
                   <button

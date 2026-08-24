@@ -885,8 +885,8 @@ function TourSelect() {
   const modalNode = activeModal && typeof document !== 'undefined' ? createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md" onClick={close}>
       <div
-        className={`modal-content flex max-h-[88vh] w-full flex-col overflow-hidden rounded-3xl bg-white/95 
-           sm:max-h-[85vh] ${
+        className={`modal-content flex max-h-[80vh] w-full flex-col overflow-hidden rounded-3xl bg-white/95 
+           sm:max-h-[85vh] sm:mt-16 ${
           activeModal === 'date' ? 'max-w-md sm:max-w-lg md:max-w-xl' :
           activeModal === 'participants' ? 'max-w-[94vw] sm:max-w-md' :
           'max-w-[94vw] sm:max-w-3xl'
@@ -950,7 +950,7 @@ function TourSelect() {
           <div className="absolute inset-0 bg-black/55 transition-colors duration-300 group-hover:bg-black/45" />
 
           {/* Content */}
-          <div className="relative flex min-h-[190px] flex-col justify-between p-5 sm:min-h-[220px] sm:p-7 md:min-h-[240px] md:p-8">
+          <div className="relative flex flex-col justify-between p-3 sm:p-7 :min-h-[240px] :p-8">
 
 
             {/* Bottom content */}
@@ -964,7 +964,7 @@ function TourSelect() {
                   </span>
                 </div>
 
-              <h2 className="font-frank text-xl font-black leading-[0.95] tracking-tight text-white sm:text-2xl md:text-4xl">
+              <h2 className="font-frank font-black leading-[0.95] tracking-tight text-white text-2xl sm:text-2xl md:text-4xl">
                 Be the reason a child smiles today.
               </h2>
 
