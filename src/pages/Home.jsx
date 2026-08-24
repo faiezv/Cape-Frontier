@@ -32,60 +32,96 @@ const Home = () => {
   const tourSelectSectionRef = useRef(null);
 
   useLayoutEffect(() => {
-  if (!window.lenis || !tourSelectSectionRef.current) return;
+  const section = tourSelectSectionRef.current;
 
-  let lastScroll = window.scrollY;
-  let hidden = false;
+  if (!section) return;
 
-  gsap.set(tourSelectSectionRef.current, {
-    y: 72, // mt-18
-    autoAlpha: 1,
-  });
+  let cleanup = null;
+  let retryTimer = null;
 
-  const animateIn = () => {
-    hidden = false;
-
-    gsap.to(tourSelectSectionRef.current, {
-      y: 80,
-      autoAlpha: 1,
-      duration: 0.35,
-      ease: "power3.out",
-      overwrite: true,
-    });
-  };
-
-  const animateOut = () => {
-    hidden = true;
-
-    gsap.to(tourSelectSectionRef.current, {
-      y: 0,
-      autoAlpha: 0,
-      duration: 0.35,
-      ease: "power3.out",
-      overwrite: true,
-    });
-  };
-
-  const handleScroll = ({ scroll }) => {
-    if (scroll <= 5) {
-      animateIn();
-      lastScroll = scroll;
+  const setup = () => {
+    if (!window.lenis) {
+      retryTimer = window.setTimeout(setup, 50);
       return;
     }
 
-    if (scroll > lastScroll + 2 && !hidden) {
-      animateOut();
-    } else if (scroll < lastScroll - 2 && hidden) {
-      animateIn();
-    }
+    let lastScroll = window.lenis.scroll || window.scrollY || 0;
+    let hidden = false;
 
-    lastScroll = scroll;
+    // Initial state
+    gsap.set(section, {
+      y: 0,
+      autoAlpha: 1,
+      force3D: true,
+    });
+
+    const show = () => {
+      if (!hidden) return;
+
+      hidden = false;
+
+      gsap.to(section, {
+        y: 0,
+        autoAlpha: 1,
+        duration: 0.4,
+        ease: "power3.out",
+        overwrite: true,
+      });
+    };
+
+    const hide = () => {
+      if (hidden) return;
+
+      hidden = true;
+
+      gsap.to(section, {
+        y: 100,
+        autoAlpha: 0,
+        duration: 0.35,
+        ease: "power3.out",
+        overwrite: true,
+      });
+    };
+
+    const handleScroll = ({ scroll }) => {
+      // Always show at the very top
+      if (scroll <= 5) {
+        show();
+        lastScroll = scroll;
+        return;
+      }
+
+      const difference = scroll - lastScroll;
+
+      // Scrolling down
+      if (difference > 2) {
+        hide();
+      }
+
+      // Scrolling up
+      else if (difference < -2) {
+        show();
+      }
+
+      lastScroll = scroll;
+    };
+
+    window.lenis.on("scroll", handleScroll);
+
+    cleanup = () => {
+      window.lenis?.off("scroll", handleScroll);
+    };
   };
 
-  window.lenis.on("scroll", handleScroll);
+  setup();
 
   return () => {
-    window.lenis.off("scroll", handleScroll);
+    if (retryTimer) {
+      window.clearTimeout(retryTimer);
+    }
+
+    cleanup?.();
+    gsap.killTweensOf(section);
   };
 }, []);
 
@@ -249,7 +285,7 @@ const Home = () => {
         ref={tourSelectSectionRef}
         className="fixed z-25 w-full overflow-x-hidden overflow-y-visible"
       >
-        <div ref={tourSelectRef} className="mx-auto max-w-5xl">
+        <div ref={tourSelectRef} className="mx-auto max-w-5xl mt-20 ">
           <TourSelect />
         </div>
       </section>

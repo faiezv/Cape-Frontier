@@ -183,9 +183,9 @@ const ClassicTourBanner = () => {
                 />
               </a>
 
-              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/45">
+              {/* <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/45">
                 Scenic • Guided • Premium
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

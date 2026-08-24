@@ -277,7 +277,7 @@ function TourSelect() {
   const isMobileLayout = viewportWidth < 700
   const tourOptions = useMemo(() => getTourOptions(), [])
 
-  const FEATURED_TOUR_ID = 'heritage-tour';
+  const FEATURED_TOUR_ID = 12;
 
   const featuredTour = useMemo(
     () => tourOptions.find((tour) => tour.id === FEATURED_TOUR_ID),
@@ -952,21 +952,19 @@ function TourSelect() {
           {/* Content */}
           <div className="relative flex min-h-[190px] flex-col justify-between p-5 sm:min-h-[220px] sm:p-7 md:min-h-[240px] md:p-8">
 
-            {/* Featured label */}
-            <div>
-              <span className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-white backdrop-blur-md">
-                Featured experience
-              </span>
-            </div>
 
             {/* Bottom content */}
             <div className="max-w-2xl">
 
-              <p className="mb-2 font-mont text-xs font-semibold uppercase tracking-[0.16em] text-white/70 sm:text-sm">
-                Be the reason
-              </p>
+                {/* Featured label */}
+                <div>
+                  <span className="inline-flex  items-center rounded-full border border-white/20 bg-white/10 px-3 py-1.5 my-1
+                  font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-white backdrop-blur-md">
+                    Featured experience
+                  </span>
+                </div>
 
-              <h2 className="font-frank text-2xl font-black leading-[0.95] tracking-tight text-white sm:text-4xl md:text-5xl">
+              <h2 className="font-frank text-xl font-black leading-[0.95] tracking-tight text-white sm:text-2xl md:text-4xl">
                 Be the reason a child smiles today.
               </h2>
 
@@ -982,11 +980,11 @@ function TourSelect() {
                 </span>
 
                 {/* Location */}
-                {featuredTour.location && (
+                {/* {featuredTour.location && (
                   <span className="font-mont text-[10px] text-white/70 sm:text-xs">
                     {featuredTour.location}
                   </span>
-                )}
+                )} */}
 
                 {/* Price */}
                 {featuredTour.price && (

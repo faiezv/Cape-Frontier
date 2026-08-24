@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom"; // Not used in this file, can be removed
 import { resolveImage } from '../../utils/ImageLoader';
 
 const TOUR_CATEGORIES_ICON = {
@@ -74,23 +74,10 @@ export default function FixedCategoryNav({
   mobileNavScrollerRef,
   mobileCategoryItemRefs,
   metrics,
-  pinned,
+  pinned, // no longer used – kept for backward compatibility
   categoryTours = [],
 }) {
-  const [scrollDirection, setScrollDirection] = useState("up");
-  const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      if (Math.abs(currentY - lastScrollY.current) < 4) return;
-      setScrollDirection(currentY > lastScrollY.current ? "down" : "up");
-      lastScrollY.current = currentY;
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
+  // Auto-scroll active category into view on mobile
   useEffect(() => {
     const container = mobileNavScrollerRef?.current;
     const activeItem = mobileCategoryItemRefs?.current?.[activeCategory];
@@ -114,26 +101,21 @@ export default function FixedCategoryNav({
     if (index !== safeIndex) onTourChange(index);
   };
 
-  console.log('categoryTours for activeCategory:', categoryTours);
-
   return (
     <div
-      key={activeCategory}   // 🔥 Forces full remount on category change
+      key={activeCategory}
       ref={mobileNavRef}
       data-mobile-category-nav
       className={`
-        w-auto lg:w-full max-w-3xl mx-4 z-[220] mt-12
+        w-auto lg:w-full max-w-3xl mx-4 z-[220]
         sm:max-w-xl sm:mx-auto
         md:max-w-2xl md:mx-auto
         pointer-events-auto
-        will-change-transform
-        transition-all duration-500 ease-out
-        ${scrollDirection === "up" ? "translate-y-8 opacity-100" : "translate-y-0 opacity-100"}
+        transition-opacity duration-300
+        opacity-100
       `}
       style={{
         top: `${metrics.mobileTop}px`,
-        visibility: pinned ? "visible" : "visible",
-        pointerEvents: pinned ? "auto" : "none",
       }}
     >
       <div className="rounded-[1.25rem] border border-white/10 bg-black/72 p-1.5 shadow-[0_12px_35px_rgba(0,0,0,0.16)] backdrop-blur-md sm:p-2">
@@ -164,19 +146,21 @@ export default function FixedCategoryNav({
         {/* Tour navigation bar */}
         <div className="mt-1.5 rounded-2xl border border-white/10 bg-white/[0.07] px-3 py-2">
           <div className="flex items-center gap-2">
-            {/* Previous */}
+            {/* Previous button – now larger and more prominent on mobile */}
             <button
               type="button"
               onClick={handlePrevTour}
               disabled={safeIndex === 0}
-              className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors duration-200 ${
-                safeIndex === 0
-                  ? "cursor-not-allowed opacity-30"
-                  : "hover:bg-white/10 active:bg-white/20"
-              }`}
+              className={`flex items-center justify-center gap-1 rounded-full font-bold transition-all duration-200
+                px-4 py-2 text-sm sm:px-3 sm:py-1 sm:text-xs
+                ${
+                  safeIndex === 0
+                    ? "cursor-not-allowed opacity-30"
+                    : "bg-white/10 hover:bg-white/20 active:scale-95"
+                }`}
               aria-label="Previous tour"
             >
-              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 sm:h-3.5 sm:w-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
                 <path d="M15 18l-6-6 6-6" />
               </svg>
               <span className="hidden sm:inline">Previous</span>
@@ -218,20 +202,22 @@ export default function FixedCategoryNav({
               </div>
             </div>
 
-            {/* Next */}
+            {/* Next button – larger and more prominent on mobile */}
             <button
               type="button"
               onClick={handleNextTour}
               disabled={safeIndex === totalTours - 1}
-              className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors duration-200 ${
-                safeIndex === totalTours - 1
-                  ? "cursor-not-allowed opacity-30"
-                  : "hover:bg-white/10 active:bg-white/20"
-              }`}
+              className={`flex items-center justify-center gap-1 rounded-full font-bold transition-all duration-200
+                px-4 py-2 text-sm sm:px-3 sm:py-1 sm:text-xs
+                ${
+                  safeIndex === totalTours - 1
+                    ? "cursor-not-allowed opacity-30"
+                    : "bg-white/10 hover:bg-white/20 active:scale-95"
+                }`}
               aria-label="Next tour"
             >
               <span className="hidden sm:inline">Next</span>
-              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 sm:h-3.5 sm:w-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
                 <path d="M9 18l6-6-6-6" />
               </svg>
             </button>

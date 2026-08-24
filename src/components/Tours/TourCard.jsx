@@ -460,7 +460,7 @@ export default function TourCard({
               ================================================= */}
 
               <div className="shrink-0 overflow-hidden">
-                <div className="flex items-center justify-between gap-3 border-b border-black/5 bg-neutral-50 px-3 py-3 sm:px-5 sm:py-4 md:px-6 xl:px-8">
+                <div className="flex items-center justify-between gap-3 border-b border-black/5 bg-neutral-50 px-3 sm:px-5 sm:py-2 md:px-6 xl:px-8">
                   {/* DETAILS */}
 
                   <button
