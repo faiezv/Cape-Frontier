@@ -3769,7 +3769,7 @@ export const tours = [
       "Cape Town, South Africa (Bo-Kaap, CBD, Sherwood Park, Manenberg)",
     duration: "7 hours (09:00 – 16:00)",
 
-    priceBase: null, // Price not specified in the brief
+    priceBase: 2500, // Price not specified in the brief
     minPeople: 1,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
@@ -4225,18 +4225,18 @@ export const tours = [
 
     pricing: [
       {
-        category: "Private Tour — 1–3 Guests",
-        pricePerPerson: 5200,
-        note: "R5,200 total private tour price. Includes all adult/child entry fees.",
+        category: "Adults — 1–3 Guests",
+        pricePerPerson: 1950,
+        note: "Private tour. Includes all adult/child entry fees.",
       },
       {
-        category: "Private Tour — 4–7 Guests",
-        pricePerPerson: 6200,
+        category: "Children (12 - 17 years)",
+        pricePerPerson: 1000,
         note: "R6,200 total private tour price. Most popular option. Includes all entry fees.",
       },
       {
-        category: "Private Tour — 8–12 Guests",
-        pricePerPerson: 9200,
+        category: "Children under 12.",
+        pricePerPerson: 1000,
         note: "R9,200 total private tour price. Includes all entry fees.",
       },
     ],
@@ -4262,21 +4262,21 @@ export const tours = [
         {
           minPeople: 1,
           maxPeople: 3,
-          perPerson: 5200,
+          perPerson: 1950,
           label: "1–3 Guests",
           note: "R5,200 total. Includes ALL adult/child entry fees.",
         },
         {
           minPeople: 4,
           maxPeople: 7,
-          perPerson: 6200,
+          perPerson: 1550,
           label: "4–7 Guests",
           note: "R6,200 total. Most popular option. Includes ALL entry fees.",
         },
         {
           minPeople: 8,
           maxPeople: 12,
-          perPerson: 9200,
+          perPerson: 1350,
           label: "8–12 Guests",
           note: "R9,200 total. Includes ALL entry fees.",
         },
