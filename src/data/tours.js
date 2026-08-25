@@ -5355,419 +5355,419 @@ export const tours = [
     tags: ["Wine", "Stellenbosch", "Full Day", "Cape Winelands"],
   },
   // Robben-Island + Langa
-  {
-    id: 16, // New tour ID to be assigned (e.g., 36)
-    type: TOUR_TYPES.HISTORICAL,
-    category: TOUR_MODIFIERS.FULL_DAY,
+  // {
+  //   id: 16, // New tour ID to be assigned (e.g., 36)
+  //   type: TOUR_TYPES.HISTORICAL,
+  //   category: TOUR_MODIFIERS.FULL_DAY,
 
-    title: "Robben Island & Langa Cultural Experience",
-    slug: "robben-island-langa-cultural-experience",
-    canonicalPath: "/tours/robben-island-langa-cultural-experience",
+  //   title: "Robben Island & Langa Cultural Experience",
+  //   slug: "robben-island-langa-cultural-experience",
+  //   canonicalPath: "/tours/robben-island-langa-cultural-experience",
 
-    seo: {
-      title:
-        "Full‑Day Robben Island & Langa Cultural Experience | Cape Frontier Tours",
-      description:
-        "Experience Cape Town's most meaningful cultural journey in one day. Combines the powerful history of Robben Island with the vibrant community life of Langa, Cape Town's oldest township.",
-      keywords: [
-        "Robben Island tour",
-        "Langa Township tour",
-        "Robben Island ferry",
-        "Nelson Mandela prison tour",
-        "Langa cultural experience",
-        "Cape Town township tour",
-        "Robben Island Museum",
-        "Guga S'thebe",
-        "Cape Town full day tour",
-        "Mandela's cell tour",
-        "Cape Town cultural tour",
-      ],
-    },
+  //   seo: {
+  //     title:
+  //       "Full‑Day Robben Island & Langa Cultural Experience | Cape Frontier Tours",
+  //     description:
+  //       "Experience Cape Town's most meaningful cultural journey in one day. Combines the powerful history of Robben Island with the vibrant community life of Langa, Cape Town's oldest township.",
+  //     keywords: [
+  //       "Robben Island tour",
+  //       "Langa Township tour",
+  //       "Robben Island ferry",
+  //       "Nelson Mandela prison tour",
+  //       "Langa cultural experience",
+  //       "Cape Town township tour",
+  //       "Robben Island Museum",
+  //       "Guga S'thebe",
+  //       "Cape Town full day tour",
+  //       "Mandela's cell tour",
+  //       "Cape Town cultural tour",
+  //     ],
+  //   },
 
-    workflow: defaultWorkflow,
+  //   workflow: defaultWorkflow,
 
-    image: getCoverImage("historical/robben-island-langa"),
-    images: getTourImages("historical/robben-island-langa", 3),
-    imageFolder: "historical/robben-island-langa",
-    videos: [],
+  //   image: getCoverImage("historical/robben-island-langa"),
+  //   images: getTourImages("historical/robben-island-langa", 3),
+  //   imageFolder: "historical/robben-island-langa",
+  //   videos: [],
 
-    location: "Cape Town, South Africa (V&A Waterfront, Robben Island, Langa)",
-    duration: "Full Day (08:00 – 16:00)",
+  //   location: "Cape Town, South Africa (V&A Waterfront, Robben Island, Langa)",
+  //   duration: "Full Day (08:00 – 16:00)",
 
-    priceBase: 3290,
-    minPeople: 1,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
+  //   priceBase: 3290,
+  //   minPeople: 1,
+  //   baseCurrency: "ZAR",
+  //   supportedCurrencies: SUPPORTED_CURRENCIES,
 
-    pricing: [
-      {
-        category: "Adults",
-        pricePerPerson: 3290,
-        note: "Full rate",
-      },
-      {
-        category: "Children (5–17 years)",
-        pricePerPerson: 1650,
-        note: "Discounted combined rate",
-      },
-      {
-        category: "Infants (0–4 years)",
-        pricePerPerson: 0,
-        note: "Free – no ticket required",
-      },
-    ],
+  //   pricing: [
+  //     {
+  //       category: "Adults",
+  //       pricePerPerson: 3290,
+  //       note: "Full rate",
+  //     },
+  //     {
+  //       category: "Children (5–17 years)",
+  //       pricePerPerson: 1650,
+  //       note: "Discounted combined rate",
+  //     },
+  //     {
+  //       category: "Infants (0–4 years)",
+  //       pricePerPerson: 0,
+  //       note: "Free – no ticket required",
+  //     },
+  //   ],
 
-    additionalPricing: [],
+  //   additionalPricing: [],
 
-    groupPricing: {
-      enabled: true,
-      icon: "",
-      tiers: [
-        {
-          minPeople: 4,
-          maxPeople: 8,
-          perPerson: null,
-          discountPercent: 10,
-          label: "4–6 Guests",
-          note: "10% discount • All-inclusive",
-        },
-      ],
-    },
+  //   groupPricing: {
+  //     enabled: true,
+  //     icon: "",
+  //     tiers: [
+  //       {
+  //         minPeople: 4,
+  //         maxPeople: 8,
+  //         perPerson: null,
+  //         discountPercent: 10,
+  //         label: "4–6 Guests",
+  //         note: "10% discount • All-inclusive",
+  //       },
+  //     ],
+  //   },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
+  //   rating: null,
+  //   stars: null,
+  //   mainReviewerName: "",
+  //   mainReviewerCountry: "",
+  //   reviewYear: null,
+  //   otherReviews: null,
+  //   mainReview: "",
 
-    description:
-      "Experience Cape Town's most meaningful cultural journey in one day. This full‑day tour combines the powerful history of Robben Island, where Nelson Mandela spent 18 years in prison, with the vibrant community life of Langa, Cape Town's oldest township. Guests enjoy seamless transport, accredited expert guides, and a deep understanding of South Africa's past and present.",
+  //   description:
+  //     "Experience Cape Town's most meaningful cultural journey in one day. This full‑day tour combines the powerful history of Robben Island, where Nelson Mandela spent 18 years in prison, with the vibrant community life of Langa, Cape Town's oldest township. Guests enjoy seamless transport, accredited expert guides, and a deep understanding of South Africa's past and present.",
 
-    highlights: [
-      {
-        text: "Robben Island Prison Tour — walk through the maximum-security prison, including Mandela's cell, guided by former political prisoners",
-      },
-      {
-        text: "Island Bus Tour — visit historic sites including Lime Quarry, Sobukwe House, WWII bunkers, and the Leper Church",
-      },
-      {
-        text: "Scenic Ferry Ride — panoramic views of Table Mountain and the Atlantic Ocean",
-      },
-      {
-        text: "Langa Township Cultural Walk — explore Cape Town's oldest township with a registered local guide",
-      },
-      {
-        text: "Guga S'thebe Arts & Culture Centre — discover local art, crafts, pottery, and community upliftment projects",
-      },
-      {
-        text: "Authentic Community Interaction — meet residents, entrepreneurs, and artisans who share stories of culture, resilience, and creativity",
-      },
-    ],
+  //   highlights: [
+  //     {
+  //       text: "Robben Island Prison Tour — walk through the maximum-security prison, including Mandela's cell, guided by former political prisoners",
+  //     },
+  //     {
+  //       text: "Island Bus Tour — visit historic sites including Lime Quarry, Sobukwe House, WWII bunkers, and the Leper Church",
+  //     },
+  //     {
+  //       text: "Scenic Ferry Ride — panoramic views of Table Mountain and the Atlantic Ocean",
+  //     },
+  //     {
+  //       text: "Langa Township Cultural Walk — explore Cape Town's oldest township with a registered local guide",
+  //     },
+  //     {
+  //       text: "Guga S'thebe Arts & Culture Centre — discover local art, crafts, pottery, and community upliftment projects",
+  //     },
+  //     {
+  //       text: "Authentic Community Interaction — meet residents, entrepreneurs, and artisans who share stories of culture, resilience, and creativity",
+  //     },
+  //   ],
 
-    included: [
-      { text: "Return transport with hotel pick‑up and drop‑off" },
-      { text: "Robben Island Ferry Tickets (adult or child ticket)" },
-      { text: "Robben Island Guided Tour — prison, Mandela's cell, bus tour" },
-      { text: "Langa Walking Tour — cultural guided experience" },
-      { text: "Professional Driver‑Guide — full‑day hosting" },
-      { text: "Bottled Water — provided during transfers" },
-      { text: "Safety Briefing — before each activity" },
-      { text: "All entry fees" },
-    ],
+  //   included: [
+  //     { text: "Return transport with hotel pick‑up and drop‑off" },
+  //     { text: "Robben Island Ferry Tickets (adult or child ticket)" },
+  //     { text: "Robben Island Guided Tour — prison, Mandela's cell, bus tour" },
+  //     { text: "Langa Walking Tour — cultural guided experience" },
+  //     { text: "Professional Driver‑Guide — full‑day hosting" },
+  //     { text: "Bottled Water — provided during transfers" },
+  //     { text: "Safety Briefing — before each activity" },
+  //     { text: "All entry fees" },
+  //   ],
 
-    excluded: [
-      { text: "Lunch — guests choose their own Waterfront restaurant" },
-      { text: "Breakfast and snacks" },
-      { text: "Gratuities" },
-      { text: "Personal purchases — crafts, souvenirs, drinks" },
-      { text: "Extra activities not listed" },
-      { text: "Accommodation" },
-      { text: "Travel Insurance — guests must arrange their own cover" },
-    ],
+  //   excluded: [
+  //     { text: "Lunch — guests choose their own Waterfront restaurant" },
+  //     { text: "Breakfast and snacks" },
+  //     { text: "Gratuities" },
+  //     { text: "Personal purchases — crafts, souvenirs, drinks" },
+  //     { text: "Extra activities not listed" },
+  //     { text: "Accommodation" },
+  //     { text: "Travel Insurance — guests must arrange their own cover" },
+  //   ],
 
-    pickupOptions: [
-      "Cape Town CBD",
-      "Green Point",
-      "Sea Point",
-      "V&A Waterfront",
-      "Custom pickup on request",
-    ],
+  //   pickupOptions: [
+  //     "Cape Town CBD",
+  //     "Green Point",
+  //     "Sea Point",
+  //     "V&A Waterfront",
+  //     "Custom pickup on request",
+  //   ],
 
-    requirements: [
-      { text: "Please carry identification if required for ferry boarding" },
-      { text: "Comfortable walking shoes recommended" },
-      { text: "Respectful behaviour towards the local community is expected" },
-    ],
+  //   requirements: [
+  //     { text: "Please carry identification if required for ferry boarding" },
+  //     { text: "Comfortable walking shoes recommended" },
+  //     { text: "Respectful behaviour towards the local community is expected" },
+  //   ],
 
-    arrangements: {
-      availability: "Available all year (ferry dependent on weather)",
-      duration: "Full Day (08:00 – 16:00)",
-      operatingTime: "08:00 – 16:00",
-      departure: "08:00",
-      return: "16:00",
-      location: "Cape Town, South Africa",
+  //   arrangements: {
+  //     availability: "Available all year (ferry dependent on weather)",
+  //     duration: "Full Day (08:00 – 16:00)",
+  //     operatingTime: "08:00 – 16:00",
+  //     departure: "08:00",
+  //     return: "16:00",
+  //     location: "Cape Town, South Africa",
 
-      clothing: [
-        "Comfortable clothing",
-        "Comfortable walking shoes",
-        "Sunscreen",
-        "Hat",
-        "Warm jacket (weather dependent)",
-      ],
+  //     clothing: [
+  //       "Comfortable clothing",
+  //       "Comfortable walking shoes",
+  //       "Sunscreen",
+  //       "Hat",
+  //       "Warm jacket (weather dependent)",
+  //     ],
 
-      thingsToBring: [
-        "Identification (if required for ferry boarding)",
-        "Camera",
-        "Cash for personal purchases",
-        "Water bottle",
-      ],
+  //     thingsToBring: [
+  //       "Identification (if required for ferry boarding)",
+  //       "Camera",
+  //       "Cash for personal purchases",
+  //       "Water bottle",
+  //     ],
 
-      passengerPolicy: "",
-      sunsetNote: "",
-    },
+  //     passengerPolicy: "",
+  //     sunsetNote: "",
+  //   },
 
-    weatherPolicy: {
-      summary:
-        "Ferry operations are subject to weather and sea conditions. Cancelled departures may be rescheduled where possible. Langa tour continues in all weather.",
-      items: [
-        { text: "Ferry operations are subject to weather and sea conditions" },
-        { text: "Weather may result in ferry delays or cancellations" },
-        { text: "Cancelled departures may be rescheduled where possible" },
-        { text: "Langa Township tour continues in all weather conditions" },
-      ],
-    },
+  //   weatherPolicy: {
+  //     summary:
+  //       "Ferry operations are subject to weather and sea conditions. Cancelled departures may be rescheduled where possible. Langa tour continues in all weather.",
+  //     items: [
+  //       { text: "Ferry operations are subject to weather and sea conditions" },
+  //       { text: "Weather may result in ferry delays or cancellations" },
+  //       { text: "Cancelled departures may be rescheduled where possible" },
+  //       { text: "Langa Township tour continues in all weather conditions" },
+  //     ],
+  //   },
 
-    cancellationPolicy: {
-      summary:
-        "Ferry operations are subject to weather and sea conditions. Cancellation terms are confirmed upon booking.",
-      items: [
-        { text: "Ferry operations are subject to weather and sea conditions" },
-        { text: "Weather may result in ferry delays or cancellations" },
-        { text: "Cancelled departures may be rescheduled where possible" },
-        { text: "Cancellation terms are confirmed upon booking" },
-      ],
-    },
+  //   cancellationPolicy: {
+  //     summary:
+  //       "Ferry operations are subject to weather and sea conditions. Cancellation terms are confirmed upon booking.",
+  //     items: [
+  //       { text: "Ferry operations are subject to weather and sea conditions" },
+  //       { text: "Weather may result in ferry delays or cancellations" },
+  //       { text: "Cancelled departures may be rescheduled where possible" },
+  //       { text: "Cancellation terms are confirmed upon booking" },
+  //     ],
+  //   },
 
-    safetyPolicy: {
-      summary:
-        "All tours are conducted in compliance with Robben Island Museum safety regulations, ferry operating procedures, and community tourism guidelines.",
-      items: [
-        { text: "All tours follow Robben Island Museum safety regulations" },
-        { text: "Ferry operates according to maritime safety standards" },
-        { text: "Guests must follow all guide instructions during the tour" },
-        {
-          text: "Langa is considered one of the safer townships when visited with local guides",
-        },
-        { text: "Please ask permission before photographing residents" },
-        {
-          text: "Respectful behaviour towards the local community is expected",
-        },
-      ],
-    },
+  //   safetyPolicy: {
+  //     summary:
+  //       "All tours are conducted in compliance with Robben Island Museum safety regulations, ferry operating procedures, and community tourism guidelines.",
+  //     items: [
+  //       { text: "All tours follow Robben Island Museum safety regulations" },
+  //       { text: "Ferry operates according to maritime safety standards" },
+  //       { text: "Guests must follow all guide instructions during the tour" },
+  //       {
+  //         text: "Langa is considered one of the safer townships when visited with local guides",
+  //       },
+  //       { text: "Please ask permission before photographing residents" },
+  //       {
+  //         text: "Respectful behaviour towards the local community is expected",
+  //       },
+  //     ],
+  //   },
 
-    stops: [
-      {
-        id: "pickup",
-        name: "Hotel Pickup",
-        time: "08:00 – 08:30",
-        duration: "30 minutes",
-        note: "Hotel pick‑up anywhere in Cape Town",
-        description:
-          "Enjoy convenient hotel pickup from anywhere in Cape Town before travelling to the V&A Waterfront Clock Tower ferry terminal.",
-        exactLocation: mapLocation({
-          label: "Cape Town Pickup Area",
-          address: "Cape Town, South Africa",
-          query: "Cape Town",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "va-waterfront",
-        name: "V&A Waterfront – Ferry Check-in",
-        time: "08:30 – 09:30",
-        duration: "1 hour",
-        note: "Check‑in for Robben Island ferry",
-        description:
-          "Transfer to the V&A Waterfront Clock Tower ferry terminal. Check in for the Robben Island ferry and prepare for the 30-minute crossing to Robben Island.",
-        exactLocation: mapLocation({
-          label: "V&A Waterfront Clock Tower",
-          address: "V&A Waterfront, Cape Town, South Africa",
-          query: "Clock Tower V&A Waterfront",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "robben-island",
-        name: "Robben Island Experience",
-        time: "09:30 – 12:30",
-        duration: "3 hours",
-        note: "Prison tour, Mandela's cell, island bus tour, museum visit",
-        description:
-          "Cross to Robben Island by ferry. Experience the powerful prison tour, including Nelson Mandela's cell, the Lime Quarry, Sobukwe House, WWII bunkers, and the Leper Church. Walk through the maximum-security prison guided by former political prisoners where available, and enjoy an island bus tour with panoramic views of Table Mountain and the Atlantic Ocean.",
-        exactLocation: mapLocation({
-          label: "Robben Island Museum",
-          address: "Robben Island, Cape Town, South Africa",
-          query: "Robben Island Museum",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "lunch",
-        name: "Lunch Break (Not Included)",
-        time: "12:30 – 13:30",
-        duration: "1 hour",
-        note: "Free time at V&A Waterfront",
-        description:
-          "Guests have free time at the V&A Waterfront to enjoy lunch at any restaurant of their choice. Lunch is not included in the tour price.",
-        exactLocation: mapLocation({
-          label: "V&A Waterfront",
-          address: "V&A Waterfront, Cape Town, South Africa",
-          query: "V&A Waterfront",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "langa",
-        name: "Langa Cultural Walking Tour",
-        time: "14:00 – 15:30",
-        duration: "1.5 hours",
-        note: "Community history, arts & crafts, cultural storytelling",
-        description:
-          "Explore Cape Town's oldest township with a registered local guide. Experience community history, arts and crafts, cultural storytelling, and a safe guided walk. Visit Guga S'thebe Arts & Culture Centre to discover local art, crafts, pottery, and community upliftment projects. Meet residents, entrepreneurs, and artisans who share stories of culture, resilience, and creativity.",
-        exactLocation: mapLocation({
-          label: "Langa Township",
-          address: "Langa, Cape Town, South Africa",
-          query: "Langa Township",
-        }),
-        images: [],
-        touristComments: [],
-      },
-      {
-        id: "dropoff",
-        name: "Hotel Drop-off",
-        time: "15:30 – 16:00",
-        duration: "30 minutes",
-        note: "End of tour at ±16:00",
-        description:
-          "After completing your cultural experience, relax during the return transfer to your original Cape Town hotel. Tour ends at approximately 16:00.",
-        exactLocation: mapLocation({
-          label: "Cape Town Drop-off Area",
-          address: "Cape Town, South Africa",
-          query: "Cape Town",
-        }),
-        images: [],
-        touristComments: [],
-      },
-    ],
+  //   stops: [
+  //     {
+  //       id: "pickup",
+  //       name: "Hotel Pickup",
+  //       time: "08:00 – 08:30",
+  //       duration: "30 minutes",
+  //       note: "Hotel pick‑up anywhere in Cape Town",
+  //       description:
+  //         "Enjoy convenient hotel pickup from anywhere in Cape Town before travelling to the V&A Waterfront Clock Tower ferry terminal.",
+  //       exactLocation: mapLocation({
+  //         label: "Cape Town Pickup Area",
+  //         address: "Cape Town, South Africa",
+  //         query: "Cape Town",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "va-waterfront",
+  //       name: "V&A Waterfront – Ferry Check-in",
+  //       time: "08:30 – 09:30",
+  //       duration: "1 hour",
+  //       note: "Check‑in for Robben Island ferry",
+  //       description:
+  //         "Transfer to the V&A Waterfront Clock Tower ferry terminal. Check in for the Robben Island ferry and prepare for the 30-minute crossing to Robben Island.",
+  //       exactLocation: mapLocation({
+  //         label: "V&A Waterfront Clock Tower",
+  //         address: "V&A Waterfront, Cape Town, South Africa",
+  //         query: "Clock Tower V&A Waterfront",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "robben-island",
+  //       name: "Robben Island Experience",
+  //       time: "09:30 – 12:30",
+  //       duration: "3 hours",
+  //       note: "Prison tour, Mandela's cell, island bus tour, museum visit",
+  //       description:
+  //         "Cross to Robben Island by ferry. Experience the powerful prison tour, including Nelson Mandela's cell, the Lime Quarry, Sobukwe House, WWII bunkers, and the Leper Church. Walk through the maximum-security prison guided by former political prisoners where available, and enjoy an island bus tour with panoramic views of Table Mountain and the Atlantic Ocean.",
+  //       exactLocation: mapLocation({
+  //         label: "Robben Island Museum",
+  //         address: "Robben Island, Cape Town, South Africa",
+  //         query: "Robben Island Museum",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "lunch",
+  //       name: "Lunch Break (Not Included)",
+  //       time: "12:30 – 13:30",
+  //       duration: "1 hour",
+  //       note: "Free time at V&A Waterfront",
+  //       description:
+  //         "Guests have free time at the V&A Waterfront to enjoy lunch at any restaurant of their choice. Lunch is not included in the tour price.",
+  //       exactLocation: mapLocation({
+  //         label: "V&A Waterfront",
+  //         address: "V&A Waterfront, Cape Town, South Africa",
+  //         query: "V&A Waterfront",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "langa",
+  //       name: "Langa Cultural Walking Tour",
+  //       time: "14:00 – 15:30",
+  //       duration: "1.5 hours",
+  //       note: "Community history, arts & crafts, cultural storytelling",
+  //       description:
+  //         "Explore Cape Town's oldest township with a registered local guide. Experience community history, arts and crafts, cultural storytelling, and a safe guided walk. Visit Guga S'thebe Arts & Culture Centre to discover local art, crafts, pottery, and community upliftment projects. Meet residents, entrepreneurs, and artisans who share stories of culture, resilience, and creativity.",
+  //       exactLocation: mapLocation({
+  //         label: "Langa Township",
+  //         address: "Langa, Cape Town, South Africa",
+  //         query: "Langa Township",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //     {
+  //       id: "dropoff",
+  //       name: "Hotel Drop-off",
+  //       time: "15:30 – 16:00",
+  //       duration: "30 minutes",
+  //       note: "End of tour at ±16:00",
+  //       description:
+  //         "After completing your cultural experience, relax during the return transfer to your original Cape Town hotel. Tour ends at approximately 16:00.",
+  //       exactLocation: mapLocation({
+  //         label: "Cape Town Drop-off Area",
+  //         address: "Cape Town, South Africa",
+  //         query: "Cape Town",
+  //       }),
+  //       images: [],
+  //       touristComments: [],
+  //     },
+  //   ],
 
-    routeInformation: {
-      title: "Full‑Day Robben Island & Langa Cultural Experience Route",
+  //   routeInformation: {
+  //     title: "Full‑Day Robben Island & Langa Cultural Experience Route",
 
-      description:
-        "Experience Cape Town's most meaningful cultural journey in one day — from the powerful history of Robben Island to the vibrant community life of Langa.",
+  //     description:
+  //       "Experience Cape Town's most meaningful cultural journey in one day — from the powerful history of Robben Island to the vibrant community life of Langa.",
 
-      items: [
-        "Hotel pickup anywhere in Cape Town",
-        "V&A Waterfront Clock Tower ferry check-in",
-        "Robben Island Experience — prison tour, Mandela's cell, island bus tour, museum visit",
-        "Lunch break at V&A Waterfront (not included)",
-        "Langa Cultural Walking Tour — community history, arts & crafts, cultural storytelling",
-        "Guga S'thebe Arts & Culture Centre visit",
-        "Hotel drop-off",
-      ],
-    },
+  //     items: [
+  //       "Hotel pickup anywhere in Cape Town",
+  //       "V&A Waterfront Clock Tower ferry check-in",
+  //       "Robben Island Experience — prison tour, Mandela's cell, island bus tour, museum visit",
+  //       "Lunch break at V&A Waterfront (not included)",
+  //       "Langa Cultural Walking Tour — community history, arts & crafts, cultural storytelling",
+  //       "Guga S'thebe Arts & Culture Centre visit",
+  //       "Hotel drop-off",
+  //     ],
+  //   },
 
-    needToKnow: [
-      { text: "Ferry departures are weather dependent" },
-      { text: "Please carry identification if required for ferry boarding" },
-      {
-        text: "Lunch is not included — guests choose their own restaurant at the V&A Waterfront",
-      },
-      { text: "Comfortable walking shoes are recommended" },
-      { text: "Please ask permission before photographing residents in Langa" },
-      { text: "Respectful behaviour towards the local community is expected" },
-      { text: "Total tour duration: 08:00 – 16:00 (8 hours)" },
-      {
-        text: "Robben Island experience is 3 hours including the ferry crossing and island tour",
-      },
-      { text: "Langa walking tour is 1.5 hours with a registered local guide" },
-    ],
+  //   needToKnow: [
+  //     { text: "Ferry departures are weather dependent" },
+  //     { text: "Please carry identification if required for ferry boarding" },
+  //     {
+  //       text: "Lunch is not included — guests choose their own restaurant at the V&A Waterfront",
+  //     },
+  //     { text: "Comfortable walking shoes are recommended" },
+  //     { text: "Please ask permission before photographing residents in Langa" },
+  //     { text: "Respectful behaviour towards the local community is expected" },
+  //     { text: "Total tour duration: 08:00 – 16:00 (8 hours)" },
+  //     {
+  //       text: "Robben Island experience is 3 hours including the ferry crossing and island tour",
+  //     },
+  //     { text: "Langa walking tour is 1.5 hours with a registered local guide" },
+  //   ],
 
-    faqs: [
-      {
-        question: "Is the ferry ticket included?",
-        answer:
-          "Yes. Return ferry tickets to Robben Island are included in the tour price for both adults and children (5–17 years). Infants 0–4 years are free.",
-      },
-      {
-        question: "Is hotel pickup included?",
-        answer:
-          "Yes. Pickup and drop-off are included from anywhere in Cape Town.",
-      },
-      {
-        question: "How long is the tour?",
-        answer: "The complete experience runs from 08:00 to 16:00 (8 hours).",
-      },
-      {
-        question: "Is lunch included?",
-        answer:
-          "No. Lunch is not included. Guests have free time at the V&A Waterfront to enjoy lunch at any restaurant of their choice.",
-      },
-      {
-        question: "What is included in the Robben Island experience?",
-        answer:
-          "The Robben Island experience includes the ferry crossing, an island bus tour, visits to the Lime Quarry, Sobukwe House, WWII bunkers, Leper Church, and the Maximum Security Prison tour including Nelson Mandela's cell.",
-      },
-      {
-        question: "What is included in the Langa experience?",
-        answer:
-          "The Langa experience includes a cultural walking tour with a registered local guide, visits to Guga S'thebe Arts & Culture Centre, and authentic community interaction with residents, entrepreneurs, and artisans.",
-      },
-      {
-        question: "Can weather affect the tour?",
-        answer:
-          "Yes. Ferry departures depend on weather and sea conditions and may occasionally be delayed or cancelled. Cancelled departures may be rescheduled where possible. The Langa portion continues in all weather.",
-      },
-      {
-        question: "Who guides the Robben Island tour?",
-        answer:
-          "The Robben Island tour is guided by Robben Island Museum guides, often former political prisoners who share firsthand experiences.",
-      },
-      {
-        question: "Who guides the Langa tour?",
-        answer:
-          "The Langa Township tour is guided by a registered local guide who provides authentic insights into community history, culture, and daily life.",
-      },
-      {
-        question: "What should I bring?",
-        answer:
-          "Bring identification (if required for ferry boarding), comfortable walking shoes, sunscreen, a hat, a camera, and cash for personal purchases. Bring a warm jacket depending on the weather.",
-      },
-    ],
+  //   faqs: [
+  //     {
+  //       question: "Is the ferry ticket included?",
+  //       answer:
+  //         "Yes. Return ferry tickets to Robben Island are included in the tour price for both adults and children (5–17 years). Infants 0–4 years are free.",
+  //     },
+  //     {
+  //       question: "Is hotel pickup included?",
+  //       answer:
+  //         "Yes. Pickup and drop-off are included from anywhere in Cape Town.",
+  //     },
+  //     {
+  //       question: "How long is the tour?",
+  //       answer: "The complete experience runs from 08:00 to 16:00 (8 hours).",
+  //     },
+  //     {
+  //       question: "Is lunch included?",
+  //       answer:
+  //         "No. Lunch is not included. Guests have free time at the V&A Waterfront to enjoy lunch at any restaurant of their choice.",
+  //     },
+  //     {
+  //       question: "What is included in the Robben Island experience?",
+  //       answer:
+  //         "The Robben Island experience includes the ferry crossing, an island bus tour, visits to the Lime Quarry, Sobukwe House, WWII bunkers, Leper Church, and the Maximum Security Prison tour including Nelson Mandela's cell.",
+  //     },
+  //     {
+  //       question: "What is included in the Langa experience?",
+  //       answer:
+  //         "The Langa experience includes a cultural walking tour with a registered local guide, visits to Guga S'thebe Arts & Culture Centre, and authentic community interaction with residents, entrepreneurs, and artisans.",
+  //     },
+  //     {
+  //       question: "Can weather affect the tour?",
+  //       answer:
+  //         "Yes. Ferry departures depend on weather and sea conditions and may occasionally be delayed or cancelled. Cancelled departures may be rescheduled where possible. The Langa portion continues in all weather.",
+  //     },
+  //     {
+  //       question: "Who guides the Robben Island tour?",
+  //       answer:
+  //         "The Robben Island tour is guided by Robben Island Museum guides, often former political prisoners who share firsthand experiences.",
+  //     },
+  //     {
+  //       question: "Who guides the Langa tour?",
+  //       answer:
+  //         "The Langa Township tour is guided by a registered local guide who provides authentic insights into community history, culture, and daily life.",
+  //     },
+  //     {
+  //       question: "What should I bring?",
+  //       answer:
+  //         "Bring identification (if required for ferry boarding), comfortable walking shoes, sunscreen, a hat, a camera, and cash for personal purchases. Bring a warm jacket depending on the weather.",
+  //     },
+  //   ],
 
-    tags: [
-      "Robben Island",
-      "Langa",
-      "Historical",
-      "Cultural",
-      "UNESCO",
-      "Nelson Mandela",
-      "Township",
-      "Cape Town",
-      "Full Day",
-      "Prison Tour",
-      "Community",
-      "Heritage",
-      "Combined Tour",
-      "World Heritage Site",
-    ],
-  },
+  //   tags: [
+  //     "Robben Island",
+  //     "Langa",
+  //     "Historical",
+  //     "Cultural",
+  //     "UNESCO",
+  //     "Nelson Mandela",
+  //     "Township",
+  //     "Cape Town",
+  //     "Full Day",
+  //     "Prison Tour",
+  //     "Community",
+  //     "Heritage",
+  //     "Combined Tour",
+  //     "World Heritage Site",
+  //   ],
+  // },
   // District-Six + Langa
   {
     id: 17, // New tour ID to be assigned (e.g., 37)
