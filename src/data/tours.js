@@ -4218,7 +4218,7 @@ export const tours = [
     location: "Cape Town, South Africa",
     duration: "Full Day / Approximately 9 Hours",
 
-    priceBase: 5200,
+    priceBase: 1950,
     minPeople: 1,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
@@ -4232,12 +4232,12 @@ export const tours = [
       {
         category: "Children (12 - 17 years)",
         pricePerPerson: 1000,
-        note: "R6,200 total private tour price. Most popular option. Includes all entry fees.",
+        note: "Most popular option. Includes all entry fees.",
       },
       {
         category: "Children under 12.",
         pricePerPerson: 1000,
-        note: "R9,200 total private tour price. Includes all entry fees.",
+        note: "Includes all entry fees.",
       },
     ],
 
@@ -4264,21 +4264,21 @@ export const tours = [
           maxPeople: 3,
           perPerson: 1950,
           label: "1–3 Guests",
-          note: "R5,200 total. Includes ALL adult/child entry fees.",
+          note: "Includes ALL adult/child entry fees.",
         },
         {
           minPeople: 4,
           maxPeople: 7,
           perPerson: 1550,
           label: "4–7 Guests",
-          note: "R6,200 total. Most popular option. Includes ALL entry fees.",
+          note: "Most popular option. Includes ALL entry fees.",
         },
         {
           minPeople: 8,
           maxPeople: 12,
           perPerson: 1350,
           label: "8–12 Guests",
-          note: "R9,200 total. Includes ALL entry fees.",
+          note: "Includes ALL entry fees.",
         },
       ],
     },
