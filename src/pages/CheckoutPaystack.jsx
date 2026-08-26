@@ -7,6 +7,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FX_RATES } from "../data/tours.js";
 import vehicles from "../data/vehicles.js";
 
+import {resolveImage} from '../utils/ImageLoader.js'
+
 gsap.registerPlugin(ScrollTrigger);
 
 // ─── Constants ────────────────────────────────────────────────────────
@@ -242,7 +244,7 @@ const VehicleOptionCard = ({ vehicle }) => (
   <div className="group overflow-hidden rounded-[1.35rem] bg-white shadow-[0_12px_28px_rgba(7,31,79,0.06)]">
     <div className="relative h-28 overflow-hidden bg-slate-100">
       <img
-        src={vehicle.image}
+        src={resolveImage(vehicle.image)}
         alt={vehicle.name}
         className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
         loading="lazy"
@@ -540,7 +542,7 @@ const CheckoutForm = ({
         </div>
 
         <p className="mt-3 text-xs leading-5 text-slate-500">
-          Pay securely through Paystack. Cape Frontier confirms pickup details after payment.
+          {/* Pay securely through Paystack. Cape Frontier confirms pickup details after payment. */}
         </p>
       </div>
 
@@ -1393,8 +1395,8 @@ const CheckoutPaystack = () => {
         className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-10"
       />
 
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(232,246,255,0.88)_48%,rgba(238,244,255,0.92)_100%)]" />
-      <div className="pointer-events-none absolute right-[7%] top-[14%] h-64 w-64 rounded-full bg-[#071f4f]/18 blur-3xl" />
+      {/* <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(232,246,255,0.88)_48%,rgba(238,244,255,0.92)_100%)]" />
+      <div className="pointer-events-none absolute right-[7%] top-[14%] h-64 w-64 rounded-full bg-[#071f4f]/18 blur-3xl" /> */}
 
       {showMobileBackTop && (
         <button
@@ -1430,7 +1432,7 @@ const CheckoutPaystack = () => {
             >
               <div className="relative min-h-[190px] overflow-hidden bg-slate-900 sm:min-h-[230px] md:min-h-[290px]">
                 <img
-                  src={tour.image}
+                  src={resolveImage(tour.image)}
                   alt={tour.title || tour.info}
                   className="absolute inset-0 h-full w-full object-cover"
                 />
@@ -1836,10 +1838,11 @@ const CheckoutPaystack = () => {
                 <aside
                   ref={rightRef}
                   onWheel={handlePaymentPanelWheel}
-                  className="h-fit max-h-[calc(100svh-1rem)] overflow-visible rounded-[1.5rem] border border-white/75 bg-white/95 shadow-[0_20px_56px_rgba(7,31,79,0.085)] backdrop-blur-xl lg:rounded-[2rem]"
+                  className="h-fit max-h-[calc(100svh-1rem)] overflow-visible border border-white/75 bg-white/95 shadow-[0_20px_56px_rgba(7,31,79,0.085)] backdrop-blur-xl 
+                  lg:rounded-[2rem]"
                 >
                   {/* Header: Pickup + Main Participant */}
-                  <div className="border-b border-slate-100/90 bg-white/80 px-4 py-3 sm:px-5 sm:py-4">
+                  <div className="border-b border-slate-100/90 bg-white/80 px-4 py-3 sm:px-5 sm:py-4 rounded-full">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="flex items-center gap-2">
                         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#071f4f]/10">
@@ -1853,7 +1856,14 @@ const CheckoutPaystack = () => {
                           <p className="text-xs text-slate-500">{bookingDetails.date || "Date TBC"}</p>
                         </div>
                       </div>
-
+                    <div className="flex items-center justify-center gap-3 px-1">
+                      <img
+                        src="/icons/paystack-logo.svg"
+                        alt="Paystack"
+                        className="h-8 shrink-0"
+                        loading="lazy"
+                      />
+                    </div>
                       <div className="flex items-center gap-2">
                         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#071f4f]/10">
                           <svg className="h-4 w-4 text-[#071f4f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1876,14 +1886,6 @@ const CheckoutPaystack = () => {
                     onFocusCapture={() => setPaymentCompact(true)}
                     className="space-y-3 overflow-visible p-3 pb-5 sm:p-4 sm:pb-6 md:p-5 md:pb-7"
                   >
-                    <div className="flex items-center justify-center gap-3 px-1">
-                      <img
-                        src="/icons/paystack-logo.svg"
-                        alt="Paystack"
-                        className="h-8 shrink-0"
-                        loading="lazy"
-                      />
-                    </div>
 
                     <CheckoutForm
                       totalAmountLabel={totalAmountLabel}
@@ -1896,6 +1898,37 @@ const CheckoutPaystack = () => {
                     />
                   </div>
                 </aside>
+
+                {/* Payment Security Disclaimer */}
+                <div className="w-full rounded-2xl border border-blue-100 bg-blue-400/20 px-4 py-4 mt-4">
+                  <div className="flex items-center gap-6">
+                    <div className="flex p-3 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
+                      <img
+                        src="/icons/disclaimer.png"
+                        alt="Payment security"
+                        className="h-10 w-10 object-contain"
+                      />
+                    </div>
+
+                    <div className="min-w-0">
+                      <p className="text-lg font-bold leading-5 text-blue-950">
+                        International payment verification
+                      </p>
+
+                      <p className="mt-1 text-xs leading-4 text-blue-900/70">
+                        Your bank may require <strong>3D Secure (3DS)</strong> verification
+                        before your payment can be completed.
+                      </p>
+
+                      {/* <p className="mt-2 text-[11px] leading-4 text-blue-900/55">
+                        3DS is an additional security step that helps verify your identity.
+                        Depending on your bank, you may be asked to approve the payment in
+                        your banking app, enter a one-time password, or complete another
+                        verification step.
+                      </p> */}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
