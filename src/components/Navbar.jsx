@@ -5,6 +5,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 import { useLoadingNavigate } from "./useLoadingNavigate.jsx";
+import { resolveImage } from '../utils/ImageLoader.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -12,15 +13,17 @@ const navItems = [
   { label: 'Home' },
   { label: 'About' },
   { label: 'Stories' },
+  { label: 'Gallery' },
   { label: 'Tours' },
-  { label: 'Contact' },
+  { label: 'FAQ' },
 ]
 
 const sectionIdMap = {
   About: 'about',
   Stories: 'stories',
   Tours: 'tours',
-  Contact: 'contact',
+  Gallery: 'gallery',
+  FAQ: 'faq',
 }
 
 const megaMenus = {
@@ -52,7 +55,7 @@ const megaMenus = {
     eyebrow: 'About Cape Frontier',
     title: 'What makes the journey feel premium',
     desc: 'A quick guide to the sections that explain the travel experience, local support, pickup flow, and booking process.',
-    logo: '/icons/navLogo.png',
+    logo: '/assets/brand/logo-removebg.png',
     layout: 'links',
     links: [
       {
@@ -116,31 +119,31 @@ const megaMenus = {
       {
         title: 'Adrenaline',
         desc: 'Shark cage diving, paragliding, snorkelling, and guided thrill experiences.',
-        image: '/images/tours/adrenaline/shark-cage-diving/1.webp',
+        image: resolveImage('/src/assets/images/tours/adrenaline/shark-cage-diving/1.webp'),
         target: 'Tours',
       },
       {
         title: 'Hiking',
         desc: 'Lion’s Head and Table Mountain routes with scenic viewpoints.',
-        image: '/images/tours/hiking/lions-head/1.webp',
+        image: resolveImage('/src/assets/images/tours/hiking/lions-head/1.webp'),
         target: 'Tours',
       },
       {
         title: 'Historical',
         desc: 'Robben Island and cultural routes with meaningful local context.',
-        image: '/images/tours/historical/robben-island/1.webp',
+        image: resolveImage('/src/assets/images/tours/historical/langa/2.webp'),
         target: 'Tours',
       },
       {
         title: 'Packages',
         desc: 'Cape Peninsula and Stellenbosch wine farm full-day experiences.',
-        image: '/images/tours/packages/peninsula-tour-1/cape-point/1.webp',
+        image: resolveImage('/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp'),
         target: 'Tours',
       },
     ],
   },
 
-  Contact: {
+  FAQ: {
     eyebrow: 'Cape Frontier policies',
     title: 'Before you book',
     desc: 'Quick policy links for booking, pickup, payments, cancellations, private tours, and vehicle arrangements. Final details are confirmed manually by Cape Frontier.',
@@ -181,11 +184,7 @@ const megaMenus = {
         desc: 'Cape Frontier decides vehicle size based on group size and operational needs.',
         target: '/policies#vehicle-policy',
       },
-      {
-        title: 'Still to confirm',
-        desc: 'Child pricing, same-day bookings, minimum advance time, and private tour fee.',
-        target: '/policies#still-to-confirm',
-      },
+
     ],
   },
 }
@@ -213,6 +212,14 @@ const Navbar = () => {
   const megaCloseTimerRef = useRef(null)
 
   const activeMegaData = activeMega ? megaMenus[activeMega] : null
+
+  const affiliationRef = useRef(null)
+  const affiliationTextRef = useRef(null)
+  const affiliationHandshakeRef = useRef(null)
+  const affiliationLogoRef = useRef(null)
+  const affiliationGlowRef = useRef(null)
+
+  const mainLogoRef = useRef(null)
 
   const scrollWindowTo = (y) => {
     const targetY = Math.max(0, y)
@@ -492,16 +499,167 @@ const Navbar = () => {
     }
   }, [])
 
+  // --------------------------------------------------
+  // MAIN LOGO HOVER ANIMATION
+  // --------------------------------------------------
+
+  const animateMainLogoIn = () => {
+    if (!mainLogoRef.current) return
+
+    gsap.killTweensOf(mainLogoRef.current)
+
+    gsap.to(mainLogoRef.current, {
+      scale: 1.045,
+      y: -1,
+      duration: 0.35,
+      ease: 'power3.out',
+    })
+  }
+
+  const animateMainLogoOut = () => {
+    if (!mainLogoRef.current) return
+
+    gsap.killTweensOf(mainLogoRef.current)
+
+    gsap.to(mainLogoRef.current, {
+      scale: 1,
+      y: 0,
+      duration: 0.3,
+      ease: 'power3.out',
+    })
+  }
+
+  // --------------------------------------------------
+  // AFFILIATION ANIMATION
+  // --------------------------------------------------
+
+const animateAffiliationIn = () => {
+  if (!affiliationRef.current) return
+
+  gsap.killTweensOf([
+    affiliationRef.current,
+    affiliationTextRef.current,
+    affiliationHandshakeRef.current,
+    affiliationLogoRef.current,
+    affiliationGlowRef.current,
+  ])
+
+  const textWidth =
+    affiliationTextRef.current?.scrollWidth || 0
+
+  // Expand the actual text element so it starts
+  // taking layout space only during the hover.
+  gsap.to(affiliationTextRef.current, {
+    width: textWidth,
+    opacity: 1,
+    x: 0,
+    letterSpacing: '0.14em',
+    duration: 0.45,
+    ease: 'power3.out',
+  })
+
+  gsap.to(affiliationRef.current, {
+    scale: 1.04,
+    y: -2,
+    duration: 0.45,
+    ease: 'power3.out',
+  })
+
+  gsap.to(affiliationHandshakeRef.current, {
+    rotate: 12,
+    scale: 1.18,
+    duration: 0.25,
+    ease: 'power2.out',
+    yoyo: true,
+    repeat: 1,
+  })
+
+  gsap.to(affiliationLogoRef.current, {
+    scale: 1.1,
+    x: 2,
+    duration: 0.55,
+    ease: 'back.out(2)',
+  })
+
+  gsap.fromTo(
+    affiliationGlowRef.current,
+    {
+      xPercent: -120,
+      opacity: 0,
+    },
+    {
+      xPercent: 180,
+      opacity: 1,
+      duration: 0.8,
+      ease: 'power2.inOut',
+    }
+  )
+}
+
+const animateAffiliationOut = () => {
+  if (!affiliationRef.current) return
+
+  gsap.killTweensOf([
+    affiliationRef.current,
+    affiliationTextRef.current,
+    affiliationHandshakeRef.current,
+    affiliationLogoRef.current,
+    affiliationGlowRef.current,
+  ])
+
+  // Collapse the text back to zero width.
+  // This means it takes ZERO layout space when hidden.
+  gsap.to(affiliationTextRef.current, {
+    width: 0,
+    opacity: 0,
+    x: -6,
+    duration: 0.3,
+    ease: 'power3.inOut',
+  })
+
+  gsap.to(affiliationRef.current, {
+    scale: 1,
+    y: 0,
+    duration: 0.35,
+    ease: 'power3.out',
+  })
+
+  gsap.to(affiliationHandshakeRef.current, {
+    rotate: 0,
+    scale: 1,
+    duration: 0.3,
+    ease: 'power3.out',
+  })
+
+  gsap.to(affiliationLogoRef.current, {
+    scale: 1,
+    x: 0,
+    duration: 0.35,
+    ease: 'power3.out',
+  })
+
+  gsap.to(affiliationGlowRef.current, {
+    opacity: 0,
+    duration: 0.2,
+    ease: 'power2.out',
+  })
+}
+
   if (isCheckout || isBooking || isSuccess) return null
 
   return (
     <>
-      {/* NAVBAR */}
+      {/* =========================================================
+          NAVBAR
+      ========================================================= */}
+
       <header
         ref={navbarRef}
         className={`
-          fixed inset-x-0 top-0 z-[9990] w-screen max-w-[100dvw]
-          overflow-x-clip border-white/10
+          fixed inset-x-0 top-0 z-[9990]
+          w-screen max-w-[100dvw]
+          overflow-x-clip
+          border-white/10
           backdrop-blur-xl
           transition-all duration-200
           ${
@@ -514,65 +672,269 @@ const Navbar = () => {
         <div
           className="
             mx-auto flex w-full max-w-[100dvw] min-w-0
-            items-center justify-between gap-1.5
-            px-2 py-2 sm:gap-3 sm:px-4 md:px-6 lg:px-8
+            items-center
+            gap-3
+            px-3 py-2
+            sm:px-4
+            md:px-6
+            lg:px-8
           "
         >
-          {/* Logo */}
-          <button
-            type="button"
+
+          {/* =====================================================
+              MAIN LOGO
+          ===================================================== */}
+
+          <a
+            href="/"
+            aria-label="Cape Frontier Travel & Tours"
             onClick={(event) => handleNavClick('Home', event)}
-            // onMouseEnter={(e) => openMega('Home', 0, e)}
-            // onMouseLeave={scheduleCloseMega}
-            className="flex min-w-0 flex- shrink items-center gap-2 overflow-hidden"
+            onMouseEnter={animateMainLogoIn}
+            onMouseLeave={animateMainLogoOut}
+            className="
+              group
+              relative
+              flex
+              shrink-0
+              items-center
+              justify-center
+              overflow-visible
+            "
           >
             <img
-              className="
-                h-14 w-auto max-w-[8rem] shrink-0 object-contain
-                sm:h-20 sm:max-w-none md:h-16
-              "
+              ref={mainLogoRef}
               src="/assets/brand/logo-removebg.png"
-              alt="Cape Frontier logo"
+              alt="Cape Frontier Travel & Tours"
+              className="
+                block
+                h-11
+                w-auto
+                max-w-[170px]
+                shrink-0
+                object-contain
+                object-center
+                sm:h-12
+                sm:max-w-[190px]
+                md:h-12
+                lg:h-13
+              "
             />
-          </button>
+          </a>
 
-          {/* Desktop Nav + FAQ -- SPLIT CONTENT */}
-          <div className="ml-auto hidden items-center gap-2 md:flex lg:gap-3">
+          {/* =====================================================
+              CAPE TOWN TOURISM AFFILIATION
+          ===================================================== */}
+          <div
+            ref={affiliationRef}
+            className="
+              group
+              relative
+              hidden
+              shrink-0
+              items-center
+              sm:flex
+            "
+            onMouseEnter={animateAffiliationIn}
+            onMouseLeave={animateAffiliationOut}
+          >
+            {/* Divider */}
+            <div
+              className="
+                mr-3
+                h-9
+                w-px
+                shrink-0
+                bg-gradient-to-b
+                from-transparent
+                via-white/30
+                to-transparent
+              "
+            />
 
-            {/* Desktop Nav */}
+            <a
+              href="https://www.capetown.travel"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Cape Town Tourism"
+              className="
+                relative
+                flex
+                items-center
+                gap-2.5
+                overflow-hidden
+                rounded-full
+                border
+                border-white/10
+                bg-white/[0.055]
+                px-3
+                py-1.5
+                backdrop-blur-xl
+                shadow-[0_8px_30px_rgba(0,0,0,0.12)]
+                transition-colors
+                duration-300
+                hover:border-white/25
+                hover:bg-white/[0.10]
+              "
+            >
+              {/* Animated light sweep */}
+              <span
+                ref={affiliationGlowRef}
+                className="
+                  pointer-events-none
+                  absolute
+                  -inset-y-4
+                  left-0
+                  w-8
+                  -skew-x-12
+                  bg-white/30
+                  blur-md
+                  opacity-0
+                "
+              />
+
+              {/* In affiliation with */}
+              <span
+                ref={affiliationTextRef}
+                className="
+                  relative
+                  z-10
+                  block
+                  shrink-0
+                  overflow-hidden
+                  whitespace-nowrap
+                  font-bitter
+                  text-[7px]
+                  font-black
+                  uppercase
+                  tracking-[0.08em]
+                  text-white/60
+                "
+                style={{
+                  width: 0,
+                  opacity: 0,
+                }}
+              >
+                In affiliation with
+              </span>
+
+              {/* Handshake */}
+              <span
+                ref={affiliationHandshakeRef}
+                className="
+                  relative
+                  z-10
+                  flex
+                  h-7
+                  w-7
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-white/[0.08]
+                "
+              >
+                <img
+                  src="/icons/handshake.webp"
+                  className="h-4.5 w-4.5 object-contain"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </span>
+
+              {/* Love Cape Town */}
+              <img
+                ref={affiliationLogoRef}
+                src="/assets/brand/logo-love-ct-blue.webp"
+                className="
+                  relative
+                  z-10
+                  h-9
+                  w-auto
+                  shrink-0
+                  object-contain
+                  opacity-90
+                "
+                alt="Love Cape Town"
+              />
+            </a>
+          </div>
+
+          {/* =====================================================
+              DESKTOP NAV + FAQ
+          ===================================================== */}
+
+          <div
+            className="
+              ml-auto
+              hidden
+              min-w-0
+              items-center
+              gap-2
+              md:flex
+              lg:gap-3
+            "
+          >
+
+            {/* Desktop Navigation */}
+
             <nav
               className="
-                flex items-center gap-1
-                rounded-full bg-blue-600 px-8
+                flex
+                items-center
+                gap-1
+                rounded-full
+                bg-blue-600
+                px-4
                 shadow-[0_8px_30px_rgba(0,0,0,0.16)]
                 lg:gap-2
+                lg:px-8
               "
+              aria-label="Desktop navigation"
             >
               {navItems.map((item, index) => (
                 <button
                   key={item.label}
                   type="button"
-                  onClick={(event) => handleNavClick(item.label, event)}
+                  onClick={(event) =>
+                    handleNavClick(item.label, event)
+                  }
                   onMouseEnter={(event) =>
                     openMega(item.label, index, event)
                   }
                   onMouseLeave={scheduleCloseMega}
                   className="
-                    rounded-full px-3 py-2
-                    text-sm font-bold text-white
-                    transition-all duration-300
-                    hover:bg-white/20 hover:text-white
+                    rounded-full
+                    px-2.5
+                    py-2
+                    text-sm
+                    font-bold
+                    text-white
+                    transition-all
+                    duration-300
+                    hover:bg-white/20
+                    hover:text-white
                     lg:px-4
                   "
                 >
-                  <span className="relative inline-flex items-center">
+                  <span
+                    className="
+                      relative
+                      inline-flex
+                      items-center
+                    "
+                  >
                     {item.label}
 
                     <span
                       className={`
-                        absolute -bottom-1 left-0
-                        h-[2px] rounded-full bg-white
-                        transition-all duration-300
+                        absolute
+                        -bottom-1
+                        left-0
+                        h-[2px]
+                        rounded-full
+                        bg-white
+                        transition-all
+                        duration-300
                         ${
                           hoverIndex === index
                             ? 'w-full opacity-100'
@@ -585,110 +947,72 @@ const Navbar = () => {
               ))}
             </nav>
 
-            {/* FAQ button */}
+            {/* CONTACT */}
+
             <button
               type="button"
-              onClick={(event) => handleNavClick('Contact', event)}
-              onMouseEnter={(event) =>
-                openMega('Contact', navItems.length - 1, event)
-              }
-              onMouseLeave={scheduleCloseMega}
+              onClick={() => {
+                
+                    const contact = document.querySelector("#contact");
+
+                    if (!contact) return;
+
+                    contact.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }}
               className="
-                flex shrink-0 items-center gap-2
+                flex
+                shrink-0
+                items-center
+                gap-2
                 rounded-full
-                border border-white/14
+                border
+                border-white/14
                 bg-white
-                px-3 py-1
-                text-xs font-extrabold text-blue-600
+                px-3
+                py-1
+                text-xs
+                font-extrabold
+                text-blue-600
                 shadow-[0_8px_30px_rgba(0,0,0,0.16)]
-                transition duration-300
+                transition
+                duration-300
                 hover:-translate-y-0.5
-                hover:bg-white/20
+                hover:bg-green
               "
             >
               <img
                 src="/icons/faqBlue.png"
-                className="h-4 w-4 sm:h-5 sm:w-5"
-                alt="FAQ"
+                className="
+                  h-4
+                  w-4
+                  sm:h-5
+                  sm:w-5
+                "
+                alt="CONTACT"
               />
 
-              <span>FAQ</span>
+              <span>Contact</span>
             </button>
 
           </div>
 
-          {/* Desktop Nav - CENTERED */}
-          {/* <nav
+          {/* =====================================================
+              MOBILE MENU BUTTON
+          ===================================================== */}
+
+          <div
             className="
-              absolute left-1/2 top-1/2
-              hidden -translate-x-1/2 -translate-y-1/2
-              items-center gap-1 md:flex lg:gap-2
-              rounded-full bg-blue-600 px-8
-              shadow-[0_8px_30px_rgba(0,0,0,0.16)]
+              ml-auto
+              flex
+              shrink-0
+              items-center
+              gap-1.5
+              sm:hidden
             "
           >
-            {navItems.map((item, index) => (
-              <button
-                key={item.label}
-                type="button"
-                onClick={(event) => handleNavClick(item.label, event)}
-                onMouseEnter={(e) => openMega(item.label, index, e)}
-                onMouseLeave={scheduleCloseMega}
-                className="
-                  rounded-full px-3 py-2 text-sm font-bold
-                  text-white transition-all duration-300
-                  hover:bg-white/20 hover:text-white
-                  lg:px-4
-                "
-              >
-                <span className="relative inline-flex items-center">
-                  {item.label}
-
-                  <span
-                    className={`
-                      absolute -bottom-1 left-0 h-[2px]
-                      rounded-full bg-white transition-all duration-300
-                      ${
-                        hoverIndex === index
-                          ? 'w-full opacity-100'
-                          : 'w-0 opacity-0'
-                      }
-                    `}
-                  />
-                </span>
-              </button>
-            ))}
-          </nav> */}
-
-          {/* FAQ button */}
-          {/* <div className="hidden shrink-0 items-center gap-2 sm:flex md:gap-3">
-            <button
-              type="button"
-              onClick={(event) => handleNavClick('Contact', event)}
-              onMouseEnter={(e) =>
-                openMega('Contact', navItems.length - 1, e)
-              }
-              onMouseLeave={scheduleCloseMega}
-              className="
-                flex items-center gap-2 rounded-full
-                border border-white/14 bg-white
-                px-3 py-1 text-xs font-extrabold text-blue-600
-                shadow-[0_8px_30px_rgba(0,0,0,0.16)]
-                transition duration-300
-                hover:-translate-y-0.5 hover:bg-white/20
-              "
-            >
-              <img
-                src="/icons/faqBlue.png"
-                className="h-4 w-4 sm:h-5 sm:w-5"
-                alt="FAQ"
-              />
-              <span>FAQ</span>
-            </button>
-          </div> */}
-
-          {/* Mobile menu toggle */}
-          <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:hidden">
             <button
               type="button"
               aria-label="Toggle menu"
@@ -699,34 +1023,77 @@ const Navbar = () => {
                 setMenuOpen((prev) => !prev)
               }}
               className="
-                flex h-9 w-9 shrink-0 items-center
-                justify-center rounded-full
-                border border-white/14
-                bg-white/8 backdrop-blur-sm
+                flex
+                h-9
+                w-9
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-white/14
+                bg-white/8
+                backdrop-blur-sm
               "
             >
-              <div className="relative flex h-4 w-5 flex-col justify-between">
+              <div
+                className="
+                  relative
+                  flex
+                  h-4
+                  w-5
+                  flex-col
+                  justify-between
+                "
+              >
                 <span
                   className={`
-                    block h-[2px] w-full rounded-full bg-white
-                    transition-all duration-300
-                    ${menuOpen ? 'translate-y-[7px] rotate-45' : ''}
+                    block
+                    h-[2px]
+                    w-full
+                    rounded-full
+                    bg-white
+                    transition-all
+                    duration-300
+                    ${
+                      menuOpen
+                        ? 'translate-y-[7px] rotate-45'
+                        : ''
+                    }
                   `}
                 />
 
                 <span
                   className={`
-                    block h-[2px] w-full rounded-full bg-white
-                    transition-all duration-300
-                    ${menuOpen ? 'opacity-0' : 'opacity-100'}
+                    block
+                    h-[2px]
+                    w-full
+                    rounded-full
+                    bg-white
+                    transition-all
+                    duration-300
+                    ${
+                      menuOpen
+                        ? 'opacity-0'
+                        : 'opacity-100'
+                    }
                   `}
                 />
 
                 <span
                   className={`
-                    block h-[2px] w-full rounded-full bg-white
-                    transition-all duration-300
-                    ${menuOpen ? '-translate-y-[7px] -rotate-45' : ''}
+                    block
+                    h-[2px]
+                    w-full
+                    rounded-full
+                    bg-white
+                    transition-all
+                    duration-300
+                    ${
+                      menuOpen
+                        ? '-translate-y-[7px] -rotate-45'
+                        : ''
+                    }
                   `}
                 />
               </div>
@@ -735,20 +1102,32 @@ const Navbar = () => {
         </div>
       </header>
 
-      {/* Desktop backdrop */}
+      {/* =========================================================
+          DESKTOP BACKDROP
+      ========================================================= */}
+
       {activeMegaData &&
         typeof document !== 'undefined' &&
         createPortal(
           <div
             className="
-              pointer-events-none fixed inset-0 z-[9970]
-              bg-black/30 backdrop-blur-[2px] md:block
+              pointer-events-none
+              fixed
+              inset-0
+              z-[9970]
+              bg-black/30
+              backdrop-blur-[2px]
+              md:block
             "
           />,
           document.body
-        )}
+        )
+      }
 
-      {/* Desktop Mega Panel */}
+      {/* =========================================================
+          DESKTOP MEGA PANEL
+      ========================================================= */}
+
       {activeMegaData &&
         typeof document !== 'undefined' &&
         createPortal(
@@ -757,36 +1136,102 @@ const Navbar = () => {
             onMouseEnter={keepMegaOpen}
             onMouseLeave={scheduleCloseMega}
             className="
-              fixed left-0 right-0 top-[4rem] z-[9980]
-              hidden max-h-[calc(100dvh-4rem)]
-              overflow-y-auto overscroll-contain
-              border-y border-black/5 bg-white text-black
+              fixed
+              left-0
+              right-0
+              top-[4rem]
+              z-[9980]
+              hidden
+              max-h-[calc(100dvh-4rem)]
+              overflow-y-auto
+              overscroll-contain
+              border-y
+              border-black/5
+              bg-linear-to-b from-white to-0%
+              text-black
               shadow-[0_18px_45px_rgba(0,0,0,0.10)]
               md:block
             "
           >
-            <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
-              <div className="grid gap-5 lg:grid-cols-[0.68fr_1.32fr]">
+            <div
+              className="
+                mx-auto
+                w-full
+                max-w-7xl
+                px-4
+                py-5
+                sm:px-6
+                lg:px-8
+              "
+            >
+              <div
+                className="
+                  grid
+                  gap-5
+                  lg:grid-cols-[0.68fr_1.32fr]
+                "
+              >
 
                 {/* Intro */}
-                <div className="rounded-[1.5rem] border border-black/5 bg-neutral-50 p-5">
+
+                <div
+                  className="
+                    rounded-[1.5rem]
+                    border
+                    border-black/5
+                    bg-neutral-50
+                    p-5
+                  "
+                >
                   {activeMegaData.logo && (
                     <img
                       src={activeMegaData.logo}
                       alt="Cape Frontier logo"
-                      className="mb-4 h-20 w-auto object-contain"
+                      className="
+                        mb-4
+                        h-20
+                        w-auto
+                        object-contain
+                      "
                     />
                   )}
 
-                  <p className="font-bitter text-[10px] font-black uppercase tracking-[0.24em] text-blue-400">
+                  <p
+                    className="
+                      font-bitter
+                      text-[10px]
+                      font-black
+                      uppercase
+                      tracking-[0.24em]
+                      text-blue-400
+                    "
+                  >
                     {activeMegaData.eyebrow}
                   </p>
 
-                  <h3 className="mt-2 font-frank text-4xl font-bold leading-none text-neutral-950">
+                  <h3
+                    className="
+                      mt-2
+                      font-frank
+                      text-4xl
+                      font-bold
+                      leading-none
+                      text-neutral-950
+                    "
+                  >
                     {activeMegaData.title}
                   </h3>
 
-                  <p className="mt-3 max-w-md font-bitter text-sm leading-6 text-neutral-600">
+                  <p
+                    className="
+                      mt-3
+                      max-w-md
+                      font-bitter
+                      text-sm
+                      leading-6
+                      text-neutral-600
+                    "
+                  >
                     {activeMegaData.desc}
                   </p>
 
@@ -796,101 +1241,203 @@ const Navbar = () => {
                       handleNavClick(activeMega, event)
                     }
                     className="
-                      mt-5 inline-flex items-center gap-2
-                      rounded-full bg-green-200 px-4 py-2
-                      font-bitter text-sm font-bold text-green-950
-                      transition hover:-translate-y-0.5
+                      mt-5
+                      inline-flex
+                      items-center
+                      gap-2
+                      rounded-full
+                      bg-green-200
+                      px-4
+                      py-2
+                      font-bitter
+                      text-sm
+                      font-bold
+                      text-green-950
+                      transition
+                      hover:-translate-y-0.5
                     "
                   >
                     Open {activeMega}
-                    <span aria-hidden="true">→</span>
+
+                    <span aria-hidden="true">
+                      →
+                    </span>
                   </button>
                 </div>
 
-                {/* Mega content */}
+                {/* Mega Content */}
+
                 {activeMegaData.layout === 'cards' ? (
-                  <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                  <div
+                    className="
+                      grid
+                      grid-cols-2
+                      gap-3
+                      lg:grid-cols-4
+                    "
+                  >
                     {activeMegaData.cards.map((card) => (
                       <button
                         key={card.title}
                         type="button"
                         onClick={(event) =>
-                          handleNavClick(card.target, event)
+                          handleNavClick(
+                            card.target,
+                            event
+                          )
                         }
                         className="
-                          group overflow-hidden rounded-[1.35rem]
-                          border border-black/5 bg-neutral-50
-                          text-left shadow-[0_10px_26px_rgba(0,0,0,0.04)]
+                          group
+                          overflow-hidden
+                          rounded-[1.35rem]
+                          border
+                          border-black/5
+                          bg-neutral-50
+                          text-left
+                          shadow-[0_10px_26px_rgba(0,0,0,0.04)]
                           transition
-                          hover:-translate-y-1 hover:bg-white
+                          hover:-translate-y-1
+                          hover:bg-white
                           hover:shadow-[0_16px_34px_rgba(0,0,0,0.08)]
                         "
                       >
-                        <div className="relative h-32 overflow-hidden">
+                        <div
+                          className="
+                            relative
+                            h-32
+                            overflow-hidden
+                          "
+                        >
                           <img
                             src={card.image}
                             alt={card.title}
                             className="
-                              h-full w-full object-cover
-                              transition duration-500
+                              h-full
+                              w-full
+                              object-cover
+                              transition
+                              duration-500
                               group-hover:scale-110
                             "
                             loading="lazy"
                           />
 
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                          <div
+                            className="
+                              absolute
+                              inset-0
+                              bg-gradient-to-t
+                              from-black/60
+                              via-black/10
+                              to-transparent
+                            "
+                          />
 
                           <p
                             className="
-                              absolute bottom-3 left-3
-                              rounded-full bg-white/90 px-3 py-1
-                              font-bitter text-xs font-bold
-                              text-black shadow-sm
+                              absolute
+                              bottom-3
+                              left-3
+                              rounded-full
+                              bg-white/90
+                              px-3
+                              py-1
+                              font-bitter
+                              text-xs
+                              font-bold
+                              text-black
+                              shadow-sm
                             "
                           >
                             {card.title}
                           </p>
                         </div>
 
-                        <p className="p-3 font-bitter text-xs leading-5 text-neutral-600">
+                        <p
+                          className="
+                            p-3
+                            font-bitter
+                            text-xs
+                            leading-5
+                            text-neutral-600
+                          "
+                        >
                           {card.desc}
                         </p>
                       </button>
                     ))}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                  <div
+                    className="
+                      grid
+                      grid-cols-2
+                      gap-3
+                      lg:grid-cols-4
+                    "
+                  >
                     {activeMegaData.links.map((link) => (
                       <button
                         key={link.title}
                         type="button"
                         onClick={(event) =>
-                          handleNavClick(link.target, event)
+                          handleNavClick(
+                            link.target,
+                            event
+                          )
                         }
                         className="
-                          group rounded-[1.35rem]
-                          border border-black/5 bg-neutral-50
-                          p-4 text-left
+                          group
+                          rounded-[1.35rem]
+                          border
+                          border-black/5
+                          bg-neutral-50
+                          p-4
+                          text-left
                           shadow-[0_10px_26px_rgba(0,0,0,0.04)]
                           transition
-                          hover:-translate-y-1 hover:bg-white
+                          hover:-translate-y-1
+                          hover:bg-white
                           hover:shadow-[0_16px_34px_rgba(0,0,0,0.08)]
                         "
                       >
-                        <p className="font-bitter text-sm font-bold text-neutral-950">
+                        <p
+                          className="
+                            font-bitter
+                            text-sm
+                            font-bold
+                            text-neutral-950
+                          "
+                        >
                           {link.title}
                         </p>
 
-                        <p className="mt-2 font-bitter text-xs leading-5 text-neutral-600">
+                        <p
+                          className="
+                            mt-2
+                            font-bitter
+                            text-xs
+                            leading-5
+                            text-neutral-600
+                          "
+                        >
                           {link.desc}
                         </p>
 
                         <span
                           className="
-                            mt-3 inline-flex rounded-full
-                            bg-green-200 px-3 py-1
-                            font-bitter text-[10px] font-bold
-                            uppercase tracking-[0.14em] text-green-950
+                            mt-3
+                            inline-flex
+                            rounded-full
+                            bg-green-200
+                            px-3
+                            py-1
+                            font-bitter
+                            text-[10px]
+                            font-bold
+                            uppercase
+                            tracking-[0.14em]
+                            text-green-950
                             transition
                             group-hover:bg-neutral-950
                             group-hover:text-white
@@ -906,39 +1453,76 @@ const Navbar = () => {
             </div>
           </div>,
           document.body
-        )}
+        )
+        }
 
-      {/* Mobile Menu */}
+      {/* =========================================================
+          MOBILE MENU
+      ========================================================= */}
+
       {menuOpen &&
         typeof document !== 'undefined' &&
         createPortal(
           <div
-            className="fixed inset-0 z-[9980] sm:hidden"
+            className="
+              fixed
+              inset-0
+              z-[9980]
+              sm:hidden
+            "
             onClick={() => setMenuOpen(false)}
-            onPointerDown={(event) => event.stopPropagation()}
-            onTouchStart={(event) => event.stopPropagation()}
+            onPointerDown={(event) =>
+              event.stopPropagation()
+            }
+            onTouchStart={(event) =>
+              event.stopPropagation()
+            }
           >
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-md" />
+
+            <div
+              className="
+                absolute
+                inset-0
+                bg-black/50
+                backdrop-blur-md
+              "
+            />
 
             <div
               ref={mobilePanelRef}
-              onClick={(event) => event.stopPropagation()}
-              onPointerDown={(event) => event.stopPropagation()}
-              onTouchStart={(event) => event.stopPropagation()}
+              onClick={(event) =>
+                event.stopPropagation()
+              }
+              onPointerDown={(event) =>
+                event.stopPropagation()
+              }
+              onTouchStart={(event) =>
+                event.stopPropagation()
+              }
               className="
-                absolute bottom-3 left-0 right-0 top-[3.75rem]
-                mx-auto w-full max-w-[calc(100dvw-1.25rem)]
+                absolute
+                bottom-3
+                left-0
+                right-0
+                top-[3.75rem]
+                mx-auto
+                w-full
+                max-w-[calc(100dvw-1.25rem)]
                 px-2.5
               "
             >
               <div
                 ref={mobileMenuContentRef}
                 className="
-                  h-full w-full overflow-y-auto
+                  h-full
+                  w-full
+                  overflow-y-auto
                   rounded-[1.7rem]
-                  border border-white/10
-                  bg-[#06164f]/88 p-3
+                  border
+                  border-white/10
+                  bg-[#06164f]/88
+                  p-3
                   shadow-[0_18px_45px_rgba(0,0,0,0.30)]
                   backdrop-blur-2xl
                 "
@@ -946,48 +1530,81 @@ const Navbar = () => {
                   WebkitOverflowScrolling: 'touch',
                 }}
               >
-                {/* Top brand block */}
+
+                {/* =================================================
+                    MOBILE BRAND
+                ================================================= */}
+
                 <div
                   className="
-                    relative overflow-hidden
+                    relative
+                    overflow-hidden
                     rounded-[1.35rem]
-                    border border-white/10
-                    bg-white p-4
+                    border
+                    border-white/10
+                    bg-white
+                    p-4
                     backdrop-blur-xl
                   "
                 >
                   <button
                     type="button"
-                    onClick={() => setMenuOpen(false)}
+                    onClick={() =>
+                      setMenuOpen(false)
+                    }
                     className="
-                      absolute right-3 top-3
-                      flex h-9 w-9 items-center justify-center
+                      absolute
+                      right-3
+                      top-3
+                      flex
+                      h-9
+                      w-9
+                      items-center
+                      justify-center
                       rounded-full
-                      border border-white/12
+                      border
+                      border-white/12
                       bg-red-400
                       text-white/85
                       transition
-                      hover:bg-white/12 hover:text-white
+                      hover:bg-white/12
+                      hover:text-white
                     "
                     aria-label="Close menu"
                   >
                     <span
-                      className="relative h-4 w-4"
+                      className="
+                        relative
+                        h-4
+                        w-4
+                      "
                       aria-hidden="true"
                     >
                       <span
                         className="
-                          absolute left-0 top-1/2 h-[2px] w-full
-                          -translate-y-1/2 rotate-45
-                          rounded-full bg-current
+                          absolute
+                          left-0
+                          top-1/2
+                          h-[2px]
+                          w-full
+                          -translate-y-1/2
+                          rotate-45
+                          rounded-full
+                          bg-current
                         "
                       />
 
                       <span
                         className="
-                          absolute left-0 top-1/2 h-[2px] w-full
-                          -translate-y-1/2 -rotate-45
-                          rounded-full bg-current
+                          absolute
+                          left-0
+                          top-1/2
+                          h-[2px]
+                          w-full
+                          -translate-y-1/2
+                          -rotate-45
+                          rounded-full
+                          bg-current
                         "
                       />
                     </span>
@@ -996,42 +1613,87 @@ const Navbar = () => {
                   <img
                     src="/assets/brand/logo-removebg.png"
                     alt="Cape Frontier logo"
-                    className="h-24 w-auto object-contain"
+                    className="
+                      block
+                      h-24
+                      w-auto
+                      max-w-[230px]
+                      object-contain
+                      object-left
+                    "
                   />
+                  <div className="border border-blue-600/20 my-2 rounded-full"/>
+                  <div className="flex justify-center items-center gap-4">
+                    
+                    <p className='text-md font-bitter font-bold'>In affiliation with </p>
 
-                  {/* <p className="mt-3 font-frank text-[10px] font-black uppercase tracking-[0.22em] text-green-200">
-                    Menu
-                  </p>
-
-                  <p className="mt-1 font-frank text-3xl font-bold leading-none text-white">
-                    Explore Cape Frontier
-                  </p>
-
-                  <p className="mt-2 max-w-[18rem] font-bitter text-xs leading-5 text-white/58">
-                    Tours, reviews, policies, and direct contact in one clean menu.
-                  </p> */}
+                    <img
+                      src="/icons/handshake.webp"
+                      alt="Handshake Icon"
+                      className="
+                        h-8
+                        w-auto
+                        max-w-[230px]
+                        object-contain
+                        object-left
+                      "
+                    />
+                    <img
+                      src="/assets/brand/logo-love-ct-blue.webp"
+                      alt="Cape Frontier logo"
+                      className="
+                        block
+                        h-12
+                        w-auto
+                        max-w-[230px]
+                        object-contain
+                        object-left
+                      "
+                    />
+                  </div>
                 </div>
 
-                {/* Mobile Navigation */}
+                {/* =================================================
+                    MOBILE NAVIGATION
+                ================================================= */}
+
                 <nav
-                  className="mt-3 grid gap-1.5"
+                  className="
+                    mt-3
+                    grid
+                    gap-1.5
+                  "
                   aria-label="Mobile navigation"
                 >
                   {navItems
-                    .filter((item) => item.label !== 'Contact')
+                    .filter(
+                      (item) =>
+                        item.label !== 'Contact'
+                    )
                     .map((item) => (
                       <button
                         key={item.label}
                         type="button"
                         onClick={(event) =>
-                          handleNavClick(item.label, event)
+                          handleNavClick(
+                            item.label,
+                            event
+                          )
                         }
                         className="
-                          group flex w-full items-center
-                          justify-between rounded-2xl
-                          border border-white/[0.08]
-                          bg-white/[0.045] px-4 py-3.5
-                          text-left backdrop-blur-md
+                          group
+                          flex
+                          w-full
+                          items-center
+                          justify-between
+                          rounded-2xl
+                          border
+                          border-white/[0.08]
+                          bg-white/[0.045]
+                          px-4
+                          py-3.5
+                          text-left
+                          backdrop-blur-md
                           transition
                           hover:border-white/14
                           hover:bg-white/[0.085]
@@ -1039,9 +1701,12 @@ const Navbar = () => {
                       >
                         <span
                           className="
-                            font-frank text-[1.45rem]
-                            font-semibold leading-none
-                            tracking-[-0.01em] text-white
+                            font-frank
+                            text-[1.45rem]
+                            font-semibold
+                            leading-none
+                            tracking-[-0.01em]
+                            text-white
                           "
                         >
                           {item.label}
@@ -1049,9 +1714,17 @@ const Navbar = () => {
 
                         <span
                           className="
-                            flex h-8 w-8 items-center justify-center
-                            rounded-full bg-white/[0.08]
-                            font-bitter text-sm font-black text-white/78
+                            flex
+                            h-8
+                            w-8
+                            items-center
+                            justify-center
+                            rounded-full
+                            bg-white/[0.08]
+                            font-bitter
+                            text-sm
+                            font-black
+                            text-white/78
                             transition
                             group-hover:bg-green-200
                             group-hover:text-blue-950
@@ -1063,28 +1736,56 @@ const Navbar = () => {
                     ))}
                 </nav>
 
-                {/* Business info */}
+                {/* =================================================
+                    BUSINESS INFO
+                ================================================= */}
+
                 <div
                   className="
-                    mt-3 rounded-2xl
-                    border border-white/[0.08]
-                    bg-white/[0.045] p-3
+                    mt-3
+                    rounded-2xl
+                    border
+                    border-white/[0.08]
+                    bg-white/[0.045]
+                    p-3
                     backdrop-blur-lg
                   "
                 >
-                  <p className="font-bitter text-[10px] font-black uppercase tracking-[0.2em] text-green-200">
+                  <p
+                    className="
+                      font-bitter
+                      text-[10px]
+                      font-black
+                      uppercase
+                      tracking-[0.2em]
+                      text-green-200
+                    "
+                  >
                     Business info
                   </p>
 
                   <div className="mt-3 grid gap-2">
 
                     {/* Location */}
-                    <div className="flex items-start gap-2.5">
+
+                    <div
+                      className="
+                        flex
+                        items-start
+                        gap-2.5
+                      "
+                    >
                       <span
                         className="
-                          mt-0.5 flex h-7 w-7 shrink-0
-                          items-center justify-center
-                          rounded-full bg-white/[0.08]
+                          mt-0.5
+                          flex
+                          h-7
+                          w-7
+                          shrink-0
+                          items-center
+                          justify-center
+                          rounded-full
+                          bg-white/[0.08]
                           text-green-200
                         "
                       >
@@ -1097,28 +1798,64 @@ const Navbar = () => {
                           aria-hidden="true"
                         >
                           <path d="M12 21s7-4.4 7-11a7 7 0 1 0-14 0c0 6.6 7 11 7 11Z" />
-                          <circle cx="12" cy="10" r="2.5" />
+                          <circle
+                            cx="12"
+                            cy="10"
+                            r="2.5"
+                          />
                         </svg>
                       </span>
 
                       <div className="min-w-0">
-                        <p className="font-bitter text-xs font-black uppercase tracking-[0.12em] text-white/86">
+                        <p
+                          className="
+                            font-bitter
+                            text-xs
+                            font-black
+                            uppercase
+                            tracking-[0.12em]
+                            text-white/86
+                          "
+                        >
                           Cape Town based
                         </p>
 
-                        <p className="mt-0.5 font-bitter text-xs leading-5 text-white/52">
-                          Guided Cape Town routes, local pickup support, and manual booking confirmation.
+                        <p
+                          className="
+                            mt-0.5
+                            font-bitter
+                            text-xs
+                            leading-5
+                            text-white/52
+                          "
+                        >
+                          Guided Cape Town routes,
+                          local pickup support, and
+                          manual booking confirmation.
                         </p>
                       </div>
                     </div>
 
                     {/* Secure booking */}
-                    <div className="flex items-start gap-2.5">
+
+                    <div
+                      className="
+                        flex
+                        items-start
+                        gap-2.5
+                      "
+                    >
                       <span
                         className="
-                          mt-0.5 flex h-7 w-7 shrink-0
-                          items-center justify-center
-                          rounded-full bg-white/[0.08]
+                          mt-0.5
+                          flex
+                          h-7
+                          w-7
+                          shrink-0
+                          items-center
+                          justify-center
+                          rounded-full
+                          bg-white/[0.08]
                           text-green-200
                         "
                       >
@@ -1135,12 +1872,31 @@ const Navbar = () => {
                       </span>
 
                       <div className="min-w-0">
-                        <p className="font-bitter text-xs font-black uppercase tracking-[0.12em] text-white/86">
+                        <p
+                          className="
+                            font-bitter
+                            text-xs
+                            font-black
+                            uppercase
+                            tracking-[0.12em]
+                            text-white/86
+                          "
+                        >
                           Secure booking flow
                         </p>
 
-                        <p className="mt-0.5 font-bitter text-xs leading-5 text-white/52">
-                          Choose your tour, confirm your group, pay online, then receive confirmation.
+                        <p
+                          className="
+                            mt-0.5
+                            font-bitter
+                            text-xs
+                            leading-5
+                            text-white/52
+                          "
+                        >
+                          Choose your tour, confirm
+                          your group, pay online, then
+                          receive confirmation.
                         </p>
                       </div>
                     </div>
@@ -1148,40 +1904,78 @@ const Navbar = () => {
                   </div>
                 </div>
 
-                {/* Terms & policies */}
+                {/* =================================================
+                    TERMS & POLICIES
+                ================================================= */}
+
                 <div
                   className="
-                    mt-3 rounded-2xl
-                    border border-white/[0.08]
-                    bg-white/[0.045] p-3
+                    mt-3
+                    rounded-2xl
+                    border
+                    border-white/[0.08]
+                    bg-white/[0.045]
+                    p-3
                     backdrop-blur-lg
                   "
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="font-bitter text-[10px] font-black uppercase tracking-[0.2em] text-green-200">
+                  <div
+                    className="
+                      flex
+                      items-center
+                      justify-between
+                      gap-3
+                    "
+                  >
+                    <p
+                      className="
+                        font-bitter
+                        text-[10px]
+                        font-black
+                        uppercase
+                        tracking-[0.2em]
+                        text-green-200
+                      "
+                    >
                       Terms & policies
                     </p>
 
                     <button
                       type="button"
                       onClick={(event) =>
-                        handleNavClick('/policies', event)
+                        handleNavClick(
+                          '/policies',
+                          event
+                        )
                       }
                       className="
-                        rounded-full bg-white/[0.08]
-                        px-3 py-1
-                        font-bitter text-[10px]
-                        font-black uppercase
-                        tracking-[0.12em] text-white/72
+                        rounded-full
+                        bg-white/[0.08]
+                        px-3
+                        py-1
+                        font-bitter
+                        text-[10px]
+                        font-black
+                        uppercase
+                        tracking-[0.12em]
+                        text-white/72
                         transition
-                        hover:bg-white/14 hover:text-white
+                        hover:bg-white/14
+                        hover:text-white
                       "
                     >
                       Open all
                     </button>
                   </div>
 
-                  <div className="mt-3 grid grid-cols-2 gap-2">
+                  <div
+                    className="
+                      mt-3
+                      grid
+                      grid-cols-2
+                      gap-2
+                    "
+                  >
                     {[
                       ['Booking', '/policies#booking-policy'],
                       ['Pickup', '/policies#pickup-policy'],
@@ -1194,16 +1988,24 @@ const Navbar = () => {
                         key={label}
                         type="button"
                         onClick={(event) =>
-                          handleNavClick(target, event)
+                          handleNavClick(
+                            target,
+                            event
+                          )
                         }
                         className="
                           rounded-xl
-                          border border-white/[0.08]
+                          border
+                          border-white/[0.08]
                           bg-white/[0.045]
-                          px-3 py-2
-                          text-left font-bitter
-                          text-[11px] font-black
-                          uppercase tracking-[0.09em]
+                          px-3
+                          py-2
+                          text-left
+                          font-bitter
+                          text-[11px]
+                          font-black
+                          uppercase
+                          tracking-[0.09em]
                           text-white/68
                           transition
                           hover:bg-white/10
@@ -1216,18 +2018,41 @@ const Navbar = () => {
                   </div>
                 </div>
 
-                {/* Bottom actions */}
-                <div className="mt-3 grid grid-cols-2 gap-2 pb-1">
+                {/* =================================================
+                    BOTTOM ACTIONS
+                ================================================= */}
+
+                <div
+                  className="
+                    mt-3
+                    grid
+                    grid-cols-2
+                    gap-2
+                    pb-1
+                  "
+                >
                   <button
                     type="button"
                     onClick={(event) =>
-                      handleNavClick('Contact', event)
+                      handleNavClick(
+                        'Contact',
+                        event
+                      )
                     }
                     className="
-                      flex items-center justify-center gap-2
-                      rounded-2xl bg-white px-4 py-3
-                      font-bitter text-xs font-black
-                      uppercase tracking-[0.12em]
+                      flex
+                      items-center
+                      justify-center
+                      gap-2
+                      rounded-2xl
+                      bg-white
+                      px-4
+                      py-3
+                      font-bitter
+                      text-xs
+                      font-black
+                      uppercase
+                      tracking-[0.12em]
                       text-blue-950
                       transition
                       hover:bg-green-100
@@ -1235,31 +2060,53 @@ const Navbar = () => {
                   >
                     <img
                       src="/icons/faqBubble.png"
-                      className="h-5 w-5"
+                      className="
+                        h-5
+                        w-5
+                      "
                       alt=""
                       aria-hidden="true"
                     />
 
-                    <span>FAQ</span>
+                    <span>
+                      FAQ
+                    </span>
                   </button>
 
                   <button
                     type="button"
                     onClick={(event) =>
-                      handleNavClick('Contact', event)
+                      handleNavClick(
+                        'Contact',
+                        event
+                      )
                     }
                     className="
-                      flex items-center justify-center gap-2
-                      rounded-2xl bg-green-200 px-4 py-3
-                      font-bitter text-xs font-black
-                      uppercase tracking-[0.12em]
+                      flex
+                      items-center
+                      justify-center
+                      gap-2
+                      rounded-2xl
+                      bg-green-200
+                      px-4
+                      py-3
+                      font-bitter
+                      text-xs
+                      font-black
+                      uppercase
+                      tracking-[0.12em]
                       text-green-950
                       transition
                       hover:bg-green-100
                     "
                   >
-                    <span>Contact</span>
-                    <span aria-hidden="true">→</span>
+                    <span>
+                      Contact
+                    </span>
+
+                    <span aria-hidden="true">
+                      →
+                    </span>
                   </button>
                 </div>
 
@@ -1268,6 +2115,10 @@ const Navbar = () => {
           </div>,
           document.body
         )}
+
+      {/* =========================================================
+          GLOBAL NAVBAR STYLES
+      ========================================================= */}
 
       <style>{`
         html,

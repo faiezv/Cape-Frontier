@@ -476,7 +476,9 @@ const Stories = () => {
 
         <TestimonialsSection />
 
-        <div className="mx-auto max-w-5xl rounded-lg px-4 sm:px-6 lg:px-0">
+        <div 
+          id="gallery"
+          className="mx-auto max-w-5xl rounded-lg px-4 sm:px-6 lg:px-0">
           <Gallery />
         </div>
 

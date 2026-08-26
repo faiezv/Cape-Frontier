@@ -776,34 +776,16 @@ export default function ToursBrowser() {
   ]);
 
   // ─────────────────────────────────────────────────────────────
-  // Previous / Next
+  // First / Last handlers
   // ─────────────────────────────────────────────────────────────
 
-  const handlePrev = useCallback(() => {
-    if (currentGlobalIndex > 0) {
-      goToTour(
-        currentGlobalIndex - 1
-      );
-    }
-  }, [
-    currentGlobalIndex,
-    goToTour,
-  ]);
+  const handleFirst = useCallback(() => {
+    goToTour(0);
+  }, [goToTour]);
 
-  const handleNext = useCallback(() => {
-    if (
-      currentGlobalIndex <
-      allTours.length - 1
-    ) {
-      goToTour(
-        currentGlobalIndex + 1
-      );
-    }
-  }, [
-    currentGlobalIndex,
-    allTours.length,
-    goToTour,
-  ]);
+  const handleLast = useCallback(() => {
+    goToTour(allTours.length - 1);
+  }, [allTours.length, goToTour]);
 
   const isFirst =
     currentGlobalIndex === 0;
@@ -811,6 +793,21 @@ export default function ToursBrowser() {
   const isLast =
     currentGlobalIndex ===
     allTours.length - 1;
+
+  // ─────────────────────────────────────────────────────────────
+  // Contact click handler
+  // ─────────────────────────────────────────────────────────────
+
+  const handleContactClick = useCallback(() => {
+    const contact = document.querySelector("#contact");
+
+    if (!contact) return;
+
+    contact.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, []);
 
   // ─────────────────────────────────────────────────────────────
   // Render
@@ -931,190 +928,126 @@ export default function ToursBrowser() {
           <div className="flex h-full w-full flex-col">
 
             {/* ───────────────────────────────────────────────
-    Previous / Next / Contact / Back to start
-    Desktop: one row
-    Mobile: navigation row + CTA row
-    ─────────────────────────────────────────────── */}
+                First / Last / Contact
+                Desktop: one row
+                Mobile: navigation row + CTA row
+                ─────────────────────────────────────────────── */}
 
-<div className="mt-30"></div>
+            <div className="mt-30"></div>
 
-<div
-  className="
-    m-2
-    shrink-0
-    pointer-events-auto
-    flex
-    flex-col
-    items-center
-    justify-center
-    gap-3
-    md:flex-row
-    md:gap-5
-  "
->
-  {/* Previous / Counter / Next */}
-  <div className="flex items-center justify-center gap-3 md:gap-5">
-    {/* Previous */}
-    <button
-      type="button"
-      onClick={handlePrev}
-      disabled={isFirst}
-      aria-label="Previous tour"
-      className={
-        isMobile
-          ? "flex items-center gap-1.5 rounded-full bg-white px-5 py-3 text-base font-bold text-blue-700 shadow-lg shadow-black/20 transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
-          : "rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
-      }
-    >
-      ‹ Previous
-    </button>
+            <div
+              className="
+                m-2
+                shrink-0
+                pointer-events-auto
+                flex
+                flex-col
+                items-center
+                justify-center
+                gap-3
+                md:flex-row
+                md:gap-5
+              "
+            >
+              {/* First / Counter / Last + Mobile Help Icon */}
+              <div className="flex items-center justify-center gap-3 md:gap-5">
+                {/* First */}
+                <button
+                  type="button"
+                  onClick={handleFirst}
+                  disabled={isFirst}
+                  aria-label="Go to first tour"
+                  className={
+                    isMobile
+                      ? "flex items-center gap-1.5 rounded-full bg-white px-5 py-3 text-base font-bold text-blue-700 shadow-lg shadow-black/20 transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+                      : "rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
+                  }
+                >
+                  ‹ First
+                </button>
 
-    {/* Counter */}
-    <span className="min-w-[55px] text-center text-sm font-medium text-white/70">
-      {currentGlobalIndex + 1} / {allTours.length}
-    </span>
+                {/* Counter */}
+                <span className="min-w-[55px] text-center text-sm font-medium text-white/70">
+                  {currentGlobalIndex + 1} / {allTours.length}
+                </span>
 
-    {/* Next */}
-    <button
-      type="button"
-      onClick={handleNext}
-      disabled={isLast}
-      aria-label="Next tour"
-      className={
-        isMobile
-          ? "flex items-center gap-1.5 rounded-full bg-white px-5 py-3 text-base font-bold text-blue-700 shadow-lg shadow-black/20 transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
-          : "rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
-      }
-    >
-      Next ›
-    </button>
-  </div>
+                {/* Last */}
+                <button
+                  type="button"
+                  onClick={handleLast}
+                  disabled={isLast}
+                  aria-label="Go to last tour"
+                  className={
+                    isMobile
+                      ? "flex items-center gap-1.5 rounded-full bg-white px-5 py-3 text-base font-bold text-blue-700 shadow-lg shadow-black/20 transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+                      : "rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
+                  }
+                >
+                  Last ›
+                </button>
 
-  {/* Secondary actions */}
-  <div className="flex items-center justify-center gap-5 md:gap-4">
-    {/* Contact CTA */}
-    <button
-      type="button"
-      onClick={() => {
-        const contact = document.querySelector("#contact");
+                {/* Mobile Help Icon (hidden on md and up) */}
+                <button
+                  type="button"
+                  onClick={handleContactClick}
+                  aria-label="Contact us"
+                  className="
+                    md:hidden
+                    flex
+                    items-center
+                    justify-center
+                    h-10
+                    w-10
+                    rounded-full
+                    bg-white
+                    text-blue-700
+                    shadow-lg
+                    shadow-black/20
+                    transition
+                    active:scale-95
+                  "
+                >
+                  <span className="text-xl font-bold leading-none">
+                    ?
+                  </span>
+                </button>
+              </div>
 
-        if (!contact) return;
-
-        contact.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }}
-      className="
-        group
-        inline-flex
-        items-center
-        gap-2
-        whitespace-nowrap
-        text-xs
-        font-medium
-        tracking-wide
-        text-white/80
-        transition-colors
-        duration-300
-        hover:text-white
-        md:ml-2
-        md:text-sm
-      "
-    >
-      <span className="relative">
-        Need help? Contact us now
-
-        <span
-          className="
-            absolute
-            -bottom-1
-            left-0
-            h-px
-            w-full
-            bg-white/60
-            transition-all
-            duration-300
-            group-hover:bg-white
-          "
-        />
-      </span>
-
-      <span
-        aria-hidden="true"
-        className="
-          text-sm
-          transition-transform
-          duration-300
-          group-hover:translate-x-1
-        "
-      >
-        →
-      </span>
-    </button>
-
-    {/* Back to start */}
-    <button
-      type="button"
-      onClick={() => {
-        gsap.to(window, {
-          duration: 1,
-          ease: "power3.inOut",
-          scrollTo: {
-            y: 0,
-            autoKill: true,
-          },
-        });
-      }}
-      aria-label="Back to start"
-      className="
-        group
-        inline-flex
-        items-center
-        gap-2
-        whitespace-nowrap
-        text-xs
-        font-medium
-        tracking-wide
-        text-white/55
-        transition-colors
-        duration-300
-        hover:text-white
-        md:text-sm
-      "
-    >
-      <span
-        aria-hidden="true"
-        className="
-          text-sm
-          transition-transform
-          duration-300
-          group-hover:-translate-y-0.5
-        "
-      >
-        ↑
-      </span>
-
-      <span className="relative">
-        Back to start
-
-        <span
-          className="
-            absolute
-            -bottom-1
-            left-0
-            h-px
-            w-full
-            bg-white/40
-            transition-colors
-            duration-300
-            group-hover:bg-white
-          "
-        />
-      </span>
-    </button>
-  </div>
-</div>
+              {/* Secondary actions (desktop only) */}
+              <div className="hidden md:flex items-center justify-center gap-5 md:gap-4">
+                {/* Contact CTA */}
+                <button
+                  type="button"
+                  onClick={handleContactClick}
+                  className="
+                    group
+                    inline-flex
+                    items-center
+                    gap-2
+                    p-2
+                    whitespace-nowrap
+                    text-xs
+                    font-medium
+                    tracking-wide
+                    text-white/80
+                    transition-all
+                    duration-300
+                    hover:bg-white
+                    hover:px-30
+                    md:ml-2
+                    md:text-sm
+                    rounded-2xl
+                    hover:rounded-full
+                    border border-white px-4
+                  "
+                >
+                  <span className="relative group-hover:text-black duration-300">
+                    Need help? Contact us now
+                  </span>
+                  <img src="/icons/topRightArrow.png" className="h-3 group-hover:brightness-0 duration-300" alt="" />
+                </button>
+              </div>
+            </div>
 
             {/* ───────────────────────────────────────────────
                 Cards

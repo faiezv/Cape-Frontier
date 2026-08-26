@@ -3,25 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { gsap } from 'gsap'
 
 const CONTACT_EMAIL = 'admin@capefrontier.co.za'
-const CONTACT_NUMBER = '(+27)00 000 0000';
+const CONTACT_NUMBER = '(+27)72 264 7284';
 
 const socialLinks = [
   {
     label: 'Facebook',
     icon: '/icons/facebook.png',
-    href: 'https://www.facebook.com/',
-    type: 'external',
-  },
-  {
-    label: 'X',
-    icon: '/icons/x.png',
-    href: 'https://x.com/',
-    type: 'external',
-  },
-  {
-    label: 'Pinterest',
-    icon: '/icons/pinterest.png',
-    href: 'https://www.pinterest.com/',
+    href: 'https://www.facebook.com/share/19B7fwycJi/',
     type: 'external',
   },
   {
@@ -342,6 +330,8 @@ const Contact = () => {
               <div className="absolute inset-x-8 bottom-3 h-8 rounded-full bg-blue-950/10 blur-2xl" />
             </div>
 
+            <p className='text-2xl font-bitter text-black/60'>Explore beyond the ordinary.</p>
+
             {/* Back to top */}
             <div className="mt-5 flex items-center justify-end gap-3">
               <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-900/55">
@@ -565,10 +555,10 @@ const Contact = () => {
                       © 2026 Cape Frontier Travel & Tours
                     </p>
 
-                    <p className="mt-1 text-xs text-white/65">
-                      Designed and built with {'<3'} by{' '}
+                    <p className="mt-1 text-sm text-white/65">
+                      Designed and built with <b>{'<3'}</b> by{' '}
                       <span className="font-semibold text-white/85">
-                        F. Viljoen
+                        F. Viljoen & FO Creative 
                       </span>
                     </p>
                   </div>

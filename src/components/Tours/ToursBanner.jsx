@@ -201,13 +201,13 @@ function ToursBanner() {
           Book Your Adventure.
         </h2>
 
-        <div className="cf-tours-intro-item mx-auto mt-4 min-h-[6rem] max-w-1xl text-balance text-lg font-semibold leading-tight text-neutral-600 sm:min-h-0 sm:text-2xl">
+        <div className="cf-tours-intro-item mx-auto mt-4 max-w-1xl text-balance text-lg font-semibold leading-tight text-neutral-600 sm:min-h-0 sm:text-2xl">
           <div className="block">
             Book a trip to{" "}
             <RotatingLocationText locations={DESTINATIONS} />
           </div>
 
-          <div className="block">
+          <div className="">
             and experience more than just a tour.
           </div>
         </div>
@@ -232,22 +232,6 @@ function ToursBanner() {
         </div>
       </div>
 
-      {/* Optional guided routes section */}
-      {/*
-      <div className="flex flex-col items-start gap-2 p-4">
-        <div>
-          <p className="inline-flex items-center gap-2 rounded-full bg-black/5 px-3 py-1 font-frank text-xs font-black uppercase tracking-wider text-black/60 backdrop-blur-sm">
-            <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
-            Guided Cape Town routes
-          </p>
-
-          <p className="max-w-sm text-sm font-bitter leading-relaxed text-black/60">
-            Choose your tour, confirm your group, and continue to a dedicated
-            tour page.
-          </p>
-        </div>
-      </div>
-      */}
 
       <style>{`
         @media (min-width: 768px) {

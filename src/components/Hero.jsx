@@ -424,10 +424,13 @@ const Hero = () => {
             className="pointer-events-none absolute inset-y-0 left-[-30%] w-[26%] skew-x-[-24deg] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.24),transparent)]"
           />
           <div className="relative z-10 flex items-center gap-3 leading-none">
-            <span>Scroll to see more</span>
-            <span ref={arrowRef}>
-              <ArrowDown className="h-4 w-4" />
-            </span>
+            <div className="flex gap-6">
+              <span>Explore beyond the ordinary.</span>
+              <span ref={arrowRef}>
+                <ArrowDown className="h-5 w-5 -translate-y-1" />
+              </span>
+              <span>Scroll to see more.</span>
+            </div>
           </div>
         </button>
       </div>
