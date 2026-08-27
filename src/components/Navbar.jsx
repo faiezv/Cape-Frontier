@@ -994,7 +994,7 @@ const Navbar = () => {
                     opacity: 0,
                   }}
                 >
-                  Affiliation to
+                  Affiliation  {'"Love Cape Town"'}
                 </span>
 
                 {/* Handshake */}
@@ -1852,6 +1852,7 @@ const Navbar = () => {
                       flex
                       items-center
                       justify-center
+                      text-center
                       gap-4
                     "
                   >
@@ -1860,9 +1861,10 @@ const Navbar = () => {
                         text-md
                         font-bitter
                         font-bold
+                        
                       "
                     >
-                      Affiliation to
+                      Affiliated to <br /> <span className='italic text-blue-500 text-lg'>Love Cape Town</span>
                     </p>
 
                     <img
