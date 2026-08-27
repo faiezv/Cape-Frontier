@@ -289,6 +289,7 @@ export const tours = [
     title: "Shark Cage Diving",
     slug: "shark-cage-diving-gansbaai",
     canonicalPath: "/tours/shark-cage-diving-gansbaai",
+    childFriendly: true,
 
     seo: {
       title: "Shark Cage Diving in Gansbaai | Cape Frontier Tours",
@@ -949,6 +950,7 @@ export const tours = [
     title: "Paragliding – Cape Town",
     slug: "paragliding-experience-cape-town",
     canonicalPath: "/tours/paragliding-experience-cape-town",
+    childFriendly: true,
 
     seo: {
       title: "Paragliding Experience in Cape Town | Cape Frontier Tours",
@@ -2468,6 +2470,7 @@ export const tours = [
     title: "The Dunes Beach Horse Riding - Noordhoek",
     slug: "horse-riding-at-the-cape-dunes",
     canonicalPath: "/tours/horse-riding-at-the-cape-dunes",
+    childFriendly: true,
 
     seo: {
       title: "Horse Riding at the Cape Dunes | Cape Frontier Tours",
@@ -2761,6 +2764,7 @@ export const tours = [
     title: "Lion’s Head Hike",
     slug: "lions-head-hike",
     canonicalPath: "/tours/lions-head-hike",
+    childFriendly: true,
 
     seo: {
       title: "Lion’s Head Guided Hike in Cape Town | Cape Frontier Tours",
@@ -2930,6 +2934,7 @@ export const tours = [
     title: "Platteklip Gorge Hike",
     slug: "platteklip-gorge-hike",
     canonicalPath: "/tours/platteklip-gorge-hike",
+    childFriendly: true,
 
     seo: {
       title: "Platteklip Gorge Guided Hike | Table Mountain Cape Town",
@@ -3099,6 +3104,7 @@ export const tours = [
     title: "Langa Township Cultural Experience",
     slug: "langa-township-cultural-experience",
     canonicalPath: "/tours/langa-township-cultural-experience",
+    childFriendly: true,
 
     seo: {
       title: "Langa Township Cultural Experience | Cape Frontier Tours",
@@ -3473,6 +3479,7 @@ export const tours = [
     title: "Robben Island Half Day Tour",
     slug: "robben-island-half-day-tour",
     canonicalPath: "/tours/robben-island-half-day-tour",
+    childFriendly: true,
 
     seo: {
       title: "Robben Island Half Day Tour | Cape Frontier Tours",
@@ -3737,6 +3744,7 @@ export const tours = [
     title: "Heritage, Faith & Cape Flats Community Tour",
     slug: "heritage-faith-cape-flats-community-tour",
     canonicalPath: "/tours/heritage-faith-cape-flats-community-tour",
+    childFriendly: true,
 
     seo: {
       title:
@@ -4175,6 +4183,7 @@ export const tours = [
     title: "Cape Town City Tour",
     slug: "full-day-cape-town-city-tour",
     canonicalPath: "/tours/full-day-cape-town-city-tour",
+    childFriendly: true,
 
     seo: {
       title: "Full-Day Cape Town City Tour | Cape Frontier Tours",
@@ -4851,6 +4860,7 @@ export const tours = [
     title: "Cape Peninsula Tour",
     slug: "peninsula-tour-2",
     canonicalPath: "/tours/peninsula-tour-2",
+    childFriendly: true,
 
     seo: {
       title: "Cape Peninsula Tour 2 | Premium Full-Day Cape Town Route",
@@ -5119,6 +5129,7 @@ export const tours = [
     title: "Stellenbosch Wine Farms",
     slug: "stellenbosch-wine-farms",
     canonicalPath: "/tours/stellenbosch-wine-farms",
+    childFriendly: true,
 
     seo: {
       title: "Stellenbosch Wine Farms Tour | Cape Frontier Tours",
@@ -5777,6 +5788,7 @@ export const tours = [
     title: "District Six + Langa Combined Tour Package",
     slug: "district-six-langa-combined-tour",
     canonicalPath: "/tours/district-six-langa-combined-tour",
+    childFriendly: true,
 
     seo: {
       title: "District Six & Langa Combined Tour Package | Cape Frontier Tours",
@@ -6182,6 +6194,7 @@ export const tours = [
     title: "3‑Day Garden Route & Route 62 Tour",
     slug: "3-day-garden-route-route-62-tour",
     canonicalPath: "/tours/3-day-garden-route-route-62-tour",
+    childFriendly: true,
 
     seo: {
       title: "3‑Day Garden Route & Route 62 Tour | Cape Frontier Tours",
@@ -6802,6 +6815,7 @@ export const tours = [
     title: "5‑Day Garden Route & Botlierskop Luxury Safari Tour",
     slug: "5-day-garden-route-botlierskop-safari-tour",
     canonicalPath: "/tours/5-day-garden-route-botlierskop-safari-tour",
+    childFriendly: true,
 
     seo: {
       title:
@@ -7688,6 +7702,7 @@ export const tours = [
     title: "5‑Day Garden Route & Gondwana Big 5 Safari Tour",
     slug: "5-day-garden-route-gondwana-big-5-safari",
     canonicalPath: "/tours/5-day-garden-route-gondwana-big-5-safari",
+    childFriendly: true,
 
     seo: {
       title:
@@ -8601,6 +8616,7 @@ export const tours = [
     title: "Cool Runnings Toboggan Park, Winelands & Adventure Loop",
     slug: "Cool-running-toboggan-park",
     canonicalPath: "/tours/cool-runnings",
+    childFriendly: true,
 
     seo: {
       title: "",
@@ -8981,6 +8997,7 @@ export const tours = [
     title: "Family Wine Tour with Kids Activities – Stellenbosch Region",
     slug: "full-day-family-wine-tour-stellenbosch",
     canonicalPath: "/tours/full-day-family-wine-tour-stellenbosch",
+    childFriendly: true,
 
     seo: {
       title: "Family Wine Tour in Stellenbosch with Kids Activities",
@@ -9436,6 +9453,7 @@ export const tours = [
     title: "Stellenbosch & Franschhoek Winelands Tour",
     slug: "full-day-stellenbosch-franschhoek-winelands-tour",
     canonicalPath: "/tours/full-day-stellenbosch-franschhoek-winelands-tour",
+    childFriendly: true,
 
     seo: {
       title: "Full-Day Stellenbosch & Franschhoek Winelands Tour",
@@ -9921,6 +9939,7 @@ export const tours = [
     slug: "full-day-cape-town-gems-kirstenbosch-constantia-winelands",
     canonicalPath:
       "/tours/full-day-cape-town-gems-kirstenbosch-constantia-winelands",
+    childFriendly: true,
 
     seo: {
       title:

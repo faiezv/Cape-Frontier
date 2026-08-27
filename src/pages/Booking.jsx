@@ -4,6 +4,8 @@
 import CheckoutSummary from '../components/CheckoutSummary';
 import TourOptions from '../components/TourDetails/TourOptions.jsx'
 import AdditionalPricing from '../components/TourDetails/AdditionalPricing';
+import KidsActivities from '../components/TourDetails/KidsActivities.jsx';
+import { KIDS_ACTIVITIES } from '../data/kidsActivities.js';
 
 import React, {
   useEffect,
@@ -350,8 +352,8 @@ function GuestStepper({
       <div className="flex items-center justify-between gap-3">
         <div>
           <p
-            className={`text-[10px] font-bold uppercase tracking-[0.16em] ${
-              inactive ? "text-neutral-400" : "text-green-700"
+            className={` font-bold ${
+              inactive ? "text-neutral-400" : "text-black"
             }`}
           >
             {label}
@@ -539,6 +541,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
     isCustom: false,
     ccParticipants: false,
     participantEmails: [],
+    selectedKidsActivity: null,
   });
 
   const [showChildrenSelector, setShowChildrenSelector] = useState(false);
@@ -547,9 +550,27 @@ const Booking = ({ embeddedTour, bookingData }) => {
   const [travellerSnapshot, setTravellerSnapshot] = useState(null);
   const [groupSnapshot, setGroupSnapshot] = useState(null);
 
+  const [confirmedChildAges, setConfirmedChildAges] = useState({});
+
+  // Group size + ages.
   const adultCount = Math.max(Number(formData.adults || 0), 1);
-  const childCount = Math.max(Number(formData.children || 0), 0);
-  const participantCount = Math.max(adultCount + childCount, 1);
+  const childAges = formData.childAges || [];
+
+  const toddlerCount = childAges.filter(
+    (age) => Number(age) < 12
+  ).length;
+
+  const childCount = childAges.filter(
+    (age) => Number(age) >= 12 && Number(age) <= 17
+  ).length;
+
+  const ageAdultCount = childAges.filter(
+    (age) => Number(age) >= 18
+  ).length;
+
+  const totalAdultCount = adultCount + ageAdultCount;
+
+  const participantCount = Math.max(totalAdultCount + childCount + toddlerCount, 1);
   const minParticipants = Math.min(tour?.minPeople ?? 1, 8);
   const maxParticipantEmails = Math.max(participantCount - 1, 0);
   const maxAdults = Math.max(1, 8 - childCount);
@@ -562,6 +583,8 @@ const Booking = ({ embeddedTour, bookingData }) => {
         ? tour.groupDiscount.rules
         : [];
 
+
+  // =================== PRICING ==================
   const activeGroupDiscountRule = groupDiscountRules
     .filter((rule) => participantCount >= Number(rule.minPeople || rule.minParticipants || 0))
     .sort(
@@ -1246,10 +1269,38 @@ const Booking = ({ embeddedTour, bookingData }) => {
       return;
     }
 
-    // if (participantCount < minParticipants) {
-    //   alert(`At least ${minParticipants} participant${minParticipants > 1 ? 's' : ''} are required for this tour.`);
-    //   return;
-    // }
+
+    // --- 1. Compute toddler and child counts ---
+    // --- Compute toddler and child counts (as before) ---
+    const toddlerCount = childAges.filter((age) => Number(age) < 12).length;
+    const childrenCount = childAges.filter(
+      (age) => Number(age) >= 12 && Number(age) <= 17
+    ).length;
+
+    // --- Compute kids activity fee using KIDS_ACTIVITIES ---
+    const selectedKidsActivityData = KIDS_ACTIVITIES.find(
+      (act) => act.id === formData.selectedKidsActivity
+    );
+
+    // Fee is calculated per adult and per child, just like in CheckoutSummary
+    const kidsActivityAdultTotal = selectedKidsActivityData
+      ? (Number(selectedKidsActivityData.adultPrice) || 0) * adultCount
+      : 0;
+
+    const kidsActivityChildTotal = selectedKidsActivityData
+      ? (Number(selectedKidsActivityData.childPrice) || 0) * childCount
+      : 0;
+
+    const kidsActivityFeeZar = kidsActivityAdultTotal + kidsActivityChildTotal;
+
+    // Convert to selected currency
+    const kidsActivityFeeConverted = convertPrice(kidsActivityFeeZar, currency);
+
+    // --- Add kids fee to total ---
+    const totalWithKids =
+      discountedTourSubtotal + privateFee + customFee + kidsActivityFeeConverted;
+
+
 
     nav("/checkout", {
       state: {
@@ -1258,10 +1309,13 @@ const Booking = ({ embeddedTour, bookingData }) => {
           ...formData,
           adults: adultCount,
           children: childCount,
+          toddlers: toddlerCount,
           participants: String(participantCount),
           participantEmails: normalizedParticipantEmails,
           ccParticipantEmails: formData.ccParticipants ? normalizedParticipantEmails : [],
           selectedExtras: formData.selectedExtras || {},
+          selectedKidsActivity: formData.selectedKidsActivity,          // pass the ID
+          kidsActivityFee: kidsActivityFeeConverted,                   // pass the converted fee
           pricingOptions: {
             isPrivate: formData.isPrivate,
             isCustom: formData.isCustom,
@@ -1271,7 +1325,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
             groupDiscountAmount,
             subtotalBeforeGroupDiscount: baseSubtotal,
             discountedTourSubtotal,
-            estimatedTotal,
+            estimatedTotal: totalWithKids,
             currency,
           },
         },
@@ -1279,13 +1333,18 @@ const Booking = ({ embeddedTour, bookingData }) => {
       },
     });
   };
+
+
   
 
   if (!tour) return null;
 
-useEffect(() => {
-  console.log('formData changed:', formData);
-}, [formData]);
+  useEffect(() => {
+    console.log('formData changed:', formData);
+  }, [formData]);
+
+  const [childAddedAnimation, setChildAddedAnimation] =
+    useState(false);
 
   return (
     <div
@@ -1864,7 +1923,7 @@ useEffect(() => {
 
               {/* BOOKING FORM */}
               <form id="booking-form" onSubmit={handleSubmit} className="grid gap-5">
-                {/* Traveller Details */}
+                {/* 1. Traveller Details */}
                 <div className="rounded-[1.75rem] border border-black/5 bg-white p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/80 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
                   <div className="mb-4 flex items-center gap-3">
                     <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-green-200 text-sm font-bold text-green-950 ring-1 ring-green-300">
@@ -2002,7 +2061,7 @@ useEffect(() => {
 
 
 
-                {/* Group Size */}
+                {/* 2. Group Size */}
                 <div className="rounded-[1.75rem] border border-black/5 bg-white p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/80 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
                   <div className="mb-4 flex items-center gap-3">
                     <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-100 text-sm font-bold text-blue-700 ring-1 ring-blue-200">
@@ -2020,24 +2079,18 @@ useEffect(() => {
 
                   <div className="rounded-2xl border border-green-200 bg-green-50/65 p-4 transition-all duration-300">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                      <div>
+                      {/* <div>
                         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-green-700">
                           Selected guests
                         </p>
                         <p className="mt-1 font-frank text-3xl font-bold leading-none text-neutral-950">
                           {participantCount} total
                         </p>
-                        <p className="mt-1 text-xs leading-5 text-neutral-500">
+                        <p className="flex flex-col items-center justify-centertext-md leading-5 text-neutral-500">
                           <b>{tour.minPeople} guests minimum. </b>
-                          {adultCount} adult{adultCount === 1 ? "" : "s"} - 
-                          {childCount > 0
-                            ? ` · ${childCount} child${childCount === 1 ? "" : "ren"}`
-                            : ""}
-                          {normalizedParticipantEmails.length > 0
-                            ? ` · ${normalizedParticipantEmails.length} email${normalizedParticipantEmails.length === 1 ? "" : "s"} added`
-                            : ""}
+                          
                         </p>
-                      </div>
+                      </div> */}
 
                       {!showGroupEditor && (
                         <button
@@ -2076,33 +2129,581 @@ useEffect(() => {
                             increaseDisabled={adultCount + childCount >= 8}
                         />
                         {/* Children column – with disclaimer above */}
-                          <div>
-                            {tour.childFriendly === false && (
-                              <div className="mb-2 flex items-center gap-2 rounded-lg border border-amber-200/80 bg-amber-50/70 px-3 py-2 text-xs text-amber-800">
-                                <span className="text-base" aria-hidden="true">⚠️</span>
-                                <span>This tour is not child‑friendly. Children cannot be added.</span>
+                        {/* ============================================================
+                            Children
+                        ============================================================ */}
+                        <div>
+                          {tour.childFriendly === false && (
+                            <div className="mb-2 flex items-center gap-2 rounded-lg border border-amber-200/80 bg-amber-50/70 px-3 py-2 text-xs text-amber-800">
+                              <span className="text-base" aria-hidden="true">
+                                ⚠️
+                              </span>
+
+                              <span>
+                                This tour is not child-friendly. Children cannot be added.
+                              </span>
+                            </div>
+                          )}
+
+                          <div className="rounded-2xl border border-black/5 bg-white p-4">
+
+                            {/* ============================================================
+                                Header
+                            ============================================================ */}
+                            <div className="flex items-center justify-between gap-3">
+                              <div>
+                                <p className="text-sm font-bold text-neutral-950">
+                                  Children
+                                </p>
+
+                                <p className="mt-1 text-xs leading-5 text-neutral-500">
+                                  Add each child's age.
+                                </p>
+                              </div>
+
+                              <span
+                                className="
+                                  rounded-full
+                                  bg-blue-50
+                                  px-2.5 py-1
+                                  text-[10px]
+                                  font-bold
+                                  text-blue-700
+                                "
+                              >
+                                {childAges.length}
+                              </span>
+                            </div>
+
+                            {/* ============================================================
+                                Add child button
+                            ============================================================ */}
+                            <button
+                              type="button"
+                              disabled={
+                                tour.childFriendly === false ||
+                                adultCount + childAges.length >= 8
+                              }
+                              onClick={() => {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  childAges: [
+                                    ...(prev.childAges || []),
+                                    12,
+                                  ],
+                                }));
+
+                                setChildAddedAnimation(true);
+
+                                setTimeout(() => {
+                                  setChildAddedAnimation(false);
+                                }, 900);
+                              }}
+                              className="
+                                relative
+                                mt-4
+                                flex
+                                w-full
+                                items-center
+                                justify-center
+                                gap-2
+                                overflow-hidden
+                                rounded-xl
+                                border
+                                border-blue-200
+                                bg-blue-50
+                                px-4 py-3
+                                text-xs
+                                font-black
+                                text-blue-700
+                                transition-all
+                                duration-200
+                                hover:-translate-y-0.5
+                                hover:border-blue-300
+                                hover:bg-blue-100
+                                active:translate-y-0
+                                disabled:cursor-not-allowed
+                                disabled:opacity-40
+                              "
+                            >
+                              <span className="text-base">
+                                +
+                              </span>
+
+                              Add child
+                            </button>
+
+                            {/* ============================================================
+                                Child added animation
+                            ============================================================ */}
+                            {childAddedAnimation && (
+                              <div
+                                className="
+                                  pointer-events-none
+                                  flex
+                                  justify-center
+                                  overflow-hidden
+                                "
+                              >
+                                <div
+                                  className="
+                                    mt-2
+                                    animate-[childPop_0.9s_ease-out_forwards]
+                                    text-3xl
+                                  "
+                                >
+                                  🧒
+                                </div>
                               </div>
                             )}
 
-                            <GuestStepper
-                              label="Children"
-                              value={childCount}
-                              hint="Optional. Leave at 0 when there are no children."
-                              onDecrease={() => adjustGuestCount("children", -1)}
-                              onIncrease={() => adjustGuestCount("children", 1)}
-                              decreaseDisabled={childCount <= 0 || (adultCount + childCount - 1) < minParticipants}
-                              increaseDisabled={
-                                adultCount + childCount >= 8 ||
-                                (tour.childFriendly === false)
-                              }
-                              inactive={childCount === 0}
-                            />
+                            {/* ============================================================
+                                Child age steppers
+                            ============================================================ */}
+                            {childAges.length > 0 && (
+                              <div className="mt-3 space-y-2">
+
+                                {childAges.map((age, index) => {
+                                  const numericAge = Number(age);
+
+                                  const isAgeConfirmed =
+                                    !!confirmedChildAges[index];
+
+                                  const category =
+                                    numericAge < 12
+                                      ? "Toddler"
+                                      : "Child";
+
+                                  /* --------------------------------------------------------
+                                    Increase age
+                                  -------------------------------------------------------- */
+                                  const increaseAge = () => {
+                                    if (isAgeConfirmed) return;
+
+                                    setFormData((prev) => {
+                                      const ages = [...(prev.childAges || [])];
+
+                                      ages[index] = Math.min(
+                                        17,
+                                        Number(ages[index] || 0) + 1
+                                      );
+
+                                      return {
+                                        ...prev,
+                                        childAges: ages,
+                                      };
+                                    });
+
+                                    // Changing age requires confirmation again
+                                    setConfirmedChildAges((prev) => ({
+                                      ...prev,
+                                      [index]: false,
+                                    }));
+                                  };
+
+                                  /* --------------------------------------------------------
+                                    Decrease age
+                                  -------------------------------------------------------- */
+                                  const decreaseAge = () => {
+                                    if (isAgeConfirmed) return;
+
+                                    setFormData((prev) => {
+                                      const ages = [...(prev.childAges || [])];
+
+                                      ages[index] = Math.max(
+                                        0,
+                                        Number(ages[index] || 0) - 1
+                                      );
+
+                                      return {
+                                        ...prev,
+                                        childAges: ages,
+                                      };
+                                    });
+
+                                    // Changing age requires confirmation again
+                                    setConfirmedChildAges((prev) => ({
+                                      ...prev,
+                                      [index]: false,
+                                    }));
+                                  };
+
+                                  /* --------------------------------------------------------
+                                    Confirm age
+                                  -------------------------------------------------------- */
+                                  const confirmChildAge = () => {
+                                    setConfirmedChildAges((prev) => ({
+                                      ...prev,
+                                      [index]: true,
+                                    }));
+                                  };
+
+                                  /* --------------------------------------------------------
+                                    Remove child
+                                  -------------------------------------------------------- */
+                                  const removeChild = () => {
+                                    setFormData((prev) => {
+                                      const ages = [...(prev.childAges || [])];
+
+                                      ages.splice(index, 1);
+
+                                      return {
+                                        ...prev,
+                                        childAges: ages,
+                                      };
+                                    });
+
+                                    /*
+                                    * Rebuild confirmation indexes so removing
+                                    * Child 1 does not leave Child 2 incorrectly
+                                    * confirmed at the old index.
+                                    */
+                                    setConfirmedChildAges((prev) => {
+                                      const next = {};
+
+                                      Object.entries(prev).forEach(
+                                        ([key, value]) => {
+                                          const oldIndex = Number(key);
+
+                                          if (oldIndex < index) {
+                                            next[oldIndex] = value;
+                                          }
+
+                                          if (oldIndex > index) {
+                                            next[oldIndex - 1] = value;
+                                          }
+                                        }
+                                      );
+
+                                      return next;
+                                    });
+                                  };
+
+                                  return (
+                                    <div
+                                      key={`child-${index}`}
+                                      className={`
+                                        group
+                                        flex
+                                        items-center
+                                        gap-3
+                                        rounded-xl
+                                        border
+                                        px-3 py-2.5
+                                        transition-all
+                                        duration-300
+
+                                        ${
+                                          isAgeConfirmed
+                                            ? "border-green-200 bg-green-50/50"
+                                            : "border-black/5 bg-neutral-50 hover:border-blue-100 hover:bg-blue-50/40"
+                                        }
+                                      `}
+                                    >
+
+                                      {/* ==================================================
+                                          Child icon
+                                      ================================================== */}
+                                      <div
+                                        className={`
+                                          flex
+                                          h-9 w-9
+                                          shrink-0
+                                          items-center
+                                          justify-center
+                                          rounded-xl
+                                          bg-white
+                                          text-lg
+                                          shadow-sm
+                                          transition-all
+                                          duration-300
+
+                                          ${
+                                            isAgeConfirmed
+                                              ? "ring-2 ring-green-200"
+                                              : "group-hover:scale-105"
+                                          }
+                                        `}
+                                      >
+                                        🧒
+                                      </div>
+
+                                      {/* ==================================================
+                                          Child label
+                                      ================================================== */}
+                                      <div className="min-w-0 flex-1">
+                                        <div className="flex items-center gap-2">
+                                          <p className="text-xs font-black text-neutral-900">
+                                            Child {index + 1}
+                                          </p>
+
+                                          {isAgeConfirmed && (
+                                            <span
+                                              className="
+                                                rounded-full
+                                                bg-green-100
+                                                px-1.5 py-0.5
+                                                text-[8px]
+                                                font-black
+                                                uppercase
+                                                tracking-wide
+                                                text-green-700
+                                              "
+                                            >
+                                              Confirmed
+                                            </span>
+                                          )}
+                                        </div>
+
+                                        <p
+                                          className={`
+                                            mt-0.5
+                                            text-[10px]
+                                            transition-colors
+                                            duration-300
+                                            ${
+                                              isAgeConfirmed
+                                                ? "text-green-600"
+                                                : "text-neutral-400"
+                                            }
+                                          `}
+                                        >
+                                          {isAgeConfirmed
+                                            ? `${category} · age confirmed`
+                                            : category}
+                                        </p>
+                                      </div>
+
+                                      {/* ==================================================
+                                          Age stepper
+                                      ================================================== */}
+                                      <div
+                                        className={`
+                                          flex
+                                          shrink-0
+                                          items-center
+                                          rounded-xl
+                                          border
+                                          bg-white
+                                          shadow-sm
+                                          transition-opacity
+                                          duration-300
+
+                                          ${
+                                            isAgeConfirmed
+                                              ? "border-green-200 opacity-60"
+                                              : "border-black/10"
+                                          }
+                                        `}
+                                      >
+
+                                        {/* Decrease */}
+                                        <button
+                                          type="button"
+                                          onClick={decreaseAge}
+                                          disabled={
+                                            numericAge <= 0 ||
+                                            isAgeConfirmed
+                                          }
+                                          className="
+                                            flex
+                                            h-8 w-8
+                                            items-center
+                                            justify-center
+                                            rounded-l-xl
+                                            text-sm
+                                            font-black
+                                            text-neutral-500
+                                            transition
+                                            hover:bg-blue-50
+                                            hover:text-blue-600
+                                            disabled:cursor-not-allowed
+                                            disabled:opacity-30
+                                          "
+                                          aria-label={`Decrease Child ${index + 1} age`}
+                                        >
+                                          −
+                                        </button>
+
+                                        {/* Age */}
+                                        <div
+                                          className="
+                                            flex
+                                            h-8
+                                            min-w-[48px]
+                                            items-center
+                                            justify-center
+                                            border-x
+                                            border-black/5
+                                            px-2
+                                          "
+                                        >
+                                          <span className="text-sm font-black text-neutral-950">
+                                            {numericAge}
+                                          </span>
+
+                                          <span className="ml-1 text-[9px] font-bold text-neutral-400">
+                                            yrs
+                                          </span>
+                                        </div>
+
+                                        {/* Increase */}
+                                        <button
+                                          type="button"
+                                          onClick={increaseAge}
+                                          disabled={
+                                            numericAge >= 17 ||
+                                            isAgeConfirmed
+                                          }
+                                          className="
+                                            flex
+                                            h-8 w-8
+                                            items-center
+                                            justify-center
+                                            rounded-r-xl
+                                            text-sm
+                                            font-black
+                                            text-neutral-500
+                                            transition
+                                            hover:bg-blue-50
+                                            hover:text-blue-600
+                                            disabled:cursor-not-allowed
+                                            disabled:opacity-30
+                                          "
+                                          aria-label={`Increase Child ${index + 1} age`}
+                                        >
+                                          +
+                                        </button>
+                                      </div>
+
+                                      {/* ==================================================
+                                          Confirm + Remove
+                                      ================================================== */}
+                                      <div className="flex shrink-0 items-center gap-1.5">
+
+                                        {/* Confirm age */}
+                                        <button
+                                          type="button"
+                                          onClick={confirmChildAge}
+                                          disabled={isAgeConfirmed}
+                                          className={`
+                                            flex
+                                            h-8 w-8
+                                            items-center
+                                            justify-center
+                                            rounded-full
+                                            border
+                                            transition-all
+                                            duration-300
+
+                                            ${
+                                              isAgeConfirmed
+                                                ? `
+                                                  scale-105
+                                                  border-green-500
+                                                  bg-green-500
+                                                  text-white
+                                                  shadow-[0_4px_14px_rgba(34,197,94,0.25)]
+                                                `
+                                                : `
+                                                  border-green-200
+                                                  bg-green-50
+                                                  text-green-600
+                                                  hover:scale-110
+                                                  hover:bg-green-100
+                                                `
+                                            }
+                                          `}
+                                          aria-label={
+                                            isAgeConfirmed
+                                              ? `Child ${index + 1} age confirmed`
+                                              : `Confirm Child ${index + 1} age`
+                                          }
+                                        >
+                                          <span
+                                            className={`
+                                              text-sm
+                                              font-black
+                                              transition-transform
+                                              duration-300
+
+                                              ${
+                                                isAgeConfirmed
+                                                  ? "scale-110"
+                                                  : "scale-100"
+                                              }
+                                            `}
+                                          >
+                                            ✓
+                                          </span>
+                                        </button>
+
+                                        {/* Remove child */}
+                                        <button
+                                          type="button"
+                                          onClick={removeChild}
+                                          className="
+                                            flex
+                                            h-8 w-8
+                                            shrink-0
+                                            items-center
+                                            justify-center
+                                            rounded-lg
+                                            text-sm
+                                            font-bold
+                                            text-neutral-300
+                                            transition-all
+                                            duration-200
+                                            hover:bg-red-50
+                                            hover:text-red-500
+                                          "
+                                          aria-label={`Remove Child ${index + 1}`}
+                                        >
+                                          ×
+                                        </button>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            {/* ============================================================
+                                Empty state
+                            ============================================================ */}
+                            {childAges.length === 0 && (
+                              <div
+                                className="
+                                  mt-3
+                                  rounded-xl
+                                  border
+                                  border-dashed
+                                  border-black/10
+                                  bg-neutral-50
+                                  px-4 py-5
+                                  text-center
+                                "
+                              >
+                                <div className="text-2xl opacity-40">
+                                  🧒
+                                </div>
+
+                                <p className="mt-2 text-xs font-bold text-neutral-500">
+                                  No children added
+                                </p>
+
+                                <p className="mt-0.5 text-[10px] text-neutral-400">
+                                  Add a child to enter their age.
+                                </p>
+                              </div>
+                            )}
                           </div>
+                        </div>
                       </div>
 
                       
 
-                      <div className="mt-4 rounded-2xl border border-black/5 bg-white p-4">
+                      {/* <div className="mt-4 rounded-2xl border border-black/5 bg-white p-4">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                           <div>
                             <p className="text-sm font-bold text-neutral-950">
@@ -2162,16 +2763,59 @@ useEffect(() => {
                             ))}
                           </div>
                         )}
-                      </div>
+                      </div> */}
 
                       <div className="mt-4 flex justify-center gap-3">
+                        {/* save more as a group */}
+                        <div
+                          ref={groupSaveRef}
+                          className="rounded-2xl border border-green-200 bg-white transition-all duration-300"
+                        >
+                          <div className="flex items-center gap-3 p-4">
+                            <img
+                              src="/icons/savemore.png"
+                              className="h-16 px-4 shrink-0 object-contain opacity-80"
+                              alt=""
+                              onError={(e) => {
+                                e.currentTarget.style.display = "none";
+                              }}
+                            />
+
+                            <div className="min-w-0 flex-1 leading-none">
+                              <p className="text-lg font-bold text-green-950">
+                                Save more when you book as a group
+                              </p>
+
+                              {/* <p className="max-w-3/4 text-xs leading-5 text-green-900/75">
+                                Bigger groups can unlock a lower per-person estimate. Group rates only apply to the full selected group size booked and paid for.
+                              </p> */}
+
+                              <button
+                                type="button"
+                                onClick={() => nav("/policies")}
+                                className="mt- inline-flex items-center gap-2 rounded-full bg-white 
+                                px-4 py-2 mt-2 
+                                text-xs font-bold text-green-800 
+                                border border-blue-600/20 shadow-sm 
+                                transition hover:-translate-y-0.5 hover:bg-green-100"
+                              >
+                                <span className="flex h-4 w-4 place-self-center justify-center rounded-full bg-green-200 text-[10px] text-green-950">
+                                  i
+                                </span>
+                                Learn more about group policy
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
                         <button
                           type="button"
                           onClick={() => {
                             setGroupSnapshot(null);
                             setShowGroupEditor(false);
                           }}
-                          className="inline-flex items-center gap-2 rounded-2xl border border-green-200 bg-white px-5 py-3 text-sm font-bold text-green-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-green-50"
+                          className="inline-flex items-center gap-2 rounded-2xl border border-green-200 bg-white px-5 
+                          text-sm font-bold text-green-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-green-50"
                         >
                           <SaveIcon />
                           Confirm group details
@@ -2203,45 +2847,13 @@ useEffect(() => {
                     </div>
                   </div>
 
-                  <div
-                    ref={groupSaveRef}
-                    className="mt-4 rounded-2xl border border-green-200 bg-green-50 p-4 transition-all duration-300"
-                  >
-                    <div className="flex items-start gap-3">
-                      <img
-                        src="/icons/savemore.png"
-                        className="mt-0.5 h-8 w-8 shrink-0 object-contain opacity-80"
-                        alt=""
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                        }}
-                      />
-
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-bold text-green-950">
-                          Save more when you book as a group
-                        </p>
-
-                        <p className="mt-1 text-xs leading-5 text-green-900/75">
-                          Bigger groups can unlock a lower per-person estimate. Group rates only apply to the full selected group size booked and paid for.
-                        </p>
-
-                        <button
-                          type="button"
-                          onClick={() => nav("/policies")}
-                          className="mt-3 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-green-800 shadow-sm transition hover:-translate-y-0.5 hover:bg-green-100"
-                        >
-                          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-green-200 text-[10px] text-green-950">
-                            i
-                          </span>
-                          Learn more about group policy
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                 
                 </div>
 
-                {/* Pickup Location */}
+
+                
+
+                {/* 3. Pickup Location */}
                 <div className="rounded-[1.75rem] border border-blue-100 bg-blue-50/45 p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/90 group-hover/right:bg-green-50/60 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
                   <div className="mb-4 flex items-center gap-3">
                     <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-sky-100 text-sm font-bold text-sky-700 ring-1 ring-sky-200">
@@ -2368,12 +2980,14 @@ useEffect(() => {
                     </div>
                   )}
                 </div>
+
+
               </form>
             </div>
           </div>
                     
           <div
-            className="border-t border-black/5 bg-white/92 px-4 py-4 md:px-8 md:py-5"
+            className="relative border-t border-black/5 bg-white/92 px-4 py-4 md:px-8 md:py-5"
           >
             <div>
                 {/* Private / Custom toggles */}
@@ -2404,13 +3018,30 @@ useEffect(() => {
                       }
                     />
                   )}
-                  </div>
+                  
+
+                </div>
+                
+                {/* Kids Activities */}
+                <KidsActivities
+                  childFriendly={tour?.childFriendly === true}
+                  adultCount={adultCount}
+                  childCount={childCount}
+                  selectedActivity={formData.selectedKidsActivity}
+                  onActivityChange={(activityId) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      selectedKidsActivity: activityId,
+                    }))
+                  }
+                />
+
             </div>
           </div>
           {/* CHECKOUT SUMMARY */}
           <div
             ref={checkoutRef}
-            className="border-t border-black/5 bg-white/92 px-4 py-4 md:px-8 md:py-5"
+            className="border-black/5 bg-white/92 px-4 py-4 md:px-8 md:py-5"
           >
           {/* Inside the component: */}
             <CheckoutSummary

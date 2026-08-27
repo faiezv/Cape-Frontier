@@ -6,8 +6,9 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FX_RATES } from "../data/tours.js";
 import vehicles from "../data/vehicles.js";
+import { KIDS_ACTIVITIES } from "../data/kidsActivities";
 
-import {resolveImage} from '../utils/ImageLoader.js'
+import { resolveImage } from '../utils/ImageLoader.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -62,17 +63,6 @@ const getTourReturnPath = (tour) => {
     .replace(/^-+|-+$/g, "");
 
   return slug ? `/tours/${slug}` : "/";
-};
-
-const getBasePriceZar = (tour) => {
-  if (typeof tour?.priceBase === "number" && Number.isFinite(tour.priceBase)) {
-    return tour.priceBase;
-  }
-
-  const raw = String(tour?.price || "").replace(/[^\d.]/g, "");
-  const parsed = parseFloat(raw);
-
-  return Number.isFinite(parsed) ? parsed : 0;
 };
 
 const convertFromZar = (amountZar, currency) => {
@@ -191,25 +181,7 @@ const SummaryRow = ({ label, value, strong = false }) => (
   </div>
 );
 
-const MiniCard = ({ label, value, note, tone = "blue" }) => {
-  const toneClasses = {
-    blue: "from-[#eef4ff] to-white",
-    green: "from-[#eef4ff] to-white",
-    stone: "from-stone-50 to-white",
-  };
 
-  return (
-    <div
-      className={`rounded-[1.35rem] bg-gradient-to-br ${toneClasses[tone] || toneClasses.blue} p-4 shadow-[0_10px_26px_rgba(7,31,79,0.05)]`}
-    >
-      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
-        {label}
-      </p>
-      <p className="mt-2 break-words font-bold leading-5 text-slate-900">{value}</p>
-      {note && <p className="mt-1 text-xs leading-5 text-slate-500">{note}</p>}
-    </div>
-  );
-};
 
 const PolicyNote = ({ title, children }) => (
   <div className="rounded-2xl bg-white/72 p-4 shadow-[0_10px_24px_rgba(7,31,79,0.04)]">
@@ -218,27 +190,6 @@ const PolicyNote = ({ title, children }) => (
   </div>
 );
 
-const EmailChip = ({ email }) => (
-  <span className="inline-flex max-w-full items-center gap-2 rounded-full bg-[#eef4ff] px-3 py-1.5 text-xs font-semibold text-[#071f4f]">
-    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-[#071f4f] shadow-sm">
-      <svg
-        className="h-3.5 w-3.5"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M20 21a8 8 0 0 0-16 0" />
-        <circle cx="12" cy="7" r="4" />
-      </svg>
-    </span>
-
-    <span className="truncate">{email}</span>
-  </span>
-);
 
 const VehicleOptionCard = ({ vehicle }) => (
   <div className="group overflow-hidden rounded-[1.35rem] bg-white shadow-[0_12px_28px_rgba(7,31,79,0.06)]">
@@ -949,6 +900,23 @@ const CheckoutPaystack = () => {
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
   }, [bookingDetails]);
 
+  // ─── 🆕 Toddler and kids activity fee ─────────────────────────────
+  const toddlerCount = useMemo(() => {
+    const raw = bookingDetails?.toddlers ?? bookingDetails?.toddlerCount ?? 0;
+    const parsed = parseInt(raw, 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+  }, [bookingDetails]);
+
+  const kidsActivityFee = useMemo(() => {
+    return Number(bookingDetails?.kidsActivityFee) || 0;
+  }, [bookingDetails]);
+
+  const selectedKidsActivity = useMemo(() => {
+    const id = bookingDetails?.selectedKidsActivity;
+    if (!id) return null;
+    return KIDS_ACTIVITIES.find(act => act.id === id) || null;
+  }, [bookingDetails]);
+
   // If no adult/child counts, fallback to total participants (assume all adults)
   const fallbackParticipants = useMemo(() => {
     const parsed = parseInt(bookingDetails?.participants, 10);
@@ -996,7 +964,6 @@ const CheckoutPaystack = () => {
 
   // ─── Total participants (unchanged) ──────────────────────────────
   const participants = effectiveAdults + effectiveChildren;
-
 
   // ─── Group pricing logic (recomputed from scratch) ────────────────
 
@@ -1147,11 +1114,11 @@ const CheckoutPaystack = () => {
     return convertFromZar(total, currency);
   }, [bookingDetails, tour, currency]);
 
-  // ─── Total price ──────────────────────────────────────────────────
+  // ─── Total price (now includes kids activity fee) ────────────────
 
   const totalPrice = useMemo(() => {
-    return discountedTourSubtotal + privateFee + customFee + extrasTotal;
-  }, [discountedTourSubtotal, privateFee, customFee, extrasTotal]);
+    return discountedTourSubtotal + privateFee + customFee + extrasTotal + kidsActivityFee;
+  }, [discountedTourSubtotal, privateFee, customFee, extrasTotal, kidsActivityFee]);
 
   const totalAmountLabel = useMemo(() => {
     return formatMoney(totalPrice, currency);
@@ -1220,6 +1187,7 @@ const CheckoutPaystack = () => {
         currency,
         adults: effectiveAdults,
         children: effectiveChildren,
+        toddlers: toddlerCount,
         adultPrice,
         childPrice,
         participants,
@@ -1228,6 +1196,7 @@ const CheckoutPaystack = () => {
         groupDiscountAmount,
         discountedTourSubtotal,
         extrasTotal,
+        kidsActivityFee,
         isPrivate,
         privateFee,
         isCustom,
@@ -1247,6 +1216,7 @@ const CheckoutPaystack = () => {
       currency,
       effectiveAdults,
       effectiveChildren,
+      toddlerCount,
       adultPrice,
       childPrice,
       participants,
@@ -1255,6 +1225,7 @@ const CheckoutPaystack = () => {
       groupDiscountAmount,
       discountedTourSubtotal,
       extrasTotal,
+      kidsActivityFee,
       privateFee,
       customFee,
       totalPrice,
@@ -1268,6 +1239,7 @@ const CheckoutPaystack = () => {
       currency,
       adults: effectiveAdults,
       children: effectiveChildren,
+      toddlers: toddlerCount,
       adultPrice,
       childPrice,
       participants,
@@ -1276,6 +1248,7 @@ const CheckoutPaystack = () => {
       groupDiscountAmount,
       discountedTourSubtotal,
       extrasTotal,
+      kidsActivityFee,
       isPrivate,
       privateFee,
       isCustom,
@@ -1288,6 +1261,7 @@ const CheckoutPaystack = () => {
       currency,
       effectiveAdults,
       effectiveChildren,
+      toddlerCount,
       adultPrice,
       childPrice,
       participants,
@@ -1296,6 +1270,7 @@ const CheckoutPaystack = () => {
       groupDiscountAmount,
       discountedTourSubtotal,
       extrasTotal,
+      kidsActivityFee,
       isPrivate,
       privateFee,
       isCustom,
@@ -1395,9 +1370,6 @@ const CheckoutPaystack = () => {
         className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-10"
       />
 
-      {/* <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(232,246,255,0.88)_48%,rgba(238,244,255,0.92)_100%)]" />
-      <div className="pointer-events-none absolute right-[7%] top-[14%] h-64 w-64 rounded-full bg-[#071f4f]/18 blur-3xl" /> */}
-
       {showMobileBackTop && (
         <button
           type="button"
@@ -1455,6 +1427,8 @@ const CheckoutPaystack = () => {
                       {effectiveAdults} adult{effectiveAdults !== 1 ? "s" : ""}
                       {effectiveChildren > 0 &&
                         ` · ${effectiveChildren} child${effectiveChildren !== 1 ? "ren" : ""}`}
+                      {toddlerCount > 0 &&
+                        ` · ${toddlerCount} toddler${toddlerCount !== 1 ? "s" : ""}`}
                     </InfoPill>
                   </div>
                 </div>
@@ -1699,8 +1673,14 @@ const CheckoutPaystack = () => {
                         />
                         {effectiveChildren > 0 && (
                           <SummaryRow
-                            label="Children"
+                            label="Children (12–17)"
                             value={`${effectiveChildren} × ${formatMoney(childPrice, currency)}`}
+                          />
+                        )}
+                        {toddlerCount > 0 && (
+                          <SummaryRow
+                            label="Toddlers (under 12)"
+                            value={`${toddlerCount} × ${formatMoney(0, currency)}`}
                           />
                         )}
                         <SummaryRow
@@ -1734,8 +1714,25 @@ const CheckoutPaystack = () => {
                           label="Optional extras"
                           value={extrasTotal > 0 ? formatMoney(extrasTotal, currency) : "None"}
                         />
+                        {selectedKidsActivity && kidsActivityFee > 0 && (
+                        <div className="mt-2 rounded-xl border border-blue-100 bg-blue-50 p-3">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-blue-500">
+                                Kids activity
+                              </p>
+                              <p className="mt-1 text-sm font-bold text-blue-950">
+                                {selectedKidsActivity.name}
+                              </p>
+                            </div>
+                            <span className="text-sm font-black text-blue-700">
+                              + {formatMoney(kidsActivityFee, currency)}
+                            </span>
+                          </div>
+                        </div>
+                      )}
 
-                        {/* 🆕 Show selected request extras (free) */}
+                        {/* Show selected request extras (free) */}
                         {(() => {
                           const selectedExtras = bookingDetails?.selectedExtras || {};
                           const additionalPricing = bookingDetails?.additionalPricing || tour?.additionalPricing || [];
@@ -1785,6 +1782,7 @@ const CheckoutPaystack = () => {
                         <p className="mt-1 text-xs font-semibold text-white/55">
                           {effectiveAdults} adult{effectiveAdults !== 1 ? "s" : ""}
                           {effectiveChildren > 0 && ` · ${effectiveChildren} child${effectiveChildren !== 1 ? "ren" : ""}`}
+                          {toddlerCount > 0 && ` · ${toddlerCount} toddler${toddlerCount !== 1 ? "s" : ""}`}
                           {" · "}{currency}
                         </p>
                       </div>
@@ -1919,13 +1917,6 @@ const CheckoutPaystack = () => {
                         Your bank may require <strong>3D Secure (3DS)</strong> verification
                         before your payment can be completed.
                       </p>
-
-                      {/* <p className="mt-2 text-[11px] leading-4 text-blue-900/55">
-                        3DS is an additional security step that helps verify your identity.
-                        Depending on your bank, you may be asked to approve the payment in
-                        your banking app, enter a one-time password, or complete another
-                        verification step.
-                      </p> */}
                     </div>
                   </div>
                 </div>
