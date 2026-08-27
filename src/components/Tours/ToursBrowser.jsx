@@ -35,6 +35,7 @@ export default function ToursBrowser() {
 
   const triggerRefs = useRef([]);
   const tourScrollTriggers = useRef([]);
+  const triggerInstances = useRef([]); // 👈 store ScrollTrigger instances
 
   const [activeCategory, setActiveCategory] = useState("adrenaline");
   const [currentTourIndex, setCurrentTourIndex] = useState(0);
@@ -295,6 +296,9 @@ export default function ToursBrowser() {
   useLayoutEffect(() => {
     if (!containerRef.current) return;
 
+    // Clear old trigger instances
+    triggerInstances.current = [];
+
     const ctx = gsap.context(() => {
       const wrappers =
         triggerRefs.current.filter(Boolean);
@@ -414,8 +418,9 @@ export default function ToursBrowser() {
           },
         });
 
-        tourScrollTriggers.current[index] =
-          activeTrigger;
+        // Store for later use in goToTour
+        triggerInstances.current[index] = activeTrigger;
+        tourScrollTriggers.current[index] = activeTrigger;
 
         // ───────────────────────────────────────────────────────
         // Card animation
@@ -563,6 +568,7 @@ export default function ToursBrowser() {
       ctx.revert();
 
       tourScrollTriggers.current = [];
+      triggerInstances.current = [];
     };
   }, [
     allTours,
@@ -574,6 +580,17 @@ export default function ToursBrowser() {
     updateActiveTour,
     stageHeight,
   ]);
+
+  // ─────────────────────────────────────────────────────────────
+  // Helper: update UI state for a given tour
+  // ─────────────────────────────────────────────────────────────
+
+  const updateStateForTour = useCallback((tour, index) => {
+    setActiveCategory(tour.categoryId);
+    setCurrentTourIndex(tour.tourIndex);
+    setCurrentTourTotal(tour.totalInCategory);
+    setCurrentGlobalIndex(index);
+  }, []);
 
   // ─────────────────────────────────────────────────────────────
   // Navigation: scroll to a specific tour
@@ -588,130 +605,89 @@ export default function ToursBrowser() {
         return;
       }
 
-      const wrapper =
-        triggerRefs.current[index];
-
+      const trigger = triggerInstances.current[index];
       const tour = allTours[index];
 
-      if (!wrapper || !tour) {
+      if (!trigger || !tour) {
         console.warn(
-          `No wrapper element found for index ${index}`
+          `No ScrollTrigger or tour found for index ${index}`
         );
-
         return;
       }
 
       // Make sure ScrollTrigger has current measurements
       ScrollTrigger.refresh();
 
-      isScrollingRef.current = true;
+      // Allow iOS to settle after refresh (address bar, etc.)
+      setTimeout(() => {
+        // The exact scroll position where this tour's animation starts
+        const targetY = trigger.start;
 
-      // ─────────────────────────────────────────
-      // IMPORTANT FIX
-      //
-      // The card animation starts at:
-      //
-      // top top += navOffset
-      //
-      // Therefore navigation MUST scroll to:
-      //
-      // wrapperTop - navOffset
-      //
-      // NOT wrapperTop - navHeight.
-      // ─────────────────────────────────────────
+        // If already very close, just update state and exit
+        if (Math.abs(window.scrollY - targetY) < 2) {
+          isScrollingRef.current = false;
+          updateStateForTour(tour, index);
+          return;
+        }
 
-      const targetY =
-        wrapper.getBoundingClientRect().top +
-        window.scrollY -
-        navOffset;
+        isScrollingRef.current = true;
 
-      // ─────────────────────────────────────────
-      // Immediately update navigation state
-      // ─────────────────────────────────────────
+        // Update UI state immediately (snappy)
+        updateStateForTour(tour, index);
 
-      setActiveCategory(
-        tour.categoryId
-      );
+        // ─────────────────────────────────────────
+        // Smooth scroll
+        // ─────────────────────────────────────────
 
-      setCurrentTourIndex(
-        tour.tourIndex
-      );
+        gsap.to(window, {
+          duration: 0.9,
 
-      setCurrentTourTotal(
-        tour.totalInCategory
-      );
+          ease: "power3.inOut",
 
-      setCurrentGlobalIndex(index);
+          scrollTo: {
+            y: targetY,
+            autoKill: true,
+          },
 
-      // ─────────────────────────────────────────
-      // Smooth scroll
-      // ─────────────────────────────────────────
+          // Keep ScrollTrigger synced during the
+          // programmatic scroll.
+          onUpdate: () => {
+            ScrollTrigger.update();
+          },
 
-      gsap.to(window, {
-        duration: 0.9,
+          // ─────────────────────────────────────
+          // FINAL POSITION
+          // ─────────────────────────────────────
 
-        ease: "power3.inOut",
-
-        scrollTo: {
-          y: targetY,
-          autoKill: true,
-        },
-
-        // Keep ScrollTrigger synced during the
-        // programmatic scroll.
-        onUpdate: () => {
-          ScrollTrigger.update();
-        },
-
-        // ─────────────────────────────────────
-        // FINAL POSITION
-        // ─────────────────────────────────────
-
-        onComplete: () => {
-          // Force the exact final scroll position.
-          window.scrollTo(
-            0,
-            targetY
-          );
-
-          ScrollTrigger.update();
-
-          // Explicitly restore selected tour
-          // state because updateActiveTour is
-          // blocked while programmatic scrolling.
-          setActiveCategory(
-            tour.categoryId
-          );
-
-          setCurrentTourIndex(
-            tour.tourIndex
-          );
-
-          setCurrentTourTotal(
-            tour.totalInCategory
-          );
-
-          setCurrentGlobalIndex(
-            index
-          );
-
-          // Wait one frame before allowing
-          // normal ScrollTrigger active updates.
-          requestAnimationFrame(() => {
-            isScrollingRef.current = false;
+          onComplete: () => {
+            // Force the exact final scroll position.
+            window.scrollTo(
+              0,
+              targetY
+            );
 
             ScrollTrigger.update();
-          });
-        },
 
-        onInterrupt: () => {
-          isScrollingRef.current = false;
+            // Explicitly restore selected tour state
+            // (in case of any drift)
+            updateStateForTour(tour, index);
 
-          ScrollTrigger.update();
-        },
-      });
+            // Wait one frame before allowing
+            // normal ScrollTrigger active updates.
+            requestAnimationFrame(() => {
+              isScrollingRef.current = false;
+              ScrollTrigger.update();
+            });
+          },
+
+          onInterrupt: () => {
+            isScrollingRef.current = false;
+            ScrollTrigger.update();
+          },
+        });
+      }, 50); // Small delay to let iOS settle
     },
-    [allTours, navOffset]
+    [allTours, updateStateForTour]
   );
 
   // ─────────────────────────────────────────────────────────────

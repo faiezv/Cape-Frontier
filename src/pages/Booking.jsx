@@ -1,8 +1,7 @@
-// The form should calculate a live price, but the final amount must be recalculated again on the server before creating the Stripe payment. 
-// Do not trust only the frontend price.
+// src/components/Booking.jsx
 
 import CheckoutSummary from '../components/CheckoutSummary';
-import TourOptions from '../components/TourDetails/TourOptions.jsx'
+import TourOptions from '../components/TourDetails/TourOptions.jsx';
 import AdditionalPricing from '../components/TourDetails/AdditionalPricing';
 import KidsActivities from '../components/TourDetails/KidsActivities.jsx';
 import { KIDS_ACTIVITIES } from '../data/kidsActivities.js';
@@ -56,49 +55,32 @@ const slugify = (value = "") =>
     .replace(/^-+|-+$/g, "");
 
 const TOUR_FOLDER_ALIASES = {
-  // adrenaline
   "shark": "adrenaline/shark-cage-diving",
   "shark-cage-diving": "adrenaline/shark-cage-diving",
-
   "gun": "adrenaline/gun-range",
   "gunrange": "adrenaline/gun-range",
   "gun-range": "adrenaline/gun-range",
-
   "paragliding": "adrenaline/paragliding",
   "para-gliding": "adrenaline/paragliding",
-
   "snorkel": "adrenaline/snorkelling",
   "snorkelling": "adrenaline/snorkelling",
   "snorkeling": "adrenaline/snorkelling",
-
-  // hiking
   "lions-head": "hiking/lions-head",
   "lion-s-head": "hiking/lions-head",
   "lion-head": "hiking/lions-head",
-
   "platteklip": "hiking/platteklip",
   "platteklip-gorge": "hiking/platteklip",
-
-  // historical
   "langa": "historical/langa",
   "langa-township": "historical/langa",
-
   "robben-island": "historical/robben-island",
   "robben-island-tour": "historical/robben-island",
-
-  // packages
   "peninsula-tour-1": "packages/peninsula-tour-1",
   "peninsula-tour-2": "packages/peninsula-tour-2",
-
-  // wine routes
   "delaire": "wine-routes/delaire",
   "delaire-graff": "wine-routes/delaire",
-
   "rust-en-vrede": "wine-routes/rest-en-vrede",
   "rest-en-vrede": "wine-routes/rest-en-vrede",
-
   "spier": "wine-routes/spier",
-
   "tokara": "wine-routes/tokara",
 };
 
@@ -126,66 +108,31 @@ const getTourFolder = (tour) => {
   if (title.includes("gun")) return "adrenaline/gun-range";
   if (title.includes("snorkel")) return "adrenaline/snorkelling";
   if (title.includes("para")) return "adrenaline/paragliding";
-
   if (title.includes("lion")) return "hiking/lions-head";
   if (title.includes("platteklip")) return "hiking/platteklip";
-
-  if (title.includes("langa")) return "historical/langa";
+  if (title.includes("langa")) return "historical/langas";
   if (title.includes("robben")) return "historical/robben-island";
-
   if (title.includes("delaire")) return "wine-routes/delaire";
   if (title.includes("rust") || title.includes("rest")) return "wine-routes/rest-en-vrede";
   if (title.includes("spier")) return "wine-routes/spier";
   if (title.includes("tokara")) return "wine-routes/tokara";
-
-  if (title.includes("peninsula") && title.includes("2")) {
-    return "packages/peninsula-tour-2";
-  }
-
-  if (title.includes("peninsula")) {
-    return "packages/peninsula-tour-1";
-  }
-
-  if (category.includes("adrenaline") || category.includes("adventure")) {
-    return `adrenaline/${slug}`;
-  }
-
-  if (category.includes("hiking")) {
-    return `hiking/${slug}`;
-  }
-
-  if (category.includes("historical")) {
-    return `historical/${slug}`;
-  }
-
-  if (category.includes("package")) {
-    return `packages/${slug}`;
-  }
-
-  if (
-    category.includes("wine") ||
-    category.includes("winery") ||
-    category.includes("wine-route")
-  ) {
-    return `wine-routes/${slug}`;
-  }
-
+  if (title.includes("peninsula") && title.includes("2")) return "packages/peninsula-tour-2";
+  if (title.includes("peninsula")) return "packages/peninsula-tour-1";
+  if (category.includes("adrenaline") || category.includes("adventure")) return `adrenaline/${slug}`;
+  if (category.includes("hiking")) return `hiking/${slug}`;
+  if (category.includes("historical")) return `historical/${slug}`;
+  if (category.includes("package")) return `packages/${slug}`;
+  if (category.includes("wine") || category.includes("winery") || category.includes("wine-route")) return `wine-routes/${slug}`;
   return slug;
 };
 
 const getTourGallery = (tour) => {
-  if (Array.isArray(tour?.images) && tour.images.length > 0) {
-    return tour.images;
-  }
-
+  if (Array.isArray(tour?.images) && tour.images.length > 0) return tour.images;
   const slug = getTourSlug(tour);
   const title = slugify(tour?.title || tour?.info || "");
-
   if (SPECIAL_GALLERIES[slug]) return SPECIAL_GALLERIES[slug];
   if (SPECIAL_GALLERIES[title]) return SPECIAL_GALLERIES[title];
-
   const folder = getTourFolder(tour);
-
   return [
     `/images/tours/${folder}/1.webp`,
     `/images/tours/${folder}/2.webp`,
@@ -193,27 +140,47 @@ const getTourGallery = (tour) => {
   ];
 };
 
+// ─── Helpers (same as CheckoutSummary) ────────────────────────────
+const getFee = (tour, type) => {
+  const defaults = { private: 750, custom: 500 };
+  if (Array.isArray(tour?.additionalPricing)) {
+    const match = tour.additionalPricing.find((item) =>
+      item.category?.toLowerCase().includes(type)
+    );
+    if (match) {
+      const amount = match.pricePerPerson ?? match.price ?? match.amount ?? 0;
+      if (Number(amount) > 0) return Number(amount);
+    }
+  }
+  if (type === "private" && tour?.privateFee !== undefined) return Number(tour.privateFee) || 0;
+  if (type === "custom" && tour?.customFee !== undefined) return Number(tour.customFee) || 0;
+  return defaults[type] || 0;
+};
+
+// ─── FX_RATES ──────────────────────────────────────────────────────
+const FX_RATES = {
+  ZAR: 1,
+  USD: 0.054,
+  EUR: 0.05,
+  GBP: 0.043,
+};
+
+// ─── Helper components ────────────────────────────────────────────
 function FlyToLocation({ center, zoom = 13 }) {
   const map = useMap();
-
   useEffect(() => {
     if (!center) return;
     map.flyTo(center, zoom, { duration: 1.1 });
   }, [center, zoom, map]);
-
   return null;
 }
 
 function MapClickHandler({ onPick }) {
   useMapEvents({
     click(e) {
-      onPick({
-        lat: e.latlng.lat,
-        lng: e.latlng.lng,
-      });
+      onPick({ lat: e.latlng.lat, lng: e.latlng.lng });
     },
   });
-
   return null;
 }
 
@@ -229,10 +196,8 @@ function PickupMap({ center, markerPosition, onPick }) {
         attribution="&copy; OpenStreetMap contributors"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-
       <MapClickHandler onPick={onPick} />
       <FlyToLocation center={center} />
-
       {markerPosition && (
         <Marker position={[markerPosition.lat, markerPosition.lng]} />
       )}
@@ -246,9 +211,7 @@ function BookingField({ label, hint, children }) {
       <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-neutral-500">
         {label}
       </span>
-
       {children}
-
       {hint && (
         <span className="mt-1.5 block text-xs leading-5 text-neutral-400">
           {hint}
@@ -265,7 +228,6 @@ function MiniAssurance({ title, text, icon = "✓" }) {
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-green-200 text-sm font-bold text-green-950">
           {icon}
         </span>
-
         <div>
           <p className="text-sm font-bold text-neutral-900">{title}</p>
           <p className="mt-1 text-xs leading-5 text-neutral-500">{text}</p>
@@ -277,16 +239,7 @@ function MiniAssurance({ title, text, icon = "✓" }) {
 
 function HomeIcon({ className = "h-4 w-4" }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.1"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <path d="m3 10.8 9-7 9 7" />
       <path d="M5.5 9.5V20h13V9.5" />
       <path d="M9.5 20v-6h5v6" />
@@ -294,18 +247,19 @@ function HomeIcon({ className = "h-4 w-4" }) {
   );
 }
 
+function SaveIcon({ className = "h-4 w-4" }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.15" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" />
+      <path d="M17 21v-8H7v8" />
+      <path d="M7 3v5h8" />
+    </svg>
+  );
+}
+
 function CheckoutCartIcon({ className = "h-5 w-5" }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.15"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.15" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <path d="M6.5 6h14l-1.4 7.2a2 2 0 0 1-2 1.6H9.1a2 2 0 0 1-2-1.6L5.6 3.8H3" />
       <path d="M9 20.2h.01" />
       <path d="M17 20.2h.01" />
@@ -314,83 +268,18 @@ function CheckoutCartIcon({ className = "h-5 w-5" }) {
   );
 }
 
-function SaveIcon({ className = "h-4 w-4" }) {
+function GuestStepper({ label, value, hint, onDecrease, onIncrease, decreaseDisabled, increaseDisabled, inactive = false }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.15"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" />
-      <path d="M17 21v-8H7v8" />
-      <path d="M7 3v5h8" />
-    </svg>
-  );
-}
-
-function GuestStepper({
-  label,
-  value,
-  hint,
-  onDecrease,
-  onIncrease,
-  decreaseDisabled,
-  increaseDisabled,
-  inactive = false,
-}) {
-  return (
-    <div
-      className={`rounded-2xl border p-3 transition-all duration-300 ${
-        inactive ? "border-neutral-200 bg-neutral-50/70" : "border-green-100 bg-white"
-      }`}
-    >
+    <div className={`rounded-2xl border p-3 transition-all duration-300 ${inactive ? "border-neutral-200 bg-neutral-50/70" : "border-green-100 bg-white"}`}>
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p
-            className={` font-bold ${
-              inactive ? "text-neutral-400" : "text-black"
-            }`}
-          >
-            {label}
-          </p>
-          {hint && (
-            <p className={`mt-1 text-xs leading-5 ${inactive ? "text-neutral-400" : "text-neutral-500"}`}>
-              {hint}
-            </p>
-          )}
+          <p className={`font-bold ${inactive ? "text-neutral-400" : "text-black"}`}>{label}</p>
+          {hint && <p className={`mt-1 text-xs leading-5 ${inactive ? "text-neutral-400" : "text-neutral-500"}`}>{hint}</p>}
         </div>
-
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onDecrease}
-            disabled={decreaseDisabled}
-            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-black/10 bg-white text-xl font-bold text-neutral-700 transition hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-35"
-          >
-            −
-          </button>
-
-          <span
-            className={`flex h-10 min-w-12 items-center justify-center rounded-2xl border bg-transparent px-4 font-frank text-2xl font-bold ${
-              inactive ? "border-neutral-200 text-neutral-400" : "border-green-200 text-green-950"
-            }`}
-          >
-            {value}
-          </span>
-
-          <button
-            type="button"
-            onClick={onIncrease}
-            disabled={increaseDisabled}
-            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-green-200 bg-white text-xl font-bold text-green-950 transition hover:-translate-y-0.5 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-35"
-          >
-            +
-          </button>
+          <button type="button" onClick={onDecrease} disabled={decreaseDisabled} className="flex h-10 w-10 items-center justify-center rounded-2xl border border-black/10 bg-white text-xl font-bold text-neutral-700 transition hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-35">−</button>
+          <span className={`flex h-10 min-w-12 items-center justify-center rounded-2xl border bg-transparent px-4 font-frank text-2xl font-bold ${inactive ? "border-neutral-200 text-neutral-400" : "border-green-200 text-green-950"}`}>{value}</span>
+          <button type="button" onClick={onIncrease} disabled={increaseDisabled} className="flex h-10 w-10 items-center justify-center rounded-2xl border border-green-200 bg-white text-xl font-bold text-green-950 transition hover:-translate-y-0.5 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-35">+</button>
         </div>
       </div>
     </div>
@@ -399,46 +288,21 @@ function GuestStepper({
 
 function ToggleOption({ active, title, text, price, icon, onClick }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`group flex min-h-[7rem] w-full flex-col justify-between rounded-2xl border p-4 text-left transition-all duration-300 ${
-        active
-          ? "border-green-300 bg-green-200 text-green-950 shadow-[0_14px_34px_rgba(34,197,94,0.18)]"
-          : "border-black/5 bg-white text-neutral-700 hover:-translate-y-0.5 hover:border-green-200 hover:bg-green-50"
-      }`}
-    >
+    <button type="button" onClick={onClick} aria-pressed={active} className={`group flex min-h-[7rem] w-full flex-col justify-between rounded-2xl border p-4 text-left transition-all duration-300 ${active ? "border-green-300 bg-green-200 text-green-950 shadow-[0_14px_34px_rgba(34,197,94,0.18)]" : "border-black/5 bg-white text-neutral-700 hover:-translate-y-0.5 hover:border-green-200 hover:bg-green-50"}`}>
       <div className="flex items-start justify-between gap-3">
-        <span
-          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl text-sm font-bold ${
-            active ? "bg-white/70 text-green-950" : "bg-neutral-100 text-neutral-500"
-          }`}
-        >
-          {icon}
-        </span>
-
-        <span
-          className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] ${
-            active ? "bg-white/70 text-green-950" : "bg-neutral-100 text-neutral-400"
-          }`}
-        >
-          {active ? "Selected" : "Optional"}
-        </span>
+        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl text-sm font-bold ${active ? "bg-white/70 text-green-950" : "bg-neutral-100 text-neutral-500"}`}>{icon}</span>
+        <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] ${active ? "bg-white/70 text-green-950" : "bg-neutral-100 text-neutral-400"}`}>{active ? "Selected" : "Optional"}</span>
       </div>
-
       <div className="mt-3">
         <p className="text-sm font-bold">{title}</p>
-        <p className={`mt-1 text-xs leading-5 ${active ? "text-green-950/75" : "text-neutral-500"}`}>
-          {text}
-        </p>
-        <p className={`mt-2 text-xs font-bold ${active ? "text-green-950" : "text-green-700"}`}>
-          {price}
-        </p>
+        <p className={`mt-1 text-xs leading-5 ${active ? "text-green-950/75" : "text-neutral-500"}`}>{text}</p>
+        <p className={`mt-2 text-xs font-bold ${active ? "text-green-950" : "text-green-700"}`}>{price}</p>
       </div>
     </button>
   );
 }
+
+// ─── Main Booking Component ────────────────────────────────────────
 
 const Booking = ({ embeddedTour, bookingData }) => {
   const nav = useNavigate();
@@ -463,13 +327,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
   const initialCurrency = location.state?.selectedCurrency || "ZAR";
   const [currency, setCurrency] = useState(initialCurrency);
 
-  const FX_RATES = {
-    ZAR: 1,
-    USD: 0.054,
-    EUR: 0.05,
-    GBP: 0.043,
-  };
-
   const convertPrice = (baseAmount = 0, targetCurrency = "ZAR") => {
     return Number(baseAmount || 0) * (FX_RATES[targetCurrency] || 1);
   };
@@ -486,52 +343,39 @@ const Booking = ({ embeddedTour, bookingData }) => {
       ? tour.supportedCurrencies
       : ["ZAR", "USD", "EUR", "GBP"];
 
-  const pricePerPerson = convertPrice(tour?.priceBase, currency);
-  const displayPrice = formatMoney(pricePerPerson, currency);
-
-  const gallery = useMemo(() => {
-    return tour ? getTourGallery(tour) : [];
-  }, [tour]);
+  // ─── Gallery ──────────────────────────────────────────────────────
+  const gallery = useMemo(() => (tour ? getTourGallery(tour) : []), [tour]);
 
   const relatedTours = useMemo(() => {
     if (!tour || !Array.isArray(allTours)) return [];
-
     const currentSlug = getTourSlug(tour);
-
     const sameType = allTours.filter((item) => {
       if (!item) return false;
       const itemSlug = getTourSlug(item);
       if (itemSlug === currentSlug || item.id === tour.id) return false;
       return item.type === tour.type || item.category === tour.category;
     });
-
     const fallback = allTours.filter((item) => {
       if (!item) return false;
       const itemSlug = getTourSlug(item);
       return itemSlug !== currentSlug && item.id !== tour.id;
     });
-
     return [...sameType, ...fallback]
-      .filter(
-        (item, index, array) =>
-          array.findIndex((candidate) => getTourSlug(candidate) === getTourSlug(item)) === index
-      )
+      .filter((item, index, array) => array.findIndex((candidate) => getTourSlug(candidate) === getTourSlug(item)) === index)
       .slice(0, 3);
   }, [tour]);
 
   const [activeImage, setActiveImage] = useState(0);
-
-  const activeImageSrc =
-    gallery[activeImage] || tour?.image || "/images/content/random/1.webp";
-
+  const activeImageSrc = gallery[activeImage] || tour?.image || "/images/content/random/1.webp";
   const fallbackImage = tour?.image || "/images/content/random/1.webp";
 
+  // ─── Form State ──────────────────────────────────────────────────
   const [formData, setFormData] = useState({
     fullName: "",
     mobile: "",
     email: "",
     date: "",
-    selectedExtras: {}, // will hold { category: quantity/boolean }
+    selectedExtras: {},
     adults: "1",
     children: "0",
     participants: "1",
@@ -542,89 +386,237 @@ const Booking = ({ embeddedTour, bookingData }) => {
     ccParticipants: false,
     participantEmails: [],
     selectedKidsActivity: null,
+    childAges: [],
+    selectedOption: null,
   });
 
   const [showChildrenSelector, setShowChildrenSelector] = useState(false);
-
-  // Snapshots for cancel functionality
   const [travellerSnapshot, setTravellerSnapshot] = useState(null);
   const [groupSnapshot, setGroupSnapshot] = useState(null);
-
   const [confirmedChildAges, setConfirmedChildAges] = useState({});
+  const [childAddedAnimation, setChildAddedAnimation] = useState(false);
 
-  // Group size + ages.
+  // ─── Derived counts ──────────────────────────────────────────────
   const adultCount = Math.max(Number(formData.adults || 0), 1);
   const childAges = formData.childAges || [];
 
-  const toddlerCount = childAges.filter(
-    (age) => Number(age) < 12
-  ).length;
+  const toddlers = childAges.filter((age) => Number(age) <= 5).length;
+  const children = childAges.filter((age) => Number(age) >= 6 && Number(age) <= 11).length;
+  const teens = childAges.filter((age) => Number(age) >= 12 && Number(age) <= 17).length;
 
-  const childCount = childAges.filter(
-    (age) => Number(age) >= 12 && Number(age) <= 17
-  ).length;
+  // Total participants = adults + all children (including toddlers, children, teens)
+  const participantCount = adultCount + childAges.length;
 
-  const ageAdultCount = childAges.filter(
-    (age) => Number(age) >= 18
-  ).length;
+  // For UI: max 8 total participants
+  const maxParticipants = 8;
+  const canAddChild = participantCount < maxParticipants && tour?.childFriendly !== false;
+  const canAddAdult = participantCount < maxParticipants;
 
-  const totalAdultCount = adultCount + ageAdultCount;
+  // ─── Pricing using CheckoutSummary logic ──────────────────────────
+  // Get category prices from tour.pricing with .startsWith matching
+  const getCategoryPrice = (category) => {
+    if (!tour?.pricing) return 0;
+    const entry = tour.pricing.find((p) =>
+      p.category?.toLowerCase().startsWith(category.toLowerCase())
+    );
+    return entry ? Number(entry.pricePerPerson) || 0 : 0;
+  };
 
-  const participantCount = Math.max(totalAdultCount + childCount + toddlerCount, 1);
-  const minParticipants = Math.min(tour?.minPeople ?? 1, 8);
-  const maxParticipantEmails = Math.max(participantCount - 1, 0);
-  const maxAdults = Math.max(1, 8 - childCount);
-  const maxChildren = Math.max(0, 8 - adultCount);
-  const shouldShowChildrenSelector = showChildrenSelector || childCount > 0;
-  const groupDiscountRules =
-    tour?.groupDiscount?.enabled === false
-      ? []
-      : Array.isArray(tour?.groupDiscount?.rules)
-        ? tour.groupDiscount.rules
-        : [];
+  const adultPriceZar = getCategoryPrice("adult");
+  const teenPriceZar = getCategoryPrice("teen");
+  const childPriceZar = getCategoryPrice("child");
+  const toddlerPriceZar = getCategoryPrice("toddler");
 
+  // If no specific adult pricing, fallback to tour.priceBase
+  const fallbackAdultPrice = Number(tour?.priceBase) || 0;
+  const finalAdultPriceZar = adultPriceZar || fallbackAdultPrice;
+  const finalTeenPriceZar = teenPriceZar || finalAdultPriceZar;
+  const finalChildPriceZar = childPriceZar || 0; // assume 0 if not defined
+  const finalToddlerPriceZar = toddlerPriceZar || 0;
 
-  // =================== PRICING ==================
-  const activeGroupDiscountRule = groupDiscountRules
-    .filter((rule) => participantCount >= Number(rule.minPeople || rule.minParticipants || 0))
-    .sort(
-      (a, b) =>
-        Number(b.discountPercent || b.discount || 0) -
-        Number(a.discountPercent || a.discount || 0)
-    )[0];
+  // Convert to selected currency
+  const adultPrice = convertPrice(finalAdultPriceZar, currency);
+  const teenPrice = convertPrice(finalTeenPriceZar, currency);
+  const childPrice = convertPrice(finalChildPriceZar, currency);
+  const toddlerPrice = convertPrice(finalToddlerPriceZar, currency);
 
-  const groupDiscountPercent = activeGroupDiscountRule
-    ? Number(activeGroupDiscountRule.discountPercent || activeGroupDiscountRule.discount || 0)
+  // Original subtotals
+  const adultSubtotal = adultCount * adultPrice;
+  const teenSubtotal = teens * teenPrice;
+  const childSubtotal = children * childPrice;
+  const toddlerSubtotal = toddlers * toddlerPrice;
+  const originalSubtotal = adultSubtotal + teenSubtotal + childSubtotal + toddlerSubtotal;
+
+  // ─── Group Discount (same as CheckoutSummary) ─────────────────────
+  let discountedSubtotal = originalSubtotal;
+  let groupDiscountAmount = 0;
+  let groupDiscountPercent = 0;
+  let adultDiscountAmount = 0;
+  let teenDiscountAmount = 0;
+  let hasDiscount = false;
+  let matchedGroupTier = null;
+  let groupPricingType = null;
+  let isCustomQuote = false;
+
+  if (
+    tour?.groupPricing?.enabled &&
+    Array.isArray(tour.groupPricing.tiers) &&
+    tour.groupPricing.tiers.length > 0
+  ) {
+    matchedGroupTier = tour.groupPricing.tiers.find((tier) => {
+      const minPeople = Number(tier.minPeople) || 0;
+      const maxPeople = tier.maxPeople == null ? Infinity : Number(tier.maxPeople);
+      return participantCount >= minPeople && participantCount <= maxPeople;
+    }) || null;
+  }
+
+  if (matchedGroupTier) {
+    const groupTotal =
+      matchedGroupTier.groupTotal != null ? Number(matchedGroupTier.groupTotal) : null;
+
+    if (groupTotal !== null && Number.isFinite(groupTotal) && groupTotal > 0) {
+      groupPricingType = "groupTotal";
+      discountedSubtotal = groupTotal;
+      groupDiscountAmount = Math.max(0, originalSubtotal - discountedSubtotal);
+      groupDiscountPercent = originalSubtotal > 0 ? (groupDiscountAmount / originalSubtotal) * 100 : 0;
+      adultDiscountAmount = groupDiscountAmount;
+      teenDiscountAmount = 0;
+      hasDiscount = groupDiscountAmount > 0;
+    } else {
+      const hasPerPersonPrice =
+        matchedGroupTier.perPerson != null &&
+        Number.isFinite(Number(matchedGroupTier.perPerson));
+      const hasDiscountPercent =
+        matchedGroupTier.discountPercent != null &&
+        Number.isFinite(Number(matchedGroupTier.discountPercent));
+
+      if (hasPerPersonPrice) {
+        groupPricingType = "perPerson";
+        const groupPersonPriceZar = Math.max(0, Number(matchedGroupTier.perPerson));
+        const groupPersonPrice = convertPrice(groupPersonPriceZar, currency);
+
+        const discountedAdultSubtotal = adultCount * groupPersonPrice;
+        const discountedTeenSubtotal = teens * groupPersonPrice;
+        // Children and toddlers keep original price
+        const unchangedChildSubtotal = childSubtotal;
+        const unchangedToddlerSubtotal = toddlerSubtotal;
+
+        discountedSubtotal =
+          discountedAdultSubtotal +
+          discountedTeenSubtotal +
+          unchangedChildSubtotal +
+          unchangedToddlerSubtotal;
+
+        adultDiscountAmount = Math.max(0, adultSubtotal - discountedAdultSubtotal);
+        teenDiscountAmount = Math.max(0, teenSubtotal - discountedTeenSubtotal);
+        groupDiscountAmount = adultDiscountAmount + teenDiscountAmount;
+
+        const adultAndTeenOriginal = adultSubtotal + teenSubtotal;
+        groupDiscountPercent =
+          adultAndTeenOriginal > 0 ? (groupDiscountAmount / adultAndTeenOriginal) * 100 : 0;
+        hasDiscount = groupDiscountAmount > 0;
+      } else if (hasDiscountPercent) {
+        groupPricingType = "discountPercent";
+        const requested = Number(matchedGroupTier.discountPercent);
+        const safe = Math.min(Math.max(requested, 0), 100);
+
+        const adultDiscount = adultSubtotal * (safe / 100);
+        const discountedAdultSubtotal = adultSubtotal - adultDiscount;
+        const teenDiscount = teenSubtotal * (safe / 100);
+        const discountedTeenSubtotal = teenSubtotal - teenDiscount;
+
+        discountedSubtotal =
+          discountedAdultSubtotal +
+          discountedTeenSubtotal +
+          childSubtotal +
+          toddlerSubtotal;
+
+        adultDiscountAmount = Math.max(0, adultDiscount);
+        teenDiscountAmount = Math.max(0, teenDiscount);
+        groupDiscountAmount = adultDiscountAmount + teenDiscountAmount;
+        groupDiscountPercent = safe;
+        hasDiscount = groupDiscountAmount > 0;
+      } else {
+        groupPricingType = "custom";
+        isCustomQuote = true;
+        discountedSubtotal = originalSubtotal;
+        groupDiscountAmount = 0;
+        groupDiscountPercent = 0;
+        adultDiscountAmount = 0;
+        teenDiscountAmount = 0;
+        hasDiscount = false;
+      }
+    }
+  }
+
+  // ─── Fees ─────────────────────────────────────────────────────────
+  const isPrivate = formData.isPrivate;
+  const isCustom = formData.isCustom;
+
+  const privateFeeZar = isPrivate ? getFee(tour, "private") : 0;
+  const privateFee = convertPrice(privateFeeZar, currency);
+
+  const customFeeZar = isCustom ? getFee(tour, "custom") : 0;
+  const customFee = convertPrice(customFeeZar, currency);
+
+  // ─── Extras ──────────────────────────────────────────────────────
+  const extrasTotalZar = useMemo(() => {
+    const selectedExtras = formData.selectedExtras || {};
+    const additionalPricing = tour?.additionalPricing || [];
+    if (!Array.isArray(additionalPricing) || additionalPricing.length === 0) return 0;
+    let total = 0;
+    additionalPricing.forEach((extra) => {
+      const { type, category, price } = extra;
+      const value = selectedExtras[category];
+      if (value === undefined || value === null || value === false) return;
+      if (type === "quantity") {
+        const qty = Number(value) || 0;
+        if (qty <= 0) return;
+        total += (Number(price) || 0) * qty;
+      } else if (type === "fixed") {
+        total += Number(price) || 0;
+      }
+    });
+    return total;
+  }, [formData.selectedExtras, tour]);
+
+  const extrasTotal = convertPrice(extrasTotalZar, currency);
+
+  // ─── Kids Activity ──────────────────────────────────────────────
+  const selectedKidsActivityData = KIDS_ACTIVITIES.find(
+    (act) => act.id === formData.selectedKidsActivity
+  );
+
+  const kidsActivityAdultTotalZar = selectedKidsActivityData
+    ? (Number(selectedKidsActivityData.adultPrice) || 0) * adultCount
     : 0;
+  const kidsActivityChildTotalZar = selectedKidsActivityData
+    ? (Number(selectedKidsActivityData.childPrice) || 0) * children
+    : 0;
+  const kidsActivityToddlerTotalZar = selectedKidsActivityData
+    ? (Number(selectedKidsActivityData.toddlerPrice) || 0) * toddlers
+    : 0;
+  const kidsActivityTotalZar =
+    kidsActivityAdultTotalZar + kidsActivityChildTotalZar + kidsActivityToddlerTotalZar;
+  const kidsActivityFee = convertPrice(kidsActivityTotalZar, currency);
 
-  const privateFee = formData.isPrivate ? convertPrice(PRIVATE_TOUR_FEE_ZAR, currency) : 0;
-  const customFee = formData.isCustom ? convertPrice(CUSTOM_TRIP_FEE_ZAR, currency) : 0;
-  const baseSubtotal = pricePerPerson * participantCount;
-  const groupDiscountAmount =
-    groupDiscountPercent > 0 ? baseSubtotal * (groupDiscountPercent / 100) : 0;
-  const discountedTourSubtotal = Math.max(baseSubtotal - groupDiscountAmount, 0);
-  const estimatedTotal = discountedTourSubtotal + privateFee + customFee;
-  const displayTotal = formatMoney(estimatedTotal, currency);
-  const displayBaseSubtotal = formatMoney(baseSubtotal, currency);
+  // ─── Totals ──────────────────────────────────────────────────────
+  const totalPrice = discountedSubtotal + privateFee + customFee + extrasTotal + kidsActivityFee;
+  const displayTotal = formatMoney(totalPrice, currency);
+  const displayBaseSubtotal = formatMoney(originalSubtotal, currency);
   const displayGroupDiscountAmount = formatMoney(groupDiscountAmount, currency);
-  const displayDiscountedTourSubtotal = formatMoney(discountedTourSubtotal, currency);
-  const displayPrivateFee = formatMoney(convertPrice(PRIVATE_TOUR_FEE_ZAR, currency), currency);
-  const displayCustomFee = formatMoney(convertPrice(CUSTOM_TRIP_FEE_ZAR, currency), currency);
-  const displayActivePrivateFee = formatMoney(privateFee, currency);
-  const displayActiveCustomFee = formatMoney(customFee, currency);
+  const displayDiscountedTourSubtotal = formatMoney(discountedSubtotal, currency);
+  const displayPrivateFee = formatMoney(privateFee, currency);
+  const displayCustomFee = formatMoney(customFee, currency);
+  const displayExtrasTotal = extrasTotal > 0 ? formatMoney(extrasTotal, currency) : "None";
+  const displayKidsActivityTotal = kidsActivityFee > 0 ? formatMoney(kidsActivityFee, currency) : "—";
 
+  // ─── UI helpers ──────────────────────────────────────────────────
   const formatTourMeta = (value = "") => {
-    const cleaned = value
-      .toString()
-      .replace(/[-_]+/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-
+    const cleaned = value.toString().replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
     if (!cleaned) return "";
-
     if (/half\s*day/i.test(cleaned)) return "Half-Day";
     if (/full\s*day/i.test(cleaned)) return "Full-Day";
-
     return cleaned.replace(/\b\w/g, (letter) => letter.toUpperCase());
   };
 
@@ -632,44 +624,30 @@ const Booking = ({ embeddedTour, bookingData }) => {
   const tourLocationLabel = formatTourMeta(tour?.location || "Cape Town");
   const tourStyleLabel = formatTourMeta(tour?.type || tour?.category || "Cape Town Tour");
   const tourInfoPills = [
-    {
-      label: "Duration",
-      value: tourDurationLabel,
-      className: "border-[#f7b7c8]/60 bg-[#fde2eb]/90 text-[#7b334f]",
-    },
-    {
-      label: "Style",
-      value: tourStyleLabel,
-      className: "border-[#ffd08a]/70 bg-[#fff0c9]/90 text-[#76511c]",
-    },
-    {
-      label: "Location",
-      value: tourLocationLabel,
-      className: "border-[#a8d8ee]/70 bg-[#dff4ff]/90 text-[#24566b]",
-    },
-    {
-      label: "Pickup",
-      value: "Included",
-      className: "border-[#b8e6c8]/70 bg-[#e3f8df]/90 text-[#2d6139]",
-    },
+    { label: "Duration", value: tourDurationLabel, className: "border-[#f7b7c8]/60 bg-[#fde2eb]/90 text-[#7b334f]" },
+    { label: "Style", value: tourStyleLabel, className: "border-[#ffd08a]/70 bg-[#fff0c9]/90 text-[#76511c]" },
+    { label: "Location", value: tourLocationLabel, className: "border-[#a8d8ee]/70 bg-[#dff4ff]/90 text-[#24566b]" },
+    { label: "Pickup", value: "Included", className: "border-[#b8e6c8]/70 bg-[#e3f8df]/90 text-[#2d6139]" },
   ].filter((pill) => pill.value);
+
   const normalizedParticipantEmails = (formData.participantEmails || [])
     .map((email) => email.trim())
     .filter(Boolean);
+
   const contactDetailsComplete = Boolean(
     formData.fullName.trim() &&
-      formData.mobile.trim() &&
-      formData.email.trim()
+    formData.mobile.trim() &&
+    formData.email.trim()
   );
   const dateDetailsComplete = Boolean(formData.date);
   const travellerDetailsComplete = contactDetailsComplete && dateDetailsComplete;
   const pickupDetailsComplete = Boolean(formData.pickupCoords);
 
+  // ─── Map state ──────────────────────────────────────────────────
   const [mapCenter, setMapCenter] = useState({
     lat: DEFAULT_CENTER[0],
     lng: DEFAULT_CENTER[1],
   });
-
   const [markerPosition, setMarkerPosition] = useState(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState("");
@@ -678,6 +656,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
   const [showTravellerEditor, setShowTravellerEditor] = useState(true);
   const [showGroupEditor, setShowGroupEditor] = useState(true);
 
+  // ─── Effects ──────────────────────────────────────────────────────
   const handleImageError = (e) => {
     if (e.currentTarget.src.includes(fallbackImage)) return;
     e.currentTarget.src = fallbackImage;
@@ -686,67 +665,43 @@ const Booking = ({ embeddedTour, bookingData }) => {
   const handleBack = () => {
     if (window.lenis) {
       window.lenis.stop();
-      window.lenis.scrollTo(window.scrollY, {
-        immediate: true,
-        force: true,
-      });
+      window.lenis.scrollTo(window.scrollY, { immediate: true, force: true });
     }
-
-    requestAnimationFrame(() => {
-      nav(-1);
-    });
+    requestAnimationFrame(() => nav(-1));
   };
 
-  // ========== BOOKING DATA PREFILL ==========
+  // Prefill from bookingData
   const prevBookingDataRef = useRef();
-
   useEffect(() => {
     if (!bookingData) return;
-
     const currentKey = JSON.stringify(bookingData);
     if (prevBookingDataRef.current === currentKey) return;
 
     const bd = bookingData;
     const updates = {};
-
-    // Basic contact & date fields
     if (bd.fullName !== undefined) updates.fullName = bd.fullName;
     if (bd.mobile !== undefined) updates.mobile = bd.mobile;
     if (bd.email !== undefined) updates.email = bd.email;
-
-    // Normalize date to YYYY-MM-DD for input[type="date"]
     if (bd.date) {
       let normalizedDate = bd.date;
       const dateObj = new Date(bd.date);
-      if (!isNaN(dateObj.getTime())) {
-        normalizedDate = dateObj.toISOString().split('T')[0];
-      }
+      if (!isNaN(dateObj.getTime())) normalizedDate = dateObj.toISOString().split('T')[0];
       updates.date = normalizedDate;
     }
-
-    // Group size
     if (bd.adults !== undefined) updates.adults = String(bd.adults);
     if (bd.children !== undefined) updates.children = String(bd.children);
-
-    // Pickup
     if (bd.pickupLocation !== undefined) updates.pickupLocation = bd.pickupLocation;
     if (bd.pickupCoords?.lat && bd.pickupCoords?.lng) {
       updates.pickupCoords = { lat: bd.pickupCoords.lat, lng: bd.pickupCoords.lng };
     }
-
-    // Options
     if (bd.isPrivate !== undefined) updates.isPrivate = bd.isPrivate;
     if (bd.isCustom !== undefined) updates.isCustom = bd.isCustom;
     if (bd.ccParticipants !== undefined) updates.ccParticipants = bd.ccParticipants;
-
-    // Participant emails
-    if (Array.isArray(bd.participantEmails)) {
-      updates.participantEmails = bd.participantEmails;
-    }
+    if (Array.isArray(bd.participantEmails)) updates.participantEmails = bd.participantEmails;
 
     // Adjust participants & enforce max 8 total
     const rawAdults = updates.adults !== undefined ? Number(updates.adults) : adultCount;
-    const rawChildren = updates.children !== undefined ? Number(updates.children) : childCount;
+    const rawChildren = updates.children !== undefined ? Number(updates.children) : 0;
     let total = rawAdults + rawChildren;
     if (total > 8) {
       const cappedAdults = Math.min(rawAdults, 8);
@@ -757,46 +712,27 @@ const Booking = ({ embeddedTour, bookingData }) => {
     }
     updates.participants = String(total);
 
-    // Trim participant emails if needed
     const maxEmails = Math.max(total - 1, 0);
     if (updates.participantEmails?.length > maxEmails) {
       updates.participantEmails = updates.participantEmails.slice(0, maxEmails);
       if (maxEmails === 0) updates.ccParticipants = false;
     }
 
-    // Apply form updates    // Enforce minParticipants before applying
     if (Object.keys(updates).length) {
-      let finalAdults = Number(updates.adults ?? formData.adults ?? 1);
-      let finalChildren = Number(updates.children ?? formData.children ?? 0);
-      let total = finalAdults + finalChildren;
-      if (total < minParticipants) {
-        const needed = minParticipants - total;
-        finalAdults = Math.min(finalAdults + needed, 8);
-        finalChildren = Math.min(finalChildren, 8 - finalAdults);
-        updates.adults = String(finalAdults);
-        updates.children = String(finalChildren);
-      }
       setFormData((prev) => ({ ...prev, ...updates }));
     }
-
-    // UI adjustments based on prefilled data
-    const finalChildren = updates.children !== undefined ? Number(updates.children) : childCount;
-    if (finalChildren > 0) setShowChildrenSelector(true);
 
     if (updates.pickupCoords) {
       setMarkerPosition(updates.pickupCoords);
       setMapCenter(updates.pickupCoords);
-      if (updates.pickupLocation) {
-        setShowPickupPicker(false);
-        setPendingPickup(null);
-      }
+      setShowPickupPicker(false);
+      setPendingPickup(null);
     }
 
     if (updates.adults !== undefined || updates.children !== undefined) {
       setShowGroupEditor(false);
     }
 
-    // Currency
     const preferredCurrency = bd.selectedCurrency || bd.pricingOptions?.currency;
     if (preferredCurrency && supportedCurrencies.includes(preferredCurrency)) {
       setCurrency(preferredCurrency);
@@ -804,26 +740,18 @@ const Booking = ({ embeddedTour, bookingData }) => {
 
     prevBookingDataRef.current = currentKey;
   }, [bookingData, supportedCurrencies]);
-  // ==========================================
 
+  // Auto-initialize min participants if no bookingData
   const defaultInitializedRef = useRef(false);
-
   useEffect(() => {
-    // Reset the flag when the tour changes
-    defaultInitializedRef.current = false;
-  }, [tour]);
-
-  useEffect(() => {
-    if (!tour || bookingData) return; // If bookingData is present, it takes precedence
+    if (!tour || bookingData) return;
     if (defaultInitializedRef.current) return;
-
     const currentAdults = Number(formData.adults || 1);
     const currentChildren = Number(formData.children || 0);
     const total = currentAdults + currentChildren;
-
-    if (total < minParticipants) {
-      const needed = minParticipants - total;
-      // Add to adults first (capped at 8)
+    const minPeople = tour?.minPeople ?? 1;
+    if (total < minPeople) {
+      const needed = minPeople - total;
       const newAdults = Math.min(currentAdults + needed, 8);
       const newChildren = Math.min(currentChildren, 8 - newAdults);
       setFormData(prev => ({
@@ -833,9 +761,8 @@ const Booking = ({ embeddedTour, bookingData }) => {
         participants: String(newAdults + newChildren),
       }));
     }
-
     defaultInitializedRef.current = true;
-  }, [tour, bookingData, minParticipants, formData.adults, formData.children]);
+  }, [tour, bookingData, formData.adults, formData.children]);
 
   useEffect(() => {
     if (!tour) nav("/");
@@ -848,7 +775,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
   useEffect(() => {
     if (location.state?.forceScrollTop) {
       window.scrollTo(0, 0);
-
       if (window.lenis) {
         window.lenis.scrollTo(0, { immediate: true, force: true });
         window.lenis.start();
@@ -858,17 +784,14 @@ const Booking = ({ embeddedTour, bookingData }) => {
 
   useEffect(() => {
     if (!gallery.length || gallery.length === 1) return;
-
     const interval = setInterval(() => {
       setActiveImage((prev) => (prev + 1) % gallery.length);
     }, 3500);
-
     return () => clearInterval(interval);
   }, [gallery]);
 
   useEffect(() => {
     if (!activeImageRef.current) return;
-
     gsap.fromTo(
       activeImageRef.current,
       { opacity: 0.65, scale: 1.02 },
@@ -878,21 +801,10 @@ const Booking = ({ embeddedTour, bookingData }) => {
 
   useEffect(() => {
     if (!formData.pickupCoords || !pickupFeedbackRef.current) return;
-
     gsap.fromTo(
       pickupFeedbackRef.current,
-      {
-        y: 10,
-        scale: 0.985,
-        autoAlpha: 0.82,
-      },
-      {
-        y: 0,
-        scale: 1,
-        autoAlpha: 1,
-        duration: 0.42,
-        ease: "back.out(1.7)",
-      }
+      { y: 10, scale: 0.985, autoAlpha: 0.82 },
+      { y: 0, scale: 1, autoAlpha: 1, duration: 0.42, ease: "back.out(1.7)" }
     );
   }, [formData.pickupCoords]);
 
@@ -900,26 +812,16 @@ const Booking = ({ embeddedTour, bookingData }) => {
     if (travellerDetailsComplete && !bookingBasicsCompleteRef.current) {
       setShowTravellerEditor(false);
     }
-
     bookingBasicsCompleteRef.current = travellerDetailsComplete;
   }, [travellerDetailsComplete]);
 
   useLayoutEffect(() => {
     if (!tour) return;
-
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        defaults: { ease: "power3.out" },
-      });
-
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
       if (!isEmbedded && backRef.current) {
-        tl.fromTo(
-          backRef.current,
-          { opacity: 0, x: -18 },
-          { opacity: 1, x: 0, duration: 0.45 }
-        );
+        tl.fromTo(backRef.current, { opacity: 0, x: -18 }, { opacity: 1, x: 0, duration: 0.45 });
       }
-
       if (cardRef.current) {
         tl.fromTo(
           cardRef.current,
@@ -928,16 +830,9 @@ const Booking = ({ embeddedTour, bookingData }) => {
           isEmbedded ? 0 : "-=0.15"
         );
       }
-
       if (!isEmbedded && leftRef.current) {
-        tl.fromTo(
-          leftRef.current,
-          { opacity: 0, x: -34 },
-          { opacity: 1, x: 0, duration: 0.55 },
-          "-=0.45"
-        );
+        tl.fromTo(leftRef.current, { opacity: 0, x: -34 }, { opacity: 1, x: 0, duration: 0.55 }, "-=0.45");
       }
-
       if (rightRef.current) {
         tl.fromTo(
           rightRef.current,
@@ -946,106 +841,63 @@ const Booking = ({ embeddedTour, bookingData }) => {
           isEmbedded ? "-=0.2" : "-=0.5"
         );
       }
-
       if (checkoutRef.current) {
-        tl.fromTo(
-          checkoutRef.current,
-          { opacity: 0, y: 24 },
-          { opacity: 1, y: 0, duration: 0.45 },
-          "-=0.15"
-        );
+        tl.fromTo(checkoutRef.current, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.45 }, "-=0.15");
       }
-
       if (bottomRef.current) {
-        tl.fromTo(
-          bottomRef.current,
-          { opacity: 0, y: 18 },
-          { opacity: 1, y: 0, duration: 0.45 },
-          "-=0.12"
-        );
+        tl.fromTo(bottomRef.current, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45 }, "-=0.12");
       }
-
       if (priceRef.current) {
         gsap.fromTo(
           priceRef.current,
           { opacity: 0.5, scale: 0.95 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 0.7,
-            delay: isEmbedded ? 0.35 : 0.7,
-            ease: "back.out(1.7)",
-          }
+          { opacity: 1, scale: 1, duration: 0.7, delay: isEmbedded ? 0.35 : 0.7, ease: "back.out(1.7)" }
         );
       }
     }, pageRef);
-
     return () => ctx.revert();
   }, [tour, isEmbedded]);
 
+  // ─── Handlers ────────────────────────────────────────────────────
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     if (name === "children") {
       const nextChildValue = Number(value || 0);
       setShowChildrenSelector(nextChildValue > 0);
     }
-
     setFormData((prev) => {
-      const next = {
-        ...prev,
-        [name]: value,
-      };
-
+      const next = { ...prev, [name]: value };
       if (name === "adults" || name === "children") {
-        let nextAdultCount = Math.max(
-          Number(name === "adults" ? value : prev.adults || 1),
-          1
-        );
-        let nextChildCount = Math.max(
-          Number(name === "children" ? value : prev.children || 0),
-          0
-        );
-
+        let nextAdultCount = Math.max(Number(name === "adults" ? value : prev.adults || 1), 1);
+        let nextChildCount = Math.max(Number(name === "children" ? value : prev.children || 0), 0);
         if (nextAdultCount + nextChildCount > 8) {
-          if (name === "adults") {
-            nextChildCount = Math.max(0, 8 - nextAdultCount);
-          } else {
-            nextChildCount = Math.max(0, 8 - nextAdultCount);
-          }
+          if (name === "adults") nextChildCount = Math.max(0, 8 - nextAdultCount);
+          else nextAdultCount = Math.max(1, 8 - nextChildCount);
         }
-
         const nextParticipantCount = Math.max(nextAdultCount + nextChildCount, 1);
         const maxEmails = Math.max(nextParticipantCount - 1, 0);
-
         next.adults = String(nextAdultCount);
         next.children = String(nextChildCount);
         next.participants = String(nextParticipantCount);
         next.participantEmails = (prev.participantEmails || []).slice(0, maxEmails);
         if (maxEmails === 0) next.ccParticipants = false;
       }
-
       return next;
     });
   };
 
   const handleToggleOption = (name) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: !prev[name],
-    }));
+    setFormData((prev) => ({ ...prev, [name]: !prev[name] }));
   };
 
   const handleAddChildren = () => {
     setShowChildrenSelector(true);
     setShowGroupEditor(true);
-
     setFormData((prev) => {
       const currentAdults = Math.max(Number(prev.adults || 1), 1);
       const nextChildren = Math.min(Math.max(Number(prev.children || 0), 1), Math.max(0, 8 - currentAdults));
       const nextParticipantCount = Math.max(currentAdults + nextChildren, 1);
       const maxEmails = Math.max(nextParticipantCount - 1, 0);
-
       return {
         ...prev,
         children: String(nextChildren),
@@ -1056,37 +908,29 @@ const Booking = ({ embeddedTour, bookingData }) => {
     });
   };
 
-  
   const adjustGuestCount = (type, delta) => {
     setFormData((prev) => {
       let nextAdults = Number(prev.adults || 1);
       let nextChildren = Number(prev.children || 0);
       let total = nextAdults + nextChildren;
-
-      // Block decrease if new total would be below min
-      if (delta < 0 && total - 1 < minParticipants) return prev;
-
+      const minPeople = tour?.minPeople ?? 1;
+      if (delta < 0 && total - 1 < minPeople) return prev;
       if (type === "adults") {
         nextAdults = Math.min(Math.max(nextAdults + delta, 1), 8 - nextChildren);
       } else if (type === "children") {
         nextChildren = Math.min(Math.max(nextChildren + delta, 0), 8 - nextAdults);
       }
-
-      // After adjustment, ensure total >= minParticipants
       let newTotal = nextAdults + nextChildren;
-      if (newTotal < minParticipants) {
-        const needed = minParticipants - newTotal;
+      if (newTotal < minPeople) {
+        const needed = minPeople - newTotal;
         const canAddToAdults = Math.min(needed, 8 - nextAdults);
         nextAdults += canAddToAdults;
         nextChildren += needed - canAddToAdults;
-        nextChildren = Math.min(nextChildren, 8 - nextAdults); // safety
+        nextChildren = Math.min(nextChildren, 8 - nextAdults);
       }
-
       const nextParticipantCount = nextAdults + nextChildren;
       const maxEmails = Math.max(nextParticipantCount - 1, 0);
-
       setShowChildrenSelector(nextChildren > 0);
-
       return {
         ...prev,
         adults: String(nextAdults),
@@ -1101,13 +945,8 @@ const Booking = ({ embeddedTour, bookingData }) => {
   const addParticipantEmail = () => {
     setFormData((prev) => {
       const existing = prev.participantEmails || [];
-      if (existing.length >= maxParticipantEmails) return prev;
-
-      return {
-        ...prev,
-        participantEmails: [...existing, ""],
-        ccParticipants: true,
-      };
+      if (existing.length >= Math.max(participantCount - 1, 0)) return prev;
+      return { ...prev, participantEmails: [...existing, ""], ccParticipants: true };
     });
   };
 
@@ -1122,41 +961,26 @@ const Booking = ({ embeddedTour, bookingData }) => {
 
   const removeParticipantEmail = (index) => {
     setFormData((prev) => {
-      const nextEmails = (prev.participantEmails || []).filter(
-        (_, emailIndex) => emailIndex !== index
-      );
-
-      return {
-        ...prev,
-        participantEmails: nextEmails,
-        ccParticipants: nextEmails.length ? prev.ccParticipants : false,
-      };
+      const nextEmails = (prev.participantEmails || []).filter((_, emailIndex) => emailIndex !== index);
+      return { ...prev, participantEmails: nextEmails, ccParticipants: nextEmails.length ? prev.ccParticipants : false };
     });
   };
 
   const handlePickupInputChange = (e) => {
     const { value } = e.target;
-
     setPendingPickup(null);
     setMarkerPosition(null);
     setShowPickupPicker(true);
-
-    setFormData((prev) => ({
-      ...prev,
-      pickupLocation: value,
-      pickupCoords: null,
-    }));
+    setFormData((prev) => ({ ...prev, pickupLocation: value, pickupCoords: null }));
   };
 
   const handleConfirmPickupLocation = () => {
     if (!pendingPickup?.coords) return;
-
     setFormData((prev) => ({
       ...prev,
       pickupLocation: pendingPickup.location,
       pickupCoords: pendingPickup.coords,
     }));
-
     setPendingPickup(null);
     setShowPickupPicker(false);
   };
@@ -1165,18 +989,13 @@ const Booking = ({ embeddedTour, bookingData }) => {
     setMarkerPosition(coords);
     setMapCenter(coords);
     setLocationError("");
-
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${coords.lat}&lon=${coords.lng}`
       );
-
       const data = await res.json();
-
       setPendingPickup({
-        location:
-          data?.display_name ||
-          `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`,
+        location: data?.display_name || `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`,
         coords,
       });
     } catch {
@@ -1189,41 +1008,20 @@ const Booking = ({ embeddedTour, bookingData }) => {
 
   const handleFindAddress = async () => {
     const query = formData.pickupLocation.trim();
-
-    if (!query) {
-      setLocationError("Enter a pickup address first.");
-      return;
-    }
-
+    if (!query) { setLocationError("Enter a pickup address first."); return; }
     try {
       setLocationLoading(true);
       setLocationError("");
-
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(
-          query
-        )}`
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`
       );
-
       if (!res.ok) throw new Error("Search failed");
-
       const data = await res.json();
-
-      if (!data.length) {
-        setLocationError("No matching location found.");
-        return;
-      }
-
+      if (!data.length) { setLocationError("No matching location found."); return; }
       const result = data[0];
-
-      const coords = {
-        lat: Number(result.lat),
-        lng: Number(result.lon),
-      };
-
+      const coords = { lat: Number(result.lat), lng: Number(result.lon) };
       setMarkerPosition(coords);
       setMapCenter(coords);
-
       setPendingPickup({
         location: result.display_name || formData.pickupLocation,
         coords,
@@ -1235,72 +1033,23 @@ const Booking = ({ embeddedTour, bookingData }) => {
     }
   };
 
+  // ─── Submit ──────────────────────────────────────────────────────
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const requiredFields = [
-      "fullName",
-      "mobile",
-      "email",
-      "date",
-      "adults",
-      "children",
-      "pickupLocation",
-    ];
-
+    const requiredFields = ["fullName", "mobile", "email", "date", "adults", "children", "pickupLocation"];
     const missing = requiredFields.some((field) => !formData[field]);
-
-    if (missing) {
-      alert("Please fill in all fields");
-      return;
-    }
-
-    if (!formData.pickupCoords) {
-      alert("Please confirm your pickup point on the map.");
-      return;
-    }
-
+    if (missing) { alert("Please fill in all fields"); return; }
+    if (!formData.pickupCoords) { alert("Please confirm your pickup point on the map."); return; }
     const invalidParticipantEmail = normalizedParticipantEmails.find(
       (email) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
     );
+    if (invalidParticipantEmail) { alert(`Please check this participant email: ${invalidParticipantEmail}`); return; }
 
-    if (invalidParticipantEmail) {
-      alert(`Please check this participant email: ${invalidParticipantEmail}`);
-      return;
-    }
+    // Prepare kids activity fee (already computed)
+    const kidsActivityFeeConverted = kidsActivityFee;
 
-
-    // --- 1. Compute toddler and child counts ---
-    // --- Compute toddler and child counts (as before) ---
-    const toddlerCount = childAges.filter((age) => Number(age) < 12).length;
-    const childrenCount = childAges.filter(
-      (age) => Number(age) >= 12 && Number(age) <= 17
-    ).length;
-
-    // --- Compute kids activity fee using KIDS_ACTIVITIES ---
-    const selectedKidsActivityData = KIDS_ACTIVITIES.find(
-      (act) => act.id === formData.selectedKidsActivity
-    );
-
-    // Fee is calculated per adult and per child, just like in CheckoutSummary
-    const kidsActivityAdultTotal = selectedKidsActivityData
-      ? (Number(selectedKidsActivityData.adultPrice) || 0) * adultCount
-      : 0;
-
-    const kidsActivityChildTotal = selectedKidsActivityData
-      ? (Number(selectedKidsActivityData.childPrice) || 0) * childCount
-      : 0;
-
-    const kidsActivityFeeZar = kidsActivityAdultTotal + kidsActivityChildTotal;
-
-    // Convert to selected currency
-    const kidsActivityFeeConverted = convertPrice(kidsActivityFeeZar, currency);
-
-    // --- Add kids fee to total ---
-    const totalWithKids =
-      discountedTourSubtotal + privateFee + customFee + kidsActivityFeeConverted;
-
-
+    // Compute final total with all components
+    const finalTotal = totalPrice;
 
     nav("/checkout", {
       state: {
@@ -1308,24 +1057,28 @@ const Booking = ({ embeddedTour, bookingData }) => {
         bookingDetails: {
           ...formData,
           adults: adultCount,
-          children: childCount,
-          toddlers: toddlerCount,
+          children: children,
+          toddlers: toddlers,
+          teens: teens,
+          childAges: childAges,
           participants: String(participantCount),
           participantEmails: normalizedParticipantEmails,
           ccParticipantEmails: formData.ccParticipants ? normalizedParticipantEmails : [],
           selectedExtras: formData.selectedExtras || {},
-          selectedKidsActivity: formData.selectedKidsActivity,          // pass the ID
-          kidsActivityFee: kidsActivityFeeConverted,                   // pass the converted fee
+          selectedKidsActivity: formData.selectedKidsActivity,
+          kidsActivityFee: kidsActivityFeeConverted,
           pricingOptions: {
-            isPrivate: formData.isPrivate,
-            isCustom: formData.isCustom,
+            isPrivate,
+            isCustom,
             privateFee,
             customFee,
             groupDiscountPercent,
             groupDiscountAmount,
-            subtotalBeforeGroupDiscount: baseSubtotal,
-            discountedTourSubtotal,
-            estimatedTotal: totalWithKids,
+            subtotalBeforeGroupDiscount: originalSubtotal,
+            discountedTourSubtotal: discountedSubtotal,
+            extrasTotal,
+            kidsActivityFee: kidsActivityFeeConverted,
+            estimatedTotal: finalTotal,
             currency,
           },
         },
@@ -1334,17 +1087,8 @@ const Booking = ({ embeddedTour, bookingData }) => {
     });
   };
 
-
-  
-
+  // ─── Render ──────────────────────────────────────────────────────
   if (!tour) return null;
-
-  useEffect(() => {
-    console.log('formData changed:', formData);
-  }, [formData]);
-
-  const [childAddedAnimation, setChildAddedAnimation] =
-    useState(false);
 
   return (
     <div
@@ -1369,9 +1113,10 @@ const Booking = ({ embeddedTour, bookingData }) => {
 
       <div
         className={`relative z-10 ${
-          isEmbedded ? "px-4 py-0 sm:px-5" : "px-6 py-10 md:px-12 xl:px-20"
+          isEmbedded ? "px-4 py-0 sm:px-5" : "px-4 py-6 sm:px-6 md:px-8 lg:px-12 xl:px-20"
         }`}
       >
+        {/* Back button */}
         <div
           ref={backRef}
           className={`mx-auto mb-6 max-w-7xl ${isEmbedded ? "hidden" : ""}`}
@@ -1385,11 +1130,11 @@ const Booking = ({ embeddedTour, bookingData }) => {
               className="w-4 rotate-270 transition-transform duration-300 group-hover:-translate-x-1"
               alt=""
             />
-
             <span className="font-frank text-base">Back to tours</span>
           </button>
         </div>
 
+        {/* Main card */}
         <div
           ref={cardRef}
           className={`mx-auto overflow-hidden border border-black/5 bg-white/92 backdrop-blur-md ${
@@ -1399,6 +1144,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
           }`}
         >
           <div className={isEmbedded ? "grid" : "grid lg:grid-cols-[0.95fr_1.05fr]"}>
+            {/* Left column – Tour gallery & details */}
             <div ref={leftRef} className={isEmbedded ? "hidden" : "relative bg-neutral-100"}>
               <div className="relative h-[380px] overflow-hidden md:h-[460px] lg:h-[680px]">
                 <img
@@ -1417,7 +1163,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
                       {tour.duration}
                     </span>
                   )}
-
                   {tour.rating && (
                     <span className="rounded-full border border-white/20 bg-green-200/95 px-3 py-1.5 text-xs font-bold text-green-950 backdrop-blur-md">
                       {tour.rating} rating
@@ -1429,11 +1174,9 @@ const Booking = ({ embeddedTour, bookingData }) => {
                   <div className="text-xs font-bold uppercase tracking-[0.25em] text-white/75">
                     Selected Tour
                   </div>
-
                   <div className="mt-2 max-w-[12ch] font-frank text-4xl leading-[0.92] md:text-5xl">
                     {tour.title || tour.info}
                   </div>
-
                   {tour.location && (
                     <div className="mt-4 inline-flex rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold backdrop-blur-sm">
                       {tour.location}
@@ -1471,7 +1214,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
                     text="Choose your accommodation or confirm a custom pickup point."
                     icon="⌖"
                   />
-
                   <MiniAssurance
                     title="Pay now, confirm after"
                     text="Final pickup and operational details are confirmed manually."
@@ -1483,7 +1225,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
                   <div className="text-xs font-bold uppercase tracking-[0.22em] text-neutral-400">
                     Tour overview
                   </div>
-
                   {tour.description && (
                     <p className="mt-3 leading-7 text-neutral-650">
                       {tour.description}
@@ -1502,7 +1243,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
                           You may also like
                         </h3>
                       </div>
-
                       <span className="rounded-full bg-green-200 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-green-950">
                         Explore
                       </span>
@@ -1516,7 +1256,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
                           convertPrice(related.priceBase, currency),
                           currency
                         );
-
                         return (
                           <button
                             key={related.slug || related.id}
@@ -1533,21 +1272,17 @@ const Booking = ({ embeddedTour, bookingData }) => {
                                 e.currentTarget.src = "/images/content/random/1.webp";
                               }}
                             />
-
                             <div className="min-w-0 flex-1">
                               <p className="truncate font-bitter text-sm font-bold text-neutral-950">
                                 {related.title}
                               </p>
-
                               <p className="mt-1 line-clamp-1 text-xs text-neutral-500">
                                 {related.duration || related.location || "Cape Town experience"}
                               </p>
-
                               <p className="mt-1 text-xs font-bold text-green-700">
                                 From {relatedPrice} pp
                               </p>
                             </div>
-
                             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-neutral-400 transition group-hover:bg-green-200 group-hover:text-green-950">
                               →
                             </span>
@@ -1560,16 +1295,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
               </div>
             </div>
 
-            {/* <div className="max-w-5xl mx-auto flex flex-col items-center mt-4">
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-green-500">
-                {isEmbedded ? "Tour request" : "Booking details"}
-              </p>
-
-              <h2 className="mt-2 font-frank text-3xl leading-none text-black md:text-4xl">
-                {isEmbedded ? "Complete your details" : "Secure your slot"}
-              </h2>
-            </div> */}
-
+            {/* Right column – Booking form */}
             <div
               ref={rightRef}
               className={`group/right ${
@@ -1591,7 +1317,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
                   group-hover/right:border-blue-200
                 "
               >
-                {/* BACKGROUND IMAGE */}
                 <img
                   src={resolveImage(tour.image)}
                   alt=""
@@ -1611,62 +1336,20 @@ const Booking = ({ embeddedTour, bookingData }) => {
                     e.currentTarget.src = resolveImage(fallbackImage);
                   }}
                 />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/55 via-black/35 to-white/85" />
 
-                {/* IMAGE CONTRAST OVERLAY */}
-                <div
-                  className="
-                    pointer-events-none
-                    absolute inset-0
-                    bg-gradient-to-b
-                    from-black/55
-                    via-black/35
-                    to-white/85
-                  "
-                />
-
-                {/* CONTENT */}
                 <div className="relative z-10">
-                  {/* EYEBROW */}
                   <div className="text-center">
-                    <p
-                      className="
-                        text-[9px] font-black uppercase
-                        tracking-[0.22em]
-                        text-white/75
-                        sm:text-[10px]
-                        sm:tracking-[0.26em]
-                      "
-                    >
+                    <p className="text-[9px] font-black uppercase tracking-[0.22em] text-white/75 sm:text-[10px] sm:tracking-[0.26em]">
                       Selected tour
                     </p>
-
-                    {/* TITLE */}
-                    <h3
-                      className="
-                        mx-auto mt-2
-                        max-w-4xl
-                        font-frank font-bold
-                        leading-[0.9]
-                        tracking-[-0.04em]
-                        text-white
-                        text-[clamp(2rem,8vw,5.6rem)]
-                      "
-                    >
+                    <h3 className="mx-auto mt-2 max-w-4xl font-frank font-bold leading-[0.9] tracking-[-0.04em] text-white text-[clamp(2rem,8vw,5.6rem)]">
                       {tour.title || tour.info}
                     </h3>
                   </div>
 
-                  {/* PILLS */}
                   {tourInfoPills?.length > 0 && (
-                    <div
-                      className="
-                        mx-auto mt-5
-                        flex max-w-3xl
-                        flex-wrap justify-center
-                        gap-2
-                        sm:mt-6 sm:gap-2.5
-                      "
-                    >
+                    <div className="mx-auto mt-5 flex max-w-3xl flex-wrap justify-center gap-2 sm:mt-6 sm:gap-2.5">
                       {tourInfoPills.map((pill) => (
                         <span
                           key={`${pill.label}-${pill.value}`}
@@ -1690,29 +1373,15 @@ const Booking = ({ embeddedTour, bookingData }) => {
                             ${pill.className}
                           `}
                         >
-                          <span
-                            className="
-                              text-[8px]
-                              font-black
-                              uppercase
-                              tracking-[0.16em]
-                              opacity-65
-                              sm:text-[9px]
-                              sm:tracking-[0.18em]
-                            "
-                          >
+                          <span className="text-[8px] font-black uppercase tracking-[0.16em] opacity-65 sm:text-[9px] sm:tracking-[0.18em]">
                             {pill.label}
                           </span>
-
-                          <span className="whitespace-nowrap">
-                            {pill.value}
-                          </span>
+                          <span className="whitespace-nowrap">{pill.value}</span>
                         </span>
                       ))}
                     </div>
                   )}
 
-                  {/* PRICE AREA */}
                   <div className="mt-6 flex justify-center sm:mt-8">
                     <div
                       ref={priceRef}
@@ -1726,103 +1395,30 @@ const Booking = ({ embeddedTour, bookingData }) => {
                         bg-white/90
                         shadow-[0_14px_40px_rgba(0,0,0,0.08)]
                         backdrop-blur-xl
-
                         sm:max-w-fit
                         sm:flex-row
                         sm:items-stretch
                       "
                     >
-                      {/* PRICE */}
-                      <div
-                        className="
-                          flex
-                          min-w-0
-                          flex-1
-                          flex-col
-                          items-center
-                          justify-center
-                          px-5 py-4
-                          text-center
-
-                          sm:min-w-[10rem]
-                          sm:px-6
-                          sm:py-4
-                        "
-                      >
-                        <div
-                          className="
-                            text-[9px]
-                            font-black
-                            uppercase
-                            tracking-[0.2em]
-                            text-neutral-400
-                            sm:text-[10px]
-                          "
-                        >
+                      <div className="flex min-w-0 flex-1 flex-col items-center justify-center px-5 py-4 text-center sm:min-w-[10rem] sm:px-6 sm:py-4">
+                        <div className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-400 sm:text-[10px]">
                           From
                         </div>
-
-                        <div
-                          className="
-                            mt-1
-                            max-w-full
-                            truncate
-                            font-frank
-                            text-3xl
-                            font-bold
-                            leading-none
-                            tracking-tight
-                            text-neutral-950
-                            sm:text-4xl
-                          "
-                        >
-                          {displayPrice}
+                        <div className="mt-1 max-w-full truncate font-frank text-3xl font-bold leading-none tracking-tight text-neutral-950 sm:text-4xl">
+                          {formatMoney(convertPrice(tour?.priceBase, currency), currency)}
                         </div>
-
-                        <div
-                          className="
-                            mt-1
-                            text-[11px]
-                            font-medium
-                            text-neutral-500
-                            sm:text-xs
-                          "
-                        >
+                        <div className="mt-1 text-[11px] font-medium text-neutral-500 sm:text-xs">
                           per person
                         </div>
                       </div>
 
-                      {/* DIVIDER */}
-                      <div
-                        className="
-                          mx-5
-                          h-px
-                          bg-black/5
+                      <div className="mx-5 h-px bg-black/5 sm:mx-0 sm:my-4 sm:h-auto sm:w-px" />
 
-                          sm:mx-0
-                          sm:my-4
-                          sm:h-auto
-                          sm:w-px
-                        "
-                      />
-
-                      {/* CURRENCY */}
-                      <div
-                        className="
-                          flex
-                          items-center
-                          justify-center
-                          px-4 py-3
-
-                          sm:px-4
-                          sm:py-4
-                        "
-                      >
+                      <div className="flex items-center justify-center px-4 py-3 sm:px-4 sm:py-4">
                         <div className="relative">
                           <label htmlFor="tour-currency" className="sr-only">
                             Select currency
                           </label>
-
                           <select
                             id="tour-currency"
                             aria-label="Select currency"
@@ -1847,15 +1443,12 @@ const Booking = ({ embeddedTour, bookingData }) => {
                               outline-none
                               transition-all
                               duration-200
-
                               hover:border-green-300
                               hover:bg-green-50
-
                               focus:border-green-400
                               focus:bg-green-50
                               focus:ring-2
                               focus:ring-green-400/20
-
                               sm:h-14
                               sm:w-24
                             "
@@ -1866,29 +1459,8 @@ const Booking = ({ embeddedTour, bookingData }) => {
                               </option>
                             ))}
                           </select>
-
-                          {/* SELECT ARROW */}
-                          <span
-                            className="
-                              pointer-events-none
-                              absolute
-                              right-3
-                              top-1/2
-                              -translate-y-1/2
-                              text-neutral-400
-                            "
-                            aria-hidden="true"
-                          >
-                            <svg
-                              width="12"
-                              height="12"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2.4"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
+                          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400" aria-hidden="true">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                               <path d="m6 9 6 6 6-6" />
                             </svg>
                           </span>
@@ -1898,31 +1470,20 @@ const Booking = ({ embeddedTour, bookingData }) => {
                   </div>
                 </div>
               </div>
-            </div>
 
-            {Array.isArray(tour?.options) &&
-              tour.options.length > 0 && (
-              <TourOptions
-                tour={tour}                     // ✅ pass the whole tour object
-                selectedOption={formData?.selectedOption}
-                onOptionChange={(optionId) => {
-                  setFormData((prev) => ({ ...prev, selectedOption: optionId }));
-                }}
-              /> 
-            )}
-            
-            
-            <div
-              ref={rightRef}
-              className={`group/right transition-colors duration-500 ${
-                isEmbedded
-                  ? "p-4 sm:p-5 md:p-6 lg:p-7"
-                  : "p-5 hover:from-white hover:via-green-49/70 hover:to-blue-50/60 md:p-7 lg:p-8"
-              }`}
-            >
+              {/* Tour Options */}
+              {Array.isArray(tour?.options) && tour.options.length > 0 && (
+                <TourOptions
+                  tour={tour}
+                  selectedOption={formData?.selectedOption}
+                  onOptionChange={(optionId) => {
+                    setFormData((prev) => ({ ...prev, selectedOption: optionId }));
+                  }}
+                />
+              )}
 
-              {/* BOOKING FORM */}
-              <form id="booking-form" onSubmit={handleSubmit} className="grid gap-5">
+              {/* Booking Form */}
+              <form id="booking-form" onSubmit={handleSubmit} className="grid gap-5 mt-5">
                 {/* 1. Traveller Details */}
                 <div className="rounded-[1.75rem] border border-black/5 bg-white p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/80 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
                   <div className="mb-4 flex items-center gap-3">
@@ -1950,7 +1511,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
                             {formData.fullName} · {formData.mobile} · {formData.email} · {formData.date}
                           </p>
                         </div>
-
                         <button
                           type="button"
                           onClick={() => {
@@ -2022,7 +1582,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
                       </BookingField>
                     </div>
 
-                    <div className="mt-4 flex justify-center gap-3">
+                    <div className="mt-4 flex flex-wrap justify-center gap-3">
                       <button
                         type="button"
                         onClick={() => {
@@ -2033,7 +1593,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
                       >
                         Save traveller details
                       </button>
-
                       {showTravellerEditor && travellerSnapshot && (
                         <button
                           type="button"
@@ -2059,8 +1618,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
                   </div>
                 </div>
 
-
-
                 {/* 2. Group Size */}
                 <div className="rounded-[1.75rem] border border-black/5 bg-white p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/80 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
                   <div className="mb-4 flex items-center gap-3">
@@ -2068,791 +1625,395 @@ const Booking = ({ embeddedTour, bookingData }) => {
                       2
                     </span>
                     <div>
-                      <h3 className="font-frank text-2xl leading-none text-neutral-950">
-                        Group size
-                      </h3>
+                      <h3 className="font-frank text-2xl leading-none text-neutral-950">Group size</h3>
                       <p className="mt-1 text-xs text-neutral-500">
-                        Select the number of guests in your own party. 
+                        Select the number of guests in your own party.
                       </p>
                     </div>
                   </div>
 
                   <div className="rounded-2xl border border-green-200 bg-green-50/65 p-4 transition-all duration-300">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                      {/* <div>
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-green-700">
-                          Selected guests
-                        </p>
-                        <p className="mt-1 font-frank text-3xl font-bold leading-none text-neutral-950">
-                          {participantCount} total
-                        </p>
-                        <p className="flex flex-col items-center justify-centertext-md leading-5 text-neutral-500">
-                          <b>{tour.minPeople} guests minimum. </b>
-                          
-                        </p>
-                      </div> */}
-
-                      {!showGroupEditor && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setGroupSnapshot({
-                              adults: formData.adults,
-                              children: formData.children, 
-                              participantEmails: [...(formData.participantEmails || [])],
-                              ccParticipants: formData.ccParticipants,
-                            });
-                            setShowGroupEditor(true);
-                          }}
-                          className="w-fit rounded-full border border-green-200 bg-white px-4 py-2 text-xs font-bold text-green-800 transition hover:-translate-y-0.5 hover:bg-green-100"
-                        >
-                          Change
-                        </button>
-                      )}
-                    </div>
-
-                    <div
-                      className={`transition-all duration-500 ease-out ${
-                        !showGroupEditor
-                          ? "max-h-0 overflow-hidden opacity-0 pointer-events-none"
-                          : "mt-4 max-h-[980px] opacity-100"
-                      }`}
-                    >
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        <GuestStepper
-                            label="Adults"
-                            value={adultCount}
-                            hint="Adults in your own booking group."
-                            onDecrease={() => adjustGuestCount("adults", -1)}
-                            onIncrease={() => adjustGuestCount("adults", 1)}
-                            decreaseDisabled={adultCount <= 1 || (adultCount - 1 + childCount) < minParticipants}
-                            increaseDisabled={adultCount + childCount >= 8}
-                        />
-                        {/* Children column – with disclaimer above */}
-                        {/* ============================================================
-                            Children
-                        ============================================================ */}
-                        <div>
-                          {tour.childFriendly === false && (
-                            <div className="mb-2 flex items-center gap-2 rounded-lg border border-amber-200/80 bg-amber-50/70 px-3 py-2 text-xs text-amber-800">
-                              <span className="text-base" aria-hidden="true">
-                                ⚠️
-                              </span>
-
-                              <span>
-                                This tour is not child-friendly. Children cannot be added.
-                              </span>
-                            </div>
-                          )}
-
-                          <div className="rounded-2xl border border-black/5 bg-white p-4">
-
-                            {/* ============================================================
-                                Header
-                            ============================================================ */}
-                            <div className="flex items-center justify-between gap-3">
-                              <div>
-                                <p className="text-sm font-bold text-neutral-950">
-                                  Children
-                                </p>
-
-                                <p className="mt-1 text-xs leading-5 text-neutral-500">
-                                  Add each child's age.
-                                </p>
-                              </div>
-
-                              <span
-                                className="
-                                  rounded-full
-                                  bg-blue-50
-                                  px-2.5 py-1
-                                  text-[10px]
-                                  font-bold
-                                  text-blue-700
-                                "
-                              >
-                                {childAges.length}
-                              </span>
-                            </div>
-
-                            {/* ============================================================
-                                Add child button
-                            ============================================================ */}
-                            <button
-                              type="button"
-                              disabled={
-                                tour.childFriendly === false ||
-                                adultCount + childAges.length >= 8
-                              }
-                              onClick={() => {
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  childAges: [
-                                    ...(prev.childAges || []),
-                                    12,
-                                  ],
-                                }));
-
-                                setChildAddedAnimation(true);
-
-                                setTimeout(() => {
-                                  setChildAddedAnimation(false);
-                                }, 900);
-                              }}
-                              className="
-                                relative
-                                mt-4
-                                flex
-                                w-full
-                                items-center
-                                justify-center
-                                gap-2
-                                overflow-hidden
-                                rounded-xl
-                                border
-                                border-blue-200
-                                bg-blue-50
-                                px-4 py-3
-                                text-xs
-                                font-black
-                                text-blue-700
-                                transition-all
-                                duration-200
-                                hover:-translate-y-0.5
-                                hover:border-blue-300
-                                hover:bg-blue-100
-                                active:translate-y-0
-                                disabled:cursor-not-allowed
-                                disabled:opacity-40
-                              "
-                            >
-                              <span className="text-base">
-                                +
-                              </span>
-
-                              Add child
-                            </button>
-
-                            {/* ============================================================
-                                Child added animation
-                            ============================================================ */}
-                            {childAddedAnimation && (
-                              <div
-                                className="
-                                  pointer-events-none
-                                  flex
-                                  justify-center
-                                  overflow-hidden
-                                "
-                              >
-                                <div
-                                  className="
-                                    mt-2
-                                    animate-[childPop_0.9s_ease-out_forwards]
-                                    text-3xl
-                                  "
-                                >
-                                  🧒
-                                </div>
-                              </div>
-                            )}
-
-                            {/* ============================================================
-                                Child age steppers
-                            ============================================================ */}
+                    {/* Wrapper: both states are always rendered – we toggle classes for smooth transitions */}
+                    <div className="overflow-hidden transition-all duration-500 ease-out">
+                      {/* ---------- Closed summary (visible when !showGroupEditor) ---------- */}
+                      <div
+                        className={`transition-all duration-500 ease-out ${
+                          showGroupEditor
+                            ? "max-h-0 opacity-0 pointer-events-none"
+                            : "max-h-[200px] opacity-100"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="text-sm font-medium text-neutral-800">
+                            <span className="font-bold text-neutral-950">{formData.adults}</span> adult{formData.adults !== 1 && 's'}
                             {childAges.length > 0 && (
-                              <div className="mt-3 space-y-2">
-
-                                {childAges.map((age, index) => {
-                                  const numericAge = Number(age);
-
-                                  const isAgeConfirmed =
-                                    !!confirmedChildAges[index];
-
-                                  const category =
-                                    numericAge < 12
-                                      ? "Toddler"
-                                      : "Child";
-
-                                  /* --------------------------------------------------------
-                                    Increase age
-                                  -------------------------------------------------------- */
-                                  const increaseAge = () => {
-                                    if (isAgeConfirmed) return;
-
-                                    setFormData((prev) => {
-                                      const ages = [...(prev.childAges || [])];
-
-                                      ages[index] = Math.min(
-                                        17,
-                                        Number(ages[index] || 0) + 1
-                                      );
-
-                                      return {
-                                        ...prev,
-                                        childAges: ages,
-                                      };
-                                    });
-
-                                    // Changing age requires confirmation again
-                                    setConfirmedChildAges((prev) => ({
-                                      ...prev,
-                                      [index]: false,
-                                    }));
-                                  };
-
-                                  /* --------------------------------------------------------
-                                    Decrease age
-                                  -------------------------------------------------------- */
-                                  const decreaseAge = () => {
-                                    if (isAgeConfirmed) return;
-
-                                    setFormData((prev) => {
-                                      const ages = [...(prev.childAges || [])];
-
-                                      ages[index] = Math.max(
-                                        0,
-                                        Number(ages[index] || 0) - 1
-                                      );
-
-                                      return {
-                                        ...prev,
-                                        childAges: ages,
-                                      };
-                                    });
-
-                                    // Changing age requires confirmation again
-                                    setConfirmedChildAges((prev) => ({
-                                      ...prev,
-                                      [index]: false,
-                                    }));
-                                  };
-
-                                  /* --------------------------------------------------------
-                                    Confirm age
-                                  -------------------------------------------------------- */
-                                  const confirmChildAge = () => {
-                                    setConfirmedChildAges((prev) => ({
-                                      ...prev,
-                                      [index]: true,
-                                    }));
-                                  };
-
-                                  /* --------------------------------------------------------
-                                    Remove child
-                                  -------------------------------------------------------- */
-                                  const removeChild = () => {
-                                    setFormData((prev) => {
-                                      const ages = [...(prev.childAges || [])];
-
-                                      ages.splice(index, 1);
-
-                                      return {
-                                        ...prev,
-                                        childAges: ages,
-                                      };
-                                    });
-
-                                    /*
-                                    * Rebuild confirmation indexes so removing
-                                    * Child 1 does not leave Child 2 incorrectly
-                                    * confirmed at the old index.
-                                    */
-                                    setConfirmedChildAges((prev) => {
-                                      const next = {};
-
-                                      Object.entries(prev).forEach(
-                                        ([key, value]) => {
-                                          const oldIndex = Number(key);
-
-                                          if (oldIndex < index) {
-                                            next[oldIndex] = value;
-                                          }
-
-                                          if (oldIndex > index) {
-                                            next[oldIndex - 1] = value;
-                                          }
-                                        }
-                                      );
-
-                                      return next;
-                                    });
-                                  };
-
-                                  return (
-                                    <div
-                                      key={`child-${index}`}
-                                      className={`
-                                        group
-                                        flex
-                                        items-center
-                                        gap-3
-                                        rounded-xl
-                                        border
-                                        px-3 py-2.5
-                                        transition-all
-                                        duration-300
-
-                                        ${
-                                          isAgeConfirmed
-                                            ? "border-green-200 bg-green-50/50"
-                                            : "border-black/5 bg-neutral-50 hover:border-blue-100 hover:bg-blue-50/40"
-                                        }
-                                      `}
-                                    >
-
-                                      {/* ==================================================
-                                          Child icon
-                                      ================================================== */}
-                                      <div
-                                        className={`
-                                          flex
-                                          h-9 w-9
-                                          shrink-0
-                                          items-center
-                                          justify-center
-                                          rounded-xl
-                                          bg-white
-                                          text-lg
-                                          shadow-sm
-                                          transition-all
-                                          duration-300
-
-                                          ${
-                                            isAgeConfirmed
-                                              ? "ring-2 ring-green-200"
-                                              : "group-hover:scale-105"
-                                          }
-                                        `}
-                                      >
-                                        🧒
-                                      </div>
-
-                                      {/* ==================================================
-                                          Child label
-                                      ================================================== */}
-                                      <div className="min-w-0 flex-1">
-                                        <div className="flex items-center gap-2">
-                                          <p className="text-xs font-black text-neutral-900">
-                                            Child {index + 1}
-                                          </p>
-
-                                          {isAgeConfirmed && (
-                                            <span
-                                              className="
-                                                rounded-full
-                                                bg-green-100
-                                                px-1.5 py-0.5
-                                                text-[8px]
-                                                font-black
-                                                uppercase
-                                                tracking-wide
-                                                text-green-700
-                                              "
-                                            >
-                                              Confirmed
-                                            </span>
-                                          )}
-                                        </div>
-
-                                        <p
-                                          className={`
-                                            mt-0.5
-                                            text-[10px]
-                                            transition-colors
-                                            duration-300
-                                            ${
-                                              isAgeConfirmed
-                                                ? "text-green-600"
-                                                : "text-neutral-400"
-                                            }
-                                          `}
-                                        >
-                                          {isAgeConfirmed
-                                            ? `${category} · age confirmed`
-                                            : category}
-                                        </p>
-                                      </div>
-
-                                      {/* ==================================================
-                                          Age stepper
-                                      ================================================== */}
-                                      <div
-                                        className={`
-                                          flex
-                                          shrink-0
-                                          items-center
-                                          rounded-xl
-                                          border
-                                          bg-white
-                                          shadow-sm
-                                          transition-opacity
-                                          duration-300
-
-                                          ${
-                                            isAgeConfirmed
-                                              ? "border-green-200 opacity-60"
-                                              : "border-black/10"
-                                          }
-                                        `}
-                                      >
-
-                                        {/* Decrease */}
-                                        <button
-                                          type="button"
-                                          onClick={decreaseAge}
-                                          disabled={
-                                            numericAge <= 0 ||
-                                            isAgeConfirmed
-                                          }
-                                          className="
-                                            flex
-                                            h-8 w-8
-                                            items-center
-                                            justify-center
-                                            rounded-l-xl
-                                            text-sm
-                                            font-black
-                                            text-neutral-500
-                                            transition
-                                            hover:bg-blue-50
-                                            hover:text-blue-600
-                                            disabled:cursor-not-allowed
-                                            disabled:opacity-30
-                                          "
-                                          aria-label={`Decrease Child ${index + 1} age`}
-                                        >
-                                          −
-                                        </button>
-
-                                        {/* Age */}
-                                        <div
-                                          className="
-                                            flex
-                                            h-8
-                                            min-w-[48px]
-                                            items-center
-                                            justify-center
-                                            border-x
-                                            border-black/5
-                                            px-2
-                                          "
-                                        >
-                                          <span className="text-sm font-black text-neutral-950">
-                                            {numericAge}
-                                          </span>
-
-                                          <span className="ml-1 text-[9px] font-bold text-neutral-400">
-                                            yrs
-                                          </span>
-                                        </div>
-
-                                        {/* Increase */}
-                                        <button
-                                          type="button"
-                                          onClick={increaseAge}
-                                          disabled={
-                                            numericAge >= 17 ||
-                                            isAgeConfirmed
-                                          }
-                                          className="
-                                            flex
-                                            h-8 w-8
-                                            items-center
-                                            justify-center
-                                            rounded-r-xl
-                                            text-sm
-                                            font-black
-                                            text-neutral-500
-                                            transition
-                                            hover:bg-blue-50
-                                            hover:text-blue-600
-                                            disabled:cursor-not-allowed
-                                            disabled:opacity-30
-                                          "
-                                          aria-label={`Increase Child ${index + 1} age`}
-                                        >
-                                          +
-                                        </button>
-                                      </div>
-
-                                      {/* ==================================================
-                                          Confirm + Remove
-                                      ================================================== */}
-                                      <div className="flex shrink-0 items-center gap-1.5">
-
-                                        {/* Confirm age */}
-                                        <button
-                                          type="button"
-                                          onClick={confirmChildAge}
-                                          disabled={isAgeConfirmed}
-                                          className={`
-                                            flex
-                                            h-8 w-8
-                                            items-center
-                                            justify-center
-                                            rounded-full
-                                            border
-                                            transition-all
-                                            duration-300
-
-                                            ${
-                                              isAgeConfirmed
-                                                ? `
-                                                  scale-105
-                                                  border-green-500
-                                                  bg-green-500
-                                                  text-white
-                                                  shadow-[0_4px_14px_rgba(34,197,94,0.25)]
-                                                `
-                                                : `
-                                                  border-green-200
-                                                  bg-green-50
-                                                  text-green-600
-                                                  hover:scale-110
-                                                  hover:bg-green-100
-                                                `
-                                            }
-                                          `}
-                                          aria-label={
-                                            isAgeConfirmed
-                                              ? `Child ${index + 1} age confirmed`
-                                              : `Confirm Child ${index + 1} age`
-                                          }
-                                        >
-                                          <span
-                                            className={`
-                                              text-sm
-                                              font-black
-                                              transition-transform
-                                              duration-300
-
-                                              ${
-                                                isAgeConfirmed
-                                                  ? "scale-110"
-                                                  : "scale-100"
-                                              }
-                                            `}
-                                          >
-                                            ✓
-                                          </span>
-                                        </button>
-
-                                        {/* Remove child */}
-                                        <button
-                                          type="button"
-                                          onClick={removeChild}
-                                          className="
-                                            flex
-                                            h-8 w-8
-                                            shrink-0
-                                            items-center
-                                            justify-center
-                                            rounded-lg
-                                            text-sm
-                                            font-bold
-                                            text-neutral-300
-                                            transition-all
-                                            duration-200
-                                            hover:bg-red-50
-                                            hover:text-red-500
-                                          "
-                                          aria-label={`Remove Child ${index + 1}`}
-                                        >
-                                          ×
-                                        </button>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
-
-                            {/* ============================================================
-                                Empty state
-                            ============================================================ */}
-                            {childAges.length === 0 && (
-                              <div
-                                className="
-                                  mt-3
-                                  rounded-xl
-                                  border
-                                  border-dashed
-                                  border-black/10
-                                  bg-neutral-50
-                                  px-4 py-5
-                                  text-center
-                                "
-                              >
-                                <div className="text-2xl opacity-40">
-                                  🧒
-                                </div>
-
-                                <p className="mt-2 text-xs font-bold text-neutral-500">
-                                  No children added
-                                </p>
-
-                                <p className="mt-0.5 text-[10px] text-neutral-400">
-                                  Add a child to enter their age.
-                                </p>
-                              </div>
+                              <span>
+                                , <span className="font-bold text-neutral-950">{childAges.length}</span> child{childAges.length !== 1 && 'ren'}
+                              </span>
                             )}
                           </div>
-                        </div>
-                      </div>
-
-                      
-
-                      {/* <div className="mt-4 rounded-2xl border border-black/5 bg-white p-4">
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                          <div>
-                            <p className="text-sm font-bold text-neutral-950">
-                              Participant email CCs
-                            </p>
-                            <p className="mt-1 text-xs leading-5 text-neutral-500">
-                              Optional. Add guest emails under the selected number of guests.
-                            </p>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={addParticipantEmail}
-                            disabled={!maxParticipantEmails || formData.participantEmails.length >= maxParticipantEmails}
-                            className="rounded-2xl border border-black/10 bg-neutral-950 px-4 py-2.5 text-xs font-bold text-white transition hover:-translate-y-0.5 hover:bg-black disabled:cursor-not-allowed disabled:opacity-40"
-                          >
-                            Add member email
-                          </button>
-                        </div>
-
-                        {maxParticipantEmails === 0 && (
-                          <p className="mt-3 rounded-xl bg-neutral-50 p-3 text-xs leading-5 text-neutral-500">
-                            Select at least 2 total guests to add extra guest emails.
-                          </p>
-                        )}
-
-                        {formData.participantEmails.length > 0 && (
-                          <div className="mt-4 grid gap-3">
-                            <label className="flex items-center gap-3 rounded-2xl bg-neutral-50 p-3 text-sm text-neutral-700">
-                              <input
-                                type="checkbox"
-                                checked={formData.ccParticipants}
-                                onChange={() => handleToggleOption("ccParticipants")}
-                                className="h-4 w-4 accent-green-500"
-                              />
-                              CC these participants after confirmed purchase
-                            </label>
-
-                            {formData.participantEmails.map((email, index) => (
-                              <div key={index} className="flex gap-2">
-                                <input
-                                  type="email"
-                                  value={email}
-                                  onChange={(e) => updateParticipantEmail(index, e.target.value)}
-                                  placeholder={`Participant ${index + 2} email`}
-                                  className="min-w-0 flex-1 rounded-2xl border border-neutral-200 bg-white p-3 text-sm outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
-                                />
-
-                                <button
-                                  type="button"
-                                  onClick={() => removeParticipantEmail(index)}
-                                  className="rounded-2xl border border-black/10 bg-white px-3 text-sm font-bold text-neutral-500 transition hover:bg-red-50 hover:text-red-500"
-                                >
-                                  ×
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div> */}
-
-                      <div className="mt-4 flex justify-center gap-3">
-                        {/* save more as a group */}
-                        <div
-                          ref={groupSaveRef}
-                          className="rounded-2xl border border-green-200 bg-white transition-all duration-300"
-                        >
-                          <div className="flex items-center gap-3 p-4">
-                            <img
-                              src="/icons/savemore.png"
-                              className="h-16 px-4 shrink-0 object-contain opacity-80"
-                              alt=""
-                              onError={(e) => {
-                                e.currentTarget.style.display = "none";
-                              }}
-                            />
-
-                            <div className="min-w-0 flex-1 leading-none">
-                              <p className="text-lg font-bold text-green-950">
-                                Save more when you book as a group
-                              </p>
-
-                              {/* <p className="max-w-3/4 text-xs leading-5 text-green-900/75">
-                                Bigger groups can unlock a lower per-person estimate. Group rates only apply to the full selected group size booked and paid for.
-                              </p> */}
-
-                              <button
-                                type="button"
-                                onClick={() => nav("/policies")}
-                                className="mt- inline-flex items-center gap-2 rounded-full bg-white 
-                                px-4 py-2 mt-2 
-                                text-xs font-bold text-green-800 
-                                border border-blue-600/20 shadow-sm 
-                                transition hover:-translate-y-0.5 hover:bg-green-100"
-                              >
-                                <span className="flex h-4 w-4 place-self-center justify-center rounded-full bg-green-200 text-[10px] text-green-950">
-                                  i
-                                </span>
-                                Learn more about group policy
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setGroupSnapshot(null);
-                            setShowGroupEditor(false);
-                          }}
-                          className="inline-flex items-center gap-2 rounded-2xl border border-green-200 bg-white px-5 
-                          text-sm font-bold text-green-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-green-50"
-                        >
-                          <SaveIcon />
-                          Confirm group details
-                        </button>
-
-                        {showGroupEditor && groupSnapshot && (
                           <button
                             type="button"
                             onClick={() => {
-                              if (groupSnapshot) {
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  adults: groupSnapshot.adults,
-                                  children: groupSnapshot.children,
-                                  participantEmails: [...groupSnapshot.participantEmails],
-                                  ccParticipants: groupSnapshot.ccParticipants,
-                                }));
-                                setShowChildrenSelector(Number(groupSnapshot.children) > 0);
-                                setGroupSnapshot(null);
-                              }
-                              setShowGroupEditor(false);
+                              setGroupSnapshot({
+                                adults: formData.adults,
+                                children: formData.children,
+                                childAges: [...(formData.childAges || [])],
+                                participantEmails: [...(formData.participantEmails || [])],
+                                ccParticipants: formData.ccParticipants,
+                              });
+                              setShowGroupEditor(true);
                             }}
-                            className="rounded-2xl border border-red-200 bg-white px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50"
+                            className="shrink-0 rounded-full border border-green-200 bg-white px-4 py-2 text-xs font-bold text-green-800 transition hover:-translate-y-0.5 hover:bg-green-100"
                           >
-                            Cancel
+                            Change
                           </button>
-                        )}
+                        </div>
+                      </div>
+
+                      {/* ---------- Open editor (visible when showGroupEditor) ---------- */}
+                      <div
+                        className={`transition-all duration-500 ease-out ${
+                          showGroupEditor
+                            ? "max-h-[2000px] opacity-100"
+                            : "max-h-0 opacity-0 pointer-events-none"
+                        }`}
+                      >
+                        <div className="mt-4"> {/* keep some spacing when expanded */}
+
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            {/* Adults */}
+                            <GuestStepper
+                              label="Adults"
+                              value={adultCount}
+                              hint="Adults aged 18+ in your booking group."
+                              onDecrease={() => adjustGuestCount("adults", -1)}
+                              onIncrease={() => adjustGuestCount("adults", 1)}
+                              decreaseDisabled={adultCount <= 1 || adultCount - 1 + childAges.length < (tour?.minPeople ?? 1)}
+                              increaseDisabled={participantCount >= maxParticipants}
+                            />
+
+                            {/* Children */}
+                            <div>
+                              {tour.childFriendly === false && (
+                                <div className="mb-2 flex items-center gap-2 rounded-lg border border-amber-200/80 bg-amber-50/70 px-3 py-2 text-xs text-amber-800">
+                                  <span className="text-base" aria-hidden="true">⚠️</span>
+                                  <span>This tour is not child-friendly. Children cannot be added.</span>
+                                </div>
+                              )}
+
+                              <div className="rounded-2xl border border-black/5 bg-white p-4">
+                                <div className="flex items-center justify-between gap-3">
+                                  <div>
+                                    <p className="text-sm font-bold text-neutral-950">Children</p>
+                                    <p className="mt-1 text-xs leading-5 text-neutral-500">Add each child's age.</p>
+                                  </div>
+                                  <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-bold text-blue-700">
+                                    {childAges.length}
+                                  </span>
+                                </div>
+
+                                {/* Age legend */}
+                                <div className="mt-3 grid grid-cols-3 gap-1.5">
+                                  <div className="rounded-lg border border-blue-100 bg-blue-50/70 px-2 py-1.5 text-center">
+                                    <p className="text-[9px] font-black text-blue-700">Toddler</p>
+                                    <p className="text-[8px] text-blue-500">0–5</p>
+                                  </div>
+                                  <div className="rounded-lg border border-blue-100 bg-blue-50/70 px-2 py-1.5 text-center">
+                                    <p className="text-[9px] font-black text-blue-700">Child</p>
+                                    <p className="text-[8px] text-blue-500">6–11</p>
+                                  </div>
+                                  <div className="rounded-lg border border-blue-100 bg-blue-50/70 px-2 py-1.5 text-center">
+                                    <p className="text-[9px] font-black text-blue-700">Teen</p>
+                                    <p className="text-[8px] text-blue-500">12–17</p>
+                                  </div>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  disabled={tour.childFriendly === false || !canAddChild}
+                                  onClick={() => {
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      childAges: [...(prev.childAges || []), 6],
+                                    }));
+                                    setChildAddedAnimation(true);
+                                    setTimeout(() => setChildAddedAnimation(false), 900);
+                                  }}
+                                  className="relative mt-4 flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-xs font-black text-blue-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-100 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40"
+                                >
+                                  <span className="text-base">+</span> Add child
+                                </button>
+
+                                {childAddedAnimation && (
+                                  <div className="pointer-events-none flex justify-center overflow-hidden">
+                                    <div className="mt-2 animate-[childPop_0.9s_ease-out_forwards] text-3xl">🧒</div>
+                                  </div>
+                                )}
+
+                                {childAges.length > 0 && (
+                                  <div className="mt-3 space-y-2">
+                                    {(() => {
+                                      // Build labels with category and per‑category numbering
+                                      const childLabels = childAges.map((age, idx) => {
+                                        let category;
+                                        if (Number(age) <= 5) category = "Toddler";
+                                        else if (Number(age) <= 11) category = "Child";
+                                        else category = "Teen";
+                                        return { age: Number(age), category, index: idx };
+                                      });
+                                      const categoryCounts = {};
+                                      childLabels.forEach((item) => {
+                                        categoryCounts[item.category] = (categoryCounts[item.category] || 0) + 1;
+                                        item.displayIndex = categoryCounts[item.category];
+                                      });
+
+                                      return childLabels.map(({ age: numericAge, category, index, displayIndex }) => {
+                                        const isAgeConfirmed = !!confirmedChildAges[index];
+                                        let ageRange, icon;
+                                        if (numericAge <= 5) { ageRange = "0–5 years"; icon = "🧒"; }
+                                        else if (numericAge <= 11) { ageRange = "6–11 years"; icon = "👦"; }
+                                        else { ageRange = "12–17 years"; icon = "🧑"; }
+
+                                        const increaseAge = () => {
+                                          if (isAgeConfirmed) return;
+                                          setFormData((prev) => {
+                                            const ages = [...(prev.childAges || [])];
+                                            ages[index] = Math.min(17, Number(ages[index] || 0) + 1);
+                                            return { ...prev, childAges: ages };
+                                          });
+                                          setConfirmedChildAges((prev) => ({ ...prev, [index]: false }));
+                                        };
+
+                                        const decreaseAge = () => {
+                                          if (isAgeConfirmed) return;
+                                          setFormData((prev) => {
+                                            const ages = [...(prev.childAges || [])];
+                                            ages[index] = Math.max(0, Number(ages[index] || 0) - 1);
+                                            return { ...prev, childAges: ages };
+                                          });
+                                          setConfirmedChildAges((prev) => ({ ...prev, [index]: false }));
+                                        };
+
+                                        const confirmChildAge = () => {
+                                          setConfirmedChildAges((prev) => ({ ...prev, [index]: true }));
+                                        };
+
+                                        const removeChild = () => {
+                                          setFormData((prev) => {
+                                            const ages = [...(prev.childAges || [])];
+                                            ages.splice(index, 1);
+                                            return { ...prev, childAges: ages };
+                                          });
+                                          setConfirmedChildAges((prev) => {
+                                            const next = {};
+                                            Object.entries(prev).forEach(([key, value]) => {
+                                              const oldIndex = Number(key);
+                                              if (oldIndex < index) next[oldIndex] = value;
+                                              if (oldIndex > index) next[oldIndex - 1] = value;
+                                            });
+                                            return next;
+                                          });
+                                        };
+
+                                        return (
+                                          <div
+                                            key={`child-${index}`}
+                                            className={`flex flex-col sm:flex-row sm:items-center items-start gap-2 sm:gap-3 rounded-xl border px-3 py-2.5 transition-all duration-300 ${
+                                              isAgeConfirmed
+                                                ? "border-green-200 bg-green-50/50"
+                                                : "border-black/5 bg-neutral-50 hover:border-blue-100 hover:bg-blue-50/40"
+                                            }`}
+                                          >
+                                            {/* Icon + info */}
+                                            <div className="flex w-full items-center gap-3 sm:w-auto">
+                                              <div
+                                                className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-white text-base sm:text-lg shadow-sm transition-all duration-300 ${
+                                                  isAgeConfirmed ? "ring-2 ring-green-200" : "group-hover:scale-105"
+                                                }`}
+                                              >
+                                                {icon}
+                                              </div>
+                                              <div className="min-w-0 flex-1">
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                  <p className="text-xs font-black text-neutral-900">
+                                                    {category} {displayIndex}
+                                                  </p>
+                                                  {isAgeConfirmed && (
+                                                    <span className="rounded-full bg-green-100 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wide text-green-700">
+                                                      Confirmed
+                                                    </span>
+                                                  )}
+                                                </div>
+                                                <p
+                                                  className={`mt-0.5 text-[10px] transition-colors duration-300 ${
+                                                    isAgeConfirmed ? "text-green-600" : "text-neutral-400"
+                                                  }`}
+                                                >
+                                                  {ageRange}
+                                                </p>
+                                              </div>
+                                            </div>
+
+                                            {/* Age controls + action buttons */}
+                                            <div className="flex w-full flex-wrap items-center justify-between gap-1.5 sm:w-auto sm:flex-nowrap sm:justify-end">
+                                              <div
+                                                className={`flex shrink-0 items-center rounded-xl border bg-white shadow-sm transition-opacity duration-300 ${
+                                                  isAgeConfirmed ? "border-green-200 opacity-60" : "border-black/10"
+                                                }`}
+                                              >
+                                                <button
+                                                  type="button"
+                                                  onClick={decreaseAge}
+                                                  disabled={numericAge <= 0 || isAgeConfirmed}
+                                                  className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-l-xl text-sm font-black text-neutral-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30"
+                                                  aria-label={`Decrease ${category} ${displayIndex} age`}
+                                                >
+                                                  −
+                                                </button>
+                                                <div className="flex h-7 min-w-[44px] sm:h-8 sm:min-w-[52px] items-center justify-center border-x border-black/5 px-1.5 sm:px-2">
+                                                  <span className="text-xs sm:text-sm font-black text-neutral-950">{numericAge}</span>
+                                                  <span className="ml-0.5 sm:ml-1 text-[8px] sm:text-[9px] font-bold text-neutral-400">yrs</span>
+                                                </div>
+                                                <button
+                                                  type="button"
+                                                  onClick={increaseAge}
+                                                  disabled={numericAge >= 17 || isAgeConfirmed}
+                                                  className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-r-xl text-sm font-black text-neutral-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30"
+                                                  aria-label={`Increase ${category} ${displayIndex} age`}
+                                                >
+                                                  +
+                                                </button>
+                                              </div>
+
+                                              <div className="flex shrink-0 items-center gap-1.5">
+                                                <button
+                                                  type="button"
+                                                  onClick={confirmChildAge}
+                                                  disabled={isAgeConfirmed}
+                                                  className={`flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border transition-all duration-300 ${
+                                                    isAgeConfirmed
+                                                      ? "scale-105 border-green-500 bg-green-500 text-white shadow-[0_4px_14px_rgba(34,197,94,0.25)]"
+                                                      : "border-green-200 bg-green-50 text-green-600 hover:scale-110 hover:bg-green-100"
+                                                  }`}
+                                                  aria-label={isAgeConfirmed ? `${category} ${displayIndex} age confirmed` : `Confirm ${category} ${displayIndex} age`}
+                                                >
+                                                  <span
+                                                    className={`text-xs sm:text-sm font-black transition-transform duration-300 ${
+                                                      isAgeConfirmed ? "scale-110" : "scale-100"
+                                                    }`}
+                                                  >
+                                                    ✓
+                                                  </span>
+                                                </button>
+                                                <button
+                                                  type="button"
+                                                  onClick={removeChild}
+                                                  className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-neutral-300 transition-all duration-200 hover:bg-red-50 hover:text-red-500"
+                                                  aria-label={`Remove ${category} ${displayIndex}`}
+                                                >
+                                                  ×
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        );
+                                      });
+                                    })()}
+                                  </div>
+                                )}
+
+                                {childAges.length === 0 && (
+                                  <div className="mt-3 rounded-xl border border-dashed border-black/10 bg-neutral-50 px-4 py-5 text-center">
+                                    <div className="text-2xl opacity-40">🧒</div>
+                                    <p className="mt-2 text-xs font-bold text-neutral-500">No children added</p>
+                                    <p className="mt-0.5 text-[10px] text-neutral-400">Add a child to enter their age.</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Group policy + action buttons – stacked on mobile, row on desktop */}
+                          <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
+                            {/* "Save more" banner */}
+                            <div ref={groupSaveRef} className="w-full rounded-2xl border border-green-200 bg-white transition-all duration-300 sm:w-auto">
+                              <div className="flex items-center gap-3 p-4">
+                                <img
+                                  src="/icons/savemore.png"
+                                  className="h-16 shrink-0 px-4 object-contain opacity-80"
+                                  alt=""
+                                  onError={(e) => { e.currentTarget.style.display = "none"; }}
+                                />
+                                <div className="min-w-0 flex-1 leading-none">
+                                  <p className="text-lg font-bold text-green-950">Save more when you book as a group</p>
+                                  <button
+                                    type="button"
+                                    onClick={() => nav("/policies")}
+                                    className="mt-2 inline-flex items-center gap-2 rounded-full border border-blue-600/20 bg-white px-4 py-2 text-xs font-bold text-green-800 shadow-sm transition hover:-translate-y-0.5 hover:bg-green-100"
+                                  >
+                                    <span className="flex h-4 w-4 place-self-center items-center justify-center rounded-full bg-green-200 text-[10px] text-green-950">i</span>
+                                    Learn more about group policy
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Confirm & Cancel buttons */}
+                            <div className="flex w-full flex-col items-center gap-2 sm:w-auto sm:flex-row sm:gap-3">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  // Auto‑confirm all child ages
+                                  const currentChildAges = formData.childAges || [];
+                                  const newConfirmed = {};
+                                  currentChildAges.forEach((_, index) => {
+                                    newConfirmed[index] = true;
+                                  });
+                                  setConfirmedChildAges(newConfirmed);
+
+                                  // Delay close to allow confirmation animations to play
+                                  setTimeout(() => {
+                                    setGroupSnapshot(null);
+                                    setShowGroupEditor(false);
+                                  }, 600);
+                                }}
+                                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-green-200 bg-white px-5 py-3 text-sm font-bold text-green-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-green-50 sm:w-auto"
+                              >
+                                <SaveIcon /> Confirm group details
+                              </button>
+
+                              {showGroupEditor && groupSnapshot && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (groupSnapshot) {
+                                      setFormData((prev) => ({
+                                        ...prev,
+                                        adults: groupSnapshot.adults,
+                                        children: groupSnapshot.children,
+                                        childAges: [...(groupSnapshot.childAges || [])],
+                                        participantEmails: [...groupSnapshot.participantEmails],
+                                        ccParticipants: groupSnapshot.ccParticipants,
+                                      }));
+                                      setShowChildrenSelector(Number(groupSnapshot.children) > 0);
+                                      setGroupSnapshot(null);
+                                    }
+                                    setShowGroupEditor(false);
+                                  }}
+                                  className="w-full rounded-2xl border border-red-200 bg-white px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50 sm:w-auto"
+                                >
+                                  Cancel
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-
-                 
                 </div>
-
-
                 
-
                 {/* 3. Pickup Location */}
                 <div className="rounded-[1.75rem] border border-blue-100 bg-blue-50/45 p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/90 group-hover/right:bg-green-50/60 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
                   <div className="mb-4 flex items-center gap-3">
@@ -2869,128 +2030,50 @@ const Booking = ({ embeddedTour, bookingData }) => {
                     </div>
                   </div>
 
-                  {/* Saved pickup after confirmation */}
                   {formData.pickupCoords && !showPickupPicker && (
-                    <div
-                      ref={pickupFeedbackRef}
-                      className="mt-3 rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-neutral-600 shadow-[0_14px_34px_rgba(34,197,94,0.10)]"
-                    >
+                    <div ref={pickupFeedbackRef} className="mt-3 rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-neutral-600 shadow-[0_14px_34px_rgba(34,197,94,0.10)]">
                       <div className="flex items-start gap-3">
                         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-green-200 text-green-950">
                           <HomeIcon />
                         </span>
-
                         <div className="min-w-0 flex-1">
-                          <div className="font-bold text-green-950">
-                            Pickup location saved
-                          </div>
-
-                          <div className="mt-1 leading-6 text-neutral-700">
-                            {formData.pickupLocation}
-                          </div>
-
+                          <div className="font-bold text-green-950">Pickup location saved</div>
+                          <div className="mt-1 leading-6 text-neutral-700">{formData.pickupLocation}</div>
                           <div className="mt-1 text-xs text-neutral-500">
-                            {formData.pickupCoords.lat.toFixed(6)},{" "}
-                            {formData.pickupCoords.lng.toFixed(6)}
+                            {formData.pickupCoords.lat.toFixed(6)}, {formData.pickupCoords.lng.toFixed(6)}
                           </div>
                         </div>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setPendingPickup(null);
-                            setMarkerPosition(null);
-                            setShowPickupPicker(true);
-                            setFormData((prev) => ({
-                              ...prev,
-                              pickupLocation: "",
-                              pickupCoords: null,
-                            }));
-                          }}
-                          className="shrink-0 rounded-full border border-green-200 bg-white px-3 py-1.5 text-xs font-bold text-green-800 transition hover:bg-green-100"
-                        >
+                        <button type="button" onClick={() => { setPendingPickup(null); setMarkerPosition(null); setShowPickupPicker(true); setFormData((prev) => ({ ...prev, pickupLocation: "", pickupCoords: null })); }} className="shrink-0 rounded-full border border-green-200 bg-white px-3 py-1.5 text-xs font-bold text-green-800 transition hover:bg-green-100">
                           Change
                         </button>
                       </div>
                     </div>
                   )}
 
-                  {/* Pickup editor (map + input + buttons) */}
                   {!formData.pickupCoords && (
-                    <div
-                      className={`transition-all duration-500 ease-out ${
-                        showPickupPicker ? "max-h-[560px] opacity-100" : "max-h-0 overflow-hidden opacity-0"
-                      }`}
-                    >
+                    <div className={`transition-all duration-500 ease-out ${showPickupPicker ? "max-h-[560px] opacity-100" : "max-h-0 overflow-hidden opacity-0"}`}>
                       <div className="mb-4 flex flex-col gap-3 md:flex-row">
-                        <input
-                          name="pickupLocation"
-                          placeholder="Hotel, guesthouse, Airbnb, or pickup point"
-                          value={formData.pickupLocation}
-                          onChange={handlePickupInputChange}
-                          className="flex-1 rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100"
-                        />
-
+                        <input name="pickupLocation" placeholder="Hotel, guesthouse, Airbnb, or pickup point" value={formData.pickupLocation} onChange={handlePickupInputChange} className="flex-1 rounded-2xl border border-neutral-200 bg-white p-4 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100" />
                         <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={pendingPickup ? handleConfirmPickupLocation : handleFindAddress}
-                            disabled={locationLoading || (!pendingPickup && !formData.pickupLocation.trim())}
-                            className="rounded-2xl bg-blue-600 px-5 py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-                          >
-                            {locationLoading
-                              ? "Searching..."
-                              : pendingPickup
-                              ? "Confirm"
-                              : "Find on map"}
+                          <button type="button" onClick={pendingPickup ? handleConfirmPickupLocation : handleFindAddress} disabled={locationLoading || (!pendingPickup && !formData.pickupLocation.trim())} className="rounded-2xl bg-blue-600 px-5 py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60">
+                            {locationLoading ? "Searching..." : pendingPickup ? "Confirm" : "Find on map"}
                           </button>
-
                           {pendingPickup && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setPendingPickup(null);
-                                setMarkerPosition(null);
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  pickupLocation: "",
-                                  pickupCoords: null,
-                                }));
-                                setLocationError("");
-                              }}
-                              className="rounded-2xl border border-red-200 bg-white px-5 py-4 font-semibold text-red-600 transition hover:-translate-y-0.5 hover:bg-red-50"
-                            >
+                            <button type="button" onClick={() => { setPendingPickup(null); setMarkerPosition(null); setFormData((prev) => ({ ...prev, pickupLocation: "", pickupCoords: null })); setLocationError(""); }} className="rounded-2xl border border-red-200 bg-white px-5 py-4 font-semibold text-red-600 transition hover:-translate-y-0.5 hover:bg-red-50">
                               Reset
                             </button>
                           )}
                         </div>
                       </div>
-
-                      <PickupMap
-                        center={[mapCenter.lat, mapCenter.lng]}
-                        markerPosition={markerPosition}
-                        onPick={handleMapPick}
-                      />
-
-                      {locationError && (
-                        <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-600">
-                          {locationError}
-                        </p>
-                      )}
+                      <PickupMap center={[mapCenter.lat, mapCenter.lng]} markerPosition={markerPosition} onPick={handleMapPick} />
+                      {locationError && <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-600">{locationError}</p>}
                     </div>
                   )}
                 </div>
-
-
               </form>
-            </div>
-          </div>
-                    
-          <div
-            className="relative border-t border-black/5 bg-white/92 px-4 py-4 md:px-8 md:py-5"
-          >
-            <div>
-                {/* Private / Custom toggles */}
+
+              {/* Toggle options & kids activities */}
+              <div className="mt-5 space-y-4">
                 <div className="flex flex-col gap-3 lg:flex-row [&>button]:flex-1">
                   <ToggleOption
                     active={formData.isPrivate}
@@ -3000,7 +2083,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
                     icon="P"
                     onClick={() => handleToggleOption("isPrivate")}
                   />
-
                   <ToggleOption
                     active={formData.isCustom}
                     title="Custom trip"
@@ -3009,60 +2091,54 @@ const Booking = ({ embeddedTour, bookingData }) => {
                     icon="C"
                     onClick={() => handleToggleOption("isCustom")}
                   />
-                  {Array.isArray(tour?.additionalPricing) && tour.additionalPricing.length > 0 && (
-                    <AdditionalPricing
-                      additionalPricing={tour.additionalPricing}
-                      selectedExtras={formData.selectedExtras}
-                      onExtrasChange={(newExtras) =>
-                        setFormData((prev) => ({ ...prev, selectedExtras: newExtras }))
-                      }
-                    />
-                  )}
-                  
-
                 </div>
-                
-                {/* Kids Activities */}
+
+                {Array.isArray(tour?.additionalPricing) && tour.additionalPricing.length > 0 && (
+                  <AdditionalPricing
+                    additionalPricing={tour.additionalPricing}
+                    selectedExtras={formData.selectedExtras}
+                    onExtrasChange={(newExtras) =>
+                      setFormData((prev) => ({ ...prev, selectedExtras: newExtras }))
+                    }
+                  />
+                )}
+
                 <KidsActivities
                   childFriendly={tour?.childFriendly === true}
                   adultCount={adultCount}
-                  childCount={childCount}
+                  childCount={children} // children 6-11
+                  toddlerCount={toddlers}
                   selectedActivity={formData.selectedKidsActivity}
                   onActivityChange={(activityId) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      selectedKidsActivity: activityId,
-                    }))
+                    setFormData((prev) => ({ ...prev, selectedKidsActivity: activityId }))
                   }
                 />
+              </div>
 
+              {/* CHECKOUT SUMMARY */}
+              <div ref={checkoutRef} className="mt-6">
+                <CheckoutSummary
+                  tour={tour}
+                  adultCount={adultCount}
+                  childCount={children}   // 6-11
+                  toddlerCount={toddlers}
+                  selectedOption={formData?.selectedOption}
+                  selectedExtras={formData.selectedExtras}
+                  additionalPricing={tour.additionalPricing}
+                  formData={formData}
+                  contactDetailsComplete={contactDetailsComplete}
+                  dateDetailsComplete={dateDetailsComplete}
+                  pickupDetailsComplete={pickupDetailsComplete}
+                  isEmbedded={isEmbedded}
+                  CheckoutCartIcon={CheckoutCartIcon}
+                  checkoutRef={checkoutRef}
+                />
+              </div>
             </div>
-          </div>
-          {/* CHECKOUT SUMMARY */}
-          <div
-            ref={checkoutRef}
-            className="border-black/5 bg-white/92 px-4 py-4 md:px-8 md:py-5"
-          >
-          {/* Inside the component: */}
-            <CheckoutSummary
-              tour={tour}
-              adultCount={adultCount}
-              childCount={childCount}
-              selectedOption={formData?.selectedOption}
-              selectedExtras={formData.selectedExtras}      // add this
-              additionalPricing={tour.additionalPricing}    // add this 
-              formData={formData}
-              contactDetailsComplete={contactDetailsComplete}
-              dateDetailsComplete={dateDetailsComplete}
-              pickupDetailsComplete={pickupDetailsComplete}
-              isEmbedded={isEmbedded}
-              CheckoutCartIcon={CheckoutCartIcon}
-              checkoutRef={checkoutRef}
-            />
-            
           </div>
         </div>
 
+        {/* Bottom bar */}
         <div
           ref={bottomRef}
           className={`mx-auto mt-6 rounded-2xl border border-black/5 bg-white/72 px-5 py-4 shadow-[0_8px_24px_rgba(0,0,0,0.04)] backdrop-blur-md ${
@@ -3075,17 +2151,8 @@ const Booking = ({ embeddedTour, bookingData }) => {
               <br />
               Your final amount is verified before payment.
             </p>
-
             <div className="flex items-center gap-2 rounded-full bg-green-200 px-4 py-2 text-sm font-semibold text-green-950">
-              <img
-                src="/icons/savemore.png"
-                className="h-5 w-5 object-contain"
-                alt=""
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                }}
-              />
-
+              <img src="/icons/savemore.png" className="h-5 w-5 object-contain" alt="" onError={(e) => e.currentTarget.style.display = "none"} />
               <span>Group pricing shown before checkout</span>
             </div>
           </div>

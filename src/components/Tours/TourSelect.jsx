@@ -208,45 +208,7 @@ function TourSelect() {
   // Mobile: expanded row index
   const [expandedIndex, setExpandedIndex] = useState(null)
 
-  // ----- NEW: banner visibility state -----
-  const [showBanner, setShowBanner] = useState(true)
-  const lastScrollY = useRef(0)
-  const bannerVisible = useRef(true)
-
-  // ----- NEW: scroll detection effect -----
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY
-
-      // Always show at top
-      if (currentScrollY <= 0) {
-        setShowBanner(true)
-        bannerVisible.current = true
-      }
-      // Hide after scrolling down past 200px
-      else if (
-        currentScrollY > 200 &&
-        currentScrollY > lastScrollY.current &&
-        bannerVisible.current
-      ) {
-        setShowBanner(false)
-        bannerVisible.current = false
-      }
-      // Show when scrolling up
-      else if (
-        currentScrollY < lastScrollY.current &&
-        !bannerVisible.current
-      ) {
-        setShowBanner(true)
-        bannerVisible.current = true
-      }
-
-      lastScrollY.current = currentScrollY
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  // ----- BANNER is always visible – removed scroll‑hide logic -----
 
   const mobileCardRef = useRef(null)
   const desktopTileRefs = useRef({})
@@ -1548,9 +1510,6 @@ function TourSelect() {
               </div>
             </button>
 
-      {/* <div className="mb-3 px-4">
-        <StepProgress />
-      </div> */}
             <div className="m-2 flex items-center justify-between gap-3">
               <button
                 type="button"
@@ -1570,39 +1529,31 @@ function TourSelect() {
               </button>
             </div>
 
-
-
-            {/* ===== BANNER WRAPPER (Travel and Tours && Save more pills) ===== */}
-            <div className="overflow-hidden">
+            {/* ===== BANNER (always visible) ===== */}
+            <div className="mt-3 flex w-full max-w-5xl flex-wrap items-center justify-between gap-2 
+            rounded-2xl border border-white/16 px-3 py-2 hadow-[0_10px_30px_rgba(0,0,0,0.06)] backdrop-blur-sm sm:flex-nowrap sm:px-4 sm:py-2.5">
+              {/* Travel & Tours title */}
               <div
-                className={`mt-3 flex w-full max-w-5xl flex-wrap items-center justify-between gap-2 rounded-2xl order border-white/16 g-white px- py-2 shadow-[0_10px_30px_rgba(0,0,0,0.06)] backdrop-blur-sm sm:flex-nowrap sm:px- sm:py-2.5 transition-all duration-300 ${showBanner
-                  ? 'translate-y-0 opacity-100'
-                  : '-translate-y-full opacity-0 pointer-events-none'
-                  }`}
+                ref={titleRef}
+                className="relative overflow-hidden rounded-2xl px-3 py-1 sm:px-4 sm:py-1.5 bg-blue-800 border"
               >
-                {/* Travel & Tours title */}
-                <div
-                  ref={titleRef}
-                  className="relative overflow-hidden rounded-2xl px-3 py-1 sm:px-4 sm:py-1.5 bg-blue-800 border border-white"
-                >
-                  <span
-                    ref={titleShineRef}
-                    className="pointer-events-none absolute inset-y-0 left-[-48%] w-[30%] skew-x-[-20deg] 
+                <span
+                  ref={titleShineRef}
+                  className="pointer-events-none absolute inset-y-0 left-[-48%] w-[30%] skew-x-[-20deg] 
                 bg-white bg[linear-gradient(90deg,transparent,rgba(0,45,203,0.18),transparent)]"
-                    aria-hidden="true"
-                  />
-                  <span className="relative bg-blu z-10 font-lobster text-base font-extrabold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.04)] sm:text-lg md:text-xl">
-                    Travel &amp; Tours
-                  </span>
-                </div>
+                  aria-hidden="true"
+                />
+                <span className="relative bg-blu z-10 font-lobster text-base font-extrabold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.04)] sm:text-lg md:text-xl">
+                  Travel &amp; Tours
+                </span>
+              </div>
 
-                {/* Save more badge */}
-                <div className="flex w-fit lg:w-fit items-center gap-2 rounded-2xl border border-green-300/80 bg-green-100/95 px-3 py-1.5 sm:px-4 sm:py-2">
-                  <img src="./icons/savemore.png" className="h-4 w-4 shrink-0 object-contain sm:h-5 sm:w-5" alt="" aria-hidden="true" />
-                  <p className="whitespace-nowrap font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-green-900 sm:text-[11px] sm:tracking-[0.1em]">
-                    Save more when you book as a group
-                  </p>
-                </div>
+              {/* Save more badge */}
+              <div className="flex w-fit lg:w-fit items-center gap-2 rounded-2xl border border-green-300/80 bg-green-100/95 px-3 py-1.5 sm:px-4 sm:py-2">
+                <img src="./icons/savemore.png" className="h-4 w-4 shrink-0 object-contain sm:h-5 sm:w-5" alt="" aria-hidden="true" />
+                <p className="whitespace-nowrap font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-green-900 sm:text-[11px] sm:tracking-[0.1em]">
+                  Save more when you book as a group
+                </p>
               </div>
             </div>
             {/* ===== END BANNER ===== */}

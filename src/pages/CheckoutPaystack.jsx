@@ -181,15 +181,12 @@ const SummaryRow = ({ label, value, strong = false }) => (
   </div>
 );
 
-
-
 const PolicyNote = ({ title, children }) => (
   <div className="rounded-2xl bg-white/72 p-4 shadow-[0_10px_24px_rgba(7,31,79,0.04)]">
     <p className="text-sm font-bold text-[#071f4f]">{title}</p>
     <p className="mt-1 text-xs leading-5 text-slate-500">{children}</p>
   </div>
 );
-
 
 const VehicleOptionCard = ({ vehicle }) => (
   <div className="group overflow-hidden rounded-[1.35rem] bg-white shadow-[0_12px_28px_rgba(7,31,79,0.06)]">
@@ -885,206 +882,255 @@ const CheckoutPaystack = () => {
     };
   }, [tour, bookingDetails, loadingSession, checkoutError, paymentCompact]);
 
-  // ─── 🆕 PRICING CALCULATION (now recomputed from scratch) ─────────
+  // ════════════════════════════════════════════════════════════════════
+  // 🆕 PRICING CALCULATION – MIRRORS CHECKOUTSUMMARY
+  // ════════════════════════════════════════════════════════════════════
 
-  // Extract adult and child counts from bookingDetails
+  // --- Extract counts from bookingDetails ---
   const adultCount = useMemo(() => {
     const raw = bookingDetails?.adultCount ?? bookingDetails?.adults;
     const parsed = parseInt(raw, 10);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
   }, [bookingDetails]);
 
-  const childCount = useMemo(() => {
-    const raw = bookingDetails?.childCount ?? bookingDetails?.children;
-    const parsed = parseInt(raw, 10);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+  // Child ages (if provided) – otherwise we fall back to childCount / toddlerCount
+  const childAges = useMemo(() => {
+    const ages = bookingDetails?.childAges;
+    if (Array.isArray(ages)) {
+      return ages
+        .map((age) => Number(age))
+        .filter((age) => Number.isFinite(age) && age >= 0 && age <= 17);
+    }
+    return [];
   }, [bookingDetails]);
 
-  // ─── 🆕 Toddler and kids activity fee ─────────────────────────────
-  const toddlerCount = useMemo(() => {
+  // Derive age categories from actual ages (or fallback to provided counts)
+  const toddlers = useMemo(() => {
+    if (childAges.length > 0) {
+      return childAges.filter((age) => age <= 5).length;
+    }
+    // Fallback: use toddlerCount from bookingDetails
     const raw = bookingDetails?.toddlers ?? bookingDetails?.toddlerCount ?? 0;
     const parsed = parseInt(raw, 10);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
-  }, [bookingDetails]);
+  }, [childAges, bookingDetails]);
 
-  const kidsActivityFee = useMemo(() => {
-    return Number(bookingDetails?.kidsActivityFee) || 0;
-  }, [bookingDetails]);
+  const children = useMemo(() => {
+    if (childAges.length > 0) {
+      return childAges.filter((age) => age >= 6 && age <= 11).length;
+    }
+    // Fallback: use childCount (but subtract toddlers if not provided)
+    const raw = bookingDetails?.childCount ?? bookingDetails?.children ?? 0;
+    const parsed = parseInt(raw, 10);
+    const fallback = Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+    // If we have a separate toddlerCount, assume children are the remainder
+    // But we don't know exactly, so we'll use the raw child count as children (and toddlers separately)
+    // This is a fallback – better to have childAges.
+    return fallback;
+  }, [childAges, bookingDetails]);
 
+  const teens = useMemo(() => {
+    if (childAges.length > 0) {
+      return childAges.filter((age) => age >= 12 && age <= 17).length;
+    }
+    // No fallback – we assume teens are not separately provided.
+    return 0;
+  }, [childAges]);
+
+  // If we have no childAges, we use the provided counts (adults, children, toddlers) directly.
+  // But we need to ensure that "children" is the 6-11 group, not including teens.
+  // So we'll use the counts from bookingDetails if childAges is empty,
+  // but we won't have teens separately – we'll assume they are 0.
+  const effectiveAdults = adultCount;
+  const effectiveChildren = children;
+  const effectiveToddlers = toddlers;
+  const effectiveTeens = teens;
+
+  // Total participants
+  const participants = effectiveAdults + effectiveChildren + effectiveToddlers + effectiveTeens;
+
+  // --- Kids activity ---
   const selectedKidsActivity = useMemo(() => {
     const id = bookingDetails?.selectedKidsActivity;
     if (!id) return null;
     return KIDS_ACTIVITIES.find(act => act.id === id) || null;
   }, [bookingDetails]);
 
-  // If no adult/child counts, fallback to total participants (assume all adults)
-  const fallbackParticipants = useMemo(() => {
-    const parsed = parseInt(bookingDetails?.participants, 10);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
-  }, [bookingDetails]);
+  const kidsActivityAdultPrice = selectedKidsActivity
+    ? Number(selectedKidsActivity.adultPrice) || 0
+    : 0;
+  const kidsActivityChildPrice = selectedKidsActivity
+    ? Number(selectedKidsActivity.childPrice) || 0
+    : 0;
+  const kidsActivityToddlerPrice = selectedKidsActivity
+    ? Number(selectedKidsActivity.toddlerPrice) || 0
+    : 0;
 
-  const effectiveAdults = adultCount > 0 || childCount > 0 ? adultCount : fallbackParticipants;
-  const effectiveChildren = childCount > 0 ? childCount : 0;
+  const kidsActivityAdultTotal = kidsActivityAdultPrice * effectiveAdults;
+  const kidsActivityChildTotal = kidsActivityChildPrice * effectiveChildren;
+  const kidsActivityToddlerTotal = kidsActivityToddlerPrice * effectiveToddlers;
+  const kidsActivityTotal = kidsActivityAdultTotal + kidsActivityChildTotal + kidsActivityToddlerTotal;
 
-  // ─── Get selected option from bookingDetails ──────────────────────
+  // Convert to selected currency
+  const kidsActivityFee = convertFromZar(kidsActivityTotal, currency);
+
+  // --- Tour option ---
   const selectedOptionId = bookingDetails?.selectedOption || bookingDetails?.optionId;
   const selectedOption = useMemo(() => {
     if (!selectedOptionId || !tour?.options) return null;
     return tour.options.find(opt => opt.id === selectedOptionId) || null;
   }, [selectedOptionId, tour]);
 
-  // ─── Adult price: first from selected option, then from pricing ──
-  const adultPrice = useMemo(() => {
-    // If a specific option is selected, use its price
-    if (selectedOption && typeof selectedOption.pricePerPerson === 'number') {
-      return convertFromZar(selectedOption.pricePerPerson, currency);
-    }
+  // --- Category pricing (with .startsWith matching) ---
+  const adultPricing = tour?.pricing?.find(p =>
+    p.category?.toLowerCase().startsWith("adult")
+  ) || tour?.pricing?.[0];
+  const adultBasePrice = Number(adultPricing?.pricePerPerson) || 0;
+  let adultPrice = adultBasePrice;
+  if (selectedOption && typeof selectedOption.pricePerPerson === 'number') {
+    adultPrice = selectedOption.pricePerPerson;
+  }
+  const adultPriceConverted = convertFromZar(adultPrice, currency);
 
-    // Otherwise fallback to pricing array (look for "adult" or first entry)
-    if (!tour?.pricing || tour.pricing.length === 0) return 0;
-    const adultEntry = tour.pricing.find(p =>
-      p.category?.toLowerCase().includes("adult")
-    ) || tour.pricing[0];
-    const basePrice = Number(adultEntry?.pricePerPerson) || 0;
-    return convertFromZar(basePrice, currency);
-  }, [selectedOption, tour, currency]);
+  const teenPricing = tour?.pricing?.find(p =>
+    p.category?.toLowerCase().startsWith("teen")
+  );
+  const teenBasePrice = Number(teenPricing?.pricePerPerson) || 0;
+  const teenPriceConverted = convertFromZar(teenBasePrice, currency);
 
-  // ─── Child price: same fallback ──────────────────────────────────
-  const childPrice = useMemo(() => {
-    if (!tour?.pricing) return 0;
-    const childEntry = tour.pricing.find(p =>
-      p.category?.toLowerCase().includes("child")
-    );
-    if (!childEntry) return 0;
-    return convertFromZar(Number(childEntry.pricePerPerson) || 0, currency);
-  }, [tour, currency]);
+  const childPricing = tour?.pricing?.find(p =>
+    p.category?.toLowerCase().startsWith("child")
+  );
+  const childBasePrice = Number(childPricing?.pricePerPerson) || 0;
+  const childPriceConverted = convertFromZar(childBasePrice, currency);
 
-  // ─── Option name for display ──────────────────────────────────────
-  const selectedOptionName = selectedOption?.name || null;
+  const toddlerPricing = tour?.pricing?.find(p =>
+    p.category?.toLowerCase().startsWith("toddler")
+  );
+  const toddlerBasePrice = Number(toddlerPricing?.pricePerPerson) || 0;
+  const toddlerPriceConverted = convertFromZar(toddlerBasePrice, currency);
 
-  // ─── Total participants (unchanged) ──────────────────────────────
-  const participants = effectiveAdults + effectiveChildren;
+  // --- Original subtotals ---
+  const adultOriginalSubtotal = effectiveAdults * adultPriceConverted;
+  const teenOriginalSubtotal = effectiveTeens * teenPriceConverted;
+  const childOriginalSubtotal = effectiveChildren * childPriceConverted;
+  const toddlerOriginalSubtotal = effectiveToddlers * toddlerPriceConverted;
+  const originalSubtotal = adultOriginalSubtotal + teenOriginalSubtotal + childOriginalSubtotal + toddlerOriginalSubtotal;
 
-  // ─── Group pricing logic (recomputed from scratch) ────────────────
+  // --- Group discount (same logic as CheckoutSummary) ---
+  let discountedSubtotal = originalSubtotal;
+  let groupDiscountAmount = 0;
+  let groupDiscountPercent = 0;
+  let adultDiscountAmount = 0;
+  let teenDiscountAmount = 0;
+  let hasDiscount = false;
+  let matchedGroupTier = null;
+  let groupPricingType = null;
+  let isCustomQuote = false;
 
-  const {
-    subtotalBeforeDiscount,
-    groupDiscountPercent,
-    groupDiscountAmount,
-    discountedTourSubtotal,
-    matchedGroupTier,
-    groupPricingType,
-    hasDiscount,
-    isCustomQuote,
-  } = useMemo(() => {
-    // Always recompute original subtotal from adult and child prices
-    let originalSubtotal = effectiveAdults * adultPrice + effectiveChildren * childPrice;
-    let discounted = originalSubtotal;
-    let discountAmt = 0;
-    let discountPct = 0;
-    let matchedTier = null;
-    let pricingType = null;
-    let hasDisc = false;
-    let custom = false;
+  if (
+    tour?.groupPricing?.enabled &&
+    Array.isArray(tour.groupPricing.tiers) &&
+    tour.groupPricing.tiers.length > 0
+  ) {
+    matchedGroupTier = tour.groupPricing.tiers.find((tier) => {
+      const minPeople = Number(tier.minPeople) || 0;
+      const maxPeople = tier.maxPeople == null ? Infinity : Number(tier.maxPeople);
+      return participants >= minPeople && participants <= maxPeople;
+    }) || null;
+  }
 
-    // Find matching group tier (if enabled)
-    if (
-      tour?.groupPricing?.enabled &&
-      Array.isArray(tour.groupPricing.tiers) &&
-      tour.groupPricing.tiers.length > 0
-    ) {
-      matchedTier = tour.groupPricing.tiers.find((tier) => {
-        const minPeople = Number(tier.minPeople) || 0;
-        const maxPeople = tier.maxPeople == null ? Infinity : Number(tier.maxPeople);
-        return participants >= minPeople && participants <= maxPeople;
-      }) || null;
-    }
+  if (matchedGroupTier) {
+    const groupTotal =
+      matchedGroupTier.groupTotal != null ? Number(matchedGroupTier.groupTotal) : null;
 
-    if (matchedTier) {
-      const groupTotal =
-        matchedTier.groupTotal != null ? Number(matchedTier.groupTotal) : null;
+    if (groupTotal !== null && Number.isFinite(groupTotal) && groupTotal > 0) {
+      groupPricingType = "groupTotal";
+      discountedSubtotal = groupTotal;
+      groupDiscountAmount = Math.max(0, originalSubtotal - discountedSubtotal);
+      groupDiscountPercent =
+        originalSubtotal > 0 ? (groupDiscountAmount / originalSubtotal) * 100 : 0;
+      adultDiscountAmount = groupDiscountAmount;
+      teenDiscountAmount = 0;
+      hasDiscount = groupDiscountAmount > 0;
+    } else {
+      const hasPerPersonPrice =
+        matchedGroupTier.perPerson != null &&
+        Number.isFinite(Number(matchedGroupTier.perPerson));
+      const hasDiscountPercent =
+        matchedGroupTier.discountPercent != null &&
+        Number.isFinite(Number(matchedGroupTier.discountPercent));
 
-      if (groupTotal !== null && groupTotal > 0) {
-        // Fixed group total
-        pricingType = "groupTotal";
-        discounted = groupTotal;
-        discountAmt = Math.max(0, originalSubtotal - discounted);
-        discountPct = originalSubtotal > 0 ? (discountAmt / originalSubtotal) * 100 : 0;
-        hasDisc = true; // group pricing is active
-        custom = false;
+      if (hasPerPersonPrice) {
+        groupPricingType = "perPerson";
+        const groupPersonPrice = Math.max(0, Number(matchedGroupTier.perPerson));
+        const groupPersonPriceConverted = convertFromZar(groupPersonPrice, currency);
+
+        const discountedAdultSubtotal = effectiveAdults * groupPersonPriceConverted;
+        const discountedTeenSubtotal = effectiveTeens * groupPersonPriceConverted;
+        // Children and toddlers keep original price
+        const unchangedChildSubtotal = childOriginalSubtotal;
+        const unchangedToddlerSubtotal = toddlerOriginalSubtotal;
+
+        discountedSubtotal =
+          discountedAdultSubtotal +
+          discountedTeenSubtotal +
+          unchangedChildSubtotal +
+          unchangedToddlerSubtotal;
+
+        adultDiscountAmount = Math.max(0, adultOriginalSubtotal - discountedAdultSubtotal);
+        teenDiscountAmount = Math.max(0, teenOriginalSubtotal - discountedTeenSubtotal);
+        groupDiscountAmount = adultDiscountAmount + teenDiscountAmount;
+
+        const adultAndTeenOriginal = adultOriginalSubtotal + teenOriginalSubtotal;
+        groupDiscountPercent =
+          adultAndTeenOriginal > 0 ? (groupDiscountAmount / adultAndTeenOriginal) * 100 : 0;
+        hasDiscount = groupDiscountAmount > 0;
+      } else if (hasDiscountPercent) {
+        groupPricingType = "discountPercent";
+        const requestedDiscountPercent = Number(matchedGroupTier.discountPercent);
+        const safeDiscountPercent = Math.min(Math.max(requestedDiscountPercent, 0), 100);
+
+        const adultDiscount = adultOriginalSubtotal * (safeDiscountPercent / 100);
+        const discountedAdultSubtotal = adultOriginalSubtotal - adultDiscount;
+        const teenDiscount = teenOriginalSubtotal * (safeDiscountPercent / 100);
+        const discountedTeenSubtotal = teenOriginalSubtotal - teenDiscount;
+
+        discountedSubtotal =
+          discountedAdultSubtotal +
+          discountedTeenSubtotal +
+          childOriginalSubtotal +
+          toddlerOriginalSubtotal;
+
+        adultDiscountAmount = Math.max(0, adultDiscount);
+        teenDiscountAmount = Math.max(0, teenDiscount);
+        groupDiscountAmount = adultDiscountAmount + teenDiscountAmount;
+        groupDiscountPercent = safeDiscountPercent;
+        hasDiscount = groupDiscountAmount > 0;
       } else {
-        const hasPerPerson =
-          matchedTier.perPerson != null && Number.isFinite(Number(matchedTier.perPerson));
-        const hasDiscountPct =
-          matchedTier.discountPercent != null && Number.isFinite(Number(matchedTier.discountPercent));
-
-        if (hasPerPerson) {
-          pricingType = "perPerson";
-          const groupAdultPrice = Math.max(0, Number(matchedTier.perPerson));
-          const discountedAdultSubtotal = effectiveAdults * groupAdultPrice;
-          const unchangedChildSubtotal = effectiveChildren * childPrice;
-          discounted = discountedAdultSubtotal + unchangedChildSubtotal;
-          discountAmt = Math.max(0, originalSubtotal - discounted);
-          discountPct = originalSubtotal > 0 ? (discountAmt / originalSubtotal) * 100 : 0;
-          hasDisc = discountAmt > 0;
-        } else if (hasDiscountPct) {
-          pricingType = "discountPercent";
-          const requested = Number(matchedTier.discountPercent);
-          const safe = Math.min(Math.max(requested, 0), 100);
-          // applyGroupDiscountToChildren is true by default in CheckoutSummary
-          discountAmt = originalSubtotal * (safe / 100);
-          discounted = originalSubtotal - discountAmt;
-          discountPct = originalSubtotal > 0 ? (discountAmt / originalSubtotal) * 100 : 0;
-          hasDisc = discountAmt > 0;
-        } else {
-          pricingType = "custom";
-          custom = true;
-          discounted = originalSubtotal;
-          discountAmt = 0;
-          discountPct = 0;
-          hasDisc = false;
-        }
+        groupPricingType = "custom";
+        isCustomQuote = true;
+        discountedSubtotal = originalSubtotal;
+        groupDiscountAmount = 0;
+        groupDiscountPercent = 0;
+        adultDiscountAmount = 0;
+        teenDiscountAmount = 0;
+        hasDiscount = false;
       }
     }
+  }
 
-    return {
-      subtotalBeforeDiscount: originalSubtotal,
-      groupDiscountPercent: discountPct,
-      groupDiscountAmount: discountAmt,
-      discountedTourSubtotal: discounted,
-      matchedGroupTier: matchedTier,
-      groupPricingType: pricingType,
-      hasDiscount: hasDisc || discountAmt > 0,
-      isCustomQuote: custom,
-    };
-  }, [
-    effectiveAdults,
-    effectiveChildren,
-    adultPrice,
-    childPrice,
-    participants,
-    tour,
-  ]);
-
-  // ─── Fees ──────────────────────────────────────────────────────────
-
+  // --- Fees ---
   const isPrivate = Boolean(bookingDetails?.isPrivate || bookingDetails?.pricingOptions?.isPrivate);
   const isCustom = Boolean(bookingDetails?.isCustom || bookingDetails?.pricingOptions?.isCustom);
 
-  const privateFee = useMemo(() => {
-    if (!isPrivate) return 0;
-    const fee = getFee(tour, "private");
-    return convertFromZar(fee, currency);
-  }, [isPrivate, tour, currency]);
+  const privateFeeZar = isPrivate ? getFee(tour, "private") : 0;
+  const privateFee = convertFromZar(privateFeeZar, currency);
 
-  const customFee = useMemo(() => {
-    if (!isCustom) return 0;
-    const fee = getFee(tour, "custom");
-    return convertFromZar(fee, currency);
-  }, [isCustom, tour, currency]);
+  const customFeeZar = isCustom ? getFee(tour, "custom") : 0;
+  const customFee = convertFromZar(customFeeZar, currency);
 
-  // ─── Extras ──────────────────────────────────────────────────────
-
+  // --- Extras ---
   const extrasTotal = useMemo(() => {
     const selectedExtras = bookingDetails?.selectedExtras || {};
     const additionalPricing = bookingDetails?.additionalPricing || tour?.additionalPricing || [];
@@ -1107,28 +1153,55 @@ const CheckoutPaystack = () => {
       } else if (type === "fixed") {
         total += Number(price) || 0;
       }
-      // type === "request" is ignored (free)
     });
 
-    // Convert from ZAR to selected currency
     return convertFromZar(total, currency);
   }, [bookingDetails, tour, currency]);
 
-  // ─── Total price (now includes kids activity fee) ────────────────
+  // --- Total ---
+  const totalPrice = discountedSubtotal + privateFee + customFee + extrasTotal + kidsActivityFee;
 
-  const totalPrice = useMemo(() => {
-    return discountedTourSubtotal + privateFee + customFee + extrasTotal + kidsActivityFee;
-  }, [discountedTourSubtotal, privateFee, customFee, extrasTotal, kidsActivityFee]);
+  const totalAmountLabel = formatMoney(totalPrice, currency);
+  const totalMinorUnit = toMinorUnit(totalPrice, currency);
 
-  const totalAmountLabel = useMemo(() => {
-    return formatMoney(totalPrice, currency);
-  }, [totalPrice, currency]);
+  // ─── Prepare summary breakdown items (for display) ──────────────
 
-  const totalMinorUnit = useMemo(() => {
-    return toMinorUnit(totalPrice, currency);
-  }, [totalPrice, currency]);
+  const breakdownItems = [
+    {
+      label: "Adults",
+      count: effectiveAdults,
+      perPerson: adultPriceConverted,
+      originalSubtotal: adultOriginalSubtotal,
+      discountAmount: adultDiscountAmount,
+      discountedSubtotal: adultOriginalSubtotal - adultDiscountAmount,
+    },
+    {
+      label: "Teens",
+      count: effectiveTeens,
+      perPerson: teenPriceConverted,
+      originalSubtotal: teenOriginalSubtotal,
+      discountAmount: teenDiscountAmount,
+      discountedSubtotal: teenOriginalSubtotal - teenDiscountAmount,
+    },
+    {
+      label: "Children",
+      count: effectiveChildren,
+      perPerson: childPriceConverted,
+      originalSubtotal: childOriginalSubtotal,
+      discountAmount: 0,
+      discountedSubtotal: childOriginalSubtotal,
+    },
+    {
+      label: "Toddlers",
+      count: effectiveToddlers,
+      perPerson: toddlerPriceConverted,
+      originalSubtotal: toddlerOriginalSubtotal,
+      discountAmount: 0,
+      discountedSubtotal: toddlerOriginalSubtotal,
+    },
+  ].filter((item) => item.count > 0);
 
-  // ─── Other derived data (unchanged) ──────────────────────────────
+  // ─── Other derived data ──────────────────────────────────────────
 
   const participantEmails = useMemo(() => {
     return normalizeEmails(
@@ -1187,14 +1260,17 @@ const CheckoutPaystack = () => {
         currency,
         adults: effectiveAdults,
         children: effectiveChildren,
-        toddlers: toddlerCount,
-        adultPrice,
-        childPrice,
+        toddlers: effectiveToddlers,
+        teens: effectiveTeens,
+        adultPrice: adultPriceConverted,
+        teenPrice: teenPriceConverted,
+        childPrice: childPriceConverted,
+        toddlerPrice: toddlerPriceConverted,
         participants,
-        subtotalBeforeDiscount,
+        subtotalBeforeDiscount: originalSubtotal,
         groupDiscountPercent,
         groupDiscountAmount,
-        discountedTourSubtotal,
+        discountedTourSubtotal: discountedSubtotal,
         extrasTotal,
         kidsActivityFee,
         isPrivate,
@@ -1216,14 +1292,17 @@ const CheckoutPaystack = () => {
       currency,
       effectiveAdults,
       effectiveChildren,
-      toddlerCount,
-      adultPrice,
-      childPrice,
+      effectiveToddlers,
+      effectiveTeens,
+      adultPriceConverted,
+      teenPriceConverted,
+      childPriceConverted,
+      toddlerPriceConverted,
       participants,
-      subtotalBeforeDiscount,
+      originalSubtotal,
       groupDiscountPercent,
       groupDiscountAmount,
-      discountedTourSubtotal,
+      discountedSubtotal,
       extrasTotal,
       kidsActivityFee,
       privateFee,
@@ -1239,14 +1318,17 @@ const CheckoutPaystack = () => {
       currency,
       adults: effectiveAdults,
       children: effectiveChildren,
-      toddlers: toddlerCount,
-      adultPrice,
-      childPrice,
+      toddlers: effectiveToddlers,
+      teens: effectiveTeens,
+      adultPrice: adultPriceConverted,
+      teenPrice: teenPriceConverted,
+      childPrice: childPriceConverted,
+      toddlerPrice: toddlerPriceConverted,
       participants,
-      subtotalBeforeDiscount,
+      subtotalBeforeDiscount: originalSubtotal,
       groupDiscountPercent,
       groupDiscountAmount,
-      discountedTourSubtotal,
+      discountedTourSubtotal: discountedSubtotal,
       extrasTotal,
       kidsActivityFee,
       isPrivate,
@@ -1261,14 +1343,17 @@ const CheckoutPaystack = () => {
       currency,
       effectiveAdults,
       effectiveChildren,
-      toddlerCount,
-      adultPrice,
-      childPrice,
+      effectiveToddlers,
+      effectiveTeens,
+      adultPriceConverted,
+      teenPriceConverted,
+      childPriceConverted,
+      toddlerPriceConverted,
       participants,
-      subtotalBeforeDiscount,
+      originalSubtotal,
       groupDiscountPercent,
       groupDiscountAmount,
-      discountedTourSubtotal,
+      discountedSubtotal,
       extrasTotal,
       kidsActivityFee,
       isPrivate,
@@ -1425,10 +1510,9 @@ const CheckoutPaystack = () => {
                     {tour.location && <InfoPill>{tour.location}</InfoPill>}
                     <InfoPill tone="green">
                       {effectiveAdults} adult{effectiveAdults !== 1 ? "s" : ""}
-                      {effectiveChildren > 0 &&
-                        ` · ${effectiveChildren} child${effectiveChildren !== 1 ? "ren" : ""}`}
-                      {toddlerCount > 0 &&
-                        ` · ${toddlerCount} toddler${toddlerCount !== 1 ? "s" : ""}`}
+                      {effectiveTeens > 0 && ` · ${effectiveTeens} teen${effectiveTeens !== 1 ? "s" : ""}`}
+                      {effectiveChildren > 0 && ` · ${effectiveChildren} child${effectiveChildren !== 1 ? "ren" : ""}`}
+                      {effectiveToddlers > 0 && ` · ${effectiveToddlers} toddler${effectiveToddlers !== 1 ? "s" : ""}`}
                     </InfoPill>
                   </div>
                 </div>
@@ -1667,41 +1751,65 @@ const CheckoutPaystack = () => {
                       </p>
 
                       <div className="mt-4 space-y-3">
-                        <SummaryRow
-                          label="Adults"
-                          value={`${effectiveAdults} × ${formatMoney(adultPrice, currency)}`}
-                        />
-                        {effectiveChildren > 0 && (
-                          <SummaryRow
-                            label="Children (12–17)"
-                            value={`${effectiveChildren} × ${formatMoney(childPrice, currency)}`}
-                          />
-                        )}
-                        {toddlerCount > 0 && (
-                          <SummaryRow
-                            label="Toddlers (under 12)"
-                            value={`${toddlerCount} × ${formatMoney(0, currency)}`}
-                          />
-                        )}
+                        {breakdownItems.map((item) => {
+                          const displayOriginal = formatMoney(item.originalSubtotal, currency);
+                          const displayDiscounted = formatMoney(item.discountedSubtotal, currency);
+                          const hasItemDiscount = item.discountAmount > 0;
+
+                          return (
+                            <div key={item.label} className="flex items-start justify-between gap-4 text-sm">
+                              <span className="text-slate-500">
+                                {item.label}{" "}
+                                <span className="text-slate-400">
+                                  ({item.count} × {formatMoney(item.perPerson, currency)})
+                                </span>
+                              </span>
+                              <span className="font-semibold text-slate-900 text-right">
+                                {hasItemDiscount ? (
+                                  <>
+                                    <span className="text-red-500 line-through mr-2">
+                                      {displayOriginal}
+                                    </span>
+                                    <span className="text-green-700">{displayDiscounted}</span>
+                                  </>
+                                ) : (
+                                  displayOriginal
+                                )}
+                              </span>
+                            </div>
+                          );
+                        })}
+
                         <SummaryRow
                           label="Tour subtotal"
-                          value={formatMoney(subtotalBeforeDiscount, currency)}
-                        />
-                        {hasDiscount && groupDiscountAmount > 0 && (
-                          <SummaryRow
-                            label="Group discount"
-                            value={
-                              groupPricingType === "groupTotal"
-                                ? `Fixed group rate · -${formatMoney(groupDiscountAmount, currency)}`
-                                : `-${formatMoney(groupDiscountAmount, currency)} · ${groupDiscountPercent.toFixed(1)}% off`
-                            }
-                          />
-                        )}
-                        <SummaryRow
-                          label="Discounted tour total"
-                          value={formatMoney(discountedTourSubtotal, currency)}
+                          value={
+                            hasDiscount ? (
+                              <>
+                                <span className="text-red-500 line-through mr-2">
+                                  {formatMoney(originalSubtotal, currency)}
+                                </span>
+                                <span className="text-green-700">
+                                  {formatMoney(discountedSubtotal, currency)}
+                                </span>
+                              </>
+                            ) : (
+                              formatMoney(originalSubtotal, currency)
+                            )
+                          }
                           strong
                         />
+
+                        {hasDiscount && groupDiscountAmount > 0 && (
+                          <div className="flex items-start justify-between gap-4 text-sm">
+                            <span className="text-slate-500">
+                              Group discount ({groupPricingType === "perPerson" ? "per‑person rate" : `${groupDiscountPercent.toFixed(0)}% off`})
+                            </span>
+                            <span className="font-semibold text-green-700">
+                              -{formatMoney(groupDiscountAmount, currency)}
+                            </span>
+                          </div>
+                        )}
+
                         <SummaryRow
                           label="Private tour fee"
                           value={isPrivate ? formatMoney(privateFee, currency) : "Not added"}
@@ -1710,27 +1818,39 @@ const CheckoutPaystack = () => {
                           label="Custom trip fee"
                           value={isCustom ? formatMoney(customFee, currency) : "Not added"}
                         />
-                        <SummaryRow
+                        {/* <SummaryRow
                           label="Optional extras"
                           value={extrasTotal > 0 ? formatMoney(extrasTotal, currency) : "None"}
-                        />
+                        /> */}
+
                         {selectedKidsActivity && kidsActivityFee > 0 && (
-                        <div className="mt-2 rounded-xl border border-blue-100 bg-blue-50 p-3">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-blue-500">
-                                Kids activity
-                              </p>
-                              <p className="mt-1 text-sm font-bold text-blue-950">
-                                {selectedKidsActivity.name}
-                              </p>
+                          <div className="mt-2 rounded-xl border border-blue-100 bg-blue-50 p-3">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-blue-500">
+                                  Kids activity
+                                </p>
+                                <p className="mt-1 text-sm font-bold text-blue-950">
+                                  {selectedKidsActivity.name}
+                                </p>
+                                <div className="mt-1 space-y-0.5 text-xs text-blue-700">
+                                  {effectiveAdults > 0 && (
+                                    <p>{effectiveAdults} × {formatMoney(kidsActivityAdultPrice, currency)} = {formatMoney(kidsActivityAdultTotal, currency)}</p>
+                                  )}
+                                  {effectiveChildren > 0 && (
+                                    <p>{effectiveChildren} × {formatMoney(kidsActivityChildPrice, currency)} = {formatMoney(kidsActivityChildTotal, currency)}</p>
+                                  )}
+                                  {effectiveToddlers > 0 && (
+                                    <p>{effectiveToddlers} × {formatMoney(kidsActivityToddlerPrice, currency)} = {formatMoney(kidsActivityToddlerTotal, currency)}</p>
+                                  )}
+                                </div>
+                              </div>
+                              <span className="text-sm font-black text-blue-700">
+                                + {formatMoney(kidsActivityFee, currency)}
+                              </span>
                             </div>
-                            <span className="text-sm font-black text-blue-700">
-                              + {formatMoney(kidsActivityFee, currency)}
-                            </span>
                           </div>
-                        </div>
-                      )}
+                        )}
 
                         {/* Show selected request extras (free) */}
                         {(() => {
@@ -1781,8 +1901,9 @@ const CheckoutPaystack = () => {
 
                         <p className="mt-1 text-xs font-semibold text-white/55">
                           {effectiveAdults} adult{effectiveAdults !== 1 ? "s" : ""}
+                          {effectiveTeens > 0 && ` · ${effectiveTeens} teen${effectiveTeens !== 1 ? "s" : ""}`}
                           {effectiveChildren > 0 && ` · ${effectiveChildren} child${effectiveChildren !== 1 ? "ren" : ""}`}
-                          {toddlerCount > 0 && ` · ${toddlerCount} toddler${toddlerCount !== 1 ? "s" : ""}`}
+                          {effectiveToddlers > 0 && ` · ${effectiveToddlers} toddler${effectiveToddlers !== 1 ? "s" : ""}`}
                           {" · "}{currency}
                         </p>
                       </div>

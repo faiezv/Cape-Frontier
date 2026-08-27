@@ -1,5 +1,4 @@
-import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // Not used in this file, can be removed
+import { useEffect, useRef, useCallback } from "react";
 import { resolveImage } from '../../utils/ImageLoader';
 
 const TOUR_CATEGORIES_ICON = {
@@ -74,36 +73,56 @@ export default function FixedCategoryNav({
   mobileNavScrollerRef,
   mobileCategoryItemRefs,
   metrics,
-  pinned, // no longer used – kept for backward compatibility
+  // pinned prop removed – no longer used
   categoryTours = [],
 }) {
-  // Auto-scroll active category into view on mobile
+  const totalTours = categoryTours.length;
+  const safeIndex = Math.min(Math.max(0, currentTourIndex), totalTours - 1);
+
+  // Debounce the auto‑scroll to avoid fighting with user swipes
+  const scrollTimeoutRef = useRef(null);
+
+  // Auto‑scroll active category into view on mobile
   useEffect(() => {
     const container = mobileNavScrollerRef?.current;
     const activeItem = mobileCategoryItemRefs?.current?.[activeCategory];
     if (!container || !activeItem) return;
-    const containerRect = container.getBoundingClientRect();
-    const itemRect = activeItem.getBoundingClientRect();
-    const targetScroll = activeItem.offsetLeft - containerRect.width / 2 + itemRect.width / 2;
-    container.scrollTo({ left: targetScroll, behavior: "smooth" });
-  }, [activeCategory]);
 
-  const totalTours = categoryTours.length;
-  const safeIndex = Math.min(Math.max(0, currentTourIndex), totalTours - 1);
+    // Clear any pending scroll to prevent race conditions
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
 
-  const handlePrevTour = () => {
+    scrollTimeoutRef.current = setTimeout(() => {
+      // Use native scrollIntoView – it’s reliable and handles edge cases
+      activeItem.scrollIntoView({
+        inline: 'center',
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }, 100); // small delay to let layout settle
+
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [activeCategory, mobileNavScrollerRef, mobileCategoryItemRefs]);
+
+  const handlePrevTour = useCallback(() => {
     if (safeIndex > 0) onTourChange(safeIndex - 1);
-  };
-  const handleNextTour = () => {
+  }, [safeIndex, onTourChange]);
+
+  const handleNextTour = useCallback(() => {
     if (safeIndex < totalTours - 1) onTourChange(safeIndex + 1);
-  };
-  const handleCircleClick = (index) => {
+  }, [safeIndex, totalTours, onTourChange]);
+
+  const handleCircleClick = useCallback((index) => {
     if (index !== safeIndex) onTourChange(index);
-  };
+  }, [safeIndex, onTourChange]);
 
   return (
     <div
-      key={activeCategory}
       ref={mobileNavRef}
       data-mobile-category-nav
       className={`
@@ -146,7 +165,7 @@ export default function FixedCategoryNav({
         {/* Tour navigation bar */}
         <div className="mt-1.5 rounded-2xl border border-white/10 bg-white/[0.07] px-3 py-2">
           <div className="flex items-center gap-2">
-            {/* Previous button – now larger and more prominent on mobile */}
+            {/* Previous button */}
             <button
               type="button"
               onClick={handlePrevTour}
@@ -202,7 +221,7 @@ export default function FixedCategoryNav({
               </div>
             </div>
 
-            {/* Next button – larger and more prominent on mobile */}
+            {/* Next button */}
             <button
               type="button"
               onClick={handleNextTour}

@@ -330,14 +330,18 @@ export const tours = [
         pricePerPerson: 4900,
         note: "Minimum two participants required.",
       },
-
       {
-        category: "Children under 12",
+        category: "Teen: Children under 18",
+        pricePerPerson: 4900,
+        note: "Teens are charged at full adult-rate.",
+      },
+      {
+        category: "Child: Children under 12",
         pricePerPerson: 2400,
         note: "",
       },
       {
-        category: "Children under 5",
+        category: "Toddler: Children under 5",
         pricePerPerson: 0,
         note: "Free of charge for children under 5 years old.",
       },
@@ -6220,9 +6224,9 @@ export const tours = [
     image:
       "/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp",
     images: [
-      "/src/assets/images/tours/packages/garden-route-3day/1.webp",
-      "/src/assets/images/tours/packages/garden-route-3day/2.webp",
-      "/src/assets/images/tours/packages/garden-route-3day/3.webp",
+      "/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp",
+      "/src/assets/images/tours/packages/3-day-garden-route/960px-Benguela_Cove_Lagoon_Wine.webp",
+      "/src/assets/images/tours/packages/3-day-garden-route/960px-Botlierskop_Landscape_2.webp",
     ],
     imageFolder: "/packages/3-day-garden-route",
     videos: [],
@@ -6242,17 +6246,17 @@ export const tours = [
         note: "Includes accommodation, breakfast, transport",
       },
       {
-        category: "Children (12-17 years)",
+        category: "Teens: (12-17 years)",
         pricePerPerson: 17000,
         note: "Full rates apply.",
       },
       {
-        category: "Children (4–12 years)",
+        category: "Child: (5–12 years)",
         pricePerPerson: 9300,
         note: "Discounted rates apply.",
       },
       {
-        category: "Children (0–3 years)",
+        category: "Toddler: (0–4 years)",
         pricePerPerson: 0,
         note: "Free of charge",
       },
@@ -6860,18 +6864,22 @@ export const tours = [
 
     pricing: [
       {
-        category: "Solo Traveller",
+        category: "Adults",
         pricePerPerson: 23500,
         note: "Includes accommodation, breakfast, transport, safari",
       },
       {
-        category: "Children (4–12 years)",
+        category: "Teens: 12 - 17",
+        pricePerPerson: 23500,
+        note: "Includes accommodation, breakfast, transport, safari",
+      },
+      {
+        category: "Child: (4–12 years)",
         pricePerPerson: 9300,
         note: "Child rate (60–75% of adult rate) – R9,300 to R11,600 depending on group size",
       },
-
       {
-        category: "Children (0–3 years)",
+        category: "Toddler: (0–3 years)",
         pricePerPerson: 0,
         note: "Free of charge",
       },

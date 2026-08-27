@@ -994,7 +994,7 @@ const Navbar = () => {
                     opacity: 0,
                   }}
                 >
-                  In affiliation with
+                  Affiliation to
                 </span>
 
                 {/* Handshake */}
@@ -1862,7 +1862,7 @@ const Navbar = () => {
                         font-bold
                       "
                     >
-                      In affiliation with
+                      Affiliation to
                     </p>
 
                     <img

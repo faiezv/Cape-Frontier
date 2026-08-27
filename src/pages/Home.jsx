@@ -14,7 +14,6 @@ gsap.registerPlugin(ScrollTrigger);
 
 const isTouchDevice = () => {
   if (typeof window === "undefined") return false;
-
   return (
     window.matchMedia?.("(pointer: coarse)").matches ||
     "ontouchstart" in window ||
@@ -30,133 +29,145 @@ const Home = () => {
   const aboutRef = useRef(null);
   const tourSelectRef = useRef(null);
   const tourSelectSectionRef = useRef(null);
+  const toursSectionRef = useRef(null);
+  const contactSectionRef = useRef(null); // kept for reference, but not used for position
 
-  useLayoutEffect(() => {
-  const section = tourSelectSectionRef.current;
+  // ---------- BUTTON STATE ----------
+  const [showButton, setShowButton] = useState(false);
+  const [isToursVisible, setIsToursVisible] = useState(false); // only Tours triggers bottom
 
-  if (!section) return;
+  // ---------- SCROLL LISTENER ----------
+  useEffect(() => {
+    const handleScroll = () => {
+      // --- Show/hide button based on hero height threshold ---
+      if (!heroRef.current) return;
+      const heroHeight = heroRef.current.offsetHeight;
+      // 👇 Adjust this value (0.5 = 50%) to change when button appears
+      const threshold = heroHeight * 0.5;
+      setShowButton(window.scrollY > threshold);
 
-  let cleanup = null;
-  let retryTimer = null;
+      // --- Check if Tours section is visible (only this triggers bottom) ---
+      let toursVisible = false;
+      if (toursSectionRef.current) {
+        const rect = toursSectionRef.current.getBoundingClientRect();
+        // If the top of Tours is above the bottom of the viewport
+        if (rect.top < window.innerHeight) toursVisible = true;
+      }
+      setIsToursVisible(toursVisible);
+    };
 
-  const setup = () => {
-    if (!window.lenis) {
-      retryTimer = window.setTimeout(setup, 50);
-      return;
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // initial check
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // ---------- SCROLL TO TOP (TOUR SELECT) ----------
+  const scrollToTourSelect = () => {
+    if (window.lenis) {
+      window.lenis.scrollTo(0, {
+        immediate: true,
+        force: true,
+      });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
+  };
 
-    let lastScroll = window.lenis.scroll || window.scrollY || 0;
-    let hidden = false;
+  // ---------- EXISTING useLayoutEffect FOR TOUR SELECT HIDE/SHOW ----------
+  useLayoutEffect(() => {
+    const section = tourSelectSectionRef.current;
+    if (!section) return;
 
-    // Initial state
-    gsap.set(section, {
-      y: 0,
-      autoAlpha: 1,
-      force3D: true,
-    });
+    let cleanup = null;
+    let retryTimer = null;
 
-    const show = () => {
-      if (!hidden) return;
-
-      hidden = false;
-
-      gsap.to(section, {
-        y: 0,
-        autoAlpha: 1,
-        duration: 0.4,
-        ease: "power3.out",
-        overwrite: true,
-      });
-    };
-
-    const hide = () => {
-      if (hidden) return;
-
-      hidden = true;
-
-      gsap.to(section, {
-        y: 100,
-        autoAlpha: 0,
-        duration: 0.35,
-        ease: "power3.out",
-        overwrite: true,
-      });
-    };
-
-    const handleScroll = ({ scroll }) => {
-      // Always show at the very top
-      if (scroll <= 5) {
-        show();
-        lastScroll = scroll;
+    const setup = () => {
+      if (!window.lenis) {
+        retryTimer = window.setTimeout(setup, 50);
         return;
       }
 
-      const difference = scroll - lastScroll;
+      let lastScroll = window.lenis.scroll || window.scrollY || 0;
+      let hidden = false;
 
-      // Scrolling down
-      if (difference > 2) {
-        hide();
-      }
+      gsap.set(section, {
+        y: 0,
+        autoAlpha: 1,
+        force3D: true,
+      });
 
-      // Scrolling up
-      else if (difference < -2) {
-        show();
-      }
+      const show = () => {
+        if (!hidden) return;
+        hidden = false;
+        gsap.to(section, {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.4,
+          ease: "power3.out",
+          overwrite: true,
+        });
+      };
 
-      lastScroll = scroll;
+      const hide = () => {
+        if (hidden) return;
+        hidden = true;
+        gsap.to(section, {
+          y: 100,
+          autoAlpha: 0,
+          duration: 0.35,
+          ease: "power3.out",
+          overwrite: true,
+        });
+      };
+
+      const handleScroll = ({ scroll }) => {
+        if (scroll <= 5) {
+          show();
+          lastScroll = scroll;
+          return;
+        }
+        const difference = scroll - lastScroll;
+        if (difference > 2) hide();
+        else if (difference < -2) show();
+        lastScroll = scroll;
+      };
+
+      window.lenis.on("scroll", handleScroll);
+      cleanup = () => window.lenis?.off("scroll", handleScroll);
     };
 
-    window.lenis.on("scroll", handleScroll);
+    setup();
 
-    cleanup = () => {
-      window.lenis?.off("scroll", handleScroll);
+    return () => {
+      if (retryTimer) window.clearTimeout(retryTimer);
+      cleanup?.();
+      gsap.killTweensOf(section);
     };
-  };
+  }, []);
 
-  setup();
-
-  return () => {
-    if (retryTimer) {
-      window.clearTimeout(retryTimer);
-    }
-
-    cleanup?.();
-    gsap.killTweensOf(section);
-  };
-}, []);
-
+  // ---------- EXISTING useEffect FOR LOCATION.STATE SCROLL ----------
   useEffect(() => {
     const scrollTarget = location.state?.scrollTo;
-
     if (!scrollTarget || !window.lenis) return undefined;
 
     const timer = window.setTimeout(() => {
       if (scrollTarget === "top") {
-        window.lenis.scrollTo(0, {
-          immediate: true,
-          force: true,
-        });
+        window.lenis.scrollTo(0, { immediate: true, force: true });
       } else {
         const element = document.getElementById(scrollTarget);
-
         if (element) {
           const y = element.getBoundingClientRect().top + window.scrollY;
-
-          window.lenis.scrollTo(y, {
-            immediate: true,
-            force: true,
-          });
+          window.lenis.scrollTo(y, { immediate: true, force: true });
         }
       }
-
-      window.requestAnimationFrame(() => {
-        ScrollTrigger.refresh(true);
-      });
+      window.requestAnimationFrame(() => ScrollTrigger.refresh(true));
     }, 700);
 
     return () => window.clearTimeout(timer);
   }, [location.key, location.state]);
 
+  // ---------- EXISTING useLayoutEffect FOR HERO/ABOUT ANIMATIONS ----------
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       if (!heroRef.current || !aboutRef.current) return;
@@ -181,7 +192,6 @@ const Home = () => {
         const heroHeight = heroRef.current?.offsetHeight || 0;
         const visualHeight = window.visualViewport?.height || 0;
         const windowHeight = window.innerHeight || 0;
-
         return Math.max(heroHeight, visualHeight, windowHeight, 1);
       };
 
@@ -193,9 +203,7 @@ const Home = () => {
         willChange: "transform, opacity",
       });
 
-      gsap.set(aboutRef.current, {
-        y: 40,
-      });
+      gsap.set(aboutRef.current, { y: 40 });
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -212,13 +220,9 @@ const Home = () => {
           anticipatePin: touchDevice ? 0 : 1,
           invalidateOnRefresh: true,
           refreshPriority: 2,
-
           onRefreshInit: () => {
-            if (window.scrollY <= 2) {
-              resetHero();
-            }
+            if (window.scrollY <= 2) resetHero();
           },
-
           onRefresh: (self) => {
             if (window.scrollY <= 2) {
               self.animation?.progress(0);
@@ -228,15 +232,7 @@ const Home = () => {
         },
       });
 
-      tl.to(
-        aboutRef.current,
-        {
-          y: 0,
-          force3D: true,
-          ease: "none",
-        },
-        0
-      ).to(
+      tl.to(aboutRef.current, { y: 0, force3D: true, ease: "none" }, 0).to(
         heroRef.current,
         {
           scale: touchDevice ? 0.72 : 0.6,
@@ -248,10 +244,7 @@ const Home = () => {
       );
 
       const refresh = () => {
-        if (window.scrollY <= 2) {
-          resetHero();
-        }
-
+        if (window.scrollY <= 2) resetHero();
         ScrollTrigger.refresh(true);
       };
 
@@ -260,7 +253,6 @@ const Home = () => {
       const refreshThree = window.setTimeout(refresh, 900);
 
       window.addEventListener("load", refresh, { once: true });
-
       if (document.fonts?.ready) {
         document.fonts.ready.then(refresh).catch(() => {});
       }
@@ -276,14 +268,15 @@ const Home = () => {
     return () => ctx.revert();
   }, []);
 
+  // ---------- RENDER ----------
   return (
     <div
       ref={pageRef}
       className="relative flex flex-col overflow-x-hidden bg-white text-white"
     >
+      {/* TourSelect wrapper – now with higher z-index to stay above about */}
       <section
-        ref={tourSelectSectionRef}
-        className="fixed z-25 w-full overflow-x-hidden overflow-y-visible"
+        className="absolute z-30 w-full overflow-x-hidden overflow-y-visible"
       >
         <div ref={tourSelectRef} className="mx-auto max-w-5xl mt-20 ">
           <TourSelect />
@@ -310,13 +303,57 @@ const Home = () => {
         <Stories />
       </section>
 
-      <section id="tours" className="relative z-26">
+      <section id="tours" ref={toursSectionRef} className="relative z-26">
         <Tours />
       </section>
 
-      <section id="contact" className="relative z-26">
+      <section id="contact" ref={contactSectionRef} className="relative z-26">
         <Contact />
       </section>
+
+      {/* ---------- FIXED BUTTON (top by default, bottom only when Tours is visible) ---------- */}
+      <div
+        className={`fixed left-1/2 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${
+          showButton
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        } ${
+          isToursVisible
+            ? "bottom-8 translate-y-0 scale-100"
+            : "top-20 translate-y-0 scale-100"
+        }`}
+        style={{
+          transitionProperty: "transform, opacity, top, bottom",
+        }}
+      >
+        <button
+          onClick={scrollToTourSelect}
+          className="flex items-center rounded-full bg-blue-600 px-5 py-2.5 shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          aria-label="Jump to tour selection"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 15l7-7 7 7"
+            />
+          </svg>
+          <span
+            className={`ml-2 font-medium text-white transition-all duration-500 delay-150 ${
+              showButton ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            Tour Select
+          </span>
+        </button>
+      </div>
     </div>
   );
 };
