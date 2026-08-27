@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-import { useLoadingNavigate } from "./useLoadingNavigate.jsx";
+import { useLoadingNavigate } from "./useLoadingNavigate.jsx"
 import { resolveImage } from '../utils/ImageLoader.js'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -137,7 +137,7 @@ const megaMenus = {
       {
         title: 'Packages',
         desc: 'Cape Peninsula and Stellenbosch wine farm full-day experiences.',
-        image: resolveImage('/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp'),
+        image: resolveImage('/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Afrika.webp'),
         target: 'Tours',
       },
     ],
@@ -184,7 +184,6 @@ const megaMenus = {
         desc: 'Cape Frontier decides vehicle size based on group size and operational needs.',
         target: '/policies#vehicle-policy',
       },
-
     ],
   },
 }
@@ -213,11 +212,19 @@ const Navbar = () => {
 
   const activeMegaData = activeMega ? megaMenus[activeMega] : null
 
+  // --------------------------------------------------
+  // AFFILIATION REFS
+  // --------------------------------------------------
+
   const affiliationRef = useRef(null)
   const affiliationTextRef = useRef(null)
   const affiliationHandshakeRef = useRef(null)
   const affiliationLogoRef = useRef(null)
   const affiliationGlowRef = useRef(null)
+
+  // --------------------------------------------------
+  // MAIN LOGO
+  // --------------------------------------------------
 
   const mainLogoRef = useRef(null)
 
@@ -249,17 +256,25 @@ const Navbar = () => {
 
     if (!el) return false
 
-    const y = el.getBoundingClientRect().top + window.scrollY
+    const y =
+      el.getBoundingClientRect().top +
+      window.scrollY
 
     scrollWindowTo(y)
 
     return true
   }
 
+  // --------------------------------------------------
+  // DESKTOP MEGA MENU
+  // --------------------------------------------------
+
   const openMega = (label, index, event) => {
     if (window.innerWidth < 768) return
 
-    window.clearTimeout(megaCloseTimerRef.current)
+    window.clearTimeout(
+      megaCloseTimerRef.current
+    )
 
     setHoverIndex(index)
     setActiveMega(label)
@@ -274,17 +289,26 @@ const Navbar = () => {
   }
 
   const scheduleCloseMega = () => {
-    window.clearTimeout(megaCloseTimerRef.current)
+    window.clearTimeout(
+      megaCloseTimerRef.current
+    )
 
-    megaCloseTimerRef.current = window.setTimeout(() => {
-      setActiveMega(null)
-      setHoverIndex(null)
-    }, 120)
+    megaCloseTimerRef.current =
+      window.setTimeout(() => {
+        setActiveMega(null)
+        setHoverIndex(null)
+      }, 120)
   }
 
   const keepMegaOpen = () => {
-    window.clearTimeout(megaCloseTimerRef.current)
+    window.clearTimeout(
+      megaCloseTimerRef.current
+    )
   }
+
+  // --------------------------------------------------
+  // NAVIGATION
+  // --------------------------------------------------
 
   const handleNavClick = (label, event) => {
     event?.preventDefault?.()
@@ -295,7 +319,10 @@ const Navbar = () => {
     setActiveMobileMega(null)
     setHoverIndex(null)
 
-    if (typeof label === 'string' && label.startsWith('/')) {
+    if (
+      typeof label === 'string' &&
+      label.startsWith('/')
+    ) {
       setPendingSection(null)
       navigate(label)
       return
@@ -335,7 +362,8 @@ const Navbar = () => {
     }
 
     requestAnimationFrame(() => {
-      const didScroll = scrollToSection(sectionId)
+      const didScroll =
+        scrollToSection(sectionId)
 
       if (didScroll) {
         setPendingSection(null)
@@ -343,7 +371,10 @@ const Navbar = () => {
     })
   }
 
-  const toggleMobileMega = (label, event) => {
+  const toggleMobileMega = (
+    label,
+    event
+  ) => {
     event?.preventDefault?.()
     event?.stopPropagation?.()
 
@@ -357,14 +388,33 @@ const Navbar = () => {
     )
   }
 
-  useEffect(() => {
-    if (location.pathname !== '/' || !pendingSection) return
+  // --------------------------------------------------
+  // PENDING SECTION SCROLL
+  // --------------------------------------------------
 
-    const delays = [0, 80, 180, 350, 650, 950]
+  useEffect(() => {
+    if (
+      location.pathname !== '/' ||
+      !pendingSection
+    ) {
+      return
+    }
+
+    const delays = [
+      0,
+      80,
+      180,
+      350,
+      650,
+      950,
+    ]
 
     const timers = delays.map((delay) =>
       window.setTimeout(() => {
-        const didScroll = scrollToSection(pendingSection)
+        const didScroll =
+          scrollToSection(
+            pendingSection
+          )
 
         if (didScroll) {
           setPendingSection(null)
@@ -372,22 +422,39 @@ const Navbar = () => {
       }, delay)
     )
 
-    return () => timers.forEach((timer) => window.clearTimeout(timer))
-  }, [location.pathname, pendingSection])
+    return () =>
+      timers.forEach((timer) =>
+        window.clearTimeout(timer)
+      )
+  }, [
+    location.pathname,
+    pendingSection,
+  ])
+
+  // --------------------------------------------------
+  // ACCENT ANIMATION
+  // --------------------------------------------------
 
   useEffect(() => {
     if (!accentRef.current) return
 
-    const tween = gsap.to(accentRef.current, {
-      x: 14,
-      duration: 2,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut',
-    })
+    const tween = gsap.to(
+      accentRef.current,
+      {
+        x: 14,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      }
+    )
 
     return () => tween.kill()
   }, [])
+
+  // --------------------------------------------------
+  // MOBILE MENU ANIMATION
+  // --------------------------------------------------
 
   useEffect(() => {
     if (!menuOpen) return
@@ -417,10 +484,21 @@ const Navbar = () => {
     )
   }, [menuOpen])
 
-  useEffect(() => {
-    if (!activeMega || !megaPanelRef.current) return
+  // --------------------------------------------------
+  // DESKTOP MEGA ANIMATION
+  // --------------------------------------------------
 
-    gsap.killTweensOf(megaPanelRef.current)
+  useEffect(() => {
+    if (
+      !activeMega ||
+      !megaPanelRef.current
+    ) {
+      return
+    }
+
+    gsap.killTweensOf(
+      megaPanelRef.current
+    )
 
     gsap.fromTo(
       megaPanelRef.current,
@@ -441,8 +519,17 @@ const Navbar = () => {
     )
   }, [activeMega])
 
+  // --------------------------------------------------
+  // MOBILE MEGA ANIMATION
+  // --------------------------------------------------
+
   useEffect(() => {
-    if (!activeMobileMega || !mobileMenuContentRef.current) return
+    if (
+      !activeMobileMega ||
+      !mobileMenuContentRef.current
+    ) {
+      return
+    }
 
     const activePanel =
       mobileMenuContentRef.current.querySelector(
@@ -468,6 +555,10 @@ const Navbar = () => {
     )
   }, [activeMobileMega])
 
+  // --------------------------------------------------
+  // RESIZE
+  // --------------------------------------------------
+
   useEffect(() => {
     const onResize = () => {
       if (window.innerWidth >= 768) {
@@ -481,10 +572,21 @@ const Navbar = () => {
       }
     }
 
-    window.addEventListener('resize', onResize)
+    window.addEventListener(
+      'resize',
+      onResize
+    )
 
-    return () => window.removeEventListener('resize', onResize)
+    return () =>
+      window.removeEventListener(
+        'resize',
+        onResize
+      )
   }, [])
+
+  // --------------------------------------------------
+  // ROUTE CHANGE
+  // --------------------------------------------------
 
   useEffect(() => {
     setMenuOpen(false)
@@ -495,18 +597,22 @@ const Navbar = () => {
 
   useEffect(() => {
     return () => {
-      window.clearTimeout(megaCloseTimerRef.current)
+      window.clearTimeout(
+        megaCloseTimerRef.current
+      )
     }
   }, [])
 
   // --------------------------------------------------
-  // MAIN LOGO HOVER ANIMATION
+  // MAIN LOGO HOVER
   // --------------------------------------------------
 
   const animateMainLogoIn = () => {
     if (!mainLogoRef.current) return
 
-    gsap.killTweensOf(mainLogoRef.current)
+    gsap.killTweensOf(
+      mainLogoRef.current
+    )
 
     gsap.to(mainLogoRef.current, {
       scale: 1.045,
@@ -519,7 +625,9 @@ const Navbar = () => {
   const animateMainLogoOut = () => {
     if (!mainLogoRef.current) return
 
-    gsap.killTweensOf(mainLogoRef.current)
+    gsap.killTweensOf(
+      mainLogoRef.current
+    )
 
     gsap.to(mainLogoRef.current, {
       scale: 1,
@@ -533,119 +641,149 @@ const Navbar = () => {
   // AFFILIATION ANIMATION
   // --------------------------------------------------
 
-const animateAffiliationIn = () => {
-  if (!affiliationRef.current) return
+  const animateAffiliationIn = () => {
+    if (!affiliationRef.current) return
 
-  gsap.killTweensOf([
-    affiliationRef.current,
-    affiliationTextRef.current,
-    affiliationHandshakeRef.current,
-    affiliationLogoRef.current,
-    affiliationGlowRef.current,
-  ])
+    gsap.killTweensOf([
+      affiliationRef.current,
+      affiliationTextRef.current,
+      affiliationHandshakeRef.current,
+      affiliationLogoRef.current,
+      affiliationGlowRef.current,
+    ])
 
-  const textWidth =
-    affiliationTextRef.current?.scrollWidth || 0
+    const textWidth =
+      affiliationTextRef.current?.scrollWidth ||
+      0
 
-  // Expand the actual text element so it starts
-  // taking layout space only during the hover.
-  gsap.to(affiliationTextRef.current, {
-    width: textWidth,
-    opacity: 1,
-    x: 0,
-    letterSpacing: '0.14em',
-    duration: 0.45,
-    ease: 'power3.out',
-  })
+    gsap.to(
+      affiliationTextRef.current,
+      {
+        width: textWidth,
+        opacity: 1,
+        x: 0,
+        letterSpacing: '0.14em',
+        duration: 0.45,
+        ease: 'power3.out',
+      }
+    )
 
-  gsap.to(affiliationRef.current, {
-    scale: 1.04,
-    y: -2,
-    duration: 0.45,
-    ease: 'power3.out',
-  })
+    gsap.to(
+      affiliationRef.current,
+      {
+        scale: 1.04,
+        y: -2,
+        duration: 0.45,
+        ease: 'power3.out',
+      }
+    )
 
-  gsap.to(affiliationHandshakeRef.current, {
-    rotate: 12,
-    scale: 1.18,
-    duration: 0.25,
-    ease: 'power2.out',
-    yoyo: true,
-    repeat: 1,
-  })
+    gsap.to(
+      affiliationHandshakeRef.current,
+      {
+        rotate: 12,
+        scale: 1.18,
+        duration: 0.25,
+        ease: 'power2.out',
+        yoyo: true,
+        repeat: 1,
+      }
+    )
 
-  gsap.to(affiliationLogoRef.current, {
-    scale: 1.1,
-    x: 2,
-    duration: 0.55,
-    ease: 'back.out(2)',
-  })
+    gsap.to(
+      affiliationLogoRef.current,
+      {
+        scale: 1.1,
+        x: 2,
+        duration: 0.55,
+        ease: 'back.out(2)',
+      }
+    )
 
-  gsap.fromTo(
-    affiliationGlowRef.current,
-    {
-      xPercent: -120,
-      opacity: 0,
-    },
-    {
-      xPercent: 180,
-      opacity: 1,
-      duration: 0.8,
-      ease: 'power2.inOut',
-    }
-  )
-}
+    gsap.fromTo(
+      affiliationGlowRef.current,
+      {
+        xPercent: -120,
+        opacity: 0,
+      },
+      {
+        xPercent: 180,
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power2.inOut',
+      }
+    )
+  }
 
-const animateAffiliationOut = () => {
-  if (!affiliationRef.current) return
+  const animateAffiliationOut = () => {
+    if (!affiliationRef.current) return
 
-  gsap.killTweensOf([
-    affiliationRef.current,
-    affiliationTextRef.current,
-    affiliationHandshakeRef.current,
-    affiliationLogoRef.current,
-    affiliationGlowRef.current,
-  ])
+    gsap.killTweensOf([
+      affiliationRef.current,
+      affiliationTextRef.current,
+      affiliationHandshakeRef.current,
+      affiliationLogoRef.current,
+      affiliationGlowRef.current,
+    ])
 
-  // Collapse the text back to zero width.
-  // This means it takes ZERO layout space when hidden.
-  gsap.to(affiliationTextRef.current, {
-    width: 0,
-    opacity: 0,
-    x: -6,
-    duration: 0.3,
-    ease: 'power3.inOut',
-  })
+    gsap.to(
+      affiliationTextRef.current,
+      {
+        width: 0,
+        opacity: 0,
+        x: -6,
+        duration: 0.3,
+        ease: 'power3.inOut',
+      }
+    )
 
-  gsap.to(affiliationRef.current, {
-    scale: 1,
-    y: 0,
-    duration: 0.35,
-    ease: 'power3.out',
-  })
+    gsap.to(
+      affiliationRef.current,
+      {
+        scale: 1,
+        y: 0,
+        duration: 0.35,
+        ease: 'power3.out',
+      }
+    )
 
-  gsap.to(affiliationHandshakeRef.current, {
-    rotate: 0,
-    scale: 1,
-    duration: 0.3,
-    ease: 'power3.out',
-  })
+    gsap.to(
+      affiliationHandshakeRef.current,
+      {
+        rotate: 0,
+        scale: 1,
+        duration: 0.3,
+        ease: 'power3.out',
+      }
+    )
 
-  gsap.to(affiliationLogoRef.current, {
-    scale: 1,
-    x: 0,
-    duration: 0.35,
-    ease: 'power3.out',
-  })
+    gsap.to(
+      affiliationLogoRef.current,
+      {
+        scale: 1,
+        x: 0,
+        duration: 0.35,
+        ease: 'power3.out',
+      }
+    )
 
-  gsap.to(affiliationGlowRef.current, {
-    opacity: 0,
-    duration: 0.2,
-    ease: 'power2.out',
-  })
-}
+    gsap.to(
+      affiliationGlowRef.current,
+      {
+        opacity: 0,
+        duration: 0.2,
+        ease: 'power2.out',
+      }
+    )
+  }
 
-  if (isCheckout || isBooking || isSuccess) return null
+  if (
+    isCheckout ||
+    isBooking ||
+    isSuccess
+  ) {
+    return null
+  }
 
   return (
     <>
@@ -688,9 +826,18 @@ const animateAffiliationOut = () => {
           <a
             href="/"
             aria-label="Cape Frontier Travel & Tours"
-            onClick={(event) => handleNavClick('Home', event)}
-            onMouseEnter={animateMainLogoIn}
-            onMouseLeave={animateMainLogoOut}
+            onClick={(event) =>
+              handleNavClick(
+                'Home',
+                event
+              )
+            }
+            onMouseEnter={
+              animateMainLogoIn
+            }
+            onMouseLeave={
+              animateMainLogoOut
+            }
             className="
               group
               relative
@@ -722,145 +869,7 @@ const animateAffiliationOut = () => {
           </a>
 
           {/* =====================================================
-              CAPE TOWN TOURISM AFFILIATION
-          ===================================================== */}
-          <div
-            ref={affiliationRef}
-            className="
-              group
-              relative
-              hidden
-              shrink-0
-              items-center
-              sm:flex
-            "
-            onMouseEnter={animateAffiliationIn}
-            onMouseLeave={animateAffiliationOut}
-          >
-            {/* Divider */}
-            <div
-              className="
-                mr-3
-                h-9
-                w-px
-                shrink-0
-                bg-gradient-to-b
-                from-transparent
-                via-white/30
-                to-transparent
-              "
-            />
-
-            <a
-              href="https://www.capetown.travel"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Cape Town Tourism"
-              className="
-                relative
-                flex
-                items-center
-                gap-2.5
-                overflow-hidden
-                rounded-full
-                border
-                border-white/10
-                bg-white/[0.055]
-                px-3
-                py-1.5
-                backdrop-blur-xl
-                shadow-[0_8px_30px_rgba(0,0,0,0.12)]
-                transition-colors
-                duration-300
-                hover:border-white/25
-                hover:bg-white/[0.10]
-              "
-            >
-              {/* Animated light sweep */}
-              <span
-                ref={affiliationGlowRef}
-                className="
-                  pointer-events-none
-                  absolute
-                  -inset-y-4
-                  left-0
-                  w-8
-                  -skew-x-12
-                  bg-white/30
-                  blur-md
-                  opacity-0
-                "
-              />
-
-              {/* In affiliation with */}
-              <span
-                ref={affiliationTextRef}
-                className="
-                  relative
-                  z-10
-                  block
-                  shrink-0
-                  overflow-hidden
-                  whitespace-nowrap
-                  font-bitter
-                  text-[7px]
-                  font-black
-                  uppercase
-                  tracking-[0.08em]
-                  text-white/60
-                "
-                style={{
-                  width: 0,
-                  opacity: 0,
-                }}
-              >
-                In affiliation with
-              </span>
-
-              {/* Handshake */}
-              <span
-                ref={affiliationHandshakeRef}
-                className="
-                  relative
-                  z-10
-                  flex
-                  h-7
-                  w-7
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-full
-                  bg-white/[0.08]
-                "
-              >
-                <img
-                  src="/icons/handshake.webp"
-                  className="h-4.5 w-4.5 object-contain"
-                  alt=""
-                  aria-hidden="true"
-                />
-              </span>
-
-              {/* Love Cape Town */}
-              <img
-                ref={affiliationLogoRef}
-                src="/assets/brand/logo-love-ct-blue.webp"
-                className="
-                  relative
-                  z-10
-                  h-9
-                  w-auto
-                  shrink-0
-                  object-contain
-                  opacity-90
-                "
-                alt="Love Cape Town"
-              />
-            </a>
-          </div>
-
-          {/* =====================================================
-              DESKTOP NAV + FAQ
+              DESKTOP NAV
           ===================================================== */}
 
           <div
@@ -875,7 +884,170 @@ const animateAffiliationOut = () => {
             "
           >
 
-            {/* Desktop Navigation */}
+            {/* =================================================
+                DESKTOP NAVIGATION
+            ================================================= */}
+            {/* =================================================
+                CAPE TOWN TOURISM AFFILIATION
+
+                MOVED HERE:
+                It now sits beside the navbar rather than
+                beside the main Cape Frontier logo.
+            ================================================= */}
+
+            <div
+              ref={affiliationRef}
+              className="
+                group
+                relative
+                hidden
+                shrink-0
+                items-center
+                sm:flex
+                hover:bg-white
+                rounded-full
+                duration-300
+              "
+              onMouseEnter={
+                animateAffiliationIn
+              }
+              onMouseLeave={
+                animateAffiliationOut
+              }
+            >
+              {/* Divider */}
+
+              <div
+                className="
+                  mr-1
+                  h-8
+                  w-px
+                  shrink-0
+                  bg-gradient-to-b
+                  from-transparent
+                  via-white/30
+                  to-transparent
+                "
+              />
+
+              <a
+                href="https://www.capetown.travel"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Cape Town Tourism"
+                className="
+                  relative
+                  flex
+                  items-center
+                  gap-2
+                  overflow-hidden
+                  rounded-full
+                  border
+                  border-white/10
+                  bg-white/[0.055]
+                  px-2.5
+                  py-1
+                  backdrop-blur-xl
+                  shadow-[0_8px_30px_rgba(0,0,0,0.12)]
+                  transition-colors
+                  duration-300
+                  hover:border-white/25
+                  hover:bg-white/[0.10]
+                "
+              >
+
+                {/* Animated light sweep */}
+
+                <span
+                  ref={affiliationGlowRef}
+                  className="
+                    pointer-events-none
+                    absolute
+                    -inset-y-4
+                    left-0
+                    w-8
+                    -skew-x-12
+                    bg-white/30
+                    blur-md
+                    opacity-0
+                  "
+                />
+
+                {/* In affiliation with */}
+
+                <span
+                  ref={affiliationTextRef}
+                  className="
+                    relative
+                    z-10
+                    block
+                    shrink-0
+                    overflow-hidden
+                    whitespace-nowrap
+                    font-frank
+                    text-md
+                    text-blue-600
+                    font-bold
+                  "
+                  style={{
+                    width: 0,
+                    opacity: 0,
+                  }}
+                >
+                  In affiliation with
+                </span>
+
+                {/* Handshake */}
+
+                <span
+                  ref={
+                    affiliationHandshakeRef
+                  }
+                  className="
+                    relative
+                    z-10
+                    flex
+                    h-7
+                    w-7
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-white/[0.08]
+                  "
+                >
+                  <img
+                    src="/icons/handshake.webp"
+                    className="
+                      h-4.5
+                      w-4.5
+                      object-contain
+                    "
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </span>
+
+                {/* Love Cape Town */}
+
+                <img
+                  ref={affiliationLogoRef}
+                  src="/assets/brand/logo-love-ct-blue.webp"
+                  className="
+                    relative
+                    z-10
+                    h-8
+                    w-auto
+                    shrink-0
+                    object-contain
+                    opacity-90
+                  "
+                  alt="Love Cape Town"
+                />
+
+              </a>
+            </div>
+
 
             <nav
               className="
@@ -891,77 +1063,93 @@ const animateAffiliationOut = () => {
               "
               aria-label="Desktop navigation"
             >
-              {navItems.map((item, index) => (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={(event) =>
-                    handleNavClick(item.label, event)
-                  }
-                  onMouseEnter={(event) =>
-                    openMega(item.label, index, event)
-                  }
-                  onMouseLeave={scheduleCloseMega}
-                  className="
-                    rounded-full
-                    px-2.5
-                    py-2
-                    text-sm
-                    font-bold
-                    text-white
-                    transition-all
-                    duration-300
-                    hover:bg-white/20
-                    hover:text-white
-                    lg:px-4
-                  "
-                >
-                  <span
+
+              {navItems.map(
+                (item, index) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={(event) =>
+                      handleNavClick(
+                        item.label,
+                        event
+                      )
+                    }
+                    onMouseEnter={(event) =>
+                      openMega(
+                        item.label,
+                        index,
+                        event
+                      )
+                    }
+                    onMouseLeave={
+                      scheduleCloseMega
+                    }
                     className="
-                      relative
-                      inline-flex
-                      items-center
+                      rounded-full
+                      px-2.5
+                      py-2
+                      text-sm
+                      font-bold
+                      text-white
+                      transition-all
+                      duration-300
+                      hover:bg-white/20
+                      hover:text-white
+                      lg:px-4
                     "
                   >
-                    {item.label}
-
                     <span
-                      className={`
-                        absolute
-                        -bottom-1
-                        left-0
-                        h-[2px]
-                        rounded-full
-                        bg-white
-                        transition-all
-                        duration-300
-                        ${
-                          hoverIndex === index
-                            ? 'w-full opacity-100'
-                            : 'w-0 opacity-0'
-                        }
-                      `}
-                    />
-                  </span>
-                </button>
-              ))}
+                      className="
+                        relative
+                        inline-flex
+                        items-center
+                      "
+                    >
+                      {item.label}
+
+                      <span
+                        className={`
+                          absolute
+                          -bottom-1
+                          left-0
+                          h-[2px]
+                          rounded-full
+                          bg-white
+                          transition-all
+                          duration-300
+                          ${
+                            hoverIndex === index
+                              ? 'w-full opacity-100'
+                              : 'w-0 opacity-0'
+                          }
+                        `}
+                      />
+                    </span>
+                  </button>
+                )
+              )}
             </nav>
 
-            {/* CONTACT */}
+            {/* =================================================
+                CONTACT
+            ================================================= */}
 
             <button
               type="button"
               onClick={() => {
-                
-                    const contact = document.querySelector("#contact");
+                const contact =
+                  document.querySelector(
+                    '#contact'
+                  )
 
-                    if (!contact) return;
+                if (!contact) return
 
-                    contact.scrollIntoView({
-                      behavior: "smooth",
-                      block: "start",
-                    });
-                  }}
+                contact.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                })
+              }}
               className="
                 flex
                 shrink-0
@@ -994,7 +1182,9 @@ const animateAffiliationOut = () => {
                 alt="CONTACT"
               />
 
-              <span>Contact</span>
+              <span>
+                Contact
+              </span>
             </button>
 
           </div>
@@ -1020,7 +1210,9 @@ const animateAffiliationOut = () => {
               onClick={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
-                setMenuOpen((prev) => !prev)
+                setMenuOpen(
+                  (prev) => !prev
+                )
               }}
               className="
                 flex
@@ -1099,6 +1291,7 @@ const animateAffiliationOut = () => {
               </div>
             </button>
           </div>
+
         </div>
       </header>
 
@@ -1121,8 +1314,7 @@ const animateAffiliationOut = () => {
             "
           />,
           document.body
-        )
-      }
+        )}
 
       {/* =========================================================
           DESKTOP MEGA PANEL
@@ -1134,7 +1326,9 @@ const animateAffiliationOut = () => {
           <div
             ref={megaPanelRef}
             onMouseEnter={keepMegaOpen}
-            onMouseLeave={scheduleCloseMega}
+            onMouseLeave={
+              scheduleCloseMega
+            }
             className="
               fixed
               left-0
@@ -1147,7 +1341,9 @@ const animateAffiliationOut = () => {
               overscroll-contain
               border-y
               border-black/5
-              bg-linear-to-b from-white to-0%
+              bg-linear-to-b
+              from-white
+              to-0%
               text-black
               shadow-[0_18px_45px_rgba(0,0,0,0.10)]
               md:block
@@ -1185,7 +1381,9 @@ const animateAffiliationOut = () => {
                 >
                   {activeMegaData.logo && (
                     <img
-                      src={activeMegaData.logo}
+                      src={
+                        activeMegaData.logo
+                      }
                       alt="Cape Frontier logo"
                       className="
                         mb-4
@@ -1206,7 +1404,9 @@ const animateAffiliationOut = () => {
                       text-blue-400
                     "
                   >
-                    {activeMegaData.eyebrow}
+                    {
+                      activeMegaData.eyebrow
+                    }
                   </p>
 
                   <h3
@@ -1219,7 +1419,9 @@ const animateAffiliationOut = () => {
                       text-neutral-950
                     "
                   >
-                    {activeMegaData.title}
+                    {
+                      activeMegaData.title
+                    }
                   </h3>
 
                   <p
@@ -1232,13 +1434,18 @@ const animateAffiliationOut = () => {
                       text-neutral-600
                     "
                   >
-                    {activeMegaData.desc}
+                    {
+                      activeMegaData.desc
+                    }
                   </p>
 
                   <button
                     type="button"
                     onClick={(event) =>
-                      handleNavClick(activeMega, event)
+                      handleNavClick(
+                        activeMega,
+                        event
+                      )
                     }
                     className="
                       mt-5
@@ -1267,7 +1474,8 @@ const animateAffiliationOut = () => {
 
                 {/* Mega Content */}
 
-                {activeMegaData.layout === 'cards' ? (
+                {activeMegaData.layout ===
+                'cards' ? (
                   <div
                     className="
                       grid
@@ -1276,96 +1484,98 @@ const animateAffiliationOut = () => {
                       lg:grid-cols-4
                     "
                   >
-                    {activeMegaData.cards.map((card) => (
-                      <button
-                        key={card.title}
-                        type="button"
-                        onClick={(event) =>
-                          handleNavClick(
-                            card.target,
-                            event
-                          )
-                        }
-                        className="
-                          group
-                          overflow-hidden
-                          rounded-[1.35rem]
-                          border
-                          border-black/5
-                          bg-neutral-50
-                          text-left
-                          shadow-[0_10px_26px_rgba(0,0,0,0.04)]
-                          transition
-                          hover:-translate-y-1
-                          hover:bg-white
-                          hover:shadow-[0_16px_34px_rgba(0,0,0,0.08)]
-                        "
-                      >
-                        <div
+                    {activeMegaData.cards.map(
+                      (card) => (
+                        <button
+                          key={card.title}
+                          type="button"
+                          onClick={(event) =>
+                            handleNavClick(
+                              card.target,
+                              event
+                            )
+                          }
                           className="
-                            relative
-                            h-32
+                            group
                             overflow-hidden
+                            rounded-[1.35rem]
+                            border
+                            border-black/5
+                            bg-neutral-50
+                            text-left
+                            shadow-[0_10px_26px_rgba(0,0,0,0.04)]
+                            transition
+                            hover:-translate-y-1
+                            hover:bg-white
+                            hover:shadow-[0_16px_34px_rgba(0,0,0,0.08)]
                           "
                         >
-                          <img
-                            src={card.image}
-                            alt={card.title}
-                            className="
-                              h-full
-                              w-full
-                              object-cover
-                              transition
-                              duration-500
-                              group-hover:scale-110
-                            "
-                            loading="lazy"
-                          />
-
                           <div
                             className="
-                              absolute
-                              inset-0
-                              bg-gradient-to-t
-                              from-black/60
-                              via-black/10
-                              to-transparent
+                              relative
+                              h-32
+                              overflow-hidden
                             "
-                          />
+                          >
+                            <img
+                              src={card.image}
+                              alt={card.title}
+                              className="
+                                h-full
+                                w-full
+                                object-cover
+                                transition
+                                duration-500
+                                group-hover:scale-110
+                              "
+                              loading="lazy"
+                            />
+
+                            <div
+                              className="
+                                absolute
+                                inset-0
+                                bg-gradient-to-t
+                                from-black/60
+                                via-black/10
+                                to-transparent
+                              "
+                            />
+
+                            <p
+                              className="
+                                absolute
+                                bottom-3
+                                left-3
+                                rounded-full
+                                bg-white/90
+                                px-3
+                                py-1
+                                font-bitter
+                                text-xs
+                                font-bold
+                                text-black
+                                shadow-sm
+                              "
+                            >
+                              {card.title}
+                            </p>
+                          </div>
 
                           <p
                             className="
-                              absolute
-                              bottom-3
-                              left-3
-                              rounded-full
-                              bg-white/90
-                              px-3
-                              py-1
+                              p-3
                               font-bitter
                               text-xs
-                              font-bold
-                              text-black
-                              shadow-sm
+                              leading-5
+                              text-neutral-600
                             "
                           >
-                            {card.title}
+                            {card.desc}
                           </p>
-                        </div>
-
-                        <p
-                          className="
-                            p-3
-                            font-bitter
-                            text-xs
-                            leading-5
-                            text-neutral-600
-                          "
-                        >
-                          {card.desc}
-                        </p>
-                      </button>
-                    ))}
+                        </button>
+                      )
+                    )}
                   </div>
                 ) : (
                   <div
@@ -1376,85 +1586,86 @@ const animateAffiliationOut = () => {
                       lg:grid-cols-4
                     "
                   >
-                    {activeMegaData.links.map((link) => (
-                      <button
-                        key={link.title}
-                        type="button"
-                        onClick={(event) =>
-                          handleNavClick(
-                            link.target,
-                            event
-                          )
-                        }
-                        className="
-                          group
-                          rounded-[1.35rem]
-                          border
-                          border-black/5
-                          bg-neutral-50
-                          p-4
-                          text-left
-                          shadow-[0_10px_26px_rgba(0,0,0,0.04)]
-                          transition
-                          hover:-translate-y-1
-                          hover:bg-white
-                          hover:shadow-[0_16px_34px_rgba(0,0,0,0.08)]
-                        "
-                      >
-                        <p
+                    {activeMegaData.links.map(
+                      (link) => (
+                        <button
+                          key={link.title}
+                          type="button"
+                          onClick={(event) =>
+                            handleNavClick(
+                              link.target,
+                              event
+                            )
+                          }
                           className="
-                            font-bitter
-                            text-sm
-                            font-bold
-                            text-neutral-950
-                          "
-                        >
-                          {link.title}
-                        </p>
-
-                        <p
-                          className="
-                            mt-2
-                            font-bitter
-                            text-xs
-                            leading-5
-                            text-neutral-600
-                          "
-                        >
-                          {link.desc}
-                        </p>
-
-                        <span
-                          className="
-                            mt-3
-                            inline-flex
-                            rounded-full
-                            bg-green-200
-                            px-3
-                            py-1
-                            font-bitter
-                            text-[10px]
-                            font-bold
-                            uppercase
-                            tracking-[0.14em]
-                            text-green-950
+                            group
+                            rounded-[1.35rem]
+                            border
+                            border-black/5
+                            bg-neutral-50
+                            p-4
+                            text-left
+                            shadow-[0_10px_26px_rgba(0,0,0,0.04)]
                             transition
-                            group-hover:bg-neutral-950
-                            group-hover:text-white
+                            hover:-translate-y-1
+                            hover:bg-white
+                            hover:shadow-[0_16px_34px_rgba(0,0,0,0.08)]
                           "
                         >
-                          View
-                        </span>
-                      </button>
-                    ))}
+                          <p
+                            className="
+                              font-bitter
+                              text-sm
+                              font-bold
+                              text-neutral-950
+                            "
+                          >
+                            {link.title}
+                          </p>
+
+                          <p
+                            className="
+                              mt-2
+                              font-bitter
+                              text-xs
+                              leading-5
+                              text-neutral-600
+                            "
+                          >
+                            {link.desc}
+                          </p>
+
+                          <span
+                            className="
+                              mt-3
+                              inline-flex
+                              rounded-full
+                              bg-green-200
+                              px-3
+                              py-1
+                              font-bitter
+                              text-[10px]
+                              font-bold
+                              uppercase
+                              tracking-[0.14em]
+                              text-green-950
+                              transition
+                              group-hover:bg-neutral-950
+                              group-hover:text-white
+                            "
+                          >
+                            View
+                          </span>
+                        </button>
+                      )
+                    )}
                   </div>
                 )}
               </div>
             </div>
           </div>,
           document.body
-        )
-        }
+        )}
 
       {/* =========================================================
           MOBILE MENU
@@ -1470,7 +1681,9 @@ const animateAffiliationOut = () => {
               z-[9980]
               sm:hidden
             "
-            onClick={() => setMenuOpen(false)}
+            onClick={() =>
+              setMenuOpen(false)
+            }
             onPointerDown={(event) =>
               event.stopPropagation()
             }
@@ -1478,6 +1691,7 @@ const animateAffiliationOut = () => {
               event.stopPropagation()
             }
           >
+
             {/* Backdrop */}
 
             <div
@@ -1527,7 +1741,8 @@ const animateAffiliationOut = () => {
                   backdrop-blur-2xl
                 "
                 style={{
-                  WebkitOverflowScrolling: 'touch',
+                  WebkitOverflowScrolling:
+                    'touch',
                 }}
               >
 
@@ -1622,10 +1837,33 @@ const animateAffiliationOut = () => {
                       object-left
                     "
                   />
-                  <div className="border border-blue-600/20 my-2 rounded-full"/>
-                  <div className="flex justify-center items-center gap-4">
-                    
-                    <p className='text-md font-bitter font-bold'>In affiliation with </p>
+
+                  <div
+                    className="
+                      my-2
+                      rounded-full
+                      border
+                      border-blue-600/20
+                    "
+                  />
+
+                  <div
+                    className="
+                      flex
+                      items-center
+                      justify-center
+                      gap-4
+                    "
+                  >
+                    <p
+                      className="
+                        text-md
+                        font-bitter
+                        font-bold
+                      "
+                    >
+                      In affiliation with
+                    </p>
 
                     <img
                       src="/icons/handshake.webp"
@@ -1638,9 +1876,10 @@ const animateAffiliationOut = () => {
                         object-left
                       "
                     />
+
                     <img
                       src="/assets/brand/logo-love-ct-blue.webp"
-                      alt="Cape Frontier logo"
+                      alt="Love Cape Town"
                       className="
                         block
                         h-12
@@ -1668,7 +1907,8 @@ const animateAffiliationOut = () => {
                   {navItems
                     .filter(
                       (item) =>
-                        item.label !== 'Contact'
+                        item.label !==
+                        'Contact'
                     )
                     .map((item) => (
                       <button
@@ -1764,7 +2004,13 @@ const animateAffiliationOut = () => {
                     Business info
                   </p>
 
-                  <div className="mt-3 grid gap-2">
+                  <div
+                    className="
+                      mt-3
+                      grid
+                      gap-2
+                    "
+                  >
 
                     {/* Location */}
 
@@ -1798,6 +2044,7 @@ const animateAffiliationOut = () => {
                           aria-hidden="true"
                         >
                           <path d="M12 21s7-4.4 7-11a7 7 0 1 0-14 0c0 6.6 7 11 7 11Z" />
+
                           <circle
                             cx="12"
                             cy="10"
@@ -1829,9 +2076,12 @@ const animateAffiliationOut = () => {
                             text-white/52
                           "
                         >
-                          Guided Cape Town routes,
-                          local pickup support, and
-                          manual booking confirmation.
+                          Guided Cape Town
+                          routes, local
+                          pickup support,
+                          and manual
+                          booking
+                          confirmation.
                         </p>
                       </div>
                     </div>
@@ -1882,7 +2132,8 @@ const animateAffiliationOut = () => {
                             text-white/86
                           "
                         >
-                          Secure booking flow
+                          Secure booking
+                          flow
                         </p>
 
                         <p
@@ -1894,9 +2145,12 @@ const animateAffiliationOut = () => {
                             text-white/52
                           "
                         >
-                          Choose your tour, confirm
-                          your group, pay online, then
-                          receive confirmation.
+                          Choose your
+                          tour, confirm
+                          your group, pay
+                          online, then
+                          receive
+                          confirmation.
                         </p>
                       </div>
                     </div>
@@ -1977,44 +2231,64 @@ const animateAffiliationOut = () => {
                     "
                   >
                     {[
-                      ['Booking', '/policies#booking-policy'],
-                      ['Pickup', '/policies#pickup-policy'],
-                      ['Payment', '/policies#payment-policy'],
-                      ['Cancellation', '/policies#cancellation-policy'],
-                      ['Reschedule', '/policies#reschedule-policy'],
-                      ['Private tours', '/policies#private-tour-policy'],
-                    ].map(([label, target]) => (
-                      <button
-                        key={label}
-                        type="button"
-                        onClick={(event) =>
-                          handleNavClick(
-                            target,
-                            event
-                          )
-                        }
-                        className="
-                          rounded-xl
-                          border
-                          border-white/[0.08]
-                          bg-white/[0.045]
-                          px-3
-                          py-2
-                          text-left
-                          font-bitter
-                          text-[11px]
-                          font-black
-                          uppercase
-                          tracking-[0.09em]
-                          text-white/68
-                          transition
-                          hover:bg-white/10
-                          hover:text-white
-                        "
-                      >
-                        {label}
-                      </button>
-                    ))}
+                      [
+                        'Booking',
+                        '/policies#booking-policy',
+                      ],
+                      [
+                        'Pickup',
+                        '/policies#pickup-policy',
+                      ],
+                      [
+                        'Payment',
+                        '/policies#payment-policy',
+                      ],
+                      [
+                        'Cancellation',
+                        '/policies#cancellation-policy',
+                      ],
+                      [
+                        'Reschedule',
+                        '/policies#reschedule-policy',
+                      ],
+                      [
+                        'Private tours',
+                        '/policies#private-tour-policy',
+                      ],
+                    ].map(
+                      ([label, target]) => (
+                        <button
+                          key={label}
+                          type="button"
+                          onClick={(event) =>
+                            handleNavClick(
+                              target,
+                              event
+                            )
+                          }
+                          className="
+                            rounded-xl
+                            border
+                            border-white/[0.08]
+                            bg-white/[0.045]
+                            px-3
+                            py-2
+                            text-left
+                            font-bitter
+                            text-[11px]
+                            font-black
+                            uppercase
+                            tracking-[0.09em]
+                            text-white/68
+                            transition
+                            hover:bg-white/10
+                            hover:text-white
+                          "
+                        >
+                          {label}
+                        </button>
+                      )
+                    )}
                   </div>
                 </div>
 
