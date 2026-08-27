@@ -35,7 +35,7 @@ export default function ToursBrowser() {
 
   const triggerRefs = useRef([]);
   const tourScrollTriggers = useRef([]);
-  const triggerInstances = useRef([]); // 👈 store ScrollTrigger instances
+  const triggerInstances = useRef([]); // 👈 store ScrollTrigger instances for navigation
 
   const [activeCategory, setActiveCategory] = useState("adrenaline");
   const [currentTourIndex, setCurrentTourIndex] = useState(0);
@@ -44,6 +44,10 @@ export default function ToursBrowser() {
 
   const [pinned, setPinned] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // ─── LOADING STATE ──────────────────────────────────────────
+  const [isLoading, setIsLoading] = useState(true);
+  const isReadyRef = useRef(false); // prevent multiple ready calls
 
   // ─────────────────────────────────────────────────────────────
   // Sizing
@@ -61,8 +65,6 @@ export default function ToursBrowser() {
   const [transitionDistance, setTransitionDistance] = useState(1100);
   const [totalDistance, setTotalDistance] = useState(1800);
 
-  // This is now kept only as a sizing value.
-  // Navigation/animation positioning uses navOffset consistently.
   const [activeDetectionOffset, setActiveDetectionOffset] = useState(450);
 
   // IMPORTANT:
@@ -112,16 +114,13 @@ export default function ToursBrowser() {
 
       setActiveDetectionOffset(250);
 
-      // IMPORTANT:
       // Card animation starts at top += 4px.
       setNavOffset(4);
 
       return;
     }
 
-    // ───────────────────────────────────────────────────────────
-    // Desktop
-    // ───────────────────────────────────────────────────────────
+    // ─── Desktop ──────────────────────────────────────────────
 
     const buttonRow = BUTTON_ROW_HEIGHT_DESKTOP;
 
@@ -157,7 +156,6 @@ export default function ToursBrowser() {
       Math.min(450, hold * 0.6)
     );
 
-    // IMPORTANT:
     // This MUST match the ScrollTrigger animation start.
     setNavOffset(6);
   }, []);
@@ -326,9 +324,7 @@ export default function ToursBrowser() {
         });
       });
 
-      // ─────────────────────────────────────────────────────────
-      // Pin navigation
-      // ─────────────────────────────────────────────────────────
+      // ─── Pin navigation ──────────────────────────────────────
 
       ScrollTrigger.create({
         trigger: containerRef.current,
@@ -361,9 +357,7 @@ export default function ToursBrowser() {
         },
       });
 
-      // ─────────────────────────────────────────────────────────
-      // Pin tour stage
-      // ─────────────────────────────────────────────────────────
+      // ─── Pin tour stage ─────────────────────────────────────
 
       ScrollTrigger.create({
         trigger: containerRef.current,
@@ -380,9 +374,7 @@ export default function ToursBrowser() {
         invalidateOnRefresh: true,
       });
 
-      // ─────────────────────────────────────────────────────────
-      // Individual tour animations
-      // ─────────────────────────────────────────────────────────
+      // ─── Individual tour animations ────────────────────────
 
       wrappers.forEach((wrapper, index) => {
         const currentCard = cards[index];
@@ -392,14 +384,7 @@ export default function ToursBrowser() {
 
         if (!currentTour) return;
 
-        // ───────────────────────────────────────────────────────
         // Active tour trigger
-        //
-        // IMPORTANT:
-        // This now uses the EXACT SAME start position as the
-        // animation and goToTour().
-        // ───────────────────────────────────────────────────────
-
         const activeTrigger = ScrollTrigger.create({
           trigger: wrapper,
 
@@ -422,15 +407,11 @@ export default function ToursBrowser() {
         triggerInstances.current[index] = activeTrigger;
         tourScrollTriggers.current[index] = activeTrigger;
 
-        // ───────────────────────────────────────────────────────
-        // Card animation
-        // ───────────────────────────────────────────────────────
-
+        // Card animation timeline
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: wrapper,
 
-            // EXACT SAME POSITION
             start: `top top+=${navOffset}`,
 
             end: `+=${totalDistance}`,
@@ -501,67 +482,61 @@ export default function ToursBrowser() {
       ScrollTrigger.refresh();
     }, containerRef);
 
-    // ───────────────────────────────────────────────────────────
-    // Refresh after fonts/images load
-    // ───────────────────────────────────────────────────────────
+    // ─── READY STATE (loading spinner) ──────────────────────
 
-    let cancelled = false;
+    // Prevent multiple calls to mark ready
+    isReadyRef.current = false;
 
-    const refresh = () => {
-      if (!cancelled) {
-        ScrollTrigger.refresh();
-      }
+    const markReady = () => {
+      if (isReadyRef.current) return;
+      isReadyRef.current = true;
+
+      // Ensure ScrollTrigger is up to date
+      ScrollTrigger.refresh();
+
+      // Wait one frame for the browser to paint
+      requestAnimationFrame(() => {
+        setIsLoading(false);
+      });
     };
 
-    const fontsReady =
-      document.fonts?.ready
-        ?.then(refresh)
-        .catch(() => {});
+    // Refresh after fonts
+    document.fonts?.ready
+      ?.then(markReady)
+      .catch(() => {});
 
-    const rafId = requestAnimationFrame(() => {
-      requestAnimationFrame(refresh);
-    });
-
-    window.addEventListener("load", refresh);
-
+    // Refresh after all images
     const images =
       containerRef.current.querySelectorAll("img");
-
     const imageListeners = [];
 
     images.forEach((img) => {
       if (!img.complete) {
-        const onLoad = () => refresh();
-
-        img.addEventListener(
-          "load",
-          onLoad,
-          { once: true }
-        );
-
-        imageListeners.push([
-          img,
-          onLoad,
-        ]);
+        const onLoad = () => markReady();
+        img.addEventListener("load", onLoad, { once: true });
+        imageListeners.push([img, onLoad]);
       }
     });
 
+    // Also mark ready after layout (RAF)
+    const rafId = requestAnimationFrame(() => {
+      requestAnimationFrame(markReady);
+    });
+
+    // Fallback: if nothing triggers, mark ready after 1.5s
+    const timeoutId = setTimeout(markReady, 1500);
+
+    // ─── Cleanup ─────────────────────────────────────────────
+
     return () => {
-      cancelled = true;
-
       cancelAnimationFrame(rafId);
+      clearTimeout(timeoutId);
 
-      window.removeEventListener(
-        "load",
-        refresh
-      );
+      window.removeEventListener("load", markReady);
 
       imageListeners.forEach(
         ([img, onLoad]) => {
-          img.removeEventListener(
-            "load",
-            onLoad
-          );
+          img.removeEventListener("load", onLoad);
         }
       );
 
@@ -635,10 +610,7 @@ export default function ToursBrowser() {
         // Update UI state immediately (snappy)
         updateStateForTour(tour, index);
 
-        // ─────────────────────────────────────────
         // Smooth scroll
-        // ─────────────────────────────────────────
-
         gsap.to(window, {
           duration: 0.9,
 
@@ -649,31 +621,19 @@ export default function ToursBrowser() {
             autoKill: true,
           },
 
-          // Keep ScrollTrigger synced during the
-          // programmatic scroll.
           onUpdate: () => {
             ScrollTrigger.update();
           },
 
-          // ─────────────────────────────────────
-          // FINAL POSITION
-          // ─────────────────────────────────────
-
           onComplete: () => {
             // Force the exact final scroll position.
-            window.scrollTo(
-              0,
-              targetY
-            );
+            window.scrollTo(0, targetY);
 
             ScrollTrigger.update();
 
             // Explicitly restore selected tour state
-            // (in case of any drift)
             updateStateForTour(tour, index);
 
-            // Wait one frame before allowing
-            // normal ScrollTrigger active updates.
             requestAnimationFrame(() => {
               isScrollingRef.current = false;
               ScrollTrigger.update();
@@ -790,274 +750,269 @@ export default function ToursBrowser() {
   // ─────────────────────────────────────────────────────────────
 
   return (
-    <main className="w-full overflow-x-hidden bg-gradient-to-br from-white to-blue-600 text-white">
-      <section
-        ref={containerRef}
-        className="relative mx-auto w-full max-w-5xl px-3 md:px-4"
-      >
-        {/* ─────────────────────────────────────────────────────
-            Fixed / pinned navigation
-        ───────────────────────────────────────────────────── */}
+    <>
+      {/* ─── LOADING SPINNER ─────────────────────────────────── */}
+      {isLoading && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+        </div>
+      )}
 
-        <div
-          className="first-panel absolute left-0 z-[5000] w-full pointer-events-none"
+      <main className="w-full overflow-x-hidden bg-gradient-to-br from-white to-blue-600 text-white">
+        <section
+          ref={containerRef}
+          className="relative mx-auto w-full max-w-5xl px-3 md:px-4"
         >
-          <div className="mt-20"></div>
-          <FixedCategoryNav
-            activeCategory={activeCategory}
-            currentTourIndex={
-              currentTourIndex
-            }
-            currentTourTotal={
-              currentTourTotal
-            }
-            pinned={pinned}
-            sections={categorySections}
-            mobileNavRef={mobileNavRef}
-            mobileNavScrollerRef={
-              mobileNavScrollerRef
-            }
-            mobileCategoryItemRefs={
-              mobileCategoryItemRefs
-            }
-            metrics={{
-              desktopNavTop: 24,
-              navLeft: 12,
-              mobileTop: 100,
-            }}
-            onSelect={(categoryId) => {
-              setActiveCategory(
-                categoryId
-              );
+          {/* ─── Fixed / pinned navigation ───────────────────── */}
 
-              setCurrentTourIndex(0);
-
-              const index =
-                allTours.findIndex(
-                  (tour) =>
-                    tour.categoryId ===
-                    categoryId
-                );
-
-              if (index !== -1) {
-                setCurrentGlobalIndex(
-                  index
-                );
-
-                goToTour(index);
+          <div
+            className="first-panel absolute left-0 z-[5000] w-full pointer-events-none"
+          >
+            <div className="mt-20"></div>
+            <FixedCategoryNav
+              activeCategory={activeCategory}
+              currentTourIndex={
+                currentTourIndex
               }
+              currentTourTotal={
+                currentTourTotal
+              }
+              pinned={pinned}
+              sections={categorySections}
+              mobileNavRef={mobileNavRef}
+              mobileNavScrollerRef={
+                mobileNavScrollerRef
+              }
+              mobileCategoryItemRefs={
+                mobileCategoryItemRefs
+              }
+              metrics={{
+                desktopNavTop: 24,
+                navLeft: 12,
+                mobileTop: 100,
+              }}
+              onSelect={(categoryId) => {
+                setActiveCategory(
+                  categoryId
+                );
+
+                setCurrentTourIndex(0);
+
+                const index =
+                  allTours.findIndex(
+                    (tour) =>
+                      tour.categoryId ===
+                      categoryId
+                  );
+
+                if (index !== -1) {
+                  setCurrentGlobalIndex(
+                    index
+                  );
+
+                  goToTour(index);
+                }
+              }}
+              onTourChange={
+                handleTourChange
+              }
+              categoryTours={
+                activeCategoryTours
+              }
+            />
+          </div>
+
+          {/* ─── ScrollTrigger wrappers ─────────────────────── */}
+
+          <div
+            className="relative"
+            style={{
+              paddingTop: `${navOffset}px`,
             }}
-            onTourChange={
-              handleTourChange
-            }
-            categoryTours={
-              activeCategoryTours
-            }
-          />
-        </div>
-
-        {/* ─────────────────────────────────────────────────────
-            ScrollTrigger wrappers
-        ───────────────────────────────────────────────────── */}
-
-        <div
-          className="relative"
-          style={{
-            paddingTop: `${navOffset}px`,
-          }}
-        >
-          {allTours.map(
-            (tour, index) => (
-              <section
-                key={tour.id}
-                ref={(el) => {
-                  triggerRefs.current[index] =
-                    el;
-                }}
-                className="tour-trigger relative"
-                data-category={
-                  tour.categoryId
-                }
-                data-tour-index={
-                  index
-                }
-                style={{
-                  height: `${totalDistance}px`,
-                }}
-              />
-            )
-          )}
-        </div>
-
-        {/* ─────────────────────────────────────────────────────
-            Tour card stage
-        ───────────────────────────────────────────────────── */}
-
-        <div
-          ref={stageRef}
-          className="absolute left-0 z-[100] w-full pointer-events-none"
-          style={{
-            top: stageTop,
-            height: `${stageHeight}px`,
-          }}
-        >
-          <div className="flex h-full w-full flex-col">
-
-            {/* ───────────────────────────────────────────────
-                First / Last / Contact
-                Desktop: one row
-                Mobile: navigation row + CTA row
-                ─────────────────────────────────────────────── */}
-
-            <div className="mt-30"></div>
-
-            <div
-              className="
-                m-2
-                shrink-0
-                pointer-events-auto
-                flex
-                flex-col
-                items-center
-                justify-center
-                gap-3
-                md:flex-row
-                md:gap-5
-              "
-            >
-              {/* First / Counter / Last + Mobile Help Icon */}
-              <div className="flex items-center justify-center gap-3 md:gap-5">
-                {/* First */}
-                <button
-                  type="button"
-                  onClick={handleFirst}
-                  disabled={isFirst}
-                  aria-label="Go to first tour"
-                  className={
-                    isMobile
-                      ? "flex items-center gap-1.5 rounded-full bg-white px-5 py-3 text-base font-bold text-blue-700 shadow-lg shadow-black/20 transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
-                      : "rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {allTours.map(
+              (tour, index) => (
+                <section
+                  key={tour.id}
+                  ref={(el) => {
+                    triggerRefs.current[index] =
+                      el;
+                  }}
+                  className="tour-trigger relative"
+                  data-category={
+                    tour.categoryId
                   }
-                >
-                  ‹ First
-                </button>
-
-                {/* Counter */}
-                <span className="min-w-[55px] text-center text-sm font-medium text-white/70">
-                  {currentGlobalIndex + 1} / {allTours.length}
-                </span>
-
-                {/* Last */}
-                <button
-                  type="button"
-                  onClick={handleLast}
-                  disabled={isLast}
-                  aria-label="Go to last tour"
-                  className={
-                    isMobile
-                      ? "flex items-center gap-1.5 rounded-full bg-white px-5 py-3 text-base font-bold text-blue-700 shadow-lg shadow-black/20 transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
-                      : "rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
+                  data-tour-index={
+                    index
                   }
-                >
-                  Last ›
-                </button>
+                  style={{
+                    height: `${totalDistance}px`,
+                  }}
+                />
+              )
+            )}
+          </div>
 
-                {/* Mobile Help Icon (hidden on md and up) */}
-                <button
-                  type="button"
-                  onClick={handleContactClick}
-                  aria-label="Contact us"
-                  className="
-                    md:hidden
-                    flex
-                    items-center
-                    justify-center
-                    h-10
-                    w-10
-                    rounded-full
-                    bg-white
-                    text-blue-700
-                    shadow-lg
-                    shadow-black/20
-                    transition
-                    active:scale-95
-                  "
-                >
-                  <span className="text-xl font-bold leading-none">
-                    ?
-                  </span>
-                </button>
-              </div>
+          {/* ─── Tour card stage ────────────────────────────── */}
 
-              {/* Secondary actions (desktop only) */}
-              <div className="hidden md:flex items-center justify-center gap-5 md:gap-4">
-                {/* Contact CTA */}
-                <button
-                  type="button"
-                  onClick={handleContactClick}
-                  className="
-                    group
-                    inline-flex
-                    items-center
-                    gap-2
-                    p-2
-                    whitespace-nowrap
-                    text-xs
-                    font-medium
-                    tracking-wide
-                    text-white/80
-                    transition-all
-                    duration-300
-                    hover:bg-white
-                    hover:px-30
-                    md:ml-2
-                    md:text-sm
-                    rounded-2xl
-                    hover:rounded-full
-                    border border-white px-4
-                  "
-                >
-                  <span className="relative group-hover:text-black duration-300">
-                    Need help? Contact us now
-                  </span>
-                  <img src="/icons/topRightArrow.png" className="h-3 group-hover:brightness-0 duration-300" alt="" />
-                </button>
-              </div>
-            </div>
+          <div
+            ref={stageRef}
+            className="absolute left-0 z-[100] w-full pointer-events-none"
+            style={{
+              top: stageTop,
+              height: `${stageHeight}px`,
+            }}
+          >
+            <div className="flex h-full w-full flex-col">
 
-            {/* ───────────────────────────────────────────────
-                Cards
-            ─────────────────────────────────────────────── */}
+              {/* ─── First / Last / Contact ──────────────────── */}
 
-            <div className="relative min-h-0 flex-1 overflow-hidden">
-              {allTours.map(
-                (tour) => (
-                  <div
-                    key={tour.id}
-                    className="tour-stage-card absolute inset-0 h-full w-full will-change-transform pointer-events-auto"
+              <div className="mt-30"></div>
+
+              <div
+                className="
+                  m-2
+                  shrink-0
+                  pointer-events-auto
+                  flex
+                  flex-col
+                  items-center
+                  justify-center
+                  gap-3
+                  md:flex-row
+                  md:gap-5
+                "
+              >
+                {/* First / Counter / Last + Mobile Help Icon */}
+                <div className="flex items-center justify-center gap-3 md:gap-5">
+                  {/* First */}
+                  <button
+                    type="button"
+                    onClick={handleFirst}
+                    disabled={isFirst}
+                    aria-label="Go to first tour"
+                    className={
+                      isMobile
+                        ? "flex items-center gap-1.5 rounded-full bg-white px-5 py-3 text-base font-bold text-blue-700 shadow-lg shadow-black/20 transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+                        : "rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
+                    }
                   >
-                    <TourCard
-                      tour={tour}
-                      cardHeight={
-                        cardHeight
-                      }
-                      isMobile={
-                        isMobile
-                      }
-                    />
-                  </div>
-                )
-              )}
+                    ‹ First
+                  </button>
+
+                  {/* Counter */}
+                  <span className="min-w-[55px] text-center text-sm font-medium text-white/70">
+                    {currentGlobalIndex + 1} / {allTours.length}
+                  </span>
+
+                  {/* Last */}
+                  <button
+                    type="button"
+                    onClick={handleLast}
+                    disabled={isLast}
+                    aria-label="Go to last tour"
+                    className={
+                      isMobile
+                        ? "flex items-center gap-1.5 rounded-full bg-white px-5 py-3 text-base font-bold text-blue-700 shadow-lg shadow-black/20 transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+                        : "rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
+                    }
+                  >
+                    Last ›
+                  </button>
+
+                  {/* Mobile Help Icon (hidden on md and up) */}
+                  <button
+                    type="button"
+                    onClick={handleContactClick}
+                    aria-label="Contact us"
+                    className="
+                      md:hidden
+                      flex
+                      items-center
+                      justify-center
+                      h-10
+                      w-10
+                      rounded-full
+                      bg-white
+                      text-blue-700
+                      shadow-lg
+                      shadow-black/20
+                      transition
+                      active:scale-95
+                    "
+                  >
+                    <span className="text-xl font-bold leading-none">
+                      ?
+                    </span>
+                  </button>
+                </div>
+
+                {/* Secondary actions (desktop only) */}
+                <div className="hidden md:flex items-center justify-center gap-5 md:gap-4">
+                  {/* Contact CTA */}
+                  <button
+                    type="button"
+                    onClick={handleContactClick}
+                    className="
+                      group
+                      inline-flex
+                      items-center
+                      gap-2
+                      p-2
+                      whitespace-nowrap
+                      text-xs
+                      font-medium
+                      tracking-wide
+                      text-white/80
+                      transition-all
+                      duration-300
+                      hover:bg-white
+                      hover:px-30
+                      md:ml-2
+                      md:text-sm
+                      rounded-2xl
+                      hover:rounded-full
+                      border border-white px-4
+                    "
+                  >
+                    <span className="relative group-hover:text-black duration-300">
+                      Need help? Contact us now
+                    </span>
+                    <img src="/icons/topRightArrow.png" className="h-3 group-hover:brightness-0 duration-300" alt="" />
+                  </button>
+                </div>
+              </div>
+
+              {/* ─── Cards ───────────────────────────────────── */}
+
+              <div className="relative min-h-0 flex-1 overflow-hidden">
+                {allTours.map(
+                  (tour) => (
+                    <div
+                      key={tour.id}
+                      className="tour-stage-card absolute inset-0 h-full w-full will-change-transform pointer-events-auto"
+                    >
+                      <TourCard
+                        tour={tour}
+                        cardHeight={
+                          cardHeight
+                        }
+                        isMobile={
+                          isMobile
+                        }
+                      />
+                    </div>
+                  )
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* ─────────────────────────────────────────────────────
-            ScrollTrigger end marker
-        ───────────────────────────────────────────────────── */}
+          {/* ─── ScrollTrigger end marker ───────────────────── */}
 
-        <div className="scroll-end h-px w-full" />
-      </section>
-    </main>
+          <div className="scroll-end h-px w-full" />
+        </section>
+      </main>
+    </>
   );
 }

@@ -1864,10 +1864,10 @@ const Navbar = () => {
                         
                       "
                     >
-                      Affiliated to <br /> <span className='italic text-blue-500 text-lg'>Love Cape Town</span>
+                      Affiliated to
                     </p>
 
-                    <img
+                    {/* <img
                       src="/icons/handshake.webp"
                       alt="Handshake Icon"
                       className="
@@ -1877,7 +1877,7 @@ const Navbar = () => {
                         object-contain
                         object-left
                       "
-                    />
+                    /> */}
 
                     <img
                       src="/assets/brand/logo-love-ct-blue.webp"
