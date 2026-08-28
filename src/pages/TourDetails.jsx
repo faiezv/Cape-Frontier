@@ -164,7 +164,7 @@ const getRelatedTours = (tour) => {
       !sameCategory.some((match) => match.slug === item.slug)
   );
 
-  return [...sameType, ...sameCategory, ...capeTownFallback].slice(0, 4);
+  return [...sameType, ...sameCategory, ...capeTownFallback].slice(0, 3);
 };
 
 const BookingIcon = ({ className = "h-4 w-4" }) => (
@@ -831,15 +831,19 @@ export default function TourDetails() {
               <div className="relative">
                 <div className="flex items-center justify-between">
                   {/* image */}
-                  <img src={resolveImage(tour.image)} alt="current-tour" 
-                  className="top-0 h-24 w-24 object-cover rounded-full border-white border-2" />
-                  <div className="flex flex-col gap-2 items-start leading-none ">
-                    <span className="rounded-full bg-green-200 px-3 py-1 font-bitter text-[10px] 
-                    font-bold uppercase text-black">
-                      {tour.title}
-                    </span>
-                    <h3 className="font-frank text-2xl font-bold leading-[0.95] text-white">
+                  <img 
+                    src={resolveImage(tour.image)} 
+                    alt="current-tour" 
+                    className="top-0 h-24 w-24 object-cover rounded-full border-white border-2" 
+                  />
+
+                  <div className="flex flex-col p-2">
+                    {/* <span className="rounded-full bg-green-200 px-3 py-2 font-bitter text-[10px] 
+                    font-bold w-fit uppercase text-black">
                       Request this tour.
+                    </span> */}
+                    <h3 className="font-frank text-2xl font-bold leading-[0.95] text-white">
+                      {tour.title}
                     </h3>
                   </div>
 

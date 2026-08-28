@@ -6913,9 +6913,9 @@ export const tours = [
     image:
       "/src/assets/images/tours/packages/5-day-boltierskop/960px-KNYSNA_-_Waterfront_terrac.webp",
     images: [
-      "/src/assets/images/tours/packages/garden-route-5day/1.webp",
-      "/src/assets/images/tours/packages/garden-route-5day/2.webp",
-      "/src/assets/images/tours/packages/garden-route-5day/3.webp",
+      "/src/assets/images/tours/packages/5-day-boltierskop/960px-KNYSNA_-_Waterfront_terrac.webp",
+      "/src/assets/images/tours/packages/5-day-garden-route/960px-Big_five_gam.webp",
+      "/src/assets/images/tours/packages/5-day-garden-route/gamedrive2-1-1536x899.webp",
     ],
     imageFolder: "packages/5-day-boltierskop",
     videos: [],
@@ -7806,9 +7806,9 @@ export const tours = [
     image:
       "/src/assets/images/tours/packages/5-day-garden-route/960px-Big_five_gam.webp",
     images: [
-      "/src/assets/images/tours/packages/5-day-garden-route/1.webp",
-      "/src/assets/images/tours/packages/5-day-garden-route/2.webp",
-      "/src/assets/images/tours/packages/5-day-garden-route/3.webp",
+      "/src/assets/images/tours/packages/5-day-garden-route/960px-Big_five_gam.webp",
+      "/src/assets/images/tours/packages/5-day-garden-route/gamedrive2-1-1536x899.webp",
+      "/src/assets/images/tours/packages/5-day-garden-route/kwenalodge1.webp",
     ],
     imageFolder: "packages/5-day-garden-route",
     videos: [],

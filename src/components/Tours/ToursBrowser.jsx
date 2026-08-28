@@ -15,6 +15,12 @@ import FixedCategoryNav from "./FixedCategoryNav.jsx";
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
+// Tell ScrollTrigger to ignore the resize events iOS Safari fires when the
+// address bar collapses/expands during scroll. Without this, every scroll
+// on iOS can trigger a full ScrollTrigger rebuild mid-gesture, which is the
+// root cause of the flicker / wrong-tour-jump / incomplete-animation bugs.
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 const BREAKPOINT = 768;
 
 const BUTTON_ROW_HEIGHT_DESKTOP = 52;
@@ -76,6 +82,17 @@ export default function ToursBrowser() {
 
   const isScrollingRef = useRef(false);
 
+  // Tracks whether layout has actually changed (breakpoint switch, viewport
+  // width change, tour-count change) since the last ScrollTrigger.refresh().
+  // Avoids calling the expensive refresh() on every nav tap.
+  const needsRefreshRef = useRef(false);
+
+  // Only real width changes should trigger a recompute — iOS fires resize
+  // events for address-bar show/hide that only change innerHeight.
+  const lastWidthRef = useRef(
+    typeof window !== "undefined" ? window.innerWidth : 0
+  );
+
   // ─────────────────────────────────────────────────────────────
   // Dynamic sizing
   // ─────────────────────────────────────────────────────────────
@@ -116,6 +133,8 @@ export default function ToursBrowser() {
 
       // Card animation starts at top += 4px.
       setNavOffset(4);
+
+      needsRefreshRef.current = true;
 
       return;
     }
@@ -158,15 +177,25 @@ export default function ToursBrowser() {
 
     // This MUST match the ScrollTrigger animation start.
     setNavOffset(6);
+
+    needsRefreshRef.current = true;
   }, []);
 
   useEffect(() => {
     computeSizes();
 
-    window.addEventListener("resize", computeSizes);
+    const handleResize = () => {
+      // Ignore height-only changes (iOS address bar collapse/expand) —
+      // only recompute when the viewport actually changes width.
+      if (window.innerWidth === lastWidthRef.current) return;
+      lastWidthRef.current = window.innerWidth;
+      computeSizes();
+    };
+
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener("resize", computeSizes);
+      window.removeEventListener("resize", handleResize);
     };
   }, [computeSizes]);
 
@@ -181,12 +210,14 @@ export default function ToursBrowser() {
 
     const updateHeight = () => {
       setNavHeight(navEl.offsetHeight || 120);
+      // Only recompute the layout-dependent sizes; computeSizes() already
+      // guards against being called redundantly via needsRefreshRef, and
+      // this no longer has its own separate resize listener (see below),
+      // so it won't compound with the window resize handler on iOS.
       computeSizes();
     };
 
     updateHeight();
-
-    window.addEventListener("resize", updateHeight);
 
     let ro;
 
@@ -196,8 +227,6 @@ export default function ToursBrowser() {
     }
 
     return () => {
-      window.removeEventListener("resize", updateHeight);
-
       if (ro) {
         ro.disconnect();
       }
@@ -321,6 +350,7 @@ export default function ToursBrowser() {
           scale: index === 0 ? 1 : 0.985,
           zIndex: 1000 - index,
           autoAlpha: 1,
+          force3D: true,
         });
       });
 
@@ -375,6 +405,13 @@ export default function ToursBrowser() {
       });
 
       // ─── Individual tour animations ────────────────────────
+      // NOTE: previously this created TWO ScrollTrigger instances per tour
+      // (one bare ScrollTrigger.create for the "active tour" logic, plus
+      // the one implicitly created by the timeline below) with identical
+      // trigger/start/end. That doubled the work ScrollTrigger.refresh()
+      // has to do on every call, which is expensive on slower devices like
+      // older iPhones. Now there is a single ScrollTrigger per tour, and
+      // both the state-update callbacks and the card animation live on it.
 
       wrappers.forEach((wrapper, index) => {
         const currentCard = cards[index];
@@ -384,30 +421,8 @@ export default function ToursBrowser() {
 
         if (!currentTour) return;
 
-        // Active tour trigger
-        const activeTrigger = ScrollTrigger.create({
-          trigger: wrapper,
-
-          start: `top top+=${navOffset}`,
-
-          end: `+=${totalDistance}`,
-
-          invalidateOnRefresh: true,
-
-          onEnter: () => {
-            updateActiveTour(currentTour);
-          },
-
-          onEnterBack: () => {
-            updateActiveTour(currentTour);
-          },
-        });
-
-        // Store for later use in goToTour
-        triggerInstances.current[index] = activeTrigger;
-        tourScrollTriggers.current[index] = activeTrigger;
-
-        // Card animation timeline
+        // Card animation timeline — this ScrollTrigger instance is reused
+        // for both the animation and the active-tour state updates.
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: wrapper,
@@ -419,8 +434,20 @@ export default function ToursBrowser() {
             scrub: 1.1,
 
             invalidateOnRefresh: true,
+
+            onEnter: () => {
+              updateActiveTour(currentTour);
+            },
+
+            onEnterBack: () => {
+              updateActiveTour(currentTour);
+            },
           },
         });
+
+        // Store for later use in goToTour
+        triggerInstances.current[index] = tl.scrollTrigger;
+        tourScrollTriggers.current[index] = tl.scrollTrigger;
 
         // Hold current card
         tl.to(
@@ -449,6 +476,7 @@ export default function ToursBrowser() {
               scale: 1,
 
               ease: "power3.out",
+              force3D: true,
 
               duration:
                 transitionDistance /
@@ -456,14 +484,20 @@ export default function ToursBrowser() {
             }
           );
 
-          // Hide current card after transition
+          // Hide current card after transition.
+          // Bumped from 0.02 -> 0.06: on a scrubbed timeline tied directly
+          // to scroll position, a near-zero-duration tween can land
+          // between two scrub-update ticks on a dropped frame (common on
+          // iOS mid-scroll) and never actually fire, leaving the old card
+          // visibly overlapping the new one. A touch more duration gives
+          // it room to always register.
           tl.to(
             currentCard,
             {
               autoAlpha: 0,
-              duration: 0.02,
+              duration: 0.06,
             },
-            0.98
+            0.97
           );
 
           // Push old card behind everything
@@ -480,6 +514,7 @@ export default function ToursBrowser() {
       });
 
       ScrollTrigger.refresh();
+      needsRefreshRef.current = false;
     }, containerRef);
 
     // ─── READY STATE (loading spinner) ──────────────────────
@@ -493,6 +528,7 @@ export default function ToursBrowser() {
 
       // Ensure ScrollTrigger is up to date
       ScrollTrigger.refresh();
+      needsRefreshRef.current = false;
 
       // Wait one frame for the browser to paint
       requestAnimationFrame(() => {
@@ -590,11 +626,17 @@ export default function ToursBrowser() {
         return;
       }
 
-      // Make sure ScrollTrigger has current measurements
-      ScrollTrigger.refresh();
+      // Only pay for a full re-measure when layout has actually changed
+      // since the last refresh (breakpoint switch, tour count change,
+      // etc). Calling ScrollTrigger.refresh() unconditionally on every
+      // nav tap is expensive on slower devices and was also a source of
+      // the "lands on wrong tour" bug when it ran mid-transition.
+      if (needsRefreshRef.current) {
+        ScrollTrigger.refresh();
+        needsRefreshRef.current = false;
+      }
 
-      // Allow iOS to settle after refresh (address bar, etc.)
-      setTimeout(() => {
+      const runScroll = () => {
         // The exact scroll position where this tour's animation starts
         const targetY = trigger.start;
 
@@ -645,7 +687,15 @@ export default function ToursBrowser() {
             ScrollTrigger.update();
           },
         });
-      }, 50); // Small delay to let iOS settle
+      };
+
+      // Small delay only needed right after a refresh to let iOS settle
+      // (address bar, viewport reflow). Skip it otherwise for snappier nav.
+      if (needsRefreshRef.current === false) {
+        runScroll();
+      } else {
+        setTimeout(runScroll, 50);
+      }
     },
     [allTours, updateStateForTour]
   );
@@ -987,10 +1037,14 @@ export default function ToursBrowser() {
 
               <div className="relative min-h-0 flex-1 overflow-hidden">
                 {allTours.map(
-                  (tour) => (
+                  (tour, index) => (
                     <div
                       key={tour.id}
-                      className="tour-stage-card absolute inset-0 h-full w-full will-change-transform pointer-events-auto"
+                      className={`tour-stage-card absolute inset-0 h-full w-full pointer-events-auto ${
+                        Math.abs(index - currentGlobalIndex) <= 1
+                          ? "will-change-transform"
+                          : ""
+                      }`}
                     >
                       <TourCard
                         tour={tour}
