@@ -3888,8 +3888,6 @@ export const tours = [
     requirements: [
       { text: "Comfortable walking shoes recommended" },
       { text: "Respectful behaviour towards the local community is expected" },
-      { text: "Modest attire recommended for mosque visits" },
-      { text: "Guests must be physically able to walk for extended periods" },
     ],
 
     arrangements: {
@@ -4211,7 +4209,6 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-
     image: getCoverImage(`${PENINSULA_PACKAGE_ONE_BASE}`),
     // image: 'src/assets/images/tours/packages/peninsula-tour-1/3.webp',
     images: packageGallery(
@@ -4226,7 +4223,6 @@ export const tours = [
       3,
     ),
     videos: [],
-
 
     location: "Cape Town, South Africa",
     duration: "Full Day / Approximately 9 Hours",
@@ -5130,22 +5126,26 @@ export const tours = [
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.FULL_DAY,
 
-    title: "Stellenbosch Wine Farms",
-    slug: "stellenbosch-wine-farms",
-    canonicalPath: "/tours/stellenbosch-wine-farms",
+    title: "Premium Stellenbosch Wine, Cheese & Chocolate Pairing Tour",
+    slug: "premium-stellenbosch-wine-cheese-chocolate-pairing-tour",
+    canonicalPath:
+      "/tours/premium-stellenbosch-wine-cheese-chocolate-pairing-tour",
     childFriendly: true,
 
     seo: {
-      title: "Stellenbosch Wine Farms Tour | Cape Frontier Tours",
+      title:
+        "Premium Stellenbosch Wine, Cheese & Chocolate Pairing Tour | Cape Frontier Tours",
       description:
-        "Request a full-day Stellenbosch wine farms experience featuring Delaire Graff, Rust en Vrede, Spier, Tokara, scenic vineyard views, and selected pickup options.",
+        "Enjoy a private full-day Stellenbosch wine experience visiting Spier, Delaire Graff and Rust en Vrede, with wine tastings, cheese pairings, lunch, scenic views and a professional private driver-guide.",
       keywords: [
-        "Stellenbosch wine farms tour",
+        "Stellenbosch wine tour",
+        "Stellenbosch wine cheese chocolate tour",
         "Cape Town wine tour",
+        "Spier Wine Farm tour",
         "Delaire Graff wine tour",
         "Rust en Vrede wine tour",
-        "Spier wine farm tour",
-        "Tokara wine estate tour",
+        "private Stellenbosch wine tour",
+        "Cape Winelands wine tour",
       ],
     },
 
@@ -5154,12 +5154,12 @@ export const tours = [
     image: getCoverImage(`${STELLENBOSCH_WINE_BASE}/delaire`),
     images: packageGallery(
       STELLENBOSCH_WINE_BASE,
-      STELLENBOSCH_WINE_DESTINATIONS,
+      ["spier", "delaire", "rust-en-vrede"],
       3,
     ),
     destinationGalleries: packageDestinationGalleries(
       STELLENBOSCH_WINE_BASE,
-      STELLENBOSCH_WINE_DESTINATIONS,
+      ["spier", "delaire", "rust-en-vrede"],
       3,
     ),
     imageFolder: "packages/wine-farms",
@@ -5167,38 +5167,45 @@ export const tours = [
     location: "Stellenbosch, South Africa",
     duration: "Full Day",
 
-    priceBase: 3500,
-    minPeople: 1,
+    priceBase: 2250,
+    minPeople: 4,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
         category: "Adults",
-        pricePerPerson: 3500,
+        pricePerPerson: 2250,
+        note: "Private driver/guide • Minimum 4 guests",
       },
-      // {
-      //   category: "Children (5–17 years)",
-      //   pricePerPerson: 2295,
-      //   note: "Robben Island child fare + Langa Township tour",
-      // },
-      // {
-      //   category: "Children (0–4 years)",
-      //   pricePerPerson: 1300,
-      //   note: "Robben Island free • Langa Township applies",
-      // }, no group/childrens pricing
+      {
+        category: "Teens (12–17 years)",
+        pricePerPerson: 950,
+        note: "Kids grape juice tasting at Spier • Lunch at Rust en Vrede • No wine tasting",
+      },
+      {
+        category: "Children (5–11 years)",
+        pricePerPerson: 950,
+        note: "Kids grape juice tasting at Spier • Lunch at Rust en Vrede • No wine tasting",
+      },
+      {
+        category: "Toddlers",
+        pricePerPerson: null,
+        note: "Toddlers are not suitable for this tour.",
+      },
+
     ],
 
     groupPricing: {
-      enabled: false,
+      enabled: true,
       icon: "/icons/savemore.png",
       tiers: [
         {
-          // minPeople: 2,
-          // maxPeople: 4,
-          // totalPrice: 9560,
-          // label: "2–4 Guests",
-          // note: "Private vehicle • All-inclusive",
+          minPeople: 5,
+          maxPeople: null,
+          perPerson: 2000,
+          label: "5+ Guests",
+          note: "Reduced adult rate for groups of 5 or more",
         },
       ],
     },
@@ -5213,80 +5220,58 @@ export const tours = [
       "Elegant, scenic and relaxed. The estates were beautiful and the whole day felt premium from start to finish.",
 
     description:
-      "A scenic full-day Stellenbosch wine farms experience covering selected premium estates, vineyard views, relaxed tasting stops, and beautiful Cape Winelands scenery. This package currently includes Delaire Graff, Rust en Vrede, Spier, and Tokara as available wine farm stops.",
+      "A premium private Stellenbosch wine experience visiting three exceptional estates: Spier Wine Farm, Delaire Graff Estate and Rust en Vrede. Enjoy wine tastings and cheese pairings at Spier and Delaire Graff, followed by a wine tasting and lunch at historic Rust en Vrede. The experience combines scenic Cape Winelands landscapes, historic estates, premium wine, food pairings and a professional private driver-guide.",
 
     highlights: [
-      { text: "Curated Stellenbosch wine farm route" },
-      { text: "Premium vineyard and mountain views" },
-      { text: "Optional lunch or food pairing stops" },
+      { text: "Private driver and professional guide" },
+      { text: "Three premium Stellenbosch wine estates" },
+      { text: "Wine and cheese pairings included" },
+      { text: "Lunch included at Rust en Vrede" },
+      { text: "Scenic mountain and vineyard views" },
+      { text: "Cape Dutch architecture and historic estates" },
+      { text: "Kids grape juice tasting at Spier" },
     ],
 
     included: [
-      { text: "Admission fees to all estates." },
-      { text: "Guided wine route assistance" },
-      { text: "Curated estate stops" },
+      { text: "Private vehicle for the full tour" },
+      { text: "Professional driver/guide" },
+      { text: "Wine tasting at Spier Wine Farm" },
+      { text: "Cheese pairing at Spier" },
+      { text: "Kids grape juice tasting at Spier" },
+      { text: "Wine tasting at Delaire Graff" },
+      { text: "Cheese pairing at Delaire Graff" },
+      { text: "Wine tasting at Rust en Vrede" },
+      { text: "Lunch at Rust en Vrede" },
+      { text: "Bottled water" },
+      { text: "Pick-up and drop-off in Cape Town CBD" },
+      { text: "Photo stops at all three estates" },
+      { text: "Guided explanations of each estate" },
     ],
 
     excluded: [
-      { text: "Wine tasting fees unless confirmed" },
-      { text: "Lunch unless arranged" },
-      { text: "Personal purchases from estates" },
+      { text: "Dessert at Rust en Vrede" },
+      { text: "Additional beverages at any estate" },
+      { text: "Premium wine upgrades, including Icon and Reserve wines" },
+      { text: "Charcuterie platters at Delaire Graff" },
+      { text: "Eagle Encounters at Spier" },
+      { text: "Kids activities beyond the included grape juice tasting" },
+      { text: "Wine tasting for children" },
+      { text: "Gratuities" },
+      { text: "Personal purchases, including wine bottles and gifts" },
+      { text: "Any extras not specifically listed under inclusions" },
     ],
 
     pickupOptions: DEFAULT_PICKUP_OPTIONS,
 
     stops: [
       {
-        id: "delaire",
-        name: "Delaire Graff",
-        time: "10:00",
-        duration: "1 - 2 hours",
-        note: "Premium wine estate and scenic views",
-        description:
-          "A refined Stellenbosch estate stop with vineyard views, mountain scenery, and a premium wine farm atmosphere.",
-        exactLocation: mapLocation({
-          label: "Delaire Graff Estate",
-          address: "Helshoogte Road, Stellenbosch, South Africa",
-          query: "Delaire Graff Estate Stellenbosch",
-        }),
-        touristComments: [
-          {
-            name: "Isabella",
-            country: "IT",
-            text: "The estate felt elegant and relaxed, with some of the best views of the day.",
-          },
-        ],
-      },
-      {
-        id: "rust-en-vrede",
-        name: "Rust en Vrede",
-        time: "12:00",
-        duration: "1 - 2 hours",
-        note: "Relaxed estate atmosphere",
-        description:
-          "A calm Stellenbosch wine farm stop known for a peaceful setting and premium wine route feel.",
-        exactLocation: mapLocation({
-          label: "Rust en Vrede Wine Estate",
-          address: "Annandale Road, Stellenbosch, South Africa",
-          query: "Rust en Vrede Wine Estate Stellenbosch",
-        }),
-        images: getTourImages(`${STELLENBOSCH_WINE_BASE}/rust-en-vrede`, 3),
-        touristComments: [
-          {
-            name: "Oliver",
-            country: "UK",
-            text: "Peaceful setting, excellent wines, and a very easygoing day.",
-          },
-        ],
-      },
-      {
         id: "spier",
-        name: "Spier",
-        time: "14:00",
-        duration: "1 - 2 hours",
-        note: "Relaxed wine farm and spacious estate setting",
+        name: "Spier Wine Farm",
+        time: "09:30",
+        duration: "1.5 hours",
+        note: "Wine tasting and cheese pairing",
         description:
-          "A relaxed wine farm stop with open estate scenery, tasting options, and optional food or picnic-style experiences.",
+          "One of South Africa's oldest wine farms, established in 1692. Spier combines Cape Dutch heritage, scenic lawns, riverside areas and a relaxed, family-friendly atmosphere. Guests enjoy a wine tasting and cheese pairing, while children can enjoy a grape juice tasting.",
         exactLocation: mapLocation({
           label: "Spier Wine Farm",
           address: "R310 Baden Powell Drive, Stellenbosch, South Africa",
@@ -5297,77 +5282,158 @@ export const tours = [
           {
             name: "Chloe",
             country: "AU",
-            text: "It was relaxed, spacious, and a great break from the city.",
+            text: "Spier was relaxed and beautiful, and the cheese pairing was a lovely way to start the day.",
           },
         ],
       },
+
       {
-        id: "tokara",
-        name: "Tokara",
-        time: "15:30",
-        duration: "1 - 2 hours",
-        note: "Elevated views and refined estate atmosphere",
+        id: "delaire-graff",
+        name: "Delaire Graff",
+        time: "11:30",
+        duration: "1.5 hours",
+        note: "Premium wine tasting and cheese pairing",
         description:
-          "A scenic Stellenbosch estate stop with elevated views, refined surroundings, and a polished wine farm atmosphere.",
+          "Perched on the Helshoogte Pass overlooking the Simonsberg and Banghoek Valley, Delaire Graff combines luxury architecture, art, gardens and dramatic mountain views. Guests enjoy a premium wine tasting with a beautifully presented cheese pairing.",
         exactLocation: mapLocation({
-          label: "Tokara Wine Estate",
+          label: "Delaire Graff Estate",
           address: "Helshoogte Road, Stellenbosch, South Africa",
-          query: "Tokara Wine Estate Stellenbosch",
+          query: "Delaire Graff Estate Stellenbosch",
         }),
+        images: getTourImages(`${STELLENBOSCH_WINE_BASE}/delaire`, 3),
         touristComments: [
           {
-            name: "Liam",
-            country: "IE",
-            text: "The views were incredible and the whole estate felt polished without being too formal.",
+            name: "Isabella",
+            country: "IT",
+            text: "The views were incredible and the estate felt incredibly elegant without being rushed.",
+          },
+        ],
+      },
+
+      {
+        id: "rust-en-vrede",
+        name: "Rust en Vrede",
+        time: "13:30",
+        duration: "2 hours",
+        note: "Wine tasting and lunch",
+        description:
+          "A historic Stellenbosch estate dating back to 1694, Rust en Vrede is renowned for its premium red wines and historic Cape Dutch buildings. Guests enjoy a wine tasting followed by lunch in an elegant and peaceful estate setting.",
+        exactLocation: mapLocation({
+          label: "Rust en Vrede Wine Estate",
+          address: "Annandale Road, Stellenbosch, South Africa",
+          query: "Rust en Vrede Wine Estate Stellenbosch",
+        }),
+        images: getTourImages(`${STELLENBOSCH_WINE_BASE}/rust-en-vrede`, 3),
+        touristComments: [
+          {
+            name: "Oliver",
+            country: "UK",
+            text: "The historic setting was beautiful, and finishing the tour with lunch made the whole experience feel very special.",
           },
         ],
       },
     ],
 
     groupDiscount: {
-      enabled: true,
+      enabled: false,
       icon: "/icons/savemore.png",
-      rules: [
-        { minPeople: 4, discountPercent: 10 },
-        { minPeople: 8, discountPercent: 15 },
-      ],
+      rules: [],
     },
 
     needToKnow: [
-      { text: "Guests must be of legal drinking age" },
-      { text: "Wine tasting fees may be separate unless confirmed" },
-      { text: "Estate availability may affect the final route" },
-      { text: "Lunch or food pairings should be requested in advance" },
+      {
+        text: "The tour has a minimum requirement of 4 guests.",
+      },
+      {
+        text: "Adult pricing is R2,250 per person for groups of 4.",
+      },
+      {
+        text: "Adult groups of 5 or more receive the R2,000 per person group rate.",
+      },
+      {
+        text: "Children aged 5–17 years are charged R950 per child.",
+      },
+      {
+        text: "Children do not participate in wine tastings.",
+      },
+      {
+        text: "Children can enjoy the grape juice tasting at Spier.",
+      },
+      {
+        text: "Estate availability may affect exact booking times.",
+      },
+      {
+        text: "The tour follows a relaxed premium itinerary with three estate visits.",
+      },
     ],
 
     cancellationPolicy: {
-      summary: "Estate availability and booking times can affect the route.",
+      summary:
+        "Estate availability and advance bookings can affect the final itinerary.",
       items: [
-        { text: "Wine farm stops may change depending on availability" },
-        { text: "Food bookings may require advance confirmation" },
-        { text: "Final cancellation rules must be confirmed with the client" },
+        {
+          text: "Wine farm stops may change depending on estate availability.",
+        },
+        {
+          text: "Tasting and lunch reservations may require advance confirmation.",
+        },
+        {
+          text: "Final cancellation rules must be confirmed at the time of booking.",
+        },
       ],
     },
 
     faqs: [
       {
-        question: "Are the wine farms separate tours?",
+        question: "How many wine estates are included?",
         answer:
-          "Based on the current structure, they are grouped as one Stellenbosch Wine Farms package.",
+          "The tour visits three estates: Spier Wine Farm, Delaire Graff Estate and Rust en Vrede.",
       },
       {
-        question: "Are tasting fees included?",
+        question: "What is included in the wine and food pairings?",
         answer:
-          "This must be confirmed with the client before final publishing.",
+          "Spier includes a wine tasting and cheese pairing. Delaire Graff includes a wine tasting and cheese pairing. Rust en Vrede includes a wine tasting and lunch.",
       },
       {
-        question: "Can the route change?",
+        question: "Can children join the tour?",
         answer:
-          "Yes. The route can change depending on estate availability, bookings, weather, and guest preference.",
+          "Yes. Children aged 5–17 years are welcome and are charged R950 per child. Children receive a grape juice tasting at Spier and lunch at Rust en Vrede but do not participate in wine tastings.",
+      },
+      {
+        question: "What is the minimum number of guests?",
+        answer: "The private tour requires a minimum of 4 guests.",
+      },
+      {
+        question: "Is there a group discount?",
+        answer:
+          "Yes. Groups of 5 or more receive a reduced adult rate of R2,000 per person.",
+      },
+      {
+        question: "Is transport included?",
+        answer:
+          "Yes. The experience includes a private vehicle, professional driver/guide, bottled water and Cape Town CBD pick-up and drop-off.",
+      },
+      {
+        question: "Are premium wine upgrades included?",
+        answer:
+          "No. Premium Icon and Reserve wine upgrades are excluded and can be purchased separately where available.",
+      },
+      {
+        question: "Is the Delaire Graff charcuterie platter included?",
+        answer:
+          "No. Charcuterie platters at Delaire Graff are optional and are not included in the tour price.",
       },
     ],
 
-    tags: ["Wine", "Stellenbosch", "Full Day", "Cape Winelands"],
+    tags: [
+      "Wine",
+      "Stellenbosch",
+      "Full Day",
+      "Cape Winelands",
+      "Cheese Pairing",
+      "Private Tour",
+      "Family Friendly",
+    ],
   },
   // Robben-Island + Langa
   // {
