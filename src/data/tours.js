@@ -10067,7 +10067,7 @@ export const tours = [
   // West Coast National Park + Kraalbaai + Groote Post Winery
   {
     id: 25,
-    type: TOUR_TYPES.DAY_TOUR,
+    type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.DAY_TOUR,
 
     title:
