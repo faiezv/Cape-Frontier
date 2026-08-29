@@ -27,33 +27,45 @@ const Home = () => {
   const pageRef = useRef(null);
   const heroRef = useRef(null);
   const aboutRef = useRef(null);
-  const tourSelectRef = useRef(null);
   const tourSelectSectionRef = useRef(null);
   const toursSectionRef = useRef(null);
-  const contactSectionRef = useRef(null); // kept for reference, but not used for position
+  const contactSectionRef = useRef(null);
 
   // ---------- BUTTON STATE ----------
   const [showButton, setShowButton] = useState(false);
-  const [isToursVisible, setIsToursVisible] = useState(false); // only Tours triggers bottom
+  const [isToursVisible, setIsToursVisible] = useState(false);
+  const [isContactVisible, setIsContactVisible] = useState(false);
 
   // ---------- SCROLL LISTENER ----------
   useEffect(() => {
     const handleScroll = () => {
-      // --- Show/hide button based on hero height threshold ---
+      // --- Show button after passing hero threshold ---
       if (!heroRef.current) return;
       const heroHeight = heroRef.current.offsetHeight;
-      // 👇 Adjust this value (0.5 = 50%) to change when button appears
       const threshold = heroHeight * 0.5;
-      setShowButton(window.scrollY > threshold);
+      const pastHero = window.scrollY > threshold;
 
-      // --- Check if Tours section is visible (only this triggers bottom) ---
+      // --- Check visibility of Tours and Contact ---
       let toursVisible = false;
+      let contactVisible = false;
+
       if (toursSectionRef.current) {
         const rect = toursSectionRef.current.getBoundingClientRect();
-        // If the top of Tours is above the bottom of the viewport
         if (rect.top < window.innerHeight) toursVisible = true;
       }
+      if (contactSectionRef.current) {
+        const rect = contactSectionRef.current.getBoundingClientRect();
+        // Only consider it visible if any part is in the viewport
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          contactVisible = true;
+        }
+      }
+
       setIsToursVisible(toursVisible);
+      setIsContactVisible(contactVisible);
+
+      // Hide button when Tours or Contact is visible, otherwise show based on hero threshold
+      setShowButton(pastHero && !toursVisible && !contactVisible);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -274,11 +286,9 @@ const Home = () => {
       ref={pageRef}
       className="relative flex flex-col overflow-x-hidden bg-white text-white"
     >
-      {/* TourSelect wrapper – now with higher z-index to stay above about */}
-      <section
-        className="absolute z-30 w-full overflow-x-hidden overflow-y-visible"
-      >
-        <div ref={tourSelectRef} className="mx-auto max-w-5xl mt-20 ">
+      {/* TourSelect wrapper – stays above About */}
+      <section className="absolute z-30 w-full overflow-x-hidden overflow-y-visible">
+        <div ref={tourSelectSectionRef} className="mx-auto max-w-5xl mt-20">
           <TourSelect />
         </div>
       </section>
@@ -311,20 +321,13 @@ const Home = () => {
         <Contact />
       </section>
 
-      {/* ---------- FIXED BUTTON (top by default, bottom only when Tours is visible) ---------- */}
+      {/* ---------- FIXED BUTTON (hidden on Tours & Contact) ---------- */}
       <div
-        className={`fixed left-1/2 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${
+        className={`fixed left-1/2 top-20 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${
           showButton
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
-        } ${
-          isToursVisible
-            ? "bottom-8 translate-y-0 scale-100"
-            : "top-20 translate-y-0 scale-100"
         }`}
-        style={{
-          transitionProperty: "transform, opacity, top, bottom",
-        }}
       >
         <button
           onClick={scrollToTourSelect}
@@ -358,4 +361,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Home

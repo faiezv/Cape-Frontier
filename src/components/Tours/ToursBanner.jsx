@@ -214,8 +214,9 @@ function ToursBanner() {
       </header>
 
       {/* Two-column grid: image | TourSelect */}
-      <div className="mt-7 grid items-stretch gap-4 md:mt-9 lg:grid-cols-[0.9fr_1.1fr]">
-        <figure className="cf-tours-intro-item relative hidden min-h-[330px] overflow-hidden rounded-[2rem] bg-[#071f4f] shadow-[0_24px_70px_rgba(7,31,79,0.12)] md:block">
+      {/* <div className="mt-7 grid items-stretch gap-4 md:mt-9 lg:grid-cols-[1fr_0fr]"> */}
+      <div className="mt-7 max-w-4xl flex items-center place-self-center gap-4 md:mt-9">
+        {/* <figure className="cf-tours-intro-item relative hidden min-h-[330px] overflow-hidden rounded-[2rem] bg-[#071f4f] shadow-[0_24px_70px_rgba(7,31,79,0.12)] md:block">
           <img
             src={bannerImage}
             alt="Cape Frontier scenic tour preview"
@@ -225,7 +226,7 @@ function ToursBanner() {
           />
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/24 to-transparent" />
-        </figure>
+        </figure> */}
 
         <div className="cf-tours-intro-item relative z-10 mx-4 lg:mx-auto">
           <TourSelect />
