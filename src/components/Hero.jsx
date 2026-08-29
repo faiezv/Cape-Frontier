@@ -8,6 +8,7 @@ import cobra1 from '/src/assets/images/tours/adrenaline/cobra/cobra-2hr/1.webp'
 import simonsTown from '/src/assets/images/content/hero/1.webp'
 import cobra2 from '/src/assets/images/tours/adrenaline/cobra/cobra-2hr/2.webp'
 import landing from '/src/assets/images/content/hero/2.webp'
+import image3 from '/src/assets/images/content/hero/3.webp'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -17,6 +18,7 @@ const slides = [
   { image: simonsTown, location: 'Simon\'s Town, Cape Town' },
   { image: cobra2, location: 'Cobra Sundowner, Cape Town' },
   { image: landing, location: 'Cape Town' },
+  { image: image3, location: 'Cape Town' },
 ]
 
 const trustItems = [

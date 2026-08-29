@@ -137,7 +137,7 @@ const megaMenus = {
       {
         title: 'Packages',
         desc: 'Cape Peninsula and Stellenbosch wine farm full-day experiences.',
-        image: resolveImage('/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Afrika.webp'),
+        image: resolveImage('/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp'),
         target: 'Tours',
       },
     ],

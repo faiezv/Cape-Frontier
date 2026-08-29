@@ -4172,7 +4172,6 @@ export const tours = [
       "Community Engagement",
     ],
   },
-
   // =========================================== PACKAGES
   // PenTour 1 - Mother City - removed
   // Cape Town City Tour
@@ -5193,7 +5192,6 @@ export const tours = [
         pricePerPerson: null,
         note: "Toddlers are not suitable for this tour.",
       },
-
     ],
 
     groupPricing: {
@@ -5435,420 +5433,6 @@ export const tours = [
       "Family Friendly",
     ],
   },
-  // Robben-Island + Langa
-  // {
-  //   id: 16, // New tour ID to be assigned (e.g., 36)
-  //   type: TOUR_TYPES.HISTORICAL,
-  //   category: TOUR_MODIFIERS.FULL_DAY,
-
-  //   title: "Robben Island & Langa Cultural Experience",
-  //   slug: "robben-island-langa-cultural-experience",
-  //   canonicalPath: "/tours/robben-island-langa-cultural-experience",
-
-  //   seo: {
-  //     title:
-  //       "Full‑Day Robben Island & Langa Cultural Experience | Cape Frontier Tours",
-  //     description:
-  //       "Experience Cape Town's most meaningful cultural journey in one day. Combines the powerful history of Robben Island with the vibrant community life of Langa, Cape Town's oldest township.",
-  //     keywords: [
-  //       "Robben Island tour",
-  //       "Langa Township tour",
-  //       "Robben Island ferry",
-  //       "Nelson Mandela prison tour",
-  //       "Langa cultural experience",
-  //       "Cape Town township tour",
-  //       "Robben Island Museum",
-  //       "Guga S'thebe",
-  //       "Cape Town full day tour",
-  //       "Mandela's cell tour",
-  //       "Cape Town cultural tour",
-  //     ],
-  //   },
-
-  //   workflow: defaultWorkflow,
-
-  //   image: getCoverImage("historical/robben-island-langa"),
-  //   images: getTourImages("historical/robben-island-langa", 3),
-  //   imageFolder: "historical/robben-island-langa",
-  //   videos: [],
-
-  //   location: "Cape Town, South Africa (V&A Waterfront, Robben Island, Langa)",
-  //   duration: "Full Day (08:00 – 16:00)",
-
-  //   priceBase: 3290,
-  //   minPeople: 1,
-  //   baseCurrency: "ZAR",
-  //   supportedCurrencies: SUPPORTED_CURRENCIES,
-
-  //   pricing: [
-  //     {
-  //       category: "Adults",
-  //       pricePerPerson: 3290,
-  //       note: "Full rate",
-  //     },
-  //     {
-  //       category: "Children (5–17 years)",
-  //       pricePerPerson: 1650,
-  //       note: "Discounted combined rate",
-  //     },
-  //     {
-  //       category: "Infants (0–4 years)",
-  //       pricePerPerson: 0,
-  //       note: "Free – no ticket required",
-  //     },
-  //   ],
-
-  //   additionalPricing: [],
-
-  //   groupPricing: {
-  //     enabled: true,
-  //     icon: "",
-  //     tiers: [
-  //       {
-  //         minPeople: 4,
-  //         maxPeople: 8,
-  //         perPerson: null,
-  //         discountPercent: 10,
-  //         label: "4–6 Guests",
-  //         note: "10% discount • All-inclusive",
-  //       },
-  //     ],
-  //   },
-
-  //   rating: null,
-  //   stars: null,
-  //   mainReviewerName: "",
-  //   mainReviewerCountry: "",
-  //   reviewYear: null,
-  //   otherReviews: null,
-  //   mainReview: "",
-
-  //   description:
-  //     "Experience Cape Town's most meaningful cultural journey in one day. This full‑day tour combines the powerful history of Robben Island, where Nelson Mandela spent 18 years in prison, with the vibrant community life of Langa, Cape Town's oldest township. Guests enjoy seamless transport, accredited expert guides, and a deep understanding of South Africa's past and present.",
-
-  //   highlights: [
-  //     {
-  //       text: "Robben Island Prison Tour — walk through the maximum-security prison, including Mandela's cell, guided by former political prisoners",
-  //     },
-  //     {
-  //       text: "Island Bus Tour — visit historic sites including Lime Quarry, Sobukwe House, WWII bunkers, and the Leper Church",
-  //     },
-  //     {
-  //       text: "Scenic Ferry Ride — panoramic views of Table Mountain and the Atlantic Ocean",
-  //     },
-  //     {
-  //       text: "Langa Township Cultural Walk — explore Cape Town's oldest township with a registered local guide",
-  //     },
-  //     {
-  //       text: "Guga S'thebe Arts & Culture Centre — discover local art, crafts, pottery, and community upliftment projects",
-  //     },
-  //     {
-  //       text: "Authentic Community Interaction — meet residents, entrepreneurs, and artisans who share stories of culture, resilience, and creativity",
-  //     },
-  //   ],
-
-  //   included: [
-  //     { text: "Return transport with hotel pick‑up and drop‑off" },
-  //     { text: "Robben Island Ferry Tickets (adult or child ticket)" },
-  //     { text: "Robben Island Guided Tour — prison, Mandela's cell, bus tour" },
-  //     { text: "Langa Walking Tour — cultural guided experience" },
-  //     { text: "Professional Driver‑Guide — full‑day hosting" },
-  //     { text: "Bottled Water — provided during transfers" },
-  //     { text: "Safety Briefing — before each activity" },
-  //     { text: "All entry fees" },
-  //   ],
-
-  //   excluded: [
-  //     { text: "Lunch — guests choose their own Waterfront restaurant" },
-  //     { text: "Breakfast and snacks" },
-  //     { text: "Gratuities" },
-  //     { text: "Personal purchases — crafts, souvenirs, drinks" },
-  //     { text: "Extra activities not listed" },
-  //     { text: "Accommodation" },
-  //     { text: "Travel Insurance — guests must arrange their own cover" },
-  //   ],
-
-  //   pickupOptions: [
-  //     "Cape Town CBD",
-  //     "Green Point",
-  //     "Sea Point",
-  //     "V&A Waterfront",
-  //     "Custom pickup on request",
-  //   ],
-
-  //   requirements: [
-  //     { text: "Please carry identification if required for ferry boarding" },
-  //     { text: "Comfortable walking shoes recommended" },
-  //     { text: "Respectful behaviour towards the local community is expected" },
-  //   ],
-
-  //   arrangements: {
-  //     availability: "Available all year (ferry dependent on weather)",
-  //     duration: "Full Day (08:00 – 16:00)",
-  //     operatingTime: "08:00 – 16:00",
-  //     departure: "08:00",
-  //     return: "16:00",
-  //     location: "Cape Town, South Africa",
-
-  //     clothing: [
-  //       "Comfortable clothing",
-  //       "Comfortable walking shoes",
-  //       "Sunscreen",
-  //       "Hat",
-  //       "Warm jacket (weather dependent)",
-  //     ],
-
-  //     thingsToBring: [
-  //       "Identification (if required for ferry boarding)",
-  //       "Camera",
-  //       "Cash for personal purchases",
-  //       "Water bottle",
-  //     ],
-
-  //     passengerPolicy: "",
-  //     sunsetNote: "",
-  //   },
-
-  //   weatherPolicy: {
-  //     summary:
-  //       "Ferry operations are subject to weather and sea conditions. Cancelled departures may be rescheduled where possible. Langa tour continues in all weather.",
-  //     items: [
-  //       { text: "Ferry operations are subject to weather and sea conditions" },
-  //       { text: "Weather may result in ferry delays or cancellations" },
-  //       { text: "Cancelled departures may be rescheduled where possible" },
-  //       { text: "Langa Township tour continues in all weather conditions" },
-  //     ],
-  //   },
-
-  //   cancellationPolicy: {
-  //     summary:
-  //       "Ferry operations are subject to weather and sea conditions. Cancellation terms are confirmed upon booking.",
-  //     items: [
-  //       { text: "Ferry operations are subject to weather and sea conditions" },
-  //       { text: "Weather may result in ferry delays or cancellations" },
-  //       { text: "Cancelled departures may be rescheduled where possible" },
-  //       { text: "Cancellation terms are confirmed upon booking" },
-  //     ],
-  //   },
-
-  //   safetyPolicy: {
-  //     summary:
-  //       "All tours are conducted in compliance with Robben Island Museum safety regulations, ferry operating procedures, and community tourism guidelines.",
-  //     items: [
-  //       { text: "All tours follow Robben Island Museum safety regulations" },
-  //       { text: "Ferry operates according to maritime safety standards" },
-  //       { text: "Guests must follow all guide instructions during the tour" },
-  //       {
-  //         text: "Langa is considered one of the safer townships when visited with local guides",
-  //       },
-  //       { text: "Please ask permission before photographing residents" },
-  //       {
-  //         text: "Respectful behaviour towards the local community is expected",
-  //       },
-  //     ],
-  //   },
-
-  //   stops: [
-  //     {
-  //       id: "pickup",
-  //       name: "Hotel Pickup",
-  //       time: "08:00 – 08:30",
-  //       duration: "30 minutes",
-  //       note: "Hotel pick‑up anywhere in Cape Town",
-  //       description:
-  //         "Enjoy convenient hotel pickup from anywhere in Cape Town before travelling to the V&A Waterfront Clock Tower ferry terminal.",
-  //       exactLocation: mapLocation({
-  //         label: "Cape Town Pickup Area",
-  //         address: "Cape Town, South Africa",
-  //         query: "Cape Town",
-  //       }),
-  //       images: [],
-  //       touristComments: [],
-  //     },
-  //     {
-  //       id: "va-waterfront",
-  //       name: "V&A Waterfront – Ferry Check-in",
-  //       time: "08:30 – 09:30",
-  //       duration: "1 hour",
-  //       note: "Check‑in for Robben Island ferry",
-  //       description:
-  //         "Transfer to the V&A Waterfront Clock Tower ferry terminal. Check in for the Robben Island ferry and prepare for the 30-minute crossing to Robben Island.",
-  //       exactLocation: mapLocation({
-  //         label: "V&A Waterfront Clock Tower",
-  //         address: "V&A Waterfront, Cape Town, South Africa",
-  //         query: "Clock Tower V&A Waterfront",
-  //       }),
-  //       images: [],
-  //       touristComments: [],
-  //     },
-  //     {
-  //       id: "robben-island",
-  //       name: "Robben Island Experience",
-  //       time: "09:30 – 12:30",
-  //       duration: "3 hours",
-  //       note: "Prison tour, Mandela's cell, island bus tour, museum visit",
-  //       description:
-  //         "Cross to Robben Island by ferry. Experience the powerful prison tour, including Nelson Mandela's cell, the Lime Quarry, Sobukwe House, WWII bunkers, and the Leper Church. Walk through the maximum-security prison guided by former political prisoners where available, and enjoy an island bus tour with panoramic views of Table Mountain and the Atlantic Ocean.",
-  //       exactLocation: mapLocation({
-  //         label: "Robben Island Museum",
-  //         address: "Robben Island, Cape Town, South Africa",
-  //         query: "Robben Island Museum",
-  //       }),
-  //       images: [],
-  //       touristComments: [],
-  //     },
-  //     {
-  //       id: "lunch",
-  //       name: "Lunch Break (Not Included)",
-  //       time: "12:30 – 13:30",
-  //       duration: "1 hour",
-  //       note: "Free time at V&A Waterfront",
-  //       description:
-  //         "Guests have free time at the V&A Waterfront to enjoy lunch at any restaurant of their choice. Lunch is not included in the tour price.",
-  //       exactLocation: mapLocation({
-  //         label: "V&A Waterfront",
-  //         address: "V&A Waterfront, Cape Town, South Africa",
-  //         query: "V&A Waterfront",
-  //       }),
-  //       images: [],
-  //       touristComments: [],
-  //     },
-  //     {
-  //       id: "langa",
-  //       name: "Langa Cultural Walking Tour",
-  //       time: "14:00 – 15:30",
-  //       duration: "1.5 hours",
-  //       note: "Community history, arts & crafts, cultural storytelling",
-  //       description:
-  //         "Explore Cape Town's oldest township with a registered local guide. Experience community history, arts and crafts, cultural storytelling, and a safe guided walk. Visit Guga S'thebe Arts & Culture Centre to discover local art, crafts, pottery, and community upliftment projects. Meet residents, entrepreneurs, and artisans who share stories of culture, resilience, and creativity.",
-  //       exactLocation: mapLocation({
-  //         label: "Langa Township",
-  //         address: "Langa, Cape Town, South Africa",
-  //         query: "Langa Township",
-  //       }),
-  //       images: [],
-  //       touristComments: [],
-  //     },
-  //     {
-  //       id: "dropoff",
-  //       name: "Hotel Drop-off",
-  //       time: "15:30 – 16:00",
-  //       duration: "30 minutes",
-  //       note: "End of tour at ±16:00",
-  //       description:
-  //         "After completing your cultural experience, relax during the return transfer to your original Cape Town hotel. Tour ends at approximately 16:00.",
-  //       exactLocation: mapLocation({
-  //         label: "Cape Town Drop-off Area",
-  //         address: "Cape Town, South Africa",
-  //         query: "Cape Town",
-  //       }),
-  //       images: [],
-  //       touristComments: [],
-  //     },
-  //   ],
-
-  //   routeInformation: {
-  //     title: "Full‑Day Robben Island & Langa Cultural Experience Route",
-
-  //     description:
-  //       "Experience Cape Town's most meaningful cultural journey in one day — from the powerful history of Robben Island to the vibrant community life of Langa.",
-
-  //     items: [
-  //       "Hotel pickup anywhere in Cape Town",
-  //       "V&A Waterfront Clock Tower ferry check-in",
-  //       "Robben Island Experience — prison tour, Mandela's cell, island bus tour, museum visit",
-  //       "Lunch break at V&A Waterfront (not included)",
-  //       "Langa Cultural Walking Tour — community history, arts & crafts, cultural storytelling",
-  //       "Guga S'thebe Arts & Culture Centre visit",
-  //       "Hotel drop-off",
-  //     ],
-  //   },
-
-  //   needToKnow: [
-  //     { text: "Ferry departures are weather dependent" },
-  //     { text: "Please carry identification if required for ferry boarding" },
-  //     {
-  //       text: "Lunch is not included — guests choose their own restaurant at the V&A Waterfront",
-  //     },
-  //     { text: "Comfortable walking shoes are recommended" },
-  //     { text: "Please ask permission before photographing residents in Langa" },
-  //     { text: "Respectful behaviour towards the local community is expected" },
-  //     { text: "Total tour duration: 08:00 – 16:00 (8 hours)" },
-  //     {
-  //       text: "Robben Island experience is 3 hours including the ferry crossing and island tour",
-  //     },
-  //     { text: "Langa walking tour is 1.5 hours with a registered local guide" },
-  //   ],
-
-  //   faqs: [
-  //     {
-  //       question: "Is the ferry ticket included?",
-  //       answer:
-  //         "Yes. Return ferry tickets to Robben Island are included in the tour price for both adults and children (5–17 years). Infants 0–4 years are free.",
-  //     },
-  //     {
-  //       question: "Is hotel pickup included?",
-  //       answer:
-  //         "Yes. Pickup and drop-off are included from anywhere in Cape Town.",
-  //     },
-  //     {
-  //       question: "How long is the tour?",
-  //       answer: "The complete experience runs from 08:00 to 16:00 (8 hours).",
-  //     },
-  //     {
-  //       question: "Is lunch included?",
-  //       answer:
-  //         "No. Lunch is not included. Guests have free time at the V&A Waterfront to enjoy lunch at any restaurant of their choice.",
-  //     },
-  //     {
-  //       question: "What is included in the Robben Island experience?",
-  //       answer:
-  //         "The Robben Island experience includes the ferry crossing, an island bus tour, visits to the Lime Quarry, Sobukwe House, WWII bunkers, Leper Church, and the Maximum Security Prison tour including Nelson Mandela's cell.",
-  //     },
-  //     {
-  //       question: "What is included in the Langa experience?",
-  //       answer:
-  //         "The Langa experience includes a cultural walking tour with a registered local guide, visits to Guga S'thebe Arts & Culture Centre, and authentic community interaction with residents, entrepreneurs, and artisans.",
-  //     },
-  //     {
-  //       question: "Can weather affect the tour?",
-  //       answer:
-  //         "Yes. Ferry departures depend on weather and sea conditions and may occasionally be delayed or cancelled. Cancelled departures may be rescheduled where possible. The Langa portion continues in all weather.",
-  //     },
-  //     {
-  //       question: "Who guides the Robben Island tour?",
-  //       answer:
-  //         "The Robben Island tour is guided by Robben Island Museum guides, often former political prisoners who share firsthand experiences.",
-  //     },
-  //     {
-  //       question: "Who guides the Langa tour?",
-  //       answer:
-  //         "The Langa Township tour is guided by a registered local guide who provides authentic insights into community history, culture, and daily life.",
-  //     },
-  //     {
-  //       question: "What should I bring?",
-  //       answer:
-  //         "Bring identification (if required for ferry boarding), comfortable walking shoes, sunscreen, a hat, a camera, and cash for personal purchases. Bring a warm jacket depending on the weather.",
-  //     },
-  //   ],
-
-  //   tags: [
-  //     "Robben Island",
-  //     "Langa",
-  //     "Historical",
-  //     "Cultural",
-  //     "UNESCO",
-  //     "Nelson Mandela",
-  //     "Township",
-  //     "Cape Town",
-  //     "Full Day",
-  //     "Prison Tour",
-  //     "Community",
-  //     "Heritage",
-  //     "Combined Tour",
-  //     "World Heritage Site",
-  //   ],
-  // },
   // District-Six + Langa
   {
     id: 17, // New tour ID to be assigned (e.g., 37)
@@ -9518,7 +9102,7 @@ export const tours = [
       "day-tour",
     ],
   },
-  // Stellenbosch & Franschhoek Winelands
+  // Stellenbosch & Franschhoek Winelands + Tram
   {
     id: 23,
     type: TOUR_TYPES.WINE_ROUTES,
@@ -9532,7 +9116,7 @@ export const tours = [
     seo: {
       title: "Full-Day Stellenbosch & Franschhoek Winelands Tour",
       description:
-        "Enjoy a private full-day tour through Stellenbosch and Franschhoek with three premium wine tastings, scenic Winelands landscapes, the Franschhoek Wine Tram and private transport from Cape Town.",
+        "Enjoy a private full-day Stellenbosch and Franschhoek Winelands tour with three premium wine tastings, cheese or chocolate pairings, the Franschhoek Wine Tram and private transport from Cape Town.",
       keywords: [
         "Stellenbosch Franschhoek wine tour",
         "Cape Town Winelands tour",
@@ -9543,12 +9127,13 @@ export const tours = [
         "Cape Town wine tour",
         "full-day Winelands tour",
         "Franschhoek Wine Tram",
+        "family friendly Winelands tour",
       ],
     },
 
     workflow: defaultWorkflow,
 
-    image: "",
+    image: '/src/assets/images/tours/packages/winelands-tram/',
     images: [],
     imageFolder: "wine-routes/stellenbosch-franschhoek-winelands",
     videos: [],
@@ -9556,67 +9141,40 @@ export const tours = [
     location: "Stellenbosch & Franschhoek, Western Cape, South Africa",
     duration: "8.5–9 hours",
 
-    priceBase: 1850,
-    minPeople: 1,
+    priceBase: 2150,
+    minPeople: 2,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
-        category: "1 Guest (Solo Traveller)",
-        pricePerPerson: 4500,
-        note: "Includes 3 standard wine tastings and the Franschhoek Wine Tram.",
-      },
-      {
-        category: "2 Guests (Couple Rate)",
+        category: "2 Guests",
         pricePerPerson: 3200,
-        note: "Private couple experience.",
+        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
       },
       {
         category: "3 Guests",
         pricePerPerson: 2650,
-        note: "Standard wine tastings included.",
+        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
       },
       {
         category: "4 Guests",
-        pricePerPerson: 2250,
-        note: "Recommended website rate.",
+        pricePerPerson: 2450,
+        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
       },
       {
-        category: "5 Guests",
+        category: "5–7 Guests",
         pricePerPerson: 2150,
-        note: "All standard tastings included.",
-      },
-      {
-        category: "6 Guests",
-        pricePerPerson: 1950,
-        note: "Group discounted rate.",
-      },
-      {
-        category: "7–10 Guests",
-        pricePerPerson: 1850,
-        note: "Larger private group rate.",
+        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
       },
     ],
 
     additionalPricing: [
       {
-        type: "external",
-        category: "Optional cheese pairing",
+        type: "request",
+        category: "Optional ice-cream stop in Franschhoek",
         pricePerPerson: null,
-        note: "Available at Zevenwacht. Additional charge applies.",
-      },
-      {
-        type: "external",
-        category: "Optional biltong pairing",
-        pricePerPerson: null,
-        note: "Available at Marianne Wine Estate. Additional charge applies.",
-      },
-      {
-        type: "external",
-        category: "Optional chocolate pairing",
-        pricePerPerson: null,
-        note: "Available at Rickety Bridge. Additional charge applies.",
+        note: "Optional stop available on request. Additional cost may apply.",
       },
     ],
 
@@ -9635,11 +9193,14 @@ export const tours = [
     mainReview: "",
 
     description:
-      "A luxurious private full-day journey through the Stellenbosch and Franschhoek Winelands, combining three curated wine tastings, breathtaking mountain and vineyard scenery, and the iconic Franschhoek Wine Tram. The experience begins with comfortable pickup in Cape Town before travelling through the Winelands with commentary from your professional driver-guide. Visit Zevenwacht Wine Estate, Marianne Wine Estate and Rickety Bridge Wine Estate before enjoying lunch in Franschhoek and a scenic open-air Wine Tram experience. Perfect for couples, families and wine lovers looking for a relaxed, scenic and memorable Cape Winelands experience.",
+      "A luxurious full-day journey through the Stellenbosch and Franschhoek Winelands, featuring three premium wine estates, breathtaking scenery, included cheese OR chocolate pairings, and the iconic Franschhoek Wine Tram. Perfect for couples, families and wine lovers seeking a relaxed, scenic and unforgettable Cape Winelands experience. The tour is family-friendly, with spacious wine-estate lawns, mountain scenery, outdoor areas and an open-air Wine Tram experience that children can enjoy.",
 
     highlights: [
       {
         text: "Three standard wine tastings included",
+      },
+      {
+        text: "Cheese OR chocolate pairing included",
       },
       {
         text: "Visit Zevenwacht Wine Estate in Stellenbosch",
@@ -9663,25 +9224,31 @@ export const tours = [
         text: "Cultural commentary while passing Langa",
       },
       {
-        text: "Bottled water and transport costs included",
+        text: "Family-friendly option available",
+      },
+      {
+        text: "Bottled water and all transport costs included",
       },
     ],
 
     included: [
       {
-        text: "Private vehicle and professional driver-guide",
+        text: "Zevenwacht standard wine tasting + cheese OR chocolate pairing",
       },
       {
-        text: "Standard wine tasting at Zevenwacht Wine Estate",
+        text: "Marianne standard wine tasting + cheese OR chocolate pairing",
       },
       {
-        text: "Standard wine tasting at Marianne Wine Estate",
-      },
-      {
-        text: "Standard wine tasting at Rickety Bridge Wine Estate",
+        text: "Rickety Bridge standard wine tasting + cheese OR chocolate pairing",
       },
       {
         text: "Franschhoek Wine Tram ticket",
+      },
+      {
+        text: "Private vehicle",
+      },
+      {
+        text: "Professional driver-guide",
       },
       {
         text: "Bottled water",
@@ -9696,16 +9263,16 @@ export const tours = [
         text: "Lunch in Franschhoek",
       },
       {
-        text: "Optional cheese pairing at Zevenwacht",
-      },
-      {
-        text: "Optional biltong pairing at Marianne Wine Estate",
-      },
-      {
-        text: "Optional chocolate pairing at Rickety Bridge",
+        text: "Optional biltong pairing",
       },
       {
         text: "Additional wine purchases",
+      },
+      {
+        text: "Any extra tastings",
+      },
+      {
+        text: "Optional ice-cream stop in Franschhoek",
       },
     ],
 
@@ -9719,9 +9286,10 @@ export const tours = [
     ],
 
     requirements: [
-      "Guests must be of legal drinking age to participate in wine tastings.",
+      "Guests participating in wine tastings must be of legal drinking age.",
       "Please provide accurate passenger information when booking.",
       "Guests should bring suitable identification where required by wine estates.",
+      "Parents and guardians remain responsible for children throughout the experience.",
     ],
 
     arrangements: {
@@ -9748,13 +9316,16 @@ export const tours = [
       ],
 
       passengerPolicy:
-        "Wine tasting is subject to the legal drinking age and venue requirements.",
+        "Wine tasting is subject to the legal drinking age and venue requirements. Children may participate in the family-friendly aspects of the tour but may not participate in wine tastings.",
 
       notes: [
         "Lunch is not included and is at the guest's own cost.",
-        "Wine estate visits and tasting availability are subject to venue operating conditions.",
-        "Optional cheese, biltong and chocolate pairings are available at additional cost.",
+        "Cheese OR chocolate pairing is included as specified in the tour package.",
+        "Optional biltong pairing is not included.",
+        "Additional wine purchases and extra tastings are not included.",
         "The Franschhoek Wine Tram ticket is included.",
+        "An optional ice-cream stop in Franschhoek can be added on request.",
+        "Wine estate visits and tasting availability are subject to venue operating conditions.",
         "The itinerary may be adjusted slightly to accommodate venue or tram operating schedules.",
       ],
     },
@@ -9793,6 +9364,9 @@ export const tours = [
         {
           text: "Guests should remain with the group during scheduled transfers and activities.",
         },
+        {
+          text: "Parents and guardians are responsible for supervising children throughout the tour.",
+        },
       ],
     },
 
@@ -9828,7 +9402,7 @@ export const tours = [
       {
         title: "Zevenwacht Wine Estate",
         description:
-          "Begin the Winelands experience with a standard wine tasting at Zevenwacht. Enjoy beautiful dam and vineyard views, with an optional cheese pairing available at additional cost.",
+          "Begin the Winelands experience with a standard wine tasting and included cheese OR chocolate pairing at Zevenwacht. Enjoy beautiful dam and vineyard views.",
         time: "09:40",
         duration: "±1 hour",
         type: "wine",
@@ -9839,7 +9413,7 @@ export const tours = [
       {
         title: "Marianne Wine Estate",
         description:
-          "Visit this boutique French-style wine estate for a standard wine tasting. An optional biltong pairing is available at additional cost.",
+          "Visit this boutique French-style wine estate for a standard wine tasting with an included cheese OR chocolate pairing.",
         time: "10:55",
         duration: "±50 minutes",
         type: "wine",
@@ -9850,7 +9424,7 @@ export const tours = [
       {
         title: "Rickety Bridge Wine Estate",
         description:
-          "Enjoy a standard wine tasting at this historic Franschhoek estate, surrounded by a spectacular mountain backdrop. An optional chocolate pairing is available.",
+          "Enjoy a standard wine tasting with an included cheese OR chocolate pairing at this historic Franschhoek estate, surrounded by a spectacular mountain backdrop.",
         time: "12:05",
         duration: "±55 minutes",
         type: "wine",
@@ -9926,22 +9500,34 @@ export const tours = [
         text: "Three standard wine tastings are included in the tour price.",
       },
       {
-        text: "Optional cheese, biltong and chocolate pairings are not included.",
+        text: "Cheese OR chocolate pairing is included at the three wine estates.",
       },
       {
         text: "Lunch in Franschhoek is not included.",
       },
       {
-        text: "Additional wine purchases are not included.",
+        text: "Optional biltong pairing is not included.",
       },
       {
-        text: "Wine tasting is subject to legal drinking age requirements.",
+        text: "Additional wine purchases and extra tastings are not included.",
       },
       {
         text: "The Franschhoek Wine Tram ticket is included.",
       },
       {
         text: "The drive past Langa is a commentary experience only; there is no stop or entry.",
+      },
+      {
+        text: "This tour is suitable for families seeking a relaxed scenic day in the Winelands.",
+      },
+      {
+        text: "Children can enjoy the open-air Wine Tram, spacious estate lawns, mountain scenery and outdoor environment.",
+      },
+      {
+        text: "An optional ice-cream stop in Franschhoek can be added on request.",
+      },
+      {
+        text: "Wine tasting is subject to legal drinking age requirements.",
       },
       {
         text: "Wine estate and Wine Tram schedules are subject to availability.",
@@ -9954,36 +9540,55 @@ export const tours = [
         answer:
           "Three standard wine tastings are included: one at Zevenwacht, one at Marianne Wine Estate and one at Rickety Bridge.",
       },
+
+      {
+        question: "Are wine pairings included?",
+        answer:
+          "Yes. A cheese OR chocolate pairing is included with the wine tasting experience at each of the three estates.",
+      },
+
       {
         question: "Is the Franschhoek Wine Tram included?",
         answer:
           "Yes. The Franschhoek Wine Tram ticket is included in the tour price.",
       },
+
       {
         question: "Is lunch included?",
         answer:
           "No. Lunch is at the guest's own cost, and you can choose your preferred restaurant in Franschhoek.",
       },
-      {
-        question: "Are wine pairings included?",
-        answer:
-          "No. Optional cheese, biltong and chocolate pairings are available at the respective estates at an additional cost.",
-      },
+
       {
         question: "Is this a private tour?",
         answer:
           "Yes. The experience includes a private vehicle and professional driver-guide.",
       },
+
+      {
+        question: "Is this tour suitable for children?",
+        answer:
+          "Yes. A family-friendly option is available. Children can enjoy the open-air Wine Tram, spacious wine-estate lawns, mountain scenery and relaxed outdoor environment. Children may not participate in wine tastings.",
+      },
+
+      {
+        question: "Is there anything for children to enjoy?",
+        answer:
+          "Yes. Children can enjoy the open-air Wine Tram ride, outdoor estate spaces and mountain scenery. An optional ice-cream stop in Franschhoek can also be added on request.",
+      },
+
       {
         question: "Do we stop at Langa?",
         answer:
           "No. Langa is a place of interest during the drive, and your guide provides cultural and historical commentary without a stop or entry.",
       },
+
       {
         question: "What time does the tour return to Cape Town?",
         answer:
           "The tour is expected to return to Cape Town at approximately 18:00.",
       },
+
       {
         question: "Who is this tour suitable for?",
         answer:
@@ -10001,6 +9606,7 @@ export const tours = [
       "private-tour",
       "day-tour",
       "wine-tasting",
+      "family-friendly",
     ],
   },
   // Cape Town Gems - Kirstenbosch & Constantia
@@ -10456,6 +10062,541 @@ export const tours = [
       "family",
       "private-tour",
       "day-tour",
+    ],
+  },
+  // West Coast National Park + Kraalbaai + Groote Post Winery
+  {
+    id: 25,
+    type: TOUR_TYPES.DAY_TOUR,
+    category: TOUR_MODIFIERS.DAY_TOUR,
+
+    title:
+      "West Coast National Park, Kraalbaai & Groote Post Winery",
+    slug: "west-coast-national-park-kraalbaai-groote-post-winery-tour",
+    canonicalPath:
+      "/tours/west-coast-national-park-kraalbaai-groote-post-winery-tour",
+    childFriendly: true,
+
+    seo: {
+      title:
+        "West Coast National Park, Kraalbaai & Groote Post Winery Private Full-Day Tour",
+      description:
+        "Explore West Coast National Park, beautiful Kraalbaai and historic Groote Post Winery on a private full-day tour from Cape Town, with wildlife viewing, lagoon scenery, beach time and a wine tasting included.",
+      keywords: [
+        "West Coast National Park tour",
+        "Kraalbaai tour",
+        "Groote Post Winery tour",
+        "West Coast Cape Town tour",
+        "Cape Town West Coast tour",
+        "Langebaan tour",
+        "Kraalbaai beach tour",
+        "West Coast National Park private tour",
+        "Groote Post wine tour",
+        "Cape Town private day tour",
+        "West Coast wildlife tour",
+        "West Coast wildflower tour",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "/src/assets/images/tours/packages/west-coast/1.webp",
+    images: [
+      "/src/assets/images/tours/packages/west-coast/1.webp",
+    ],
+    imageFolder: "packages/west-coast",
+    videos: [],
+
+    location:
+      "West Coast National Park, Kraalbaai & Groote Post Winery, Western Cape, South Africa",
+
+    duration: "Full day",
+
+    priceBase: 3200,
+    minPeople: 2,
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "Adult",
+        pricePerPerson: 3200,
+        note: "",
+      },
+      {
+        category: "Child: 5–12 Years",
+        pricePerPerson: 1900,
+        note: "Child rate for guests aged 5–12 years.",
+      },
+      {
+        category: "Toddler: 0-4 Years",
+        pricePerPerson: null,
+        note: "Not applicable for toddlers.",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        type: "external",
+        category: "Kayak rental at Kraalbaai",
+        pricePerPerson: null,
+        note: "Optional activity. Guest-paid directly.",
+      },
+      {
+        type: "external",
+        category: "Stand-up paddle boarding at Kraalbaai",
+        pricePerPerson: null,
+        note: "Optional activity. Guest-paid directly.",
+      },
+    ],
+
+    groupPricing: {
+    enabled: true,
+    icon: "",
+    tiers: [
+      {
+        minPeople: 2,
+        maxPeople: 3,
+        perPerson: 3200,
+        label: "2–3 guests",
+        note: "Adult rate. Minimum tour total of R6,400 covers 2 guests.",
+      },
+      {
+        minPeople: 4,
+        maxPeople: 6,
+        perPerson: 3100,
+        label: "4–6 guests",
+        note: "Adult rate for groups of 4–6 guests.",
+      },
+      {
+        minPeople: 7,
+        maxPeople: 10,
+        perPerson: 3000,
+        label: "7–10 guests",
+        note: "Adult rate for groups of 7–10 guests.",
+      },
+      {
+        minPeople: 11,
+        maxPeople: null,
+        perPerson: null,
+        label: "11+ guests",
+        note: "Custom quote based on group size and requirements.",
+      },
+    ],
+  },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "A private full-day journey along the Cape West Coast, combining the natural beauty of West Coast National Park, the turquoise lagoon waters of Kraalbaai and the peaceful countryside setting of Groote Post Winery. Guests can enjoy wildlife viewing, scenic lagoon viewpoints, beach time, photography stops and a standard wine tasting at Groote Post. The experience also includes private transport, a professional driver-guide, onboard Wi-Fi, bottled water and all listed entry fees.",
+
+    highlights: [
+      {
+        text: "Explore West Coast National Park",
+      },
+      {
+        text: "Visit beautiful Kraalbaai and its turquoise lagoon",
+      },
+      {
+        text: "±2–3 hours of beach time at Kraalbaai",
+      },
+      {
+        text: "Wildlife viewing inside West Coast National Park",
+      },
+      {
+        text: "Scenic Langebaan Lagoon viewpoints",
+      },
+      {
+        text: "Standard wine tasting at Groote Post Winery included",
+      },
+      {
+        text: "Historic Groote Post Winery and countryside landscapes",
+      },
+      {
+        text: "Seasonal Postberg wildflower reserve scenery",
+      },
+      {
+        text: "Scenic stop in Yzerfontein",
+      },
+      {
+        text: "Private vehicle and professional driver-guide",
+      },
+      {
+        text: "Onboard Wi-Fi and bottled water",
+      },
+      {
+        text: "All listed entry fees included",
+      },
+    ],
+
+    included: [
+      {
+        text: "Private vehicle for the full day",
+      },
+      {
+        text: "Professional driver-guide",
+      },
+      {
+        text: "Onboard Wi-Fi",
+      },
+      {
+        text: "Bottled water for all guests",
+      },
+      {
+        text: "Standard wine tasting at Groote Post Winery",
+      },
+      {
+        text: "West Coast National Park entry",
+      },
+      {
+        text: "Kraalbaai access",
+      },
+      {
+        text: "Groote Post Winery entry",
+      },
+      {
+        text: "Scenic stop at Yzerfontein",
+      },
+      {
+        text: "Langebaan Lagoon viewpoints",
+      },
+      {
+        text: "Wildlife viewing inside the park",
+      },
+      {
+        text: "Photo stops and commentary",
+      },
+    ],
+
+    excluded: [
+      {
+        text: "Lunch at Groote Post Winery",
+      },
+      {
+        text: "Kayak rental at Kraalbaai",
+      },
+      {
+        text: "Stand-up paddle boarding at Kraalbaai",
+      },
+      {
+        text: "Snacks or additional beverages",
+      },
+      {
+        text: "Beach towels or swimwear",
+      },
+      {
+        text: "Personal purchases at shops or farm stalls",
+      },
+    ],
+
+    pickupOptions: [
+      {
+        type: "hotel",
+        label: "Cape Town CBD & surrounds",
+        description:
+          "Private pick-up and drop-off from accommodation in Cape Town CBD and surrounding areas.",
+      },
+    ],
+
+    requirements: [
+      "Guests should bring suitable identification where required.",
+      "Guests should bring suitable swimwear and beach equipment if they intend to swim.",
+      "Guests participating in the wine tasting must meet applicable legal drinking-age requirements.",
+    ],
+
+    arrangements: {
+      availability:
+        "Available subject to West Coast National Park, Kraalbaai and Groote Post Winery operating conditions.",
+      duration: "Full day",
+      operatingTime: "",
+      departure: "Cape Town CBD & surrounds",
+      return: "Cape Town CBD & surrounds",
+      location:
+        "Cape Town → Yzerfontein → West Coast National Park → Kraalbaai → Groote Post Winery → Cape Town",
+
+      clothing: [
+        "Comfortable clothing",
+        "Comfortable walking shoes",
+        "Swimwear if swimming at Kraalbaai",
+        "Light jacket for cooler weather",
+      ],
+
+      thingsToBring: [
+        "Sun protection",
+        "Hat",
+        "Sunscreen",
+        "Camera",
+        "Swimwear",
+        "Beach towel",
+      ],
+
+      passengerPolicy:
+        "Guests are expected to follow the instructions of the professional driver-guide, West Coast National Park and Groote Post Winery staff.",
+
+      notes: [
+        "Lunch at Groote Post Winery is not included and is guest-paid.",
+        "Kayaking and stand-up paddle boarding at Kraalbaai are optional and guest-paid.",
+        "The standard wine tasting at Groote Post Winery is included.",
+        "Additional beverages and personal purchases are not included.",
+        "Postberg wildflower displays are seasonal and are highlighted during August–September.",
+        "Yzerfontein is a scenic/photo stop with an optional coffee break.",
+        "Langebaan is mentioned as a place along the route and offers lagoon views.",
+        "Beach time at Kraalbaai is approximately 2–3 hours.",
+        "Park and venue access is subject to operating conditions.",
+      ],
+    },
+
+    weatherPolicy: {
+      summary:
+        "The tour operates subject to weather and safety conditions, particularly for outdoor activities at Kraalbaai and within the national park.",
+      items: [
+        {
+          text: "Wildlife viewing and scenic drives generally continue in suitable weather conditions.",
+        },
+        {
+          text: "Beach activities at Kraalbaai may be affected by weather and water conditions.",
+        },
+        {
+          text: "Optional kayaking and stand-up paddle boarding are subject to operator and weather conditions.",
+        },
+        {
+          text: "Seasonal wildflower displays depend on seasonal conditions and cannot be guaranteed.",
+        },
+      ],
+    },
+
+
+    safetyPolicy: {
+      summary:
+        "Guests must follow the safety requirements of West Coast National Park, Kraalbaai activity operators and Groote Post Winery.",
+      items: [
+        {
+          text: "Guests must follow all instructions provided by the professional driver-guide and venue staff.",
+        },
+        {
+          text: "Guests should remain with the group during scheduled transfers and activities.",
+        },
+        {
+          text: "Guests should exercise caution around the lagoon and beach areas.",
+        },
+        {
+          text: "Optional water activities are subject to operator safety requirements.",
+        },
+        {
+          text: "Responsible alcohol consumption is expected during the wine tasting.",
+        },
+      ],
+    },
+
+    /*
+     * FULL-DAY TOUR
+     * Uses stops rather than the multi-day itinerary structure.
+     */
+    itinerary: null,
+
+    stops: [
+
+      {
+        name: "Yzerfontein",
+        description:
+          "Visit the quiet coastal village of Yzerfontein for a quick scenic photo opportunity and optional coffee break.",
+        time: "Flexible",
+        duration: "",
+        type: "scenic",
+        optional: true,
+        image: "",
+      },
+
+      {
+        name: "West Coast National Park",
+        description:
+          "Explore one of South Africa's most scenic protected areas, with wildlife viewing, lagoon viewpoints, fynbos vegetation, photography opportunities and commentary about conservation and the West Coast ecosystem.",
+        time: "",
+        duration: "",
+        type: "nature",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Langebaan Lagoon Viewpoints",
+        description:
+          "Enjoy scenic viewpoints overlooking the turquoise waters of Langebaan Lagoon while travelling through the West Coast National Park area.",
+        time: "",
+        duration: "",
+        type: "scenic",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Kraalbaai",
+        description:
+          "Spend approximately 2–3 hours at Kraalbaai enjoying its crystal-clear turquoise lagoon, white sandy beach and peaceful surroundings. Swimming and relaxation are available, with optional kayaking and stand-up paddle boarding at guest cost.",
+        time: "",
+        duration: "±2–3 hours",
+        type: "beach",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Groote Post Winery",
+        description:
+          "Visit the historic Groote Post Winery for its scenic countryside atmosphere, rolling hills, vineyards and historic farm buildings. A standard wine tasting is included, while lunch at the restaurant is guest-paid.",
+        time: "",
+        duration: "",
+        type: "wine",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Return to Cape Town",
+        description:
+          "Comfortable private journey back to Cape Town following the day's West Coast experience.",
+        time: "",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+    ],
+
+
+    needToKnow: [
+      {
+        text: "The minimum tour total is R6,400 and covers 2 guests.",
+      },
+      {
+        text: "Adult pricing is R3,200 pp for 2–3 guests, R3,100 pp for 4–6 guests and R3,000 pp for 7–10 guests.",
+      },
+      {
+        text: "The child rate is R1,900 pp for ages 5–12 and R2,100 pp for ages 13–17.",
+      },
+      {
+        text: "The standard wine tasting at Groote Post Winery is included.",
+      },
+      {
+        text: "Lunch at Groote Post Winery is not included and is guest-paid.",
+      },
+      {
+        text: "Kayaking and stand-up paddle boarding at Kraalbaai are optional and guest-paid.",
+      },
+      {
+        text: "Kraalbaai beach time is approximately 2–3 hours.",
+      },
+      {
+        text: "Postberg wildflowers are seasonal and are typically highlighted during August–September.",
+      },
+      {
+        text: "Yzerfontein is a scenic/photo stop with an optional coffee break.",
+      },
+      {
+        text: "Langebaan is mentioned as a location along the route and offers lagoon views.",
+      },
+      {
+        text: "Guests should bring suitable swimwear if they intend to swim at Kraalbaai.",
+      },
+      {
+        text: "Additional beverages, snacks and personal purchases are not included.",
+      },
+    ],
+
+    faqs: [
+      {
+        question: "What is included in the tour?",
+        answer:
+          "The tour includes a private vehicle, professional driver-guide, onboard Wi-Fi, bottled water, standard wine tasting at Groote Post Winery, West Coast National Park entry, Kraalbaai access, Groote Post Winery entry and scenic stops.",
+      },
+
+      {
+        question: "Is the wine tasting at Groote Post included?",
+        answer:
+          "Yes. A standard wine tasting at Groote Post Winery is included in the tour price.",
+      },
+
+      {
+        question: "Is lunch included?",
+        answer: "No. Lunch at Groote Post Winery is guest-paid.",
+      },
+
+      {
+        question: "How long do we spend at Kraalbaai?",
+        answer:
+          "Approximately 2–3 hours are allocated for beach time, swimming and relaxation at Kraalbaai.",
+      },
+
+      {
+        question: "Can we kayak or paddleboard at Kraalbaai?",
+        answer:
+          "Yes. Kayaking and stand-up paddle boarding are available as optional activities, but guests pay for these separately.",
+      },
+
+      {
+        question: "Is this tour suitable for children?",
+        answer:
+          "Yes. The tour is suitable for families, with calm lagoon-style waters at Kraalbaai, wildlife viewing, scenic stops and plenty of outdoor space.",
+      },
+
+      {
+        question: "What wildlife can we see?",
+        answer:
+          "The park is home to animals including eland, bontebok, ostrich and tortoises, as well as migratory birds.",
+      },
+
+      {
+        question: "Can we see the West Coast wildflowers?",
+        answer:
+          "The Postberg wildflower reserve is seasonal, with wildflower displays highlighted during August–September. Displays depend on seasonal conditions and cannot be guaranteed.",
+      },
+
+      {
+        question: "Do we stop in Yzerfontein?",
+        answer:
+          "Yzerfontein is a scenic stop for a quick photo opportunity and optional coffee break.",
+      },
+
+      {
+        question: "Do we stop in Langebaan?",
+        answer:
+          "Langebaan is mentioned as a place along the route and offers beautiful lagoon views.",
+      },
+
+      {
+        question: "Is this a private tour?",
+        answer:
+          "Yes. The experience includes a private vehicle and professional driver-guide for the full day.",
+      },
+
+      {
+        question: "Where can you pick us up?",
+        answer:
+          "Pick-up and drop-off are available in Cape Town CBD and surrounding areas.",
+      },
+    ],
+
+    tags: [
+      "west-coast",
+      "west-coast-national-park",
+      "kraalbaai",
+      "groote-post",
+      "winery",
+      "langebaan",
+      "yzerfontein",
+      "wildlife",
+      "beach",
+      "wine",
+      "cape-town",
+      "private-tour",
+      "day-tour",
+      "family-friendly",
     ],
   },
 ];
