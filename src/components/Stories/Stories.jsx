@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useRef } from 'react'
+import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -100,6 +100,52 @@ const Stories = () => {
 
   const testimonial = useMemo(() => getLatestReview(), [])
   const rating = clampRating(testimonial.rating)
+
+  // ------------------------------------------------------------
+  // HASH-ANCHOR SCROLL FIX (e.g. someone loads /#gallery)
+  // The browser natively jumps to #gallery on load BEFORE Lenis and
+  // GSAP ScrollTrigger finish initializing, which throws off pin/scrub
+  // calculations and causes an incorrect landing position. We strip
+  // the hash immediately so the browser can't do that, then perform
+  // our own deliberate scroll once Lenis is ready.
+  // ------------------------------------------------------------
+  useEffect(() => {
+    const hash = window.location.hash?.slice(1)
+    if (!hash) return undefined
+
+    // Strip immediately so native/browser hash scrolling can't fire
+    // (including on any future re-render or refresh of this entry).
+    const { pathname, search } = window.location
+    window.history.replaceState(null, '', pathname + search)
+
+    let cancelled = false
+    let timer = null
+
+    const waitForLenisAndScroll = () => {
+      if (cancelled) return
+      if (!window.lenis) {
+        timer = window.setTimeout(waitForLenisAndScroll, 50)
+        return
+      }
+
+      timer = window.setTimeout(() => {
+        if (cancelled) return
+        const element = document.getElementById(hash)
+        if (element) {
+          const y = element.getBoundingClientRect().top + window.scrollY
+          window.lenis.scrollTo(y, { immediate: true, force: true })
+        }
+        window.requestAnimationFrame(() => ScrollTrigger.refresh(true))
+      }, 700)
+    }
+
+    waitForLenisAndScroll()
+
+    return () => {
+      cancelled = true
+      if (timer) window.clearTimeout(timer)
+    }
+  }, [])
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {

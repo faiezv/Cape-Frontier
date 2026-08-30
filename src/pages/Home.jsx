@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -23,6 +23,7 @@ const isTouchDevice = () => {
 
 const Home = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const pageRef = useRef(null);
   const heroRef = useRef(null);
@@ -35,6 +36,21 @@ const Home = () => {
   const [showButton, setShowButton] = useState(false);
   const [isToursVisible, setIsToursVisible] = useState(false);
   const [isContactVisible, setIsContactVisible] = useState(false);
+
+  // ---------- PREVENT BROWSER'S OWN SCROLL RESTORATION ----------
+  // The browser tries to restore scroll position on reload / back-forward
+  // navigation on its own. That fights with Lenis + our scrollTo logic and
+  // can cause an unrelated jump on load. Take manual control of it.
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      const previous = window.history.scrollRestoration;
+      window.history.scrollRestoration = "manual";
+      return () => {
+        window.history.scrollRestoration = previous;
+      };
+    }
+    return undefined;
+  }, []);
 
   // ---------- SCROLL LISTENER ----------
   useEffect(() => {
@@ -158,7 +174,10 @@ const Home = () => {
     };
   }, []);
 
-  // ---------- EXISTING useEffect FOR LOCATION.STATE SCROLL ----------
+  // ---------- SCROLL-TO-SECTION FROM location.state (fixed) ----------
+  // Consumes scrollTo once, then strips it from history state via
+  // navigate(..., { replace: true }) so a page reload or browser
+  // back/forward on this history entry can't replay a stale scroll target.
   useEffect(() => {
     const scrollTarget = location.state?.scrollTo;
     if (!scrollTarget || !window.lenis) return undefined;
@@ -174,10 +193,17 @@ const Home = () => {
         }
       }
       window.requestAnimationFrame(() => ScrollTrigger.refresh(true));
+
+      // Clear the consumed intent from history state so it can't fire again.
+      navigate(location.pathname + location.search, {
+        replace: true,
+        state: {},
+      });
     }, 700);
 
     return () => window.clearTimeout(timer);
-  }, [location.key, location.state]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.key]);
 
   // ---------- EXISTING useLayoutEffect FOR HERO/ABOUT ANIMATIONS ----------
   useLayoutEffect(() => {
@@ -361,4 +387,4 @@ const Home = () => {
   );
 };
 
-export default Home
+export default Home;
