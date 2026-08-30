@@ -16,18 +16,12 @@ export default function ToursBrowser() {
   const mobileNavScrollerRef = useRef(null);
   const mobileCategoryItemRefs = useRef({});
 
-  // Refs to each rendered card, keyed by tour id, used to measure the
-  // active card's real height so the prev/next buttons can match it.
+  // Refs to each rendered card, keyed by tour id.
   const cardRefs = useRef({});
 
   const [activeCategory, setActiveCategory] = useState("adrenaline");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-
-  // Height (px) of the currently active card. Drives the row height so
-  // the prev/next buttons (self-stretch) match the visible card instead
-  // of the tallest card in the category.
-  const [stageHeight, setStageHeight] = useState(null);
 
   // Swipe state
   const [touchStartX, setTouchStartX] = useState(0);
@@ -113,44 +107,6 @@ export default function ToursBrowser() {
     },
     [filteredTours, goToTour]
   );
-
-  // ── Height measurement ──────────────────────────────────────────────
-  // Measures the DOM height of whichever card is currently active and
-  // syncs it into state so the row (and therefore the stretched
-  // prev/next buttons) can be pinned to that exact height.
-
-  const measureActiveCard = useCallback(() => {
-    const activeId = filteredTours[currentIndex]?.id;
-    if (activeId == null) return;
-    const el = cardRefs.current[activeId];
-    if (el) {
-      setStageHeight(el.offsetHeight);
-    }
-  }, [filteredTours, currentIndex]);
-
-  // Re-measure whenever the active card changes.
-  useEffect(() => {
-    measureActiveCard();
-  }, [measureActiveCard]);
-
-  // Re-measure if the active card's own content resizes (images loading,
-  // fonts swapping in, dynamic text, etc).
-  useEffect(() => {
-    const activeId = filteredTours[currentIndex]?.id;
-    const el = activeId != null ? cardRefs.current[activeId] : null;
-    if (!el || typeof ResizeObserver === "undefined") return;
-
-    const ro = new ResizeObserver(() => measureActiveCard());
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [currentIndex, filteredTours, measureActiveCard]);
-
-  // Re-measure on viewport resize (e.g. rotation, window resize) since
-  // wrapping/line-breaks can change the card's height at new widths.
-  useEffect(() => {
-    window.addEventListener("resize", measureActiveCard);
-    return () => window.removeEventListener("resize", measureActiveCard);
-  }, [measureActiveCard]);
 
   // ── Swipe / Touch ──────────────────────────────────────────────────
 
@@ -245,17 +201,10 @@ export default function ToursBrowser() {
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Main flex row – height is pinned to the active card's
-                measured height so prev/next buttons (self-stretch)
-                match the visible card, not the tallest card in the
-                category. */}
-            <div
-              className="flex items-stretch gap-1"
-              style={{
-                height: stageHeight ? `${stageHeight}px` : "auto",
-                transition: "height 300ms ease",
-              }}
-            >
+            {/* Main flex row – height is now auto, allowing the tallest
+                card to determine the row height. The prev/next buttons
+                use self-stretch, so they'll match that height naturally. */}
+            <div className="flex items-stretch gap-1">
               {/* Previous button – hidden on mobile */}
               <AnimatePresence>
                 {!isFirst && (
@@ -290,11 +239,7 @@ export default function ToursBrowser() {
                 )}
               </AnimatePresence>
 
-              {/* Track – flex:1. Every card in the category stays
-                  mounted (only opacity toggles) so the horizontal
-                  slide transform works, but the row's height is no
-                  longer left to "auto" (which would take the tallest
-                  child) — it's driven by stageHeight above. */}
+              {/* Track – flex:1. All cards are in the DOM, only opacity toggles. */}
               <motion.div
                 ref={trackRef}
                 className="flex flex-1 min-w-0 items-start will-change-transform"
