@@ -21,6 +21,10 @@
     overflow-anchor: none;
   }
 
+  .tours-browser {
+    overflow-anchor: none;
+  }
+
   body {
     overflow-x: hidden;
   }

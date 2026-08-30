@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Hero from "../components/Hero.jsx";
 import About from "../components/About/About.jsx";
 import Stories from "../components/Stories/Stories.jsx";
-import Tours from "../components/Tours/Tours.jsx";   // <-- COMMENTED OUT
+import Tours from "../components/Tours/Tours.jsx";
 import Contact from "../components/Contact.jsx";
 import TourSelect from "../components/Tours/TourSelect.jsx";
 
@@ -29,7 +29,7 @@ const Home = () => {
   const heroRef = useRef(null);
   const aboutRef = useRef(null);
   const tourSelectSectionRef = useRef(null);
-  const toursSectionRef = useRef(null);  // Keep ref but Tours is removed
+  const toursSectionRef = useRef(null);
   const contactSectionRef = useRef(null);
 
   // ---------- BUTTON STATE ----------
@@ -71,8 +71,6 @@ const Home = () => {
       let toursVisible = false;
       let contactVisible = false;
 
-      // Since Tours is commented out, toursSectionRef.current is null,
-      // so toursVisible stays false.
       if (toursSectionRef.current) {
         const rect = toursSectionRef.current.getBoundingClientRect();
         if (rect.top < window.innerHeight) toursVisible = true;
@@ -104,7 +102,7 @@ const Home = () => {
     }
   };
 
-  // ---------- TOUR SELECT HIDE/SHOW (unchanged) ----------
+  // ---------- TOUR SELECT HIDE/SHOW ----------
   useLayoutEffect(() => {
     const section = tourSelectSectionRef.current;
     if (!section) return;
@@ -176,7 +174,7 @@ const Home = () => {
     };
   }, []);
 
-  // ---------- SCROLL-TO-SECTION FROM location.state (unchanged) ----------
+  // ---------- SCROLL-TO-SECTION FROM location.state ----------
   useEffect(() => {
     const scrollTarget = location.state?.scrollTo;
     if (!scrollTarget || !window.lenis) return undefined;
@@ -202,7 +200,22 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key]);
 
-  // ---------- HERO & ABOUT ANIMATIONS (unchanged) ----------
+  // ---------- REFRESH ONCE TOURS' LAYOUT ACTUALLY SETTLES ----------
+  // Tours is the heaviest, slowest-to-stabilize subtree on this page
+  // (carousel, category nav, image loads). The old approach refreshed
+  // ScrollTrigger on blind timers (80/320/900ms) that raced Tours'
+  // real layout settling — if a refresh fired mid-shift, ScrollTrigger
+  // recalculated the Hero pin against a still-moving page and then
+  // visibly corrected once Tours finished. ToursBrowser now dispatches
+  // 'tours:stable' once its own ResizeObserver reports no size change
+  // for 150ms, so this refresh only ever runs against a settled layout.
+  useEffect(() => {
+    const onStable = () => ScrollTrigger.refresh(true);
+    window.addEventListener("tours:stable", onStable);
+    return () => window.removeEventListener("tours:stable", onStable);
+  }, []);
+
+  // ---------- HERO & ABOUT ANIMATIONS ----------
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       if (!heroRef.current || !aboutRef.current) return;
@@ -278,14 +291,14 @@ const Home = () => {
         0
       );
 
+      // Keep the load/fonts refresh — cheap, and covers late web-font
+      // metric shifts that affect Hero/About text height specifically.
+      // The Tours-driven refresh above is now what handles the heavy,
+      // unpredictable layout settling instead of a blind timer chain.
       const refresh = () => {
         if (window.scrollY <= 2) resetHero();
         ScrollTrigger.refresh(true);
       };
-
-      const refreshOne = window.setTimeout(refresh, 80);
-      const refreshTwo = window.setTimeout(refresh, 320);
-      const refreshThree = window.setTimeout(refresh, 900);
 
       window.addEventListener("load", refresh, { once: true });
       if (document.fonts?.ready) {
@@ -293,9 +306,6 @@ const Home = () => {
       }
 
       return () => {
-        window.clearTimeout(refreshOne);
-        window.clearTimeout(refreshTwo);
-        window.clearTimeout(refreshThree);
         window.removeEventListener("load", refresh);
       };
     }, pageRef);
@@ -309,7 +319,6 @@ const Home = () => {
       ref={pageRef}
       className="relative flex flex-col overflow-x-hidden bg-white text-white"
     >
-      {/* TourSelect wrapper */}
       <section className="absolute z-30 w-full overflow-x-hidden overflow-y-visible">
         <div ref={tourSelectSectionRef} className="mx-auto max-w-5xl mt-20">
           <TourSelect />
@@ -336,12 +345,9 @@ const Home = () => {
         <Stories />
       </section>
 
-      {/* TOURS SECTION – COMMENTED OUT FOR TESTING */}
-      
-        <section id="tours" ref={toursSectionRef} className="relative z-26">
-          <Tours />
-        </section> 
-     
+      <section id="tours" ref={toursSectionRef} className="relative z-26">
+        <Tours />
+      </section>
 
       <section id="contact" ref={contactSectionRef} className="relative z-26">
         <Contact />

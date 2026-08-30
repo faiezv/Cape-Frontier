@@ -209,8 +209,8 @@ export default function ToursBrowser() {
   };
 
   return (
-    <main className="w-full overflow-x-hidden bg-gradient-to-br from-white to-blue-600 text-white py-10">
-      {/* <section ref={containerRef} className="relative mx-auto w-full max-w-5xl px-3 md:px-4">
+    <main className="tours-browser w-full overflow-x-hidden bg-gradient-to-br from-white to-blue-600 text-white py-10">
+      <section ref={containerRef} className="relative mx-auto w-full max-w-5xl px-3 md:px-4">
         <FixedCategoryNav
           activeCategory={activeCategory}
           currentTourIndex={currentTourIndex}
@@ -343,7 +343,7 @@ export default function ToursBrowser() {
             </div>
           </div>
         </div>
-      </section> */}
+      </section>
     </main>
   );
 }
