@@ -277,7 +277,7 @@ export default function ToursBrowser() {
                 )}
               </AnimatePresence>
 
-              <motion.div
+              {/* <motion.div
                 ref={trackRef}
                 className="flex flex-1 min-w-0 items-start will-change-transform"
                 style={{
@@ -305,7 +305,7 @@ export default function ToursBrowser() {
                     <TourCard tour={tour} isMobile={isMobile} isCarousel={true} />
                   </motion.div>
                 ))}
-              </motion.div>
+              </motion.div> */}
 
               <AnimatePresence>
                 {!isLast && (
