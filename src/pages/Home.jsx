@@ -8,7 +8,7 @@ import About from "../components/About/About.jsx";
 import Stories from "../components/Stories/Stories.jsx";
 import Tours from "../components/Tours/Tours.jsx";
 import Contact from "../components/Contact.jsx";
-import TourSelect from "../components/Tours/TourSelect.jsx";
+// import TourSelect from "../components/Tours/TourSelect.jsx";  // <-- COMMENTED OUT
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,11 +28,11 @@ const Home = () => {
   const pageRef = useRef(null);
   const heroRef = useRef(null);
   const aboutRef = useRef(null);
-  const tourSelectSectionRef = useRef(null);
+  // const tourSelectSectionRef = useRef(null); // <-- COMMENTED OUT
   const toursSectionRef = useRef(null);
   const contactSectionRef = useRef(null);
 
-  // ---------- BUTTON STATE ----------
+  // ---------- BUTTON STATE (kept but unused) ----------
   const [showButton, setShowButton] = useState(false);
   const [isToursVisible, setIsToursVisible] = useState(false);
   const [isContactVisible, setIsContactVisible] = useState(false);
@@ -60,7 +60,7 @@ const Home = () => {
     }
   }, [location]);
 
-  // ---------- SCROLL LISTENER (for button visibility) ----------
+  // ---------- SCROLL LISTENER (only for button visibility – but button is removed) ----------
   useEffect(() => {
     const handleScroll = () => {
       if (!heroRef.current) return;
@@ -89,92 +89,26 @@ const Home = () => {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
-
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ---------- SCROLL TO TOP (Tour Select button) ----------
-  const scrollToTourSelect = () => {
-    if (window.lenis) {
-      window.lenis.scrollTo(0, { immediate: true, force: true });
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
+  // ---------- SCROLL TO TOP (not used, kept for reference) ----------
+  // const scrollToTourSelect = () => {
+  //   if (window.lenis) {
+  //     window.lenis.scrollTo(0, { immediate: true, force: true });
+  //   } else {
+  //     window.scrollTo({ top: 0, behavior: "smooth" });
+  //   }
+  // };
 
-  // ---------- TOUR SELECT HIDE/SHOW ON SCROLL ----------
-  useLayoutEffect(() => {
-    const section = tourSelectSectionRef.current;
-    if (!section) return;
+  // ---------- TOUR SELECT HIDE/SHOW (commented out) ----------
+  // useLayoutEffect(() => {
+  //   const section = tourSelectSectionRef.current;
+  //   if (!section) return;
+  //   ... (removed)
+  // }, []);
 
-    let cleanup = null;
-    let retryTimer = null;
-
-    const setup = () => {
-      if (!window.lenis) {
-        retryTimer = window.setTimeout(setup, 50);
-        return;
-      }
-
-      let lastScroll = window.lenis.scroll || window.scrollY || 0;
-      let hidden = false;
-
-      gsap.set(section, {
-        y: 0,
-        autoAlpha: 1,
-        force3D: true,
-      });
-
-      const show = () => {
-        if (!hidden) return;
-        hidden = false;
-        gsap.to(section, {
-          y: 0,
-          autoAlpha: 1,
-          duration: 0.4,
-          ease: "power3.out",
-          overwrite: true,
-        });
-      };
-
-      const hide = () => {
-        if (hidden) return;
-        hidden = true;
-        gsap.to(section, {
-          y: 100,
-          autoAlpha: 0,
-          duration: 0.35,
-          ease: "power3.out",
-          overwrite: true,
-        });
-      };
-
-      const handleScroll = ({ scroll }) => {
-        if (scroll <= 5) {
-          show();
-          lastScroll = scroll;
-          return;
-        }
-        const difference = scroll - lastScroll;
-        if (difference > 2) hide();
-        else if (difference < -2) show();
-        lastScroll = scroll;
-      };
-
-      window.lenis.on("scroll", handleScroll);
-      cleanup = () => window.lenis?.off("scroll", handleScroll);
-    };
-
-    setup();
-
-    return () => {
-      if (retryTimer) window.clearTimeout(retryTimer);
-      cleanup?.();
-      gsap.killTweensOf(section);
-    };
-  }, []);
-
-  // ---------- SCROLL-TO-SECTION FROM location.state ----------
+  // ---------- SCROLL-TO-SECTION FROM location.state (unchanged) ----------
   useEffect(() => {
     const scrollTarget = location.state?.scrollTo;
     if (!scrollTarget || !window.lenis) return undefined;
@@ -200,7 +134,7 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key]);
 
-  // ---------- HERO & ABOUT ANIMATIONS (GSAP + ScrollTrigger) ----------
+  // ---------- HERO & ABOUT ANIMATIONS (unchanged) ----------
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       if (!heroRef.current || !aboutRef.current) return;
@@ -301,18 +235,20 @@ const Home = () => {
     return () => ctx.revert();
   }, []);
 
-  // ---------- RENDER ----------
+  // ---------- RENDER (without TourSelect & button) ----------
   return (
     <div
       ref={pageRef}
       className="relative flex flex-col overflow-x-hidden bg-white text-white"
     >
-      {/* TourSelect wrapper */}
-      <section className="absolute z-30 w-full overflow-x-hidden overflow-y-visible">
-        <div ref={tourSelectSectionRef} className="mx-auto max-w-5xl mt-20">
-          <TourSelect />
-        </div>
-      </section>
+      {/* 
+        // TourSelect wrapper – REMOVED
+        <section className="absolute z-30 w-full overflow-x-hidden overflow-y-visible">
+          <div ref={tourSelectSectionRef} className="mx-auto max-w-5xl mt-20">
+            <TourSelect />
+          </div>
+        </section> 
+      */}
 
       <section
         id="home"
@@ -342,42 +278,44 @@ const Home = () => {
         <Contact />
       </section>
 
-      {/* Fixed button */}
-      <div
-        className={`fixed left-1/2 top-20 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${
-          showButton
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        }`}
-      >
-        <button
-          onClick={scrollToTourSelect}
-          className="flex items-center rounded-full bg-blue-600 px-5 py-2.5 shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          aria-label="Jump to tour selection"
+      {/* Fixed button – REMOVED */}
+      {/* 
+        <div
+          className={`fixed left-1/2 top-20 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${
+            showButton
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
+          }`}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 text-white"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+          <button
+            onClick={scrollToTourSelect}
+            className="flex items-center rounded-full bg-blue-600 px-5 py-2.5 shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            aria-label="Jump to tour selection"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 15l7-7 7 7"
-            />
-          </svg>
-          <span
-            className={`ml-2 font-medium text-white transition-all duration-500 delay-150 ${
-              showButton ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            Tour Select
-          </span>
-        </button>
-      </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 15l7-7 7 7"
+              />
+            </svg>
+            <span
+              className={`ml-2 font-medium text-white transition-all duration-500 delay-150 ${
+                showButton ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              Tour Select
+            </span>
+          </button>
+        </div> 
+      */}
     </div>
   );
 };
