@@ -6,9 +6,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Hero from "../components/Hero.jsx";
 import About from "../components/About/About.jsx";
 import Stories from "../components/Stories/Stories.jsx";
-import Tours from "../components/Tours/Tours.jsx";
+// import Tours from "../components/Tours/Tours.jsx";   // <-- COMMENTED OUT
 import Contact from "../components/Contact.jsx";
-// import TourSelect from "../components/Tours/TourSelect.jsx";  // <-- COMMENTED OUT
+import TourSelect from "../components/Tours/TourSelect.jsx";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,16 +28,16 @@ const Home = () => {
   const pageRef = useRef(null);
   const heroRef = useRef(null);
   const aboutRef = useRef(null);
-  // const tourSelectSectionRef = useRef(null); // <-- COMMENTED OUT
-  const toursSectionRef = useRef(null);
+  const tourSelectSectionRef = useRef(null);
+  const toursSectionRef = useRef(null);  // Keep ref but Tours is removed
   const contactSectionRef = useRef(null);
 
-  // ---------- BUTTON STATE (kept but unused) ----------
+  // ---------- BUTTON STATE ----------
   const [showButton, setShowButton] = useState(false);
   const [isToursVisible, setIsToursVisible] = useState(false);
   const [isContactVisible, setIsContactVisible] = useState(false);
 
-  // ---------- DISABLE BROWSER SCROLL RESTORATION (insurance) ----------
+  // ---------- DISABLE BROWSER SCROLL RESTORATION ----------
   useLayoutEffect(() => {
     if ("scrollRestoration" in window.history) {
       const previous = window.history.scrollRestoration;
@@ -60,7 +60,7 @@ const Home = () => {
     }
   }, [location]);
 
-  // ---------- SCROLL LISTENER (only for button visibility – but button is removed) ----------
+  // ---------- SCROLL LISTENER (for button visibility) ----------
   useEffect(() => {
     const handleScroll = () => {
       if (!heroRef.current) return;
@@ -71,6 +71,8 @@ const Home = () => {
       let toursVisible = false;
       let contactVisible = false;
 
+      // Since Tours is commented out, toursSectionRef.current is null,
+      // so toursVisible stays false.
       if (toursSectionRef.current) {
         const rect = toursSectionRef.current.getBoundingClientRect();
         if (rect.top < window.innerHeight) toursVisible = true;
@@ -89,24 +91,90 @@ const Home = () => {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ---------- SCROLL TO TOP (not used, kept for reference) ----------
-  // const scrollToTourSelect = () => {
-  //   if (window.lenis) {
-  //     window.lenis.scrollTo(0, { immediate: true, force: true });
-  //   } else {
-  //     window.scrollTo({ top: 0, behavior: "smooth" });
-  //   }
-  // };
+  // ---------- SCROLL TO TOP (Tour Select button) ----------
+  const scrollToTourSelect = () => {
+    if (window.lenis) {
+      window.lenis.scrollTo(0, { immediate: true, force: true });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
-  // ---------- TOUR SELECT HIDE/SHOW (commented out) ----------
-  // useLayoutEffect(() => {
-  //   const section = tourSelectSectionRef.current;
-  //   if (!section) return;
-  //   ... (removed)
-  // }, []);
+  // ---------- TOUR SELECT HIDE/SHOW (unchanged) ----------
+  useLayoutEffect(() => {
+    const section = tourSelectSectionRef.current;
+    if (!section) return;
+
+    let cleanup = null;
+    let retryTimer = null;
+
+    const setup = () => {
+      if (!window.lenis) {
+        retryTimer = window.setTimeout(setup, 50);
+        return;
+      }
+
+      let lastScroll = window.lenis.scroll || window.scrollY || 0;
+      let hidden = false;
+
+      gsap.set(section, {
+        y: 0,
+        autoAlpha: 1,
+        force3D: true,
+      });
+
+      const show = () => {
+        if (!hidden) return;
+        hidden = false;
+        gsap.to(section, {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.4,
+          ease: "power3.out",
+          overwrite: true,
+        });
+      };
+
+      const hide = () => {
+        if (hidden) return;
+        hidden = true;
+        gsap.to(section, {
+          y: 100,
+          autoAlpha: 0,
+          duration: 0.35,
+          ease: "power3.out",
+          overwrite: true,
+        });
+      };
+
+      const handleScroll = ({ scroll }) => {
+        if (scroll <= 5) {
+          show();
+          lastScroll = scroll;
+          return;
+        }
+        const difference = scroll - lastScroll;
+        if (difference > 2) hide();
+        else if (difference < -2) show();
+        lastScroll = scroll;
+      };
+
+      window.lenis.on("scroll", handleScroll);
+      cleanup = () => window.lenis?.off("scroll", handleScroll);
+    };
+
+    setup();
+
+    return () => {
+      if (retryTimer) window.clearTimeout(retryTimer);
+      cleanup?.();
+      gsap.killTweensOf(section);
+    };
+  }, []);
 
   // ---------- SCROLL-TO-SECTION FROM location.state (unchanged) ----------
   useEffect(() => {
@@ -235,20 +303,18 @@ const Home = () => {
     return () => ctx.revert();
   }, []);
 
-  // ---------- RENDER (without TourSelect & button) ----------
+  // ---------- RENDER ----------
   return (
     <div
       ref={pageRef}
       className="relative flex flex-col overflow-x-hidden bg-white text-white"
     >
-      {/* 
-        // TourSelect wrapper – REMOVED
-        <section className="absolute z-30 w-full overflow-x-hidden overflow-y-visible">
-          <div ref={tourSelectSectionRef} className="mx-auto max-w-5xl mt-20">
-            <TourSelect />
-          </div>
-        </section> 
-      */}
+      {/* TourSelect wrapper */}
+      <section className="absolute z-30 w-full overflow-x-hidden overflow-y-visible">
+        <div ref={tourSelectSectionRef} className="mx-auto max-w-5xl mt-20">
+          <TourSelect />
+        </div>
+      </section>
 
       <section
         id="home"
@@ -270,52 +336,53 @@ const Home = () => {
         <Stories />
       </section>
 
-      <section id="tours" ref={toursSectionRef} className="relative z-26">
-        <Tours />
-      </section>
+      {/* TOURS SECTION – COMMENTED OUT FOR TESTING */}
+      {/* 
+        <section id="tours" ref={toursSectionRef} className="relative z-26">
+          <Tours />
+        </section> 
+      */}
 
       <section id="contact" ref={contactSectionRef} className="relative z-26">
         <Contact />
       </section>
 
-      {/* Fixed button – REMOVED */}
-      {/* 
-        <div
-          className={`fixed left-1/2 top-20 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${
-            showButton
-              ? "opacity-100 pointer-events-auto"
-              : "opacity-0 pointer-events-none"
-          }`}
+      {/* Fixed button */}
+      <div
+        className={`fixed left-1/2 top-20 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${
+          showButton
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <button
+          onClick={scrollToTourSelect}
+          className="flex items-center rounded-full bg-blue-600 px-5 py-2.5 shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          aria-label="Jump to tour selection"
         >
-          <button
-            onClick={scrollToTourSelect}
-            className="flex items-center rounded-full bg-blue-600 px-5 py-2.5 shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            aria-label="Jump to tour selection"
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 15l7-7 7 7"
-              />
-            </svg>
-            <span
-              className={`ml-2 font-medium text-white transition-all duration-500 delay-150 ${
-                showButton ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              Tour Select
-            </span>
-          </button>
-        </div> 
-      */}
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 15l7-7 7 7"
+            />
+          </svg>
+          <span
+            className={`ml-2 font-medium text-white transition-all duration-500 delay-150 ${
+              showButton ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            Tour Select
+          </span>
+        </button>
+      </div>
     </div>
   );
 };
