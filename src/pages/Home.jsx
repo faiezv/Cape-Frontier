@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Hero from "../components/Hero.jsx";
 import About from "../components/About/About.jsx";
 import Stories from "../components/Stories/Stories.jsx";
-// import Tours from "../components/Tours/Tours.jsx";   // <-- COMMENTED OUT
+import Tours from "../components/Tours/Tours.jsx";   // <-- COMMENTED OUT
 import Contact from "../components/Contact.jsx";
 import TourSelect from "../components/Tours/TourSelect.jsx";
 
@@ -337,11 +337,11 @@ const Home = () => {
       </section>
 
       {/* TOURS SECTION – COMMENTED OUT FOR TESTING */}
-      {/* 
+      
         <section id="tours" ref={toursSectionRef} className="relative z-26">
           <Tours />
         </section> 
-      */}
+     
 
       <section id="contact" ref={contactSectionRef} className="relative z-26">
         <Contact />
