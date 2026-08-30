@@ -32,11 +32,12 @@ const Home = () => {
   const toursSectionRef = useRef(null);
   const contactSectionRef = useRef(null);
 
+  // ---------- BUTTON STATE ----------
   const [showButton, setShowButton] = useState(false);
   const [isToursVisible, setIsToursVisible] = useState(false);
   const [isContactVisible, setIsContactVisible] = useState(false);
 
-  // ---------- 1. DISABLE BROWSER SCROLL RESTORATION BEFORE PAINT ----------
+  // ---------- DISABLE BROWSER SCROLL RESTORATION (insurance) ----------
   useLayoutEffect(() => {
     if ("scrollRestoration" in window.history) {
       const previous = window.history.scrollRestoration;
@@ -47,85 +48,7 @@ const Home = () => {
     }
   }, []);
 
-  // ---------- 2. LOCK SCROLL & FORCE TOP (WITH OVERFLOW HIDING) ----------
-  useEffect(() => {
-    // If there's a hash or a state‑based scroll target, let those effects handle it.
-    if (location.hash || location.state?.scrollTo) return;
-
-    // Prevent any scroll until we've set the position.
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    let isMounted = true;
-    let retries = 0;
-    const maxRetries = 30; // ~3 seconds
-
-    const forceScrollToTop = () => {
-      if (!isMounted) return;
-
-      // Stop Lenis to avoid conflicts
-      if (window.lenis) {
-        window.lenis.stop();
-        window.lenis.scrollTo(0, { immediate: true, force: true });
-        // Restart Lenis after a short delay, but keep overflow hidden for now
-        setTimeout(() => {
-          if (window.lenis && isMounted) {
-            window.lenis.start();
-          }
-        }, 50);
-        return true;
-      } else {
-        window.scrollTo({ top: 0, behavior: "auto" });
-        return false;
-      }
-    };
-
-    const attemptScroll = () => {
-      if (!isMounted) return;
-      const success = forceScrollToTop();
-      if (!success && retries < maxRetries) {
-        retries++;
-        setTimeout(attemptScroll, 100);
-      } else {
-        // Once we have scrolled (or Lenis is available), release overflow after
-        // waiting for all layout changes (fonts, images, ScrollTrigger).
-        const releaseScroll = () => {
-          if (!isMounted) return;
-          document.body.style.overflow = originalOverflow || "";
-          // Refresh ScrollTrigger after the layout settles
-          requestAnimationFrame(() => ScrollTrigger.refresh(true));
-        };
-
-        // Wait for fonts, images, and any other layout shifts.
-        const loadPromises = [
-          document.fonts?.ready || Promise.resolve(),
-          new Promise((resolve) => {
-            if (document.readyState === "complete") resolve();
-            else window.addEventListener("load", resolve, { once: true });
-          }),
-        ];
-
-        Promise.all(loadPromises).then(() => {
-          // Give an extra frame for any remaining layout shifts.
-          requestAnimationFrame(() => {
-            setTimeout(releaseScroll, 200);
-          });
-        });
-      }
-    };
-
-    // First attempt after a minimal delay to let React paint.
-    const initialTimer = setTimeout(attemptScroll, 100);
-
-    return () => {
-      isMounted = false;
-      clearTimeout(initialTimer);
-      // Restore overflow if component unmounts early
-      document.body.style.overflow = originalOverflow || "";
-    };
-  }, []); // empty deps → only on mount
-
-  // ---------- 3. HASH OVERRIDE (unchanged) ----------
+  // ---------- HASH OVERRIDE ----------
   useEffect(() => {
     if (location.hash) {
       window.history.replaceState(null, "", location.pathname + location.search);
@@ -133,12 +56,11 @@ const Home = () => {
       if (window.lenis) {
         window.lenis.scrollTo(0, { immediate: true, force: true });
       }
-      // After handling hash, we also need to refresh ScrollTrigger
       requestAnimationFrame(() => ScrollTrigger.refresh(true));
     }
   }, [location]);
 
-  // ---------- 4. SCROLL LISTENER (unchanged) ----------
+  // ---------- SCROLL LISTENER (for button visibility) ----------
   useEffect(() => {
     const handleScroll = () => {
       if (!heroRef.current) return;
@@ -167,10 +89,11 @@ const Home = () => {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ---------- 5. SCROLL TO TOP (TOUR SELECT) ----------
+  // ---------- SCROLL TO TOP (Tour Select button) ----------
   const scrollToTourSelect = () => {
     if (window.lenis) {
       window.lenis.scrollTo(0, { immediate: true, force: true });
@@ -179,7 +102,7 @@ const Home = () => {
     }
   };
 
-  // ---------- 6. TOUR SELECT HIDE/SHOW (unchanged) ----------
+  // ---------- TOUR SELECT HIDE/SHOW ON SCROLL ----------
   useLayoutEffect(() => {
     const section = tourSelectSectionRef.current;
     if (!section) return;
@@ -251,7 +174,7 @@ const Home = () => {
     };
   }, []);
 
-  // ---------- 7. SCROLL-TO-SECTION FROM location.state (unchanged) ----------
+  // ---------- SCROLL-TO-SECTION FROM location.state ----------
   useEffect(() => {
     const scrollTarget = location.state?.scrollTo;
     if (!scrollTarget || !window.lenis) return undefined;
@@ -277,7 +200,7 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key]);
 
-  // ---------- 8. HERO / ABOUT ANIMATIONS (unchanged) ----------
+  // ---------- HERO & ABOUT ANIMATIONS (GSAP + ScrollTrigger) ----------
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       if (!heroRef.current || !aboutRef.current) return;
