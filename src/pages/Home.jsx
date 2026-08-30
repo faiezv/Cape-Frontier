@@ -47,40 +47,35 @@ const Home = () => {
     }
   }, []);
 
-  // ---------- 2. LENIS SCROLL LOCK + FORCED TOP (WITH RETRY) ----------
+  // ---------- 2. LOCK SCROLL & FORCE TOP (WITH OVERFLOW HIDING) ----------
   useEffect(() => {
     // If there's a hash or a state‑based scroll target, let those effects handle it.
     if (location.hash || location.state?.scrollTo) return;
 
+    // Prevent any scroll until we've set the position.
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     let isMounted = true;
     let retries = 0;
-    const maxRetries = 20; // ~2 seconds
+    const maxRetries = 30; // ~3 seconds
 
     const forceScrollToTop = () => {
       if (!isMounted) return;
 
-      // If Lenis is available, stop it temporarily, scroll, then restart.
+      // Stop Lenis to avoid conflicts
       if (window.lenis) {
-        // Stop Lenis to prevent any conflicting scroll events
         window.lenis.stop();
-
-        // Scroll to top with immediate effect
         window.lenis.scrollTo(0, { immediate: true, force: true });
-
-        // Restart Lenis after a tiny delay to let the scroll settle
+        // Restart Lenis after a short delay, but keep overflow hidden for now
         setTimeout(() => {
           if (window.lenis && isMounted) {
             window.lenis.start();
-            // Refresh ScrollTrigger after the scroll is done
-            requestAnimationFrame(() => ScrollTrigger.refresh(true));
           }
         }, 50);
-
         return true;
       } else {
-        // Fallback to native scroll if Lenis isn't ready yet
         window.scrollTo({ top: 0, behavior: "auto" });
-        requestAnimationFrame(() => ScrollTrigger.refresh(true));
         return false;
       }
     };
@@ -91,15 +86,42 @@ const Home = () => {
       if (!success && retries < maxRetries) {
         retries++;
         setTimeout(attemptScroll, 100);
+      } else {
+        // Once we have scrolled (or Lenis is available), release overflow after
+        // waiting for all layout changes (fonts, images, ScrollTrigger).
+        const releaseScroll = () => {
+          if (!isMounted) return;
+          document.body.style.overflow = originalOverflow || "";
+          // Refresh ScrollTrigger after the layout settles
+          requestAnimationFrame(() => ScrollTrigger.refresh(true));
+        };
+
+        // Wait for fonts, images, and any other layout shifts.
+        const loadPromises = [
+          document.fonts?.ready || Promise.resolve(),
+          new Promise((resolve) => {
+            if (document.readyState === "complete") resolve();
+            else window.addEventListener("load", resolve, { once: true });
+          }),
+        ];
+
+        Promise.all(loadPromises).then(() => {
+          // Give an extra frame for any remaining layout shifts.
+          requestAnimationFrame(() => {
+            setTimeout(releaseScroll, 200);
+          });
+        });
       }
     };
 
-    // First attempt after a short delay to let Lenis initialize.
-    const initialTimer = setTimeout(attemptScroll, 150);
+    // First attempt after a minimal delay to let React paint.
+    const initialTimer = setTimeout(attemptScroll, 100);
 
     return () => {
       isMounted = false;
       clearTimeout(initialTimer);
+      // Restore overflow if component unmounts early
+      document.body.style.overflow = originalOverflow || "";
     };
   }, []); // empty deps → only on mount
 
@@ -111,6 +133,8 @@ const Home = () => {
       if (window.lenis) {
         window.lenis.scrollTo(0, { immediate: true, force: true });
       }
+      // After handling hash, we also need to refresh ScrollTrigger
+      requestAnimationFrame(() => ScrollTrigger.refresh(true));
     }
   }, [location]);
 
