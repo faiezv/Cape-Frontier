@@ -271,7 +271,7 @@ export default function TourCard({ tour, isMobile, isCarousel = false }) {
           /* Removed h-full from carousel */
         `}>
           {/* -------- IMAGE PANEL -------- */}
-          <div className="relative h-64 md:h-full md:min-h-full flex-shrink-0 bg-neutral-900 overflow-hidden">
+          <div className="relative h-64 md:h-full md:min-h-full flex-shrink-0 bg-neutral-900 overflow-hidden " >
             <FallbackImage
               sources={imageSources}
               alt={tour?.title || "Tour image"}

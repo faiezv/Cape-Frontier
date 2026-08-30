@@ -9080,7 +9080,7 @@ export const tours = [
   // Stellenbosch & Franschhoek Winelands + Tram
   {
     id: 23,
-    type: TOUR_TYPES.WINE_ROUTES,
+    type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.DAY_TOUR,
 
     title: "Stellenbosch & Franschhoek Winelands Tour",
@@ -9108,7 +9108,7 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: '/src/assets/images/tours/packages/winelands-tram/',
+    image: '',
     images: [],
     imageFolder: "wine-routes/stellenbosch-franschhoek-winelands",
     videos: [],
@@ -9587,7 +9587,7 @@ export const tours = [
   // Cape Town Gems - Kirstenbosch & Constantia
   {
     id: 24,
-    type: TOUR_TYPES.WINE_ROUTES,
+    type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.DAY_TOUR,
 
     title: "Cape Town Gems – Kirstenbosch & Constantia Winelands Experience",

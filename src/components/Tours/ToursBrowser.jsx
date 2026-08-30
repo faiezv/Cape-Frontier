@@ -5,8 +5,6 @@ import TourCard from "./TourCard.jsx";
 import FixedCategoryNav from "./FixedCategoryNav.jsx";
 
 const BREAKPOINT = 768;
-const MOBILE_NAV_GAP = 18;
-const NAVBAR_OFFSET = 20;
 
 export default function ToursBrowser() {
   const containerRef = useRef(null);
@@ -15,29 +13,25 @@ export default function ToursBrowser() {
   const mobileNavRef = useRef(null);
   const mobileNavScrollerRef = useRef(null);
   const mobileCategoryItemRefs = useRef({});
-
-  // Refs to each rendered card, keyed by tour id.
   const cardRefs = useRef({});
 
   const [activeCategory, setActiveCategory] = useState("adrenaline");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Swipe state
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchStartY, setTouchStartY] = useState(0);
   const [touchDeltaX, setTouchDeltaX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
   // ── Categories & Tours ──────────────────────────────────────────────
-
   const categorySections = useMemo(() => {
     const grouped = {
-      adrenaline: tours.filter((t) => t.type === TOUR_TYPES.ADRENALINE),
-      hiking: tours.filter((t) => t.type === TOUR_TYPES.HIKING),
-      historical: tours.filter((t) => t.type === TOUR_TYPES.HISTORICAL),
+      adrenaline: tours.filter((t) => t.type === "adrenaline"),
+      hiking: tours.filter((t) => t.type === "hiking"),
+      historical: tours.filter((t) => t.type === "historical"),
       packages: tours.filter(
-        (t) => t.type === TOUR_TYPES.PACKAGES || t.type === TOUR_TYPES.WINE_ROUTES
+        (t) => t.type === "packages" || t.type === "wine_routes"
       ),
     };
     return Object.entries(grouped).map(([id, tourList]) => ({
@@ -80,8 +74,45 @@ export default function ToursBrowser() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // ── Navigation ──────────────────────────────────────────────────────
+  // ── Lenis sync: this is the actual fix for the jump ─────────────────
+  // Any time this component's real rendered height changes (images
+  // loading in, category switch, mobile breakpoint switch, card content
+  // changing), Lenis's cached scroll bounds go stale. If Lenis
+  // recalculates bounds while stale, the visible scroll position can
+  // snap to a clamped value — which looks exactly like "jump to the
+  // start of a component". A ResizeObserver on the stage keeps Lenis's
+  // internal measurements honest in real time instead of only on
+  // window resize.
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
 
+    let raf = null;
+    const notifyLenis = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        window.lenis?.resize();
+      });
+    };
+
+    const ro = new ResizeObserver(notifyLenis);
+    ro.observe(el);
+
+    return () => {
+      ro.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // Also resize explicitly after category/index changes settle and after
+  // the crossfade transition finishes, since ResizeObserver can fire a
+  // beat later than you want for a transform-based transition.
+  useEffect(() => {
+    const t = setTimeout(() => window.lenis?.resize(), 450);
+    return () => clearTimeout(t);
+  }, [activeCategory, currentIndex, isMobile]);
+
+  // ── Navigation ──────────────────────────────────────────────────────
   const goToTour = useCallback(
     (index) => {
       if (index < 0 || index >= filteredTours.length) return;
@@ -109,7 +140,6 @@ export default function ToursBrowser() {
   );
 
   // ── Swipe / Touch ──────────────────────────────────────────────────
-
   const handleTouchStart = useCallback((e) => {
     const touch = e.touches[0];
     setTouchStartX(touch.clientX);
@@ -143,8 +173,17 @@ export default function ToursBrowser() {
     setTouchDeltaX(0);
   }, [isDragging, touchDeltaX, goToNext, goToPrev]);
 
+  // Scope arrow-key nav to when the carousel is actually on screen, so it
+  // can't hijack navigation (or implicitly assume scroll focus) while the
+  // user is elsewhere on the page — e.g. while Hero/About/Stories are in view.
   useEffect(() => {
     const handleKeyDown = (e) => {
+      const el = containerRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const inView = rect.top < window.innerHeight && rect.bottom > 0;
+      if (!inView) return;
+
       if (e.key === "ArrowLeft") { e.preventDefault(); goToPrev(); }
       else if (e.key === "ArrowRight") { e.preventDefault(); goToNext(); }
     };
@@ -153,13 +192,11 @@ export default function ToursBrowser() {
   }, [goToPrev, goToNext]);
 
   // ── Derived ──────────────────────────────────────────────────────
-
   const currentTour = filteredTours[currentIndex] || null;
   const currentTourIndex = currentTour ? currentTour.tourIndex : 0;
   const currentTourTotal = currentTour ? currentTour.totalInCategory : 0;
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === filteredTours.length - 1;
-
   const prevTour = filteredTours[currentIndex - 1] || null;
   const nextTour = filteredTours[currentIndex + 1] || null;
 
@@ -170,8 +207,6 @@ export default function ToursBrowser() {
       : 0;
     return `translateX(${base + dragOffset}%)`;
   };
-
-  // ── Render ──────────────────────────────────────────────────────
 
   return (
     <main className="w-full overflow-x-hidden bg-gradient-to-br from-white to-blue-600 text-white py-10">
@@ -197,15 +232,17 @@ export default function ToursBrowser() {
         <div ref={stageRef} className="relative z-10 w-full pointer-events-auto my-4">
           <div
             className="relative w-full overflow-hidden mb-20"
+            style={{
+              minHeight: '600px',
+              height: 'auto',
+              contain: 'layout style paint',
+              willChange: 'transform',
+            }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Main flex row – height is now auto, allowing the tallest
-                card to determine the row height. The prev/next buttons
-                use self-stretch, so they'll match that height naturally. */}
-            <div className="flex items-stretch gap-1">
-              {/* Previous button – hidden on mobile */}
+            <div className="flex items-stretch gap-1" style={{ minHeight: '600px' }}>
               <AnimatePresence>
                 {!isFirst && (
                   <motion.div
@@ -215,6 +252,7 @@ export default function ToursBrowser() {
                     animate={{ opacity: 1, width: "auto" }}
                     exit={{ opacity: 0, width: 0 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
+                    onAnimationComplete={() => window.lenis?.resize()}
                   >
                     <button
                       type="button"
@@ -239,7 +277,6 @@ export default function ToursBrowser() {
                 )}
               </AnimatePresence>
 
-              {/* Track – flex:1. All cards are in the DOM, only opacity toggles. */}
               <motion.div
                 ref={trackRef}
                 className="flex flex-1 min-w-0 items-start will-change-transform"
@@ -247,6 +284,7 @@ export default function ToursBrowser() {
                   transform: getTrackTransform(),
                   transition: isDragging ? "none" : "transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
                   height: "auto",
+                  minHeight: '600px',
                 }}
               >
                 {filteredTours.map((tour, index) => (
@@ -269,7 +307,6 @@ export default function ToursBrowser() {
                 ))}
               </motion.div>
 
-              {/* Next button – hidden on mobile */}
               <AnimatePresence>
                 {!isLast && (
                   <motion.div
@@ -279,6 +316,7 @@ export default function ToursBrowser() {
                     animate={{ opacity: 1, width: "auto" }}
                     exit={{ opacity: 0, width: 0 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
+                    onAnimationComplete={() => window.lenis?.resize()}
                   >
                     <button
                       type="button"
