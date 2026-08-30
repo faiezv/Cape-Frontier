@@ -405,8 +405,6 @@ export const tours = [
       "Custom pickup on request",
     ],
 
-    requirements: [],
-
     arrangements: {
       availability: "",
       duration: "",
@@ -8285,9 +8283,9 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: "",
+    image: "/src/assets/images/tours/packages/cool-runnings/1.webp",
     images: [],
-    imageFolder: "packages/wine-routes/",
+    imageFolder: "packages/cool-runnings/",
     videos: [],
 
     location: "Cape Town → Winelands → Cape Town",
@@ -8415,16 +8413,6 @@ export const tours = [
       items: [],
     },
 
-    cancellationPolicy: {
-      summary: "",
-      items: [],
-    },
-
-    safetyPolicy: {
-      summary: "",
-      items: [],
-    },
-
     /*
      * FULL-DAY ITINERARY / STOPS
      */
@@ -8457,7 +8445,7 @@ export const tours = [
           },
         ],
 
-        image: "",
+        image: ['/src/assets/images/tours/packages/cool-runnings/5.webp']
       },
 
       {
@@ -8488,7 +8476,6 @@ export const tours = [
           },
         ],
 
-        image: "",
       },
 
       {
@@ -8602,18 +8589,6 @@ export const tours = [
       },
     ],
 
-    vehicle: {
-      type: "Air-conditioned vehicle",
-      description: "",
-    },
-
-    securityAndLiability: null,
-
-    accommodation: {
-      included: false,
-      type: "",
-      description: "",
-    },
 
     needToKnow: [
       {

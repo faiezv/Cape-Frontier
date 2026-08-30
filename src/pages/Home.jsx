@@ -38,9 +38,6 @@ const Home = () => {
   const [isContactVisible, setIsContactVisible] = useState(false);
 
   // ---------- PREVENT BROWSER'S OWN SCROLL RESTORATION ----------
-  // The browser tries to restore scroll position on reload / back-forward
-  // navigation on its own. That fights with Lenis + our scrollTo logic and
-  // can cause an unrelated jump on load. Take manual control of it.
   useEffect(() => {
     if ("scrollRestoration" in window.history) {
       const previous = window.history.scrollRestoration;
@@ -51,6 +48,22 @@ const Home = () => {
     }
     return undefined;
   }, []);
+
+  // ---------- FIX: OVERRIDE HASH-BASED SCROLLING ----------
+  // This effect runs once on mount (and whenever location changes).
+  // If a hash exists, remove it from the URL and force scroll to top.
+  useEffect(() => {
+    if (location.hash) {
+      // Remove the hash without triggering a page reload
+      window.history.replaceState(null, "", location.pathname + location.search);
+      // Scroll to top immediately
+      window.scrollTo(0, 0);
+      // If Lenis is available, also tell it to go to top
+      if (window.lenis) {
+        window.lenis.scrollTo(0, { immediate: true, force: true });
+      }
+    }
+  }, [location]); // Re‑run if location changes (e.g., user navigates to a hash)
 
   // ---------- SCROLL LISTENER ----------
   useEffect(() => {
@@ -71,7 +84,6 @@ const Home = () => {
       }
       if (contactSectionRef.current) {
         const rect = contactSectionRef.current.getBoundingClientRect();
-        // Only consider it visible if any part is in the viewport
         if (rect.top < window.innerHeight && rect.bottom > 0) {
           contactVisible = true;
         }
@@ -80,12 +92,11 @@ const Home = () => {
       setIsToursVisible(toursVisible);
       setIsContactVisible(contactVisible);
 
-      // Hide button when Tours or Contact is visible, otherwise show based on hero threshold
       setShowButton(pastHero && !toursVisible && !contactVisible);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // initial check
+    handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -175,9 +186,6 @@ const Home = () => {
   }, []);
 
   // ---------- SCROLL-TO-SECTION FROM location.state (fixed) ----------
-  // Consumes scrollTo once, then strips it from history state via
-  // navigate(..., { replace: true }) so a page reload or browser
-  // back/forward on this history entry can't replay a stale scroll target.
   useEffect(() => {
     const scrollTarget = location.state?.scrollTo;
     if (!scrollTarget || !window.lenis) return undefined;
@@ -194,7 +202,7 @@ const Home = () => {
       }
       window.requestAnimationFrame(() => ScrollTrigger.refresh(true));
 
-      // Clear the consumed intent from history state so it can't fire again.
+      // Clear the consumed intent from history state
       navigate(location.pathname + location.search, {
         replace: true,
         state: {},
