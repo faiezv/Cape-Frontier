@@ -32,12 +32,11 @@ const Home = () => {
   const toursSectionRef = useRef(null);
   const contactSectionRef = useRef(null);
 
-  // ---------- BUTTON STATE ----------
   const [showButton, setShowButton] = useState(false);
   const [isToursVisible, setIsToursVisible] = useState(false);
   const [isContactVisible, setIsContactVisible] = useState(false);
 
-  // ===== FIX 1: PREVENT BROWSER SCROLL RESTORATION BEFORE PAINT =====
+  // ---------- 1. DISABLE BROWSER SCROLL RESTORATION BEFORE PAINT ----------
   useLayoutEffect(() => {
     if ("scrollRestoration" in window.history) {
       const previous = window.history.scrollRestoration;
@@ -48,28 +47,63 @@ const Home = () => {
     }
   }, []);
 
-  // ===== FIX 2: MOUNT‑TIME SCROLL TO TOP (unless hash or state intent) =====
+  // ---------- 2. LENIS SCROLL LOCK + FORCED TOP (WITH RETRY) ----------
   useEffect(() => {
-    // If there is a hash or an explicit scroll target from navigation state,
-    // let those dedicated effects handle it.
+    // If there's a hash or a state‑based scroll target, let those effects handle it.
     if (location.hash || location.state?.scrollTo) return;
 
-    // Otherwise, force scroll to the very top after a short delay
-    // to override any residual browser restoration.
-    const timer = setTimeout(() => {
-      if (window.lenis) {
-        window.lenis.scrollTo(0, { immediate: true, force: true });
-      } else {
-        window.scrollTo({ top: 0, behavior: "auto" });
-      }
-      // Re‑evaluate ScrollTrigger so pinning/spacing recalculates correctly
-      requestAnimationFrame(() => ScrollTrigger.refresh(true));
-    }, 100);
+    let isMounted = true;
+    let retries = 0;
+    const maxRetries = 20; // ~2 seconds
 
-    return () => clearTimeout(timer);
+    const forceScrollToTop = () => {
+      if (!isMounted) return;
+
+      // If Lenis is available, stop it temporarily, scroll, then restart.
+      if (window.lenis) {
+        // Stop Lenis to prevent any conflicting scroll events
+        window.lenis.stop();
+
+        // Scroll to top with immediate effect
+        window.lenis.scrollTo(0, { immediate: true, force: true });
+
+        // Restart Lenis after a tiny delay to let the scroll settle
+        setTimeout(() => {
+          if (window.lenis && isMounted) {
+            window.lenis.start();
+            // Refresh ScrollTrigger after the scroll is done
+            requestAnimationFrame(() => ScrollTrigger.refresh(true));
+          }
+        }, 50);
+
+        return true;
+      } else {
+        // Fallback to native scroll if Lenis isn't ready yet
+        window.scrollTo({ top: 0, behavior: "auto" });
+        requestAnimationFrame(() => ScrollTrigger.refresh(true));
+        return false;
+      }
+    };
+
+    const attemptScroll = () => {
+      if (!isMounted) return;
+      const success = forceScrollToTop();
+      if (!success && retries < maxRetries) {
+        retries++;
+        setTimeout(attemptScroll, 100);
+      }
+    };
+
+    // First attempt after a short delay to let Lenis initialize.
+    const initialTimer = setTimeout(attemptScroll, 150);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(initialTimer);
+    };
   }, []); // empty deps → only on mount
 
-  // ---------- HASH-BASED SCROLL OVERRIDE (existing, unchanged) ----------
+  // ---------- 3. HASH OVERRIDE (unchanged) ----------
   useEffect(() => {
     if (location.hash) {
       window.history.replaceState(null, "", location.pathname + location.search);
@@ -80,7 +114,7 @@ const Home = () => {
     }
   }, [location]);
 
-  // ---------- SCROLL LISTENER (unchanged) ----------
+  // ---------- 4. SCROLL LISTENER (unchanged) ----------
   useEffect(() => {
     const handleScroll = () => {
       if (!heroRef.current) return;
@@ -109,23 +143,19 @@ const Home = () => {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
-
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ---------- SCROLL TO TOP (TOUR SELECT) ----------
+  // ---------- 5. SCROLL TO TOP (TOUR SELECT) ----------
   const scrollToTourSelect = () => {
     if (window.lenis) {
-      window.lenis.scrollTo(0, {
-        immediate: true,
-        force: true,
-      });
+      window.lenis.scrollTo(0, { immediate: true, force: true });
     } else {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
-  // ---------- TOUR SELECT HIDE/SHOW (unchanged) ----------
+  // ---------- 6. TOUR SELECT HIDE/SHOW (unchanged) ----------
   useLayoutEffect(() => {
     const section = tourSelectSectionRef.current;
     if (!section) return;
@@ -197,7 +227,7 @@ const Home = () => {
     };
   }, []);
 
-  // ---------- SCROLL-TO-SECTION FROM location.state (unchanged) ----------
+  // ---------- 7. SCROLL-TO-SECTION FROM location.state (unchanged) ----------
   useEffect(() => {
     const scrollTarget = location.state?.scrollTo;
     if (!scrollTarget || !window.lenis) return undefined;
@@ -223,7 +253,7 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key]);
 
-  // ---------- HERO / ABOUT ANIMATIONS (unchanged) ----------
+  // ---------- 8. HERO / ABOUT ANIMATIONS (unchanged) ----------
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       if (!heroRef.current || !aboutRef.current) return;
