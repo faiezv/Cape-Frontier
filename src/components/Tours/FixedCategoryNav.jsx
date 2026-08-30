@@ -133,15 +133,39 @@ export default function FixedCategoryNav({
     }
   }, [categoryTours, animPhase]);
 
-  // ----- Scroll category into view -----
+  // ----- Scroll category into view (mobile pill strip only) -----
+  // This must NEVER be able to touch page/window scroll — it only ever
+  // sets scrollLeft on the nav's own scroller element, computed manually.
+  // scrollIntoView({block:'nearest'}) was removed here: when the browser
+  // doesn't treat mobileNavScrollerRef as a valid scrollport for the
+  // active pill, it walks up the DOM and scrolls the page itself instead
+  // — which was firing on every mount (this effect runs once on initial
+  // render regardless of deps), producing an instant jump to wherever
+  // this nav sits on the page, on every load and every remount.
+  const didMountRef = useRef(false);
   useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return; // skip the very first run — nothing to scroll to yet
+    }
+
     const container = mobileNavScrollerRef?.current;
     const activeItem = mobileCategoryItemRefs?.current?.[activeCategory];
     if (!container || !activeItem) return;
+
     if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
     scrollTimeoutRef.current = setTimeout(() => {
-      activeItem.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' });
+      const itemLeft = activeItem.offsetLeft;
+      const itemWidth = activeItem.offsetWidth;
+      const containerWidth = container.clientWidth;
+      const targetScroll = itemLeft - containerWidth / 2 + itemWidth / 2;
+
+      container.scrollTo({
+        left: Math.max(0, targetScroll),
+        behavior: 'smooth',
+      });
     }, 100);
+
     return () => {
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
     };
