@@ -11,7 +11,6 @@ import { useNavigate } from 'react-router-dom'
 import { useLoadingNavigate } from "../useLoadingNavigate.jsx"
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-
 // -----------------------------------------------------------------------------
 // data helpers (unchanged)
 // -----------------------------------------------------------------------------
@@ -32,12 +31,9 @@ const getTourTitle = (tour) => {
 }
 
 const getTourImage = (tour) => {
-  // Fallback for string tours (like FALLBACK_TOURS)
   if (typeof tour === 'string') {
     return fallbackUrl; // you can import a fallback directly
   }
-
-  // Extract the image path from the tour data
   let imagePath =
     tour?.image ||
     tour?.img ||
@@ -45,14 +41,11 @@ const getTourImage = (tour) => {
     (tour?.gallery && tour.gallery[0]) ||
     (tour?.images && tour.images[0]);
 
-  // If the tour has an imageFolder but no specific file, try "1.webp"
   if (!imagePath && tour.imageFolder) {
     imagePath = `/src/assets/images/tours/${tour.imageFolder}/1.webp`;
   }
-
   return resolveTourImage(imagePath);
 };
-
 
 const getTourLocation = (tour) => {
   if (typeof tour === 'string') return 'Cape Town, South Africa'
@@ -85,7 +78,6 @@ const formatTourPrice = (tour) => {
 
 const getTourMeta = (tour) => {
   if (typeof tour === 'string') return 'Guided Cape Town experience'
-
   return [tour?.duration, tour?.category, tour?.type]
     .filter(Boolean)
     .join(' • ') || 'Guided Cape Town experience'
@@ -165,7 +157,6 @@ const useScrollLock = (locked) => {
     document.body.style.overflow = 'hidden';
     document.body.style.paddingRight = `${scrollbarWidth}px`;
 
-    // Stop Lenis
     if (window.lenis) {
       window.lenis.stop();
     }
@@ -235,6 +226,18 @@ function TourSelect() {
   const destinationModalRef = useRef(null)
   const destinationRowRefs = useRef([])
   const destinationTitleRefs = useRef([])
+
+  // -----------------------------------------------------------------
+  // NEW: loading state for destination modal
+  // -----------------------------------------------------------------
+  const [destinationLoading, setDestinationLoading] = useState(false);
+
+  // -----------------------------------------------------------------
+  // NEW: featured tour scroll shrink progress (0 = full, 1 = compact)
+  // -----------------------------------------------------------------
+  const [featuredProgress, setFeaturedProgress] = useState(0);
+  const featuredContainerRef = useRef(null);
+  const featuredScrollFrameRef = useRef(null);
 
   const isMobileLayout = viewportWidth < 700
   const tourOptions = useMemo(() => getTourOptions(), [])
@@ -373,7 +376,6 @@ function TourSelect() {
 
     const tl = gsap.timeline({
       onComplete: () => {
-        // Hold the glow before switching
         gsap.delayedCall(0.7, () => {
           setJustCompletedStep(null)
 
@@ -384,7 +386,6 @@ function TourSelect() {
       },
     })
 
-    // ----- Text animation (unchanged) -----
     tl.to([valueEl, previewEl], {
       opacity: 0,
       y: -8,
@@ -402,7 +403,7 @@ function TourSelect() {
         duration: 0.25,
         ease: 'back.out(0.6)',
       })
-      .to({}, { duration: 0.55 }) // hold
+      .to({}, { duration: 0.55 })
       .to([valueEl, previewEl], {
         opacity: 0,
         y: -6,
@@ -421,12 +422,6 @@ function TourSelect() {
         duration: 0.25,
         ease: 'back.out(0.7)',
       })
-
-    // ----- Icon pop animation (mobile only) -----
-    if (iconEl) {
-      const originalBg = window.getComputedStyle(iconEl).backgroundColor
-
-    }
   }
 
   const completeStepWithDelay = (stepIndex, nextStep, updatedValue, updatedPreview, targetStepIndex) => {
@@ -460,61 +455,142 @@ function TourSelect() {
   }, [searchError?.id])
 
   // ===========================================================================
-  // FIX: Entrance animation for destination modal rows – now glitch‑free
+  // FIX: GLITCH-FREE DESTINATION MODAL ANIMATION with loading dots
   // ===========================================================================
   useEffect(() => {
-    if (activeModal === 'destination' && destinationModalRef.current) {
-      // 1. Clear any stale refs from previous filter
-      destinationRowRefs.current = destinationRowRefs.current.slice(0, filteredTours.length);
+    // Only run when the destination modal is open
+    if (activeModal !== 'destination') {
+      setDestinationLoading(false);
+      setFeaturedProgress(0);
+      return;
+    }
 
-      // 2. Use requestAnimationFrame to ensure DOM is fully painted
-      const rafId = requestAnimationFrame(() => {
-        const rows = destinationRowRefs.current.filter(Boolean);
-        if (!rows.length) return;
+    // Start loading
+    setDestinationLoading(true);
 
-        // 3. Reset to hidden state
-        gsap.set(rows, {
-          opacity: 0,
-          y: 12,
-          willChange: 'transform, opacity',
-        });
+    // Immediately hide all rows (they are already hidden via inline styles, but ensure it)
+    const rows = destinationRowRefs.current.filter(Boolean);
+    if (rows.length) {
+      gsap.set(rows, { opacity: 0, y: 12 });
+    }
 
-        // 4. Animate in with a slight stagger
-        gsap.to(rows, {
+    // Simulate loading delay (300ms) – feels snappy and professional
+    const loadTimer = setTimeout(() => {
+      setDestinationLoading(false);
+
+      // Grab rows again (refs might have updated if filter changed)
+      const rowsNow = destinationRowRefs.current.filter(Boolean);
+      if (rowsNow.length) {
+        gsap.to(rowsNow, {
           opacity: 1,
           y: 0,
           stagger: 0.05,
           duration: 0.4,
           ease: 'power2.out',
-          clearProps: 'opacity',
-          onComplete: () => {
-            // 5. After animation, remove will‑change to free resources
-            rows.forEach(el => el.style.willChange = 'auto');
-          }
+          clearProps: 'opacity,transform', // remove inline styles after animation
         });
-      });
+      }
+    }, 300);
 
-      return () => cancelAnimationFrame(rafId);
+    // Cleanup timers and kill tweens when modal closes or filter changes
+    return () => {
+      clearTimeout(loadTimer);
+      const rowsNow = destinationRowRefs.current.filter(Boolean);
+      if (rowsNow.length) {
+        gsap.killTweensOf(rowsNow);
+      }
+    };
+  }, [activeModal, filterType]);
+
+  // Reset loading state when modal closes
+  useEffect(() => {
+    if (activeModal !== 'destination') {
+      setDestinationLoading(false);
+      setFeaturedProgress(0);
     }
-  }, [activeModal, filterType, filteredTours.length]);
+  }, [activeModal]);
+
+  // ===========================================================================
+  // SCROLL SHRINK FOR FEATURED TOUR + WHEEL FORWARDING (prevent main page scroll)
+  // ===========================================================================
+  useEffect(() => {
+    if (activeModal !== 'destination') {
+      setFeaturedProgress(0);
+      if (featuredScrollFrameRef.current) {
+        cancelAnimationFrame(featuredScrollFrameRef.current);
+        featuredScrollFrameRef.current = null;
+      }
+      return;
+    }
+
+    const container = destinationModalRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      if (featuredScrollFrameRef.current) return;
+      featuredScrollFrameRef.current = requestAnimationFrame(() => {
+        const card = featuredContainerRef.current;
+        if (!card) {
+          featuredScrollFrameRef.current = null;
+          return;
+        }
+        const scrollTop = container.scrollTop;
+        const cardHeight = card.offsetHeight || 280;
+        const threshold = cardHeight * 0.5;
+        const progress = Math.min(scrollTop / threshold, 1);
+        setFeaturedProgress(progress);
+        featuredScrollFrameRef.current = null;
+      });
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    // Initial check
+    handleScroll();
+
+    // --- FIX: forward wheel events from featured container to the tour list,
+    //         and prevent main page scroll with stopPropagation + preventDefault
+    const featuredEl = featuredContainerRef.current;
+    if (featuredEl) {
+      const wheelHandler = (e) => {
+        e.preventDefault();
+        e.stopPropagation();  // FIX: stop bubbling to main page
+        container.scrollBy({ top: e.deltaY, behavior: 'auto' });
+      };
+      featuredEl.addEventListener('wheel', wheelHandler, { passive: false });
+      return () => {
+        container.removeEventListener('scroll', handleScroll);
+        featuredEl.removeEventListener('wheel', wheelHandler);
+        if (featuredScrollFrameRef.current) {
+          cancelAnimationFrame(featuredScrollFrameRef.current);
+          featuredScrollFrameRef.current = null;
+        }
+      };
+    } else {
+      return () => {
+        container.removeEventListener('scroll', handleScroll);
+        if (featuredScrollFrameRef.current) {
+          cancelAnimationFrame(featuredScrollFrameRef.current);
+          featuredScrollFrameRef.current = null;
+        }
+      };
+    }
+  }, [activeModal]);
 
   // Overflow check for title marquee (desktop only) – now deferred until after animation
   useEffect(() => {
     if (isMobileLayout || activeModal !== 'destination') return;
-    // Wait for the animation to finish (400ms + stagger) plus a buffer
     const timer = setTimeout(() => {
       destinationTitleRefs.current.forEach((el) => {
         if (!el) return;
         const parent = el.closest('.marquee-wrapper');
         if (!parent) return;
-        // Check if text overflows
         if (el.scrollWidth > parent.clientWidth) {
           parent.classList.add('marquee-active');
         } else {
           parent.classList.remove('marquee-active');
         }
       });
-    }, 700); // 400ms animation + 300ms buffer
+    }, 700);
     return () => clearTimeout(timer);
   }, [filteredTours, isMobileLayout, activeModal]);
 
@@ -887,525 +963,517 @@ function TourSelect() {
         </div>
 
         {activeModal === 'destination' && (
-  <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
 
-    {/* ============================================================
-        FEATURED TOUR
-        ============================================================ */}
-    {featuredTour && (
-      <div className="shrink-0 border-b border-black/5 bg-white p-3 sm:p-4">
-        <button
-          type="button"
-          onClick={() => handleDestinationSelect(featuredTour.title)}
-          className="group relative w-full overflow-hidden rounded-[26px] text-left shadow-[0_18px_50px_rgba(15,23,42,0.14)]"
-        >
-          {/* Background image */}
-          <img
-            src={featuredTour.image}
-            alt={featuredTour.title}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            loading="eager"
-            decoding="async"
-          />
-
-          {/* Dark overlay */}
-          <div className="absolute inset-0 bg-black/55 transition-colors duration-300 group-hover:bg-black/45" />
-
-          {/* Content */}
-          <div className="relative flex flex-col justify-between p-3 sm:p-7 :min-h-[240px] :p-8">
-
-
-            {/* Bottom content */}
-            <div className="max-w-2xl">
-
-                {/* Featured label */}
-                <div>
-                  <span className="inline-flex  items-center rounded-full border border-white/20 bg-white/10 px-3 py-1.5 my-1
-                  font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-white backdrop-blur-md">
-                    Featured experience
-                  </span>
-                </div>
-
-              <h2 className="font-frank font-black leading-[0.95] tracking-tight text-white text-2xl sm:text-2xl md:text-4xl">
-                Be the reason a child smiles today.
-              </h2>
-
-              <p className="mt-3 max-w-xl truncate font-mont text-sm leading-relaxed text-white/75 sm:text-base">
-                {featuredTour.title}
-              </p>
-
-              <div className="mt-4 flex flex-wrap items-center gap-3">
-
-                {/* CTA */}
-                <span className="rounded-full bg-white px-4 py-2 font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-black transition-transform duration-300 group-hover:scale-105 sm:text-xs">
-                  Explore this tour
-                </span>
-
-                {/* Location */}
-                {/* {featuredTour.location && (
-                  <span className="font-mont text-[10px] text-white/70 sm:text-xs">
-                    {featuredTour.location}
-                  </span>
-                )} */}
-
-                {/* Price */}
-                {featuredTour.price && (
-                  <span className="font-bitter text-[10px] font-black text-white/80 sm:text-xs">
-                    From {featuredTour.price}
-                  </span>
-                )}
-
-              </div>
-            </div>
-          </div>
-        </button>
-      </div>
-    )}
-
-    {/* ============================================================
-        FILTER + TOUR CONTENT
-        ============================================================ */}
-    <div className="flex min-h-0 flex-1 overflow-hidden">
-
-      {/* ============================================================
-          FILTER SIDEBAR — DESKTOP
-          ============================================================ */}
-      {!isMobileLayout && (
-        <div className="w-44 shrink-0 border-r border-black/5 bg-white/50 p-3 backdrop-blur-sm sm:w-52">
-
-          <p className="mb-2 font-bitter text-[10px] font-black uppercase tracking-[0.12em] text-black/40">
-            Filter by
-          </p>
-
-          <div className="flex flex-col gap-1">
-            {tourTypes.map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => setFilterType(type)}
-                className={`rounded-lg px-3 py-2 text-left font-mont text-sm font-medium capitalize transition-colors ${
-                  filterType === type
-                    ? 'bg-blue-100 text-blue-800 ring-1 ring-blue-300'
-                    : 'text-black/60 hover:bg-black/5'
-                }`}
-              >
-                {type === 'all' ? 'All tours' : type}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ============================================================
-          TOUR LIST
-          ============================================================ */}
-      <div
-        ref={destinationModalRef}
-        className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-3 pb-2 sm:p-4"
-        onWheel={(e) => e.stopPropagation()}
-        onTouchMove={(e) => e.stopPropagation()}
-        data-lenis-prevent
-      >
-
-        {/* ========================================================
-            MOBILE FILTERS
-            ======================================================== */}
-        {isMobileLayout && (
-          <>
-            {/* Horizontal filter chips */}
-            <div className="mb-3 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-
-              {tourTypes.map((type) => (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => setFilterType(type)}
-                  className={`whitespace-nowrap rounded-full px-3 py-1.5 font-mont text-xs font-medium capitalize transition-colors ${
-                    filterType === type
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'bg-black/5 text-black/60 hover:bg-black/10'
-                  }`}
-                >
-                  {type === 'all' ? 'All' : type}
-                </button>
-              ))}
-
-            </div>
-
-            {/* Instruction */}
-            <div className="mb-3 flex items-center gap-2 text-xs text-black/40">
-
-              <svg
-                className="h-4 w-4"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M7 13l3 3 7-7" />
-                <circle cx="12" cy="12" r="10" />
-              </svg>
-
-              <span className="font-mont">
-                Tap a tour to expand and select
-              </span>
-
-            </div>
-          </>
-        )}
-
-        {/* ========================================================
-            NO TOURS
-            ======================================================== */}
-        {filteredTours.length === 0 ? (
-
-          <div className="flex h-full items-center justify-center text-black/40">
-            No tours match this filter.
-          </div>
-
-        ) : (
-
-          /* ======================================================
-             TOUR ROWS
-             ====================================================== */
-          filteredTours.map((tour, index) => {
-
-            const selected = destination === tour.title;
-
-            const isExpanded =
-              isMobileLayout && expandedIndex === index;
-
-            return (
+            {/* ============================================================
+                FEATURED TOUR – Premium Ad-Style Card with Scroll Shrink
+                FIX: two content blocks (full / compact) + wheel forwarding
+                ============================================================ */}
+            {featuredTour && (
               <div
-                key={tour.title}
-                ref={(el) => {
-                  destinationRowRefs.current[index] = el;
-                }}
-                className={`
-                  group relative mb-2 w-full cursor-pointer
-                  overflow-hidden rounded-xl border
-                  transition-all duration-300
-
-                  ${!isMobileLayout && 'hover:h-28'}
-
-                  ${
-                    !isMobileLayout
-                      ? 'h-20'
-                      : isExpanded
-                        ? 'h-40'
-                        : 'h-20'
-                  }
-
-                  ${
-                    selected
-                      ? 'border-green-500 ring-2 ring-green-500/30'
-                      : 'border-black/5 hover:border-blue-200/60 hover:shadow-md'
-                  }
-                `}
-                onClick={() => {
-
-                  if (isMobileLayout) {
-
-                    setExpandedIndex((prev) =>
-                      prev === index ? null : index
-                    );
-
-                  } else {
-
-                    handleDestinationSelect(tour.title);
-
-                  }
-
+                ref={featuredContainerRef}
+                className="shrink-0 border-b border-black/5 bg-white transition-all duration-300 ease-out pointer-events-auto"
+                style={{
+                  // FIX: increased min height to 110px
+                  height: `clamp(110px, ${280 - featuredProgress * 170}px, 280px)`,
+                  // FIX: increased min padding
+                  padding: `${Math.max(10, 14 - featuredProgress * 4)}px ${Math.max(10, 14 - featuredProgress * 4)}px`,
                 }}
               >
+                <div
+                  className="group relative w-full h-full overflow-hidden rounded-[26px] text-left shadow-[0_20px_60px_rgba(15,23,42,0.25)] transition-shadow duration-700 hover:shadow-[0_30px_80px_rgba(15,23,42,0.35)] pointer-events-none"
+                >
+                  <img
+                    src={featuredTour.image}
+                    alt={featuredTour.title}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
+                    loading="eager"
+                    decoding="async"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 transition-colors duration-500 group-hover:from-black/85 group-hover:via-black/45 pointer-events-none" />
 
-                {/* ==================================================
-                    DESKTOP
-                    ================================================== */}
-                {!isMobileLayout && (
-                  <>
-                    {/* Background */}
-                    <div className="absolute inset-0 -z-10 transition-opacity duration-300 group-hover:opacity-0">
+                  <div
+                    className="relative flex flex-col justify-center h-full p-2 sm:p-4 md:p-5 pointer-events-none"
+                    style={{
+                      padding: `${Math.max(10, 14 - featuredProgress * 4)}px ${Math.max(10, 14 - featuredProgress * 4)}px`,
+                    }}
+                  >
+                    <div className="max-w-2xl">
 
-                      <img
-                        src={tour.image}
-                        className="h-full w-full object-cover brightness-[0.6]"
-                        alt=""
-                        loading="lazy"
-                        decoding="async"
-                      />
-
-                      <div className="absolute inset-0 flex items-center justify-center overflow-hidden px-4">
-
-                        <div className="marquee-wrapper w-full overflow-hidden whitespace-nowrap">
-
-                          <div
-                            ref={(el) => {
-                              destinationTitleRefs.current[index] = el;
-                            }}
-                            className="marquee-text inline-block font-frank text-xl font-black uppercase tracking-wide text-white drop-shadow-xl sm:text-2xl"
-                          >
-                            {tour.title}
-                          </div>
-
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                    {/* Hover layer */}
-                    <div className="absolute inset-0 flex items-center gap-3 bg-white/90 px-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-
-                      <img
-                        src={tour.image}
-                        className="h-14 w-14 shrink-0 rounded-lg object-cover shadow-md"
-                        alt=""
-                        loading="lazy"
-                        decoding="async"
-                      />
-
-                      <div className="min-w-0 flex-1">
-
-                        <p className="truncate font-frank text-sm font-bold text-black/85">
-                          {tour.title}
-                        </p>
-
-                        <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
-
-                          {/* Location */}
-                          <span className="inline-flex items-center gap-1 rounded-full bg-black/[0.04] px-2 py-0.5 font-mont text-[10px] text-black/55">
-
-                            <svg
-                              className="h-3 w-3 text-black/30"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" />
-                              <circle cx="12" cy="10" r="3" />
-                            </svg>
-
-                            {tour.location}
-
+                      {/* --- FULL CONTENT (shown when not shrunk) --- */}
+                      <div className={featuredProgress < 0.5 ? 'block' : 'hidden'}>
+                        <div className="mb-0.5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 backdrop-blur-sm sm:mb-1 sm:px-3 sm:py-1">
+                          <span className="relative flex h-1.5 w-1.5">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
                           </span>
-
-                          {/* Duration */}
-                          {tour.duration && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50/70 px-2 py-0.5 font-mont text-[10px] text-blue-700">
-
-                              <svg
-                                className="h-3 w-3 text-blue-400"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                              >
-                                <circle cx="12" cy="12" r="10" />
-                                <polyline points="12 6 12 12 16 14" />
-                              </svg>
-
-                              {tour.duration}
-
-                            </span>
-                          )}
-
-                          {/* Price */}
-                          {tour.price && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-green-100/80 px-2 py-0.5 font-bitter text-[10px] font-black text-green-800">
-                              From {tour.price}
-                            </span>
-                          )}
-
+                          <span className="font-bitter text-[7px] font-black uppercase tracking-[0.16em] text-white/90 sm:text-[9px]">
+                            Featured
+                          </span>
                         </div>
 
+                        <h2 className="font-frank font-black leading-[1.05] tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-all duration-300"
+                            style={{ fontSize: `clamp(1.1rem, ${2.2 - featuredProgress * 1.2}rem, 2.2rem)` }}>
+                          Be the reason a child smiles today.
+                        </h2>
+
+                        <div className="mt-0 flex items-center gap-1.5 text-white/80 sm:mt-0.5">
+                          <svg className="h-2.5 w-2.5 text-emerald-300/70 sm:h-3.5 sm:w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                            <path d="M2 17l10 5 10-5" />
+                            <path d="M2 12l10 5 10-5" />
+                          </svg>
+                          <span className="font-mont text-[10px] font-medium tracking-wide text-white/80 sm:text-xs">
+                            {featuredTour.title}
+                          </span>
+                        </div>
+
+                        <div className="mt-0 flex flex-wrap items-center gap-1 sm:mt-1 sm:gap-1.5">
+                          {featuredTour.location && (
+                            <span className="inline-flex items-center gap-0.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[8px] font-medium text-white/80 backdrop-blur-sm sm:px-2.5 sm:py-0.5 sm:text-[10px]">
+                              <svg className="h-2 w-2 text-white/50 sm:h-2.5 sm:w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" />
+                                <circle cx="12" cy="10" r="3" />
+                              </svg>
+                              {featuredTour.location}
+                            </span>
+                          )}
+                          {featuredTour.price && (
+                            <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-500/20 px-1.5 py-0.5 text-[8px] font-bold text-emerald-200 backdrop-blur-sm sm:px-2.5 sm:py-0.5 sm:text-[10px]">
+                              <svg className="h-2 w-2 text-emerald-300/70 sm:h-2.5 sm:w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M8 12h8" />
+                                <path d="M12 8v8" />
+                              </svg>
+                              From {featuredTour.price}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="mt-0.5 flex items-center gap-2 sm:mt-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleDestinationSelect(featuredTour.title)}
+                            className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 font-bitter text-[9px] font-black uppercase tracking-[0.08em] text-black transition-all duration-300 hover:scale-105 hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)] active:scale-95 sm:px-4 sm:py-1.5 sm:text-[10px] pointer-events-auto"
+                          >
+                            Explore this tour
+                            <svg className="h-2.5 w-2.5 transition-transform duration-300 group-hover:translate-x-1 sm:h-3 sm:w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M5 12h14" />
+                              <path d="M12 5l7 7-7 7" />
+                            </svg>
+                          </button>
+                        </div>
                       </div>
 
-                      {/* Details */}
-                      <a
-                        href={tour.link}
-                        onClick={(e) => e.stopPropagation()}
-                        className="shrink-0 rounded-full border-2 border-transparent bg-blue-600 px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-white shadow-md transition-all duration-300 hover:border-blue-400 hover:shadow-[0_0_12px_rgba(59,130,246,0.5)]"
-                      >
-                        See details
-                      </a>
+                      {/* --- COMPACT CONTENT (shown when shrunk) --- */}
+                      <div className={featuredProgress >= 0.5 ? 'block' : 'hidden'}>
+                        <div className="flex flex-col items-center gap-1">
+                          <p className='text-white text-2xl'>{featuredTour.title}</p>
+
+
+                          <div className="flex justify-center gap-10">
+                            <h2
+                              className="flex justify-center font-frank font-black leading-[1.05] tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+                              style={{ fontSize: 'clamp(1.1rem, 1.4rem, 1.8rem)' }}
+                            >
+                              ✨ Featured
+                            </h2>
+                            <button
+                              type="button"
+                              onClick={() => handleDestinationSelect(featuredTour.title)}
+                              className="inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 font-bitter text-[9px] font-black uppercase tracking-[0.08em] text-black backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-white sm:px-3 sm:py-1.5 pointer-events-auto"
+                            >
+                              Select
+                              <svg className="h-2.5 w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M5 12h14" />
+                                <path d="M12 5l7 7-7 7" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
 
                     </div>
-                  </>
-                )}
+                  </div>
+                </div>
+              </div>
+            )}
 
-                {/* ==================================================
-                    MOBILE
-                    ================================================== */}
+            {/* ============================================================
+                FILTER + TOUR CONTENT
+                ============================================================ */}
+            <div className="flex min-h-0 flex-1 overflow-hidden">
+
+              {/* ============================================================
+                  FILTER SIDEBAR — DESKTOP
+                  ============================================================ */}
+              {!isMobileLayout && (
+                <div className="w-44 shrink-0 border-r border-black/5 bg-white/50 p-3 backdrop-blur-sm sm:w-52">
+                  <p className="mb-2 font-bitter text-[10px] font-black uppercase tracking-[0.12em] text-black/40">
+                    Filter by
+                  </p>
+                  <div className="flex flex-col gap-1">
+                    {tourTypes.map((type) => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => setFilterType(type)}
+                        className={`rounded-lg px-3 py-2 text-left font-mont text-sm font-medium capitalize transition-colors ${
+                          filterType === type
+                            ? 'bg-blue-100 text-blue-800 ring-1 ring-blue-300'
+                            : 'text-black/60 hover:bg-black/5'
+                        }`}
+                      >
+                        {type === 'all' ? 'All tours' : type}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ============================================================
+                  TOUR LIST
+                  ============================================================ */}
+              <div
+                ref={destinationModalRef}
+                className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-3 pb-2 sm:p-4"
+                onWheel={(e) => e.stopPropagation()}
+                onTouchMove={(e) => e.stopPropagation()}
+                data-lenis-prevent
+              >
+
+                {/* ========================================================
+                    MOBILE FILTERS
+                    ======================================================== */}
                 {isMobileLayout && (
                   <>
-                    {/* Collapsed background */}
-                    <div
-                      className={`absolute inset-0 transition-opacity duration-300 ${
-                        isExpanded
-                          ? 'opacity-0'
-                          : 'opacity-100'
-                      }`}
-                    >
-
-                      <img
-                        src={tour.image}
-                        className="h-full w-full object-cover brightness-[0.6]"
-                        alt=""
-                        loading="lazy"
-                        decoding="async"
-                      />
-
-                      <div className="absolute inset-0 flex items-center justify-center overflow-hidden px-4">
-
-                        <div className="w-full overflow-hidden whitespace-nowrap">
-
-                          <div className="inline-block font-frank text-xl font-black uppercase tracking-wide text-white drop-shadow-xl">
-                            {tour.title}
-                          </div>
-
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                    {/* Expanded content */}
-                    <div
-                      className={`absolute inset-0 flex items-center gap-3 bg-white/95 px-3 transition-opacity duration-300 ${
-                        isExpanded
-                          ? 'opacity-100'
-                          : 'opacity-0'
-                      }`}
-                    >
-
-                      <img
-                        src={tour.image}
-                        className="h-14 w-14 shrink-0 rounded-lg object-cover shadow-md"
-                        alt=""
-                        loading="lazy"
-                        decoding="async"
-                      />
-
-                      <div className="min-w-0 flex-1">
-
-                        <p className="truncate font-frank text-sm font-bold text-black/85">
-                          {tour.title}
-                        </p>
-
-                        <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
-
-                          {/* Location */}
-                          <span className="inline-flex items-center gap-1 rounded-full bg-black/[0.04] px-2 py-0.5 font-mont text-[10px] text-black/55">
-
-                            <svg
-                              className="h-3 w-3 text-black/30"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" />
-                              <circle cx="12" cy="10" r="3" />
-                            </svg>
-
-                            {tour.location}
-
-                          </span>
-
-                          {/* Duration */}
-                          {tour.duration && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50/70 px-2 py-0.5 font-mont text-[10px] text-blue-700">
-
-                              <svg
-                                className="h-3 w-3 text-blue-400"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                              >
-                                <circle cx="12" cy="12" r="10" />
-                                <polyline points="12 6 12 12 16 14" />
-                              </svg>
-
-                              {tour.duration}
-
-                            </span>
-                          )}
-
-                          {/* Price */}
-                          {tour.price && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-green-100/80 px-2 py-0.5 font-bitter text-[10px] font-black text-green-800">
-                              From {tour.price}
-                            </span>
-                          )}
-
-                        </div>
-
-                      </div>
-
-                      {/* Mobile buttons */}
-                      <div className="flex shrink-0 flex-col items-end gap-1">
-
+                    <div className="mb-3 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                      {tourTypes.map((type) => (
                         <button
+                          key={type}
                           type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDestinationSelect(tour.title);
-                          }}
-                          className="rounded-full bg-blue-600 px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-white shadow-md transition-all duration-300 hover:bg-blue-700"
+                          onClick={() => setFilterType(type)}
+                          className={`whitespace-nowrap rounded-full px-3 py-1.5 font-mont text-xs font-medium capitalize transition-colors ${
+                            filterType === type
+                              ? 'bg-blue-600 text-white shadow-md'
+                              : 'bg-black/5 text-black/60 hover:bg-black/10'
+                          }`}
                         >
-                          Select
+                          {type === 'all' ? 'All' : type}
                         </button>
-
-                        <a
-                          href={tour.link}
-                          onClick={(e) => e.stopPropagation()}
-                          className="rounded-full border border-blue-600 px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-blue-600 shadow-md transition-all duration-300 hover:bg-blue-700 hover:text-white"
-                        >
-                          Details
-                        </a>
-
-                      </div>
-
+                      ))}
+                    </div>
+                    <div className="mb-3 flex items-center gap-2 text-xs text-black/40">
+                      <svg
+                        className="h-4 w-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M7 13l3 3 7-7" />
+                        <circle cx="12" cy="12" r="10" />
+                      </svg>
+                      <span className="font-mont">
+                        Tap a tour to expand and select
+                      </span>
                     </div>
                   </>
                 )}
 
-                {/* ==================================================
-                    SELECTED CHECKMARK
-                    ================================================== */}
-                {selected && (
-                  <div className="absolute right-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-green-500 shadow-md">
-
-                    <svg
-                      className="h-3.5 w-3.5 text-white"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-
+                {/* ========================================================
+                    LOADER (blue dots circle)
+                    ======================================================== */}
+                {destinationLoading && (
+                  <div className="flex justify-center items-center py-6">
+                    <div className="loader-dots-circle">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
                   </div>
                 )}
 
+                {/* ========================================================
+                    NO TOURS
+                    ======================================================== */}
+                {filteredTours.length === 0 ? (
+                  <div className="flex h-full items-center justify-center text-black/40">
+                    No tours match this filter.
+                  </div>
+                ) : (
+                  /* ======================================================
+                     TOUR ROWS – each row starts hidden (opacity:0, y:12)
+                     ====================================================== */
+                  filteredTours.map((tour, index) => {
+                    const selected = destination === tour.title;
+                    const isExpanded =
+                      isMobileLayout && expandedIndex === index;
+
+                    return (
+                      <div
+                        key={tour.title}
+                        ref={(el) => {
+                          destinationRowRefs.current[index] = el;
+                        }}
+                        className={`
+                          group relative mb-2 w-full cursor-pointer
+                          overflow-hidden rounded-xl border
+                          transition-all duration-300
+
+                          ${!isMobileLayout && 'hover:h-28'}
+
+                          ${
+                            !isMobileLayout
+                              ? 'h-20'
+                              : isExpanded
+                                ? 'h-40'
+                                : 'h-20'
+                          }
+
+                          ${
+                            selected
+                              ? 'border-green-500 ring-2 ring-green-500/30'
+                              : 'border-black/5 hover:border-blue-200/60 hover:shadow-md'
+                          }
+                        `}
+                        style={{
+                          opacity: 0,
+                          transform: 'translateY(12px)',
+                          willChange: 'transform, opacity'
+                        }}
+                        onClick={() => {
+                          if (isMobileLayout) {
+                            setExpandedIndex((prev) =>
+                              prev === index ? null : index
+                            );
+                          } else {
+                            handleDestinationSelect(tour.title);
+                          }
+                        }}
+                      >
+
+                        {/* ==================================================
+                            DESKTOP
+                            ================================================== */}
+                        {!isMobileLayout && (
+                          <>
+                            <div className="absolute inset-0 -z-10 transition-opacity duration-300 group-hover:opacity-0">
+                              <img
+                                src={tour.image}
+                                className="h-full w-full object-cover brightness-[0.6]"
+                                alt=""
+                                loading="lazy"
+                                decoding="async"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center overflow-hidden px-4">
+                                <div className="marquee-wrapper w-full overflow-hidden whitespace-nowrap">
+                                  <div
+                                    ref={(el) => {
+                                      destinationTitleRefs.current[index] = el;
+                                    }}
+                                    className="marquee-text inline-block font-frank text-xl font-black uppercase tracking-wide text-white drop-shadow-xl sm:text-2xl"
+                                  >
+                                    {tour.title}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="absolute inset-0 flex items-center gap-3 bg-white/90 px-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                              <img
+                                src={tour.image}
+                                className="h-14 w-14 shrink-0 rounded-lg object-cover shadow-md"
+                                alt=""
+                                loading="lazy"
+                                decoding="async"
+                              />
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate font-frank text-sm font-bold text-black/85">
+                                  {tour.title}
+                                </p>
+                                <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-black/[0.04] px-2 py-0.5 font-mont text-[10px] text-black/55">
+                                    <svg
+                                      className="h-3 w-3 text-black/30"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                    >
+                                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" />
+                                      <circle cx="12" cy="10" r="3" />
+                                    </svg>
+                                    {tour.location}
+                                  </span>
+                                  {tour.duration && (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50/70 px-2 py-0.5 font-mont text-[10px] text-blue-700">
+                                      <svg
+                                        className="h-3 w-3 text-blue-400"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                      >
+                                        <circle cx="12" cy="12" r="10" />
+                                        <polyline points="12 6 12 12 16 14" />
+                                      </svg>
+                                      {tour.duration}
+                                    </span>
+                                  )}
+                                  {tour.price && (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-green-100/80 px-2 py-0.5 font-bitter text-[10px] font-black text-green-800">
+                                      From {tour.price}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <a
+                                href={tour.link}
+                                onClick={(e) => e.stopPropagation()}
+                                className="shrink-0 rounded-full border-2 border-transparent bg-blue-600 px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-white shadow-md transition-all duration-300 hover:border-blue-400 hover:shadow-[0_0_12px_rgba(59,130,246,0.5)]"
+                              >
+                                See details
+                              </a>
+                            </div>
+                          </>
+                        )}
+
+                        {/* ==================================================
+                            MOBILE
+                            ================================================== */}
+                        {isMobileLayout && (
+                          <>
+                            <div
+                              className={`absolute inset-0 transition-opacity duration-300 ${
+                                isExpanded
+                                  ? 'opacity-0'
+                                  : 'opacity-100'
+                              }`}
+                            >
+                              <img
+                                src={tour.image}
+                                className="h-full w-full object-cover brightness-[0.6]"
+                                alt=""
+                                loading="lazy"
+                                decoding="async"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center overflow-hidden px-4">
+                                <div className="w-full overflow-hidden whitespace-nowrap">
+                                  <div className="inline-block font-frank text-xl font-black uppercase tracking-wide text-white drop-shadow-xl">
+                                    {tour.title}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div
+                              className={`absolute inset-0 flex items-center gap-3 bg-white/95 px-3 transition-opacity duration-300 ${
+                                isExpanded
+                                  ? 'opacity-100'
+                                  : 'opacity-0'
+                              }`}
+                            >
+                              <img
+                                src={tour.image}
+                                className="h-14 w-14 shrink-0 rounded-lg object-cover shadow-md"
+                                alt=""
+                                loading="lazy"
+                                decoding="async"
+                              />
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate font-frank text-sm font-bold text-black/85">
+                                  {tour.title}
+                                </p>
+                                <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-black/[0.04] px-2 py-0.5 font-mont text-[10px] text-black/55">
+                                    <svg
+                                      className="h-3 w-3 text-black/30"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                    >
+                                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" />
+                                      <circle cx="12" cy="10" r="3" />
+                                    </svg>
+                                    {tour.location}
+                                  </span>
+                                  {tour.duration && (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50/70 px-2 py-0.5 font-mont text-[10px] text-blue-700">
+                                      <svg
+                                        className="h-3 w-3 text-blue-400"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                      >
+                                        <circle cx="12" cy="12" r="10" />
+                                        <polyline points="12 6 12 12 16 14" />
+                                      </svg>
+                                      {tour.duration}
+                                    </span>
+                                  )}
+                                  {tour.price && (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-green-100/80 px-2 py-0.5 font-bitter text-[10px] font-black text-green-800">
+                                      From {tour.price}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex shrink-0 flex-col items-end gap-1">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDestinationSelect(tour.title);
+                                  }}
+                                  className="rounded-full bg-blue-600 px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-white shadow-md transition-all duration-300 hover:bg-blue-700"
+                                >
+                                  Select
+                                </button>
+                                <a
+                                  href={tour.link}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="rounded-full border border-blue-600 px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-blue-600 shadow-md transition-all duration-300 hover:bg-blue-700 hover:text-white"
+                                >
+                                  Details
+                                </a>
+                              </div>
+                            </div>
+                          </>
+                        )}
+
+                        {/* ==================================================
+                            SELECTED CHECKMARK
+                            ================================================== */}
+                        {selected && (
+                          <div className="absolute right-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-green-500 shadow-md">
+                            <svg
+                              className="h-3.5 w-3.5 text-white"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          </div>
+                        )}
+
+                      </div>
+                    );
+                  })
+                )}
+
               </div>
-            );
-          })
+            </div>
+          </div>
         )}
-
-      </div>
-    </div>
-  </div>
-)}
-
 
         {activeModal === 'date' && (
           <div className="flex justify-center p-4 pb-6 sm:p-6 md:p-8">
@@ -1477,9 +1545,6 @@ function TourSelect() {
       <div className="relative mx-auto w-full max-w-5xl overflow-visible rounded-[26px] 
        p-3 sm:rounded-[28px] sm:p-4">
 
-
-
-
         {isMobileLayout ? (
           <div className="rounded-[22px] p-2">
             <button
@@ -1532,7 +1597,6 @@ function TourSelect() {
             {/* ===== BANNER (always visible) ===== */}
             <div className="mt-3 flex w-full max-w-5xl flex-wrap items-center justify-between gap-2 
             rounded-2xl border border-white/16 px-3 py-2 hadow-[0_10px_30px_rgba(0,0,0,0.06)] backdrop-blur-sm sm:flex-nowrap sm:px-4 sm:py-2.5">
-              {/* Travel & Tours title */}
               <div
                 ref={titleRef}
                 className="relative overflow-hidden rounded-2xl px-3 py-1 sm:px-4 sm:py-1.5 bg-blue-800 border"
@@ -1547,8 +1611,6 @@ function TourSelect() {
                   Travel &amp; Tours
                 </span>
               </div>
-
-              {/* Save more badge */}
               <div className="flex w-fit lg:w-fit items-center gap-2 rounded-2xl border border-green-300/80 bg-green-100/95 px-3 py-1.5 sm:px-4 sm:py-2">
                 <img src="./icons/savemore.png" className="h-4 w-4 shrink-0 object-contain sm:h-5 sm:w-5" alt="" aria-hidden="true" />
                 <p className="whitespace-nowrap font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-green-900 sm:text-[11px] sm:tracking-[0.1em]">
@@ -1669,6 +1731,30 @@ function TourSelect() {
         @keyframes scrollText {
           0% { transform: translateX(0); }
           100% { transform: translateX(-100%); }
+        }
+
+        /* --- Blue dots circle loader --- */
+        .loader-dots-circle {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
+        }
+        .loader-dots-circle span {
+          display: block;
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          background: #3b82f6;
+          animation: dotPulse 1.2s ease-in-out infinite both;
+        }
+        .loader-dots-circle span:nth-child(1) { animation-delay: -0.32s; }
+        .loader-dots-circle span:nth-child(2) { animation-delay: -0.16s; }
+        .loader-dots-circle span:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes dotPulse {
+          0%, 80%, 100% { transform: scale(0.5); opacity: 0.3; }
+          40% { transform: scale(1); opacity: 1; }
         }
       `}</style>
     </>

@@ -4,6 +4,8 @@ import { useLocation } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
+// import KidsActivities from '../components/TourDetails/k'
+import { KidsActivitiesNavbar } from '../components/KidsActivitiesNavbar.jsx';
 import { useLoadingNavigate } from "./useLoadingNavigate.jsx"
 import { resolveImage } from '../utils/ImageLoader.js'
 
@@ -1130,6 +1132,9 @@ const Navbar = () => {
                 )
               )}
             </nav>
+
+            {/* KIDS ACTIVITIES */}
+            <KidsActivitiesNavbar />
 
             {/* =================================================
                 CONTACT
