@@ -37,8 +37,8 @@ const Home = () => {
   const [isToursVisible, setIsToursVisible] = useState(false);
   const [isContactVisible, setIsContactVisible] = useState(false);
 
-  // ---------- PREVENT BROWSER'S OWN SCROLL RESTORATION ----------
-  useEffect(() => {
+  // ===== FIX 1: PREVENT BROWSER SCROLL RESTORATION BEFORE PAINT =====
+  useLayoutEffect(() => {
     if ("scrollRestoration" in window.history) {
       const previous = window.history.scrollRestoration;
       window.history.scrollRestoration = "manual";
@@ -46,35 +46,48 @@ const Home = () => {
         window.history.scrollRestoration = previous;
       };
     }
-    return undefined;
   }, []);
 
-  // ---------- FIX: OVERRIDE HASH-BASED SCROLLING ----------
-  // This effect runs once on mount (and whenever location changes).
-  // If a hash exists, remove it from the URL and force scroll to top.
+  // ===== FIX 2: MOUNT‑TIME SCROLL TO TOP (unless hash or state intent) =====
+  useEffect(() => {
+    // If there is a hash or an explicit scroll target from navigation state,
+    // let those dedicated effects handle it.
+    if (location.hash || location.state?.scrollTo) return;
+
+    // Otherwise, force scroll to the very top after a short delay
+    // to override any residual browser restoration.
+    const timer = setTimeout(() => {
+      if (window.lenis) {
+        window.lenis.scrollTo(0, { immediate: true, force: true });
+      } else {
+        window.scrollTo({ top: 0, behavior: "auto" });
+      }
+      // Re‑evaluate ScrollTrigger so pinning/spacing recalculates correctly
+      requestAnimationFrame(() => ScrollTrigger.refresh(true));
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []); // empty deps → only on mount
+
+  // ---------- HASH-BASED SCROLL OVERRIDE (existing, unchanged) ----------
   useEffect(() => {
     if (location.hash) {
-      // Remove the hash without triggering a page reload
       window.history.replaceState(null, "", location.pathname + location.search);
-      // Scroll to top immediately
       window.scrollTo(0, 0);
-      // If Lenis is available, also tell it to go to top
       if (window.lenis) {
         window.lenis.scrollTo(0, { immediate: true, force: true });
       }
     }
-  }, [location]); // Re‑run if location changes (e.g., user navigates to a hash)
+  }, [location]);
 
-  // ---------- SCROLL LISTENER ----------
+  // ---------- SCROLL LISTENER (unchanged) ----------
   useEffect(() => {
     const handleScroll = () => {
-      // --- Show button after passing hero threshold ---
       if (!heroRef.current) return;
       const heroHeight = heroRef.current.offsetHeight;
       const threshold = heroHeight * 0.5;
       const pastHero = window.scrollY > threshold;
 
-      // --- Check visibility of Tours and Contact ---
       let toursVisible = false;
       let contactVisible = false;
 
@@ -91,7 +104,6 @@ const Home = () => {
 
       setIsToursVisible(toursVisible);
       setIsContactVisible(contactVisible);
-
       setShowButton(pastHero && !toursVisible && !contactVisible);
     };
 
@@ -113,7 +125,7 @@ const Home = () => {
     }
   };
 
-  // ---------- EXISTING useLayoutEffect FOR TOUR SELECT HIDE/SHOW ----------
+  // ---------- TOUR SELECT HIDE/SHOW (unchanged) ----------
   useLayoutEffect(() => {
     const section = tourSelectSectionRef.current;
     if (!section) return;
@@ -185,7 +197,7 @@ const Home = () => {
     };
   }, []);
 
-  // ---------- SCROLL-TO-SECTION FROM location.state (fixed) ----------
+  // ---------- SCROLL-TO-SECTION FROM location.state (unchanged) ----------
   useEffect(() => {
     const scrollTarget = location.state?.scrollTo;
     if (!scrollTarget || !window.lenis) return undefined;
@@ -201,8 +213,6 @@ const Home = () => {
         }
       }
       window.requestAnimationFrame(() => ScrollTrigger.refresh(true));
-
-      // Clear the consumed intent from history state
       navigate(location.pathname + location.search, {
         replace: true,
         state: {},
@@ -213,7 +223,7 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key]);
 
-  // ---------- EXISTING useLayoutEffect FOR HERO/ABOUT ANIMATIONS ----------
+  // ---------- HERO / ABOUT ANIMATIONS (unchanged) ----------
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       if (!heroRef.current || !aboutRef.current) return;
@@ -320,7 +330,7 @@ const Home = () => {
       ref={pageRef}
       className="relative flex flex-col overflow-x-hidden bg-white text-white"
     >
-      {/* TourSelect wrapper – stays above About */}
+      {/* TourSelect wrapper */}
       <section className="absolute z-30 w-full overflow-x-hidden overflow-y-visible">
         <div ref={tourSelectSectionRef} className="mx-auto max-w-5xl mt-20">
           <TourSelect />
@@ -355,7 +365,7 @@ const Home = () => {
         <Contact />
       </section>
 
-      {/* ---------- FIXED BUTTON (hidden on Tours & Contact) ---------- */}
+      {/* Fixed button */}
       <div
         className={`fixed left-1/2 top-20 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${
           showButton
