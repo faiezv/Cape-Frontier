@@ -1,3 +1,5 @@
+import { min } from "three/tsl";
+
 export const TOUR_TYPES = {
   ADRENALINE: "adrenaline",
   HIKING: "hiking",
@@ -8627,7 +8629,7 @@ export const tours = [
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.DAY_TOUR,
 
-    title: "Family Wine Tour with Kids Activities – Stellenbosch Region",
+    title: "Family Wine Tour with Kids Activities",
     slug: "full-day-family-wine-tour-stellenbosch",
     canonicalPath: "/tours/full-day-family-wine-tour-stellenbosch",
     childFriendly: true,
@@ -8649,9 +8651,11 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: "",
-    images: [],
-    imageFolder: "packages/wine-farms",
+    image: "/src/assets/images/tours/packages/family-wine/1.webp",
+    images: [
+      "/src/assets/images/tours/packages/family-wine/1.webp",
+    ],
+    imageFolder: "packages/family-wine",
     videos: [],
 
     location: "Stellenbosch, Cape Winelands, South Africa",
@@ -8852,11 +8856,6 @@ export const tours = [
       ],
     },
 
-    cancellationPolicy: {
-      summary: "",
-      items: [],
-    },
-
     safetyPolicy: {
       summary:
         "This is a family-friendly experience with structured timing and activities suitable for children.",
@@ -8881,7 +8880,7 @@ export const tours = [
 
     stops: [
       {
-        title: "Pickup from Cape Town",
+        name: "Pickup from Cape Town",
         description:
           "Your driver-guide collects you from your Cape Town hotel. Bottled water is provided for the journey.",
         time: "08:00",
@@ -8892,7 +8891,7 @@ export const tours = [
       },
 
       {
-        title: "Vredenheim Wine Farm",
+        name: "Vredenheim Wine Farm",
         description:
           "Adults enjoy a premium wine tasting while children explore the Big Cats Park, farm animals, jungle gym and large gardens.",
         time: "09:00",
@@ -8903,7 +8902,7 @@ export const tours = [
       },
 
       {
-        title: "Butterfly World OR Giraffe House",
+        name: "Butterfly World OR Giraffe House",
         description:
           "Choose one family attraction. Butterfly World features a tropical butterfly house, reptiles and birds, while Giraffe House offers wildlife education and encounters with giraffes, zebras and reptiles.",
         time: "11:15",
@@ -8914,7 +8913,7 @@ export const tours = [
       },
 
       {
-        title: "Lunch in Stellenbosch",
+        name: "Lunch in Stellenbosch",
         description:
           "Enjoy a relaxed lunch at a family-friendly restaurant in Stellenbosch. Suggested options include Schoon Bakery, Hudsons, De Warenmarkt or Spur.",
         time: "12:30",
@@ -8925,7 +8924,7 @@ export const tours = [
       },
 
       {
-        title: "Stellenbosch Town Walk",
+        name: "Stellenbosch Town Walk",
         description:
           "Explore historic Stellenbosch with stops along Dorp Street, Oom Samie se Winkel, artisan chocolate shops and scenic photo locations.",
         time: "13:45",
@@ -8936,7 +8935,7 @@ export const tours = [
       },
 
       {
-        title: "Helshoogte Pass Scenic Drive",
+        name: "Helshoogte Pass Scenic Drive",
         description:
           "Enjoy spectacular mountain scenery along Helshoogte Pass with safe viewpoints for photographs. Adults can optionally enjoy a second wine tasting at Tokara.",
         time: "14:45",
@@ -8947,7 +8946,7 @@ export const tours = [
       },
 
       {
-        title: "Mooiberge Strawberry Farm",
+        name: "Mooiberge Strawberry Farm",
         description:
           "During strawberry season, enjoy strawberry picking, the play area and colourful scarecrows. If strawberries are out of season, this time becomes additional Stellenbosch exploration or a second wine estate.",
         time: "15:30",
@@ -8958,7 +8957,7 @@ export const tours = [
       },
 
       {
-        title: "Return to Cape Town",
+        name: "Return to Cape Town",
         description:
           "Depart the Stellenbosch area and return to Cape Town for hotel drop-off.",
         time: "16:30",
@@ -8967,25 +8966,8 @@ export const tours = [
         optional: false,
         image: "",
       },
-
-      {
-        title: "Cape Town Hotel Drop-Off",
-        description:
-          "Arrive back at your Cape Town hotel at approximately 17:30.",
-        time: "17:30",
-        duration: "",
-        type: "transport",
-        optional: false,
-        image: "",
-      },
     ],
-
-    vehicle: {
-      type: "Private vehicle",
-      description:
-        "Comfortable private transport with a driver-guide and bottled water.",
-    },
-
+    
     securityAndLiability: null,
 
     accommodation: {
@@ -9108,15 +9090,17 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: '',
-    images: [],
-    imageFolder: "wine-routes/stellenbosch-franschhoek-winelands",
+    image: '/src/assets/images/tours/packages/winelands+tram/1.webp',
+    images: [
+      '/src/assets/images/tours/packages/winelands+tram/1.webp',
+    ],
+    imageFolder: "packages/winelands+tram",
     videos: [],
 
     location: "Stellenbosch & Franschhoek, Western Cape, South Africa",
     duration: "8.5–9 hours",
 
-    priceBase: 2150,
+    priceBase: 3200,
     minPeople: 2,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
@@ -9127,20 +9111,23 @@ export const tours = [
         pricePerPerson: 3200,
         note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
       },
+
       {
-        category: "3 Guests",
-        pricePerPerson: 2650,
-        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
+        category: "Teens (13–17 years)",
+        pricePerPerson: 3200,
+        note: "Franschhoek Wine Tram ticket and private vehicle.",
       },
+
       {
-        category: "4 Guests",
-        pricePerPerson: 2450,
-        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
+        category: "Children (4–12 years)",
+        pricePerPerson: 3200,
+        note: "Franschhoek Wine Tram ticket and private vehicle.",
       },
+
       {
-        category: "5–7 Guests",
-        pricePerPerson: 2150,
-        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
+        category: "Toddlers (0–3 years)",
+        pricePerPerson: 3200,
+        note: "Franschhoek Wine Tram ticket and private vehicle.",
       },
     ],
 
@@ -9154,9 +9141,34 @@ export const tours = [
     ],
 
     groupPricing: {
-      enabled: false,
+      enabled: true,
       icon: "",
-      tiers: [],
+      tiers: [
+      {
+        minPeople: 2,
+        maxPeople: 3,
+        perPerson: 2600,
+        discountPercent: null,
+        label: "2-3 Guests",
+        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
+      },
+      {
+        minPeople: 4,
+        maxPeople: 4,
+        perPerson: 2450,
+        label: "4 Guests",
+        discountPercent: null,
+        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
+      },
+      {
+        minPeople: 5,
+        maxPeople: 7,
+        perPerson: 2150,
+        label: "5–7 Guests",
+        discountPercent: null,
+        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
+      },
+      ],
     },
 
     rating: null,
@@ -9321,10 +9333,7 @@ export const tours = [
       ],
     },
 
-    cancellationPolicy: {
-      summary: "",
-      items: [],
-    },
+
 
     safetyPolicy: {
       summary:
@@ -9353,7 +9362,7 @@ export const tours = [
 
     stops: [
       {
-        title: "Pick-Up in Cape Town",
+        name: "Pick-Up in Cape Town",
         description:
           "Private vehicle collection from your Cape Town accommodation. Bottled water is provided for the journey.",
         time: "08:30–09:00",
@@ -9364,7 +9373,7 @@ export const tours = [
       },
 
       {
-        title: "Drive Past Langa",
+        name: "Drive Past Langa",
         description:
           "Travel along the N2 while your driver-guide provides commentary on Langa, Cape Town's oldest township, including its history and cultural significance. There is no stop or entry.",
         time: "09:00",
@@ -9375,7 +9384,7 @@ export const tours = [
       },
 
       {
-        title: "Zevenwacht Wine Estate",
+        name: "Zevenwacht Wine Estate",
         description:
           "Begin the Winelands experience with a standard wine tasting and included cheese OR chocolate pairing at Zevenwacht. Enjoy beautiful dam and vineyard views.",
         time: "09:40",
@@ -9386,7 +9395,7 @@ export const tours = [
       },
 
       {
-        title: "Marianne Wine Estate",
+        name: "Marianne Wine Estate",
         description:
           "Visit this boutique French-style wine estate for a standard wine tasting with an included cheese OR chocolate pairing.",
         time: "10:55",
@@ -9397,7 +9406,7 @@ export const tours = [
       },
 
       {
-        title: "Rickety Bridge Wine Estate",
+        name: "Rickety Bridge Wine Estate",
         description:
           "Enjoy a standard wine tasting with an included cheese OR chocolate pairing at this historic Franschhoek estate, surrounded by a spectacular mountain backdrop.",
         time: "12:05",
@@ -9408,7 +9417,7 @@ export const tours = [
       },
 
       {
-        title: "Lunch in Franschhoek",
+        name: "Lunch in Franschhoek",
         description:
           "Enjoy lunch at a restaurant of your choice in Franschhoek. Guests select and pay for their own lunch.",
         time: "13:05",
@@ -9419,7 +9428,7 @@ export const tours = [
       },
 
       {
-        title: "Franschhoek Wine Tram",
+        name: "Franschhoek Wine Tram",
         description:
           "Enjoy a scenic open-air hop-on hop-off tram experience through Franschhoek's vineyards and mountains. The Wine Tram ticket is included.",
         time: "14:20",
@@ -9430,7 +9439,7 @@ export const tours = [
       },
 
       {
-        title: "Return to Cape Town",
+        name: "Return to Cape Town",
         description:
           "Begin the comfortable journey back to Cape Town through the surrounding mountain passes and farmlands.",
         time: "16:30",
@@ -9440,24 +9449,7 @@ export const tours = [
         image: "",
       },
 
-      {
-        title: "Cape Town Drop-Off",
-        description:
-          "Arrive back at your Cape Town accommodation at approximately 18:00.",
-        time: "18:00",
-        duration: "",
-        type: "transport",
-        optional: false,
-        image: "",
-      },
     ],
-
-    vehicle: {
-      type: "Private vehicle",
-      description:
-        "Comfortable private vehicle with a professional driver-guide and bottled water.",
-    },
-
     securityAndLiability: null,
 
     accommodation: {
@@ -9617,9 +9609,11 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: "",
-    images: [],
-    imageFolder: "wine-routes/cape-town-gems-kirstenbosch-constantia",
+    image: "/src/assets/images/tours/packages/cape-town-gems/3.webp",
+    images: [
+      "/src/assets/images/tours/packages/cape-town-gems/3.webp"
+    ],
+    imageFolder: "packages/cape-town-gems",
     videos: [],
 
     location: "Cape Town CBD, Kirstenbosch & Constantia, South Africa",
@@ -9809,11 +9803,6 @@ export const tours = [
       ],
     },
 
-    cancellationPolicy: {
-      summary: "",
-      items: [],
-    },
-
     safetyPolicy: {
       summary:
         "Guests should follow instructions from the driver-guide and venue staff throughout the experience.",
@@ -9838,7 +9827,7 @@ export const tours = [
 
     stops: [
       {
-        title: "Pick-Up in Cape Town CBD",
+        name: "Pick-Up in Cape Town CBD",
         description:
           "Private collection from your Cape Town CBD hotel or residence. Bottled water is provided.",
         time: "08:30",
@@ -9849,7 +9838,7 @@ export const tours = [
       },
 
       {
-        title: "AfroGem Jewellery Experience",
+        name: "AfroGem Jewellery Experience",
         description:
           "Explore African diamonds, tanzanite, gemstones and local jewellery craftsmanship at AfroGem.",
         time: "09:00",
@@ -9860,7 +9849,7 @@ export const tours = [
       },
 
       {
-        title: "Kirstenbosch National Botanical Garden",
+        name: "Kirstenbosch National Botanical Garden",
         description:
           "Explore indigenous gardens, fynbos, proteas, sculptures and the iconic Boomslang canopy walkway beneath the eastern slopes of Table Mountain.",
         time: "10:20",
@@ -9871,7 +9860,7 @@ export const tours = [
       },
 
       {
-        title: "Groot Constantia Wine Estate",
+        name: "Groot Constantia Wine Estate",
         description:
           "Visit the historic Groot Constantia estate and enjoy a standard wine tasting. Adults and teens receive the included tasting according to the supplied pricing structure.",
         time: "12:15",
@@ -9882,7 +9871,7 @@ export const tours = [
       },
 
       {
-        title: "Lunch in Constantia",
+        name: "Lunch in Constantia",
         description:
           "Enjoy a relaxed lunch break at your choice of restaurant. Suggested options include Jonkershuis Restaurant, Simons Restaurant or Constantia Glen Restaurant.",
         time: "13:00",
@@ -9893,7 +9882,7 @@ export const tours = [
       },
 
       {
-        title: "Klein Constantia Wine Estate",
+        name: "Klein Constantia Wine Estate",
         description:
           "Explore the historic estate and learn about the legacy of Vin de Constance. A wine tasting is available optionally at additional cost.",
         time: "14:00",
@@ -9904,7 +9893,7 @@ export const tours = [
       },
 
       {
-        title: "Constantia Glen Wine Estate",
+        name: "Constantia Glen Wine Estate",
         description:
           "Finish the Winelands experience at this boutique estate with panoramic views over the Constantia Valley. A standard wine tasting is included.",
         time: "14:40",
@@ -9915,7 +9904,7 @@ export const tours = [
       },
 
       {
-        title: "Return to Cape Town CBD",
+        name: "Return to Cape Town CBD",
         description: "Enjoy a comfortable return journey to the Cape Town CBD.",
         time: "15:30",
         duration: "±30 minutes",
@@ -9923,24 +9912,8 @@ export const tours = [
         optional: false,
         image: "",
       },
-
-      {
-        title: "Cape Town CBD Drop-Off",
-        description:
-          "Arrive back at your Cape Town CBD hotel or residence at approximately 16:00.",
-        time: "16:00",
-        duration: "",
-        type: "transport",
-        optional: false,
-        image: "",
-      },
     ],
 
-    vehicle: {
-      type: "Private vehicle",
-      description:
-        "Comfortable private vehicle with a professional driver-guide and bottled water.",
-    },
 
     securityAndLiability: null,
 
