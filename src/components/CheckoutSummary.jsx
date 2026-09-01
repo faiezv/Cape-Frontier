@@ -3,6 +3,7 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import gsap from "gsap";
 import { KIDS_ACTIVITIES } from "../data/kidsActivities";
+import { resolveImage } from '../utils/ImageLoader.js'
 
 // ============================================================
 // HELPER — PRIVATE / CUSTOM FEES
@@ -640,7 +641,7 @@ const CheckoutSummary = ({
           <div className="flex items-center gap-3">
             {tour?.images?.[0] ? (
               <img
-                src={tour.images[0]}
+                src={resolveImage(tour.images[0])}
                 alt={tour.title}
                 className="w-12 h-12 rounded-full object-cover border-2 border-blue-200"
               />
