@@ -17,13 +17,22 @@ export default async function handler(req, res) {
   }
 
   try {
-    const secretKey = process.env.PAYSTACK_SECRET_KEY;
+    // const secretKey = process.env.PAYSTACK_SECRET_KEY;
+    const secretKey =
+    process.env.VERCEL_ENV === "production"
+      ? process.env.PAYSTACK_SECRET_KEY
+      : process.env.PAYSTACK_SECRET_KEY_TEST;
 
     if (!secretKey) {
       return res.status(500).json({
-        error: "Missing PAYSTACK_SECRET_KEY",
+        error:
+          process.env.VERCEL_ENV === "production"
+            ? "Missing PAYSTACK_SECRET_KEY"
+            : "Missing PAYSTACK_SECRET_KEY_TEST",
       });
     }
+
+    
 
     const {
       email,
