@@ -239,7 +239,7 @@ export const KidsActivitiesNavbar = () => {
             hover:-translate-y-0.5 hover:bg-blue-50
           "
         >
-          <span>🎯</span> Kiddies
+          <span>🎯</span> Kids Activities
         </button>
 
         {isPopupOpen && (

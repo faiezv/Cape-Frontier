@@ -366,8 +366,53 @@ const Booking = ({ embeddedTour, bookingData }) => {
   }, [tour]);
 
   const [activeImage, setActiveImage] = useState(0);
+
+
+
   const activeImageSrc = gallery[activeImage] || tour?.image || "/images/content/random/1.webp";
   const fallbackImage = tour?.image || "/images/content/random/1.webp";
+
+    useEffect(() => {
+    setActiveImage(0);
+  }, [tour]);
+
+  // Reset child-related state whenever the selected tour changes.
+  // Prevents confirmed children from a previous (child-friendly) tour
+  // from carrying over — already confirmed — onto a tour where
+  // tour.childFriendly === false.
+  const prevTourSlugRef = useRef(null);
+  useEffect(() => {
+    if (!tour) return;
+    const tourSlug = getTourSlug(tour);
+    const isTourSwitch =
+      prevTourSlugRef.current !== null && prevTourSlugRef.current !== tourSlug;
+
+    if (isTourSwitch) {
+      // Any confirmations belonged to the previous tour's children — always clear them.
+      setConfirmedChildAges({});
+      setChildAddedAnimation(false);
+
+      if (tour.childFriendly === false) {
+        // New tour doesn't allow children — strip any carried-over children entirely.
+        setFormData((prev) => {
+          const nextAdults = Math.max(Number(prev.adults || 1), 1);
+          const nextParticipantCount = Math.max(nextAdults, 1);
+          const maxEmails = Math.max(nextParticipantCount - 1, 0);
+          return {
+            ...prev,
+            children: "0",
+            childAges: [],
+            participants: String(nextParticipantCount),
+            participantEmails: (prev.participantEmails || []).slice(0, maxEmails),
+            ccParticipants: maxEmails === 0 ? false : prev.ccParticipants,
+          };
+        });
+        setShowChildrenSelector(false);
+      }
+    }
+
+    prevTourSlugRef.current = tourSlug;
+  }, [tour]);
 
   // ─── Form State ──────────────────────────────────────────────────
   const [formData, setFormData] = useState({
@@ -688,8 +733,23 @@ const Booking = ({ embeddedTour, bookingData }) => {
       if (!isNaN(dateObj.getTime())) normalizedDate = dateObj.toISOString().split('T')[0];
       updates.date = normalizedDate;
     }
+
     if (bd.adults !== undefined) updates.adults = String(bd.adults);
-    if (bd.children !== undefined) updates.children = String(bd.children);
+
+    // Prefer the detailed per-child ages array (from TourSelect's guest picker)
+    // over the plain `children` count — it carries toddler/child/teen info
+    // that the count alone loses.
+    const incomingChildAges = Array.isArray(bd.childAges)
+      ? bd.childAges.map((age) => Number(age)).filter((age) => Number.isFinite(age))
+      : null;
+
+    if (incomingChildAges) {
+      updates.childAges = incomingChildAges;
+      updates.children = String(incomingChildAges.length);
+    } else if (bd.children !== undefined) {
+      updates.children = String(bd.children);
+    }
+
     if (bd.pickupLocation !== undefined) updates.pickupLocation = bd.pickupLocation;
     if (bd.pickupCoords?.lat && bd.pickupCoords?.lng) {
       updates.pickupCoords = { lat: bd.pickupCoords.lat, lng: bd.pickupCoords.lng };
@@ -709,6 +769,9 @@ const Booking = ({ embeddedTour, bookingData }) => {
       updates.adults = String(cappedAdults);
       updates.children = String(cappedChildren);
       total = cappedAdults + cappedChildren;
+      if (updates.childAges) {
+        updates.childAges = updates.childAges.slice(0, cappedChildren);
+      }
     }
     updates.participants = String(total);
 
@@ -729,8 +792,11 @@ const Booking = ({ embeddedTour, bookingData }) => {
       setPendingPickup(null);
     }
 
-    if (updates.adults !== undefined || updates.children !== undefined) {
+    if (updates.adults !== undefined || updates.children !== undefined || updates.childAges !== undefined) {
       setShowGroupEditor(false);
+      if (updates.childAges?.length) {
+        setShowChildrenSelector(true);
+      }
     }
 
     const preferredCurrency = bd.selectedCurrency || bd.pricingOptions?.currency;
