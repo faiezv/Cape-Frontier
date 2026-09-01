@@ -1,5 +1,3 @@
-import { min } from "three/tsl";
-
 export const TOUR_TYPES = {
   ADRENALINE: "adrenaline",
   HIKING: "hiking",
@@ -131,7 +129,6 @@ const PENINSULA_1_DESTINATIONS = [
   "ostrich-farm",
   "simons-town",
 ];
-
 const PENINSULA_2_DESTINATIONS = [
   "boulders-beach",
   "camps-bay",
@@ -141,12 +138,7 @@ const PENINSULA_2_DESTINATIONS = [
   "simons-town",
 ];
 
-const STELLENBOSCH_WINE_DESTINATIONS = [
-  "delaire",
-  "rust-en-vrede",
-  "spier",
-  "tokara",
-];
+
 
 /*
 adrenaline - shark, gun-range, paragliding, 2hr-cobra, 
@@ -156,130 +148,6 @@ packages -
 */
 
 export const tours = [
-  // TEMAPLTE
-  // {
-  //   id: null,
-  //   type: TOUR_TYPES.PACKAGES,
-  //   category: TOUR_MODIFIERS.MULTI_DAY,
-
-  //   title: "",
-  //   slug: "",
-  //   canonicalPath: "",
-
-  //   seo: {
-  //     title: "",
-  //     description: "",
-  //     keywords: [],
-  //   },
-
-  //   workflow: defaultWorkflow,
-
-  //   image: "",
-  //   images: [],
-  //   imageFolder: "",
-  //   videos: [],
-
-  //   location: "",
-  //   duration: "",
-
-  //   priceBase: 0,
-  //   minPeople: 1,
-  //   baseCurrency: "ZAR",
-  //   supportedCurrencies: SUPPORTED_CURRENCIES,
-
-  //   pricing: [],
-
-  //   additionalPricing: [],
-
-  //   groupPricing: {
-  //     enabled: false,
-  //     icon: "",
-  //     tiers: [],
-  //   },
-
-  //   rating: null,
-  //   stars: null,
-  //   mainReviewerName: "",
-  //   mainReviewerCountry: "",
-  //   reviewYear: null,
-  //   otherReviews: null,
-  //   mainReview: "",
-
-  //   description: "",
-
-  //   highlights: [],
-  //   included: [],
-  //   excluded: [],
-
-  //   pickupOptions: [],
-  //   requirements: [],
-
-  //   arrangements: {
-  //     availability: "",
-  //     duration: "",
-  //     operatingTime: "",
-  //     departure: "",
-  //     return: "",
-  //     location: "",
-  //     clothing: [],
-  //     thingsToBring: [],
-  //     passengerPolicy: "",
-  //     notes: [],
-  //   },
-
-  //   weatherPolicy: {
-  //     summary: "",
-  //     items: [],
-  //   },
-
-  //   cancellationPolicy: {
-  //     summary: "",
-  //     items: [],
-  //   },
-
-  //   safetyPolicy: {
-  //     summary: "",
-  //     items: [],
-  //   },
-
-  //   itinerary: {
-  //     intro: {
-  //       title: "",
-  //       description: "",
-  //     },
-
-  //     route: {
-  //       title: "",
-  //       description: "",
-  //     },
-
-  //     days: [],
-  //   },
-
-  //   stops: null,
-
-  //   // routeInformation: {
-  //   //   title: "",
-  //   //   description: "",
-  //   //   items: [],
-  //   // },
-
-  //   vehicle: null,
-
-  //   securityAndLiability: null,
-
-  //   accommodation: {
-  //     included: false,
-  //     type: "",
-  //     description: "",
-  //   },
-
-  //   needToKnow: [],
-
-  //   faqs: [],
-
-  //   tags: [],
-  // },
   // =========================================== ADRENALINE
   // HALF_DAY
   //Shark-cage-diving
@@ -1307,7 +1175,7 @@ export const tours = [
 
     pricing: [
       {
-        category: "Sunset Drive",
+        category: "Adults",
         pricePerPerson: 2900,
         note: "2-hour self-drive experience.",
       },
@@ -1727,7 +1595,7 @@ export const tours = [
 
     pricing: [
       {
-        category: "24‑Hour Self‑Drive Cobra",
+        category: "Adults",
         pricePerPerson: 6400,
         note: "Includes one free passenger. 24-hour rental: 08:30 – 08:30.",
       },
@@ -2116,7 +1984,7 @@ export const tours = [
 
     pricing: [
       {
-        category: "Full Day Self‑Drive Cobra",
+        category: "Adults",
         pricePerPerson: 4500,
         note: "8-hour experience. Includes one free passenger.",
       },
@@ -9114,19 +8982,19 @@ export const tours = [
 
       {
         category: "Teens (13–17 years)",
-        pricePerPerson: 3200,
+        pricePerPerson: 2600,
         note: "Franschhoek Wine Tram ticket and private vehicle.",
       },
 
       {
         category: "Children (4–12 years)",
-        pricePerPerson: 3200,
+        pricePerPerson: 2600,
         note: "Franschhoek Wine Tram ticket and private vehicle.",
       },
 
       {
         category: "Toddlers (0–3 years)",
-        pricePerPerson: 3200,
+        pricePerPerson: null,
         note: "Franschhoek Wine Tram ticket and private vehicle.",
       },
     ],
@@ -9146,17 +9014,25 @@ export const tours = [
       tiers: [
       {
         minPeople: 2,
-        maxPeople: 3,
-        perPerson: 2600,
+        maxPeople: 2,
+        perPerson: 3200,
         discountPercent: null,
         label: "2-3 Guests",
+        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
+      },
+      {
+        minPeople: 3,
+        maxPeople: 3,
+        perPerson: 2650,
+        label: "3 Guests",
+        discountPercent: null,
         note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
       },
       {
         minPeople: 4,
         maxPeople: 4,
         perPerson: 2450,
-        label: "4 Guests",
+        label: "5–7 Guests",
         discountPercent: null,
         note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
       },
@@ -10587,3 +10463,128 @@ export const getToursByCategory = (category) =>
   tours.filter((tour) => tour.category === category);
 
 export default tours;
+
+  // TEMAPLTE
+  // {
+  //   id: null,
+  //   type: TOUR_TYPES.PACKAGES,
+  //   category: TOUR_MODIFIERS.MULTI_DAY,
+
+  //   title: "",
+  //   slug: "",
+  //   canonicalPath: "",
+
+  //   seo: {
+  //     title: "",
+  //     description: "",
+  //     keywords: [],
+  //   },
+
+  //   workflow: defaultWorkflow,
+
+  //   image: "",
+  //   images: [],
+  //   imageFolder: "",
+  //   videos: [],
+
+  //   location: "",
+  //   duration: "",
+
+  //   priceBase: 0,
+  //   minPeople: 1,
+  //   baseCurrency: "ZAR",
+  //   supportedCurrencies: SUPPORTED_CURRENCIES,
+
+  //   pricing: [],
+
+  //   additionalPricing: [],
+
+  //   groupPricing: {
+  //     enabled: false,
+  //     icon: "",
+  //     tiers: [],
+  //   },
+
+  //   rating: null,
+  //   stars: null,
+  //   mainReviewerName: "",
+  //   mainReviewerCountry: "",
+  //   reviewYear: null,
+  //   otherReviews: null,
+  //   mainReview: "",
+
+  //   description: "",
+
+  //   highlights: [],
+  //   included: [],
+  //   excluded: [],
+
+  //   pickupOptions: [],
+  //   requirements: [],
+
+  //   arrangements: {
+  //     availability: "",
+  //     duration: "",
+  //     operatingTime: "",
+  //     departure: "",
+  //     return: "",
+  //     location: "",
+  //     clothing: [],
+  //     thingsToBring: [],
+  //     passengerPolicy: "",
+  //     notes: [],
+  //   },
+
+  //   weatherPolicy: {
+  //     summary: "",
+  //     items: [],
+  //   },
+
+  //   cancellationPolicy: {
+  //     summary: "",
+  //     items: [],
+  //   },
+
+  //   safetyPolicy: {
+  //     summary: "",
+  //     items: [],
+  //   },
+
+  //   itinerary: {
+  //     intro: {
+  //       title: "",
+  //       description: "",
+  //     },
+
+  //     route: {
+  //       title: "",
+  //       description: "",
+  //     },
+
+  //     days: [],
+  //   },
+
+  //   stops: null,
+
+  //   // routeInformation: {
+  //   //   title: "",
+  //   //   description: "",
+  //   //   items: [],
+  //   // },
+
+  //   vehicle: null,
+
+  //   securityAndLiability: null,
+
+  //   accommodation: {
+  //     included: false,
+  //     type: "",
+  //     description: "",
+  //   },
+
+  //   needToKnow: [],
+
+  //   faqs: [],
+
+  //   tags: [],
+  // },
