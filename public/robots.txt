@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /checkout
+Disallow: /success
+ 
+Sitemap: https://www.cape-frontier.co.za/sitemap.xml
+ 
