@@ -1,80 +1,124 @@
 import { useEffect } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { Helmet } from 'react-helmet-async'
 import Lenis from 'lenis'
+
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({
   ignoreMobileResize: true,
 })
+
 /////////////// PAGES ////////////////////////////
-import ScrollToTop from './components/ScrollToTop.jsx'
 import Navbar from './components/Navbar.jsx'
 import LoadingBar from '../src/components/LoadingBar.jsx'
 import AnimatedRoutes from './components/AnimatedRoutes.jsx'
 
 const App = () => {
   useEffect(() => {
-    // Stop the browser restoring a stale native scroll position on
-    // reload/back-forward before Lenis and ScrollTrigger have measured
-    // the page. Without this, the browser jumps scrollY to wherever it
-    // was last time, and everything below then has to fight to correct it.
+    // Disable browser's native scroll restoration
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual'
     }
 
+    // Initialize Lenis
     const lenis = new Lenis({
       stopInertiaOnNavigate: true,
       smoothWheel: true,
       syncTouch: false,
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     })
     window.lenis = lenis
+    lenis.scrollTo(0, { immediate: true, force: true })
+    lenis.start()
     lenis.on('scroll', ScrollTrigger.update)
 
-    // Drive Lenis from GSAP's own ticker instead of a separate rAF loop,
-    // so Lenis and every ScrollTrigger animation stay on the exact same
-    // frame schedule. Removes frame-ordering drift that causes visible
-    // snapping right after a ScrollTrigger.refresh().
-    const lenisTick = (time) => {
-      lenis.raf(time * 1000)
-    }
+    const lenisTick = (time) => lenis.raf(time * 1000)
     gsap.ticker.add(lenisTick)
     gsap.ticker.lagSmoothing(0)
 
-    // Let ScrollToTop know Lenis is ready, in case its effect already
-    // ran before this one (React runs child effects before parent effects,
-    // so on first mount ScrollToTop can fire before this block does).
-    window.dispatchEvent(new Event('lenis:ready'))
+    // Use ResizeObserver to refresh only after layout stabilises
+    let timeoutId = null
+    let isStable = false
 
-    const refresh = () => {
-      ScrollTrigger.refresh(true)
+    const refresh = () => ScrollTrigger.refresh(true)
+
+    const onStable = () => {
+      if (isStable) return
+      isStable = true
+      // Force a final refresh and reset scroll
+      requestAnimationFrame(() => {
+        refresh()
+        lenis.scrollTo(0, { immediate: true, force: true })
+      })
     }
-    const refreshOne = window.setTimeout(refresh, 120)
-    const refreshTwo = window.setTimeout(refresh, 500)
-    window.addEventListener('load', refresh, { once: true })
+
+    const checkStability = () => {
+      if (timeoutId) clearTimeout(timeoutId)
+      isStable = false
+      timeoutId = setTimeout(onStable, 500) // wait 500ms of no changes
+    }
+
+    // Observe the whole document for layout changes
+    const observer = new ResizeObserver(checkStability)
+    observer.observe(document.body)
+
+    // Also watch images and fonts
+    const images = document.querySelectorAll('img')
+    let loadedCount = 0
+    const onImageLoad = () => {
+      loadedCount++
+      if (loadedCount === images.length) checkStability()
+    }
+    images.forEach(img => {
+      if (img.complete) loadedCount++
+      else img.addEventListener('load', onImageLoad)
+    })
+    if (loadedCount === images.length) checkStability()
+
     if (document.fonts?.ready) {
-      document.fonts.ready.then(refresh).catch(() => {})
+      document.fonts.ready.then(checkStability)
     }
+
+    window.addEventListener('load', checkStability)
+
+    // Fallback timers in case ResizeObserver misses something
+    const timers = [
+      setTimeout(refresh, 100),
+      setTimeout(refresh, 300),
+      setTimeout(refresh, 600),
+      setTimeout(refresh, 1200),
+    ]
 
     return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+      timers.forEach(clearTimeout)
+      observer.disconnect()
+      images.forEach(img => img.removeEventListener('load', onImageLoad))
+      window.removeEventListener('load', checkStability)
       gsap.ticker.remove(lenisTick)
-      window.clearTimeout(refreshOne)
-      window.clearTimeout(refreshTwo)
-      window.removeEventListener('load', refresh)
       lenis.off('scroll', ScrollTrigger.update)
       lenis.destroy()
-      if (window.lenis === lenis) {
-        window.lenis = null
-      }
+      window.lenis = null
     }
   }, [])
+
   return (
-    <div className="relative min-w-full bg-white">
-      <LoadingBar>
-        <ScrollToTop />
-        <Navbar />
-        <AnimatedRoutes />
-      </LoadingBar>
-    </div>
+    <>
+      <Helmet>
+        <title>Cape Frontier</title>
+        <meta name="description" content="Cape Frontier" />
+        <link rel="canonical" href="https://www.cape-frontier.co.za" />
+      </Helmet>
+      <div className="relative min-w-full bg-white">
+        <LoadingBar>
+          <Navbar />
+          <AnimatedRoutes />
+        </LoadingBar>
+      </div>
+    </>
   )
 }
+
 export default App

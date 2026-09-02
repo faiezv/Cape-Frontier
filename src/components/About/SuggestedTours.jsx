@@ -4,6 +4,8 @@ import { gsap } from 'gsap'
 import tours from '../../data/tours.js'
 import { resolveImage } from '../../utils/ImageLoader.js'
 
+import { formatMoney } from '../Tours/Helpers.jsx';
+
 // -----------------------------------------------------------------------------
 // featured tour selection
 // keep this list small because this section is only a quick preview before tours
@@ -25,13 +27,10 @@ const formatPrice = (amount, currency = 'ZAR') => {
   const value = Number(amount || 0)
 
   try {
-    return new Intl.NumberFormat('en-ZA', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0,
-    }).format(value)
-  } catch {
-    return `${currency} ${value.toLocaleString('en-ZA')}`
+    return formatMoney(value, currency)
+  } catch (error) {
+    console.error('Error formatting price:', error)
+    return `${currency} ${value.toFixed(2)}`
   }
 }
 

@@ -1,5 +1,6 @@
 // src/utils/bookingPricing.js
 
+import { formatMoney } from '../components/Tours/Helpers.jsx';
 export const PRIVATE_TOUR_FEE_ZAR = 750;
 export const CUSTOM_TRIP_FEE_ZAR = 500;
 
@@ -35,22 +36,8 @@ export const convertPrice = (
   );
 };
 
-export const formatMoney = (
-  amount = 0,
-  currency = "ZAR"
-) => {
-  const numericAmount = Number(amount || 0);
+export { formatMoney };
 
-  return new Intl.NumberFormat("en", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 2,
-  }).format(
-    Number.isFinite(numericAmount)
-      ? numericAmount
-      : 0
-  );
-};
 
 /**
  * Find the selected tour option.

@@ -3,6 +3,8 @@
 import ClientOnly from "../components/ClientOnly";
 import { lazy, Suspense } from "react"; // ensure you have Suspense imported
 
+import { formatMoney } from '../components/Tours/Helpers.jsx';
+
 // Lazy-load the map – this import only runs on the client
 const Map = lazy(() => import("../components/Map"));
 const DEFAULT_CENTER = [-33.9249, 18.4241];
@@ -371,13 +373,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
   const convertPrice = (baseAmount = 0, targetCurrency = "ZAR") => {
     return Number(baseAmount || 0) * (FX_RATES[targetCurrency] || 1);
   };
-
-  const formatMoney = (amount, currencyCode) =>
-    new Intl.NumberFormat("en", {
-      style: "currency",
-      currency: currencyCode,
-      maximumFractionDigits: 2,
-    }).format(amount);
 
   const supportedCurrencies =
     tour?.supportedCurrencies?.length > 0

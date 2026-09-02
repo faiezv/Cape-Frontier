@@ -24,7 +24,7 @@ const slides = [
 const trustItems = [
   { title: 'Trusted Local Guides', subtitle: 'Licensed & experienced', type: 'shield' },
   { title: 'Top Rated Experiences', subtitle: 'Loved by travellers', type: 'star' },
-  { title: '24/7 Support', subtitle: 'We’re here for you', type: 'support' },
+  { title: '24/7 Support', subtitle: 'We\'re here for you', type: 'support' },
   { title: 'Secure Booking', subtitle: 'Safe & flexible payments', type: 'lock' },
 ]
 
@@ -133,18 +133,17 @@ const Hero = () => {
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
-  // ----- NEW: Pin TourSelect while the hero scrolls away -----
+  // Pin TourSelect while the hero scrolls away
   useEffect(() => {
     const mm = gsap.matchMedia()
     mm.add('(min-width: 768px)', () => {
       if (!heroRef.current || !tourSelectRef.current) return
       const st = ScrollTrigger.create({
         trigger: heroRef.current,
-        start: 'top top',       // pin when hero top reaches viewport top
-        end: 'bottom top',      // unpin when hero bottom reaches viewport top
+        start: 'top top',
+        end: 'bottom top',
         pin: tourSelectRef.current,
-        pinSpacing: false,      // no extra space added when pinned
-        // markers: true,       // uncomment to debug boundaries
+        pinSpacing: false,
       })
       return () => st.kill()
     })
@@ -372,6 +371,7 @@ const Hero = () => {
     <section
       ref={heroRef}
       className="relative h-[100svh] min-h-[100svh] w-full max-w-full overflow-x-hidden overflow-y-clip text-white font-frank"
+      style={{ aspectRatio: '16 / 9' }} // Force fixed aspect ratio to prevent layout shift
     >
       {slides.map((slide, index) => (
         <div
@@ -379,7 +379,7 @@ const Hero = () => {
           ref={(el) => {
             bgRefs.current[index] = el
           }}
-          className="absolute inset-0 will-change-transform "
+          className="absolute inset-0 will-change-transform"
           style={{
             backgroundImage: `url(${slide.image})`,
             backgroundSize: 'cover',
@@ -392,26 +392,35 @@ const Hero = () => {
 
       <div className="relative z-20 flex h-full flex-col">
         <div ref={contentRef}
-          className={`flex flex-1 flex-col items-center px-4 ${isVeryShort ? 'pt18 pb-20' : isShort ? 'pt20 pb-22' : 'pt-24 pb-24'
-            } sm:px-6 sm:pt12 sm:pb-12 md:px-8 md:pt-28 md:pb-24 lg:px-10 lgpt-32`}
+          className="flex flex-1 flex-col items-center px-4 pt-24 pb-24 sm:px-6 sm:pt-12 sm:pb-12 md:px-8 md:pt-28 md:pb-24 lg:px-10 lg:pt-32"
         >
-
-
-          <div className={`${isVeryShort ? 'mt-' : 'mt-'} flex w-full flex-col items-center`}>
-            {/* Title and subtitle commented out in your original code – kept as is */}
+          {/* Tour Select is rendered inside Home, so we don't need it here */}
+          {/* But we keep the ref for pinning */}
+          <div ref={tourSelectRef} className="w-full max-w-5xl">
+            {/* The actual TourSelect component is rendered in Home, this is just a placeholder */}
           </div>
 
-
-
-          {/* Quick actions and trust badges commented out – kept as is */}
-          <div className={`${isVeryShort ? 'mt-4' : 'mt-6'} z-10 w-full max-w-5xl overflow-hidden sm:mt-7`}>
-            <div className="relative w-full overflow-hidden">
-              <div ref={trustTrackRef} className="flex w-max flex-nowrap gap-3 will-change-transform">
-                {/* Trust items carousel commented out in your original code */}
+          {/* The rest of the hero content would go here, but your original code had it commented out */}
+          {/* I'll keep it minimal because your original hero only had the background images and trust items */}
+          <div className="mt-auto flex w-full flex-col items-center justify-end pb-8">
+            <div className="mt-4 w-full max-w-5xl overflow-hidden">
+              <div className="relative w-full overflow-hidden">
+                <div ref={trustTrackRef} className="flex w-max flex-nowrap gap-3 will-change-transform">
+                  {visibleTrustItems.map((item, idx) => (
+                    <div
+                      key={idx}
+                      ref={(el) => { trustRefs.current[idx] = el }}
+                      className="flex shrink-0 items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 backdrop-blur-sm"
+                    >
+                      <Icon type={item.type} />
+                      <span className="text-xs font-bold tracking-wide">{item.title}</span>
+                      <span className="text-[10px] text-white/70">{item.subtitle}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-[linear-gradient(90deg,rgba(2,8,23,0.62)_0%,rgba(2,8,23,0.28)_42%,rgba(2,8,23,0)_100%)] sm:w-24" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-[linear-gradient(270deg,rgba(2,8,23,0.62)_0%,rgba(2,8,23,0.28)_42%,rgba(2,8,23,0)_100%)] sm:w-24" />
               </div>
-
-              <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-[linear-gradient(90deg,rgba(2,8,23,0.62)_0%,rgba(2,8,23,0.28)_42%,rgba(2,8,23,0)_100%)] sm:w-24" />
-              <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-[linear-gradient(270deg,rgba(2,8,23,0.62)_0%,rgba(2,8,23,0.28)_42%,rgba(2,8,23,0)_100%)] sm:w-24" />
             </div>
           </div>
         </div>

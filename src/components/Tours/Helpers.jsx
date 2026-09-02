@@ -171,12 +171,27 @@ export function getTourImageSources(tour) {
   );
 }
 
+// src/components/Tours/Helpers.jsx
+
 export function formatMoney(amount, currencyCode = "ZAR") {
-  return new Intl.NumberFormat("en-ZA", {
-    style: "currency",
-    currency: currencyCode,
-    maximumFractionDigits: 2,
-  }).format(Number.isFinite(amount) ? amount : 0);
+  // Guard
+  const num = typeof amount === 'number' && !isNaN(amount) ? amount : 0;
+
+  // Round to 2 decimals and split
+  const rounded = Math.round(num * 100) / 100;
+  const parts = rounded.toFixed(2).split('.');
+  const integerPart = parts[0];
+  const decimalPart = parts[1];
+
+  // Add commas as thousand separators (no Intl!)
+  const withCommas = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  // Currency symbols (add more if needed)
+  const symbols = { ZAR: 'R', USD: '$', EUR: '€', GBP: '£' };
+  const symbol = symbols[currencyCode] || currencyCode;
+
+  // Use a regular space (not non‑breaking)
+  return `${symbol} ${withCommas}.${decimalPart}`;
 }
 
 export function convertPrice(baseAmount, targetCurrency) {

@@ -3,18 +3,25 @@ import { createPortal } from "react-dom";
 import { useState, useRef, useEffect } from "react";
 import { KIDS_ACTIVITIES } from "../data/kidsActivities";
 
+// ✅ FIX: Force comma as thousands separator (consistent everywhere)
 const formatPrice = (price) => {
   if (price === null || price === undefined) return "Check rate";
   if (price === 0) return "Free";
-  return `R${price.toLocaleString("en-ZA")}`;
+  return `R${price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 };
 
 export const KidsActivitiesNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
+  const [mounted, setMounted] = useState(false); // ✅ Portal guard
   const scrollContainerRef = useRef(null);
   const popupTimeoutRef = useRef(null);
+
+  // ✅ Mount after hydration to avoid portal mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleMouseEnter = () => {
     clearTimeout(popupTimeoutRef.current);
@@ -27,7 +34,7 @@ export const KidsActivitiesNavbar = () => {
     }, 600);
   };
 
-  // Scroll lock + Lenis
+  // Scroll lock + Lenis (unchanged)
   useEffect(() => {
     if (!isOpen) {
       document.documentElement.style.overflow = "";
@@ -35,13 +42,11 @@ export const KidsActivitiesNavbar = () => {
       if (window.lenis) window.lenis.start();
       return;
     }
-
     const htmlOverflow = document.documentElement.style.overflow;
     const bodyOverflow = document.body.style.overflow;
     document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
     if (window.lenis) window.lenis.stop();
-
     return () => {
       document.documentElement.style.overflow = htmlOverflow || "";
       document.body.style.overflow = bodyOverflow || "";
@@ -49,7 +54,6 @@ export const KidsActivitiesNavbar = () => {
     };
   }, [isOpen]);
 
-  // Close popup when modal opens
   useEffect(() => {
     if (isOpen) {
       clearTimeout(popupTimeoutRef.current);
@@ -57,12 +61,10 @@ export const KidsActivitiesNavbar = () => {
     }
   }, [isOpen]);
 
-  // Cleanup timeout
   useEffect(() => {
     return () => clearTimeout(popupTimeoutRef.current);
   }, []);
 
-  // Modal content
   const modal = (
     <div
       className={`
@@ -117,7 +119,6 @@ export const KidsActivitiesNavbar = () => {
           <div className="space-y-2">
             {KIDS_ACTIVITIES.map((activity) => {
               const isExpanded = expandedId === activity.id;
-
               return (
                 <div
                   key={activity.id}
@@ -313,7 +314,8 @@ export const KidsActivitiesNavbar = () => {
         )}
       </div>
 
-      {typeof document !== "undefined" && createPortal(modal, document.body)}
+      {/* ✅ Portal only after client mount – no hydration mismatch */}
+      {mounted && createPortal(modal, document.body)}
     </>
   );
 };

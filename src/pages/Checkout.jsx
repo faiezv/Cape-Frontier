@@ -12,6 +12,8 @@ import { appearance, stripePromise } from "/config/stripe.js";
 import { FX_RATES } from "../data/tours.js";
 import vehicles from "../data/vehicles.js";
 
+import { formatMoney } from '../components/Tours/Helpers.jsx';
+
 gsap.registerPlugin(ScrollTrigger);
 
 const DEFAULT_PRIVATE_TOUR_FEE_ZAR = 750;
@@ -59,16 +61,6 @@ const convertFromZar = (amountZar, currency) => {
   return safeAmount * rate;
 };
 
-const formatMoney = (amount, currency) => {
-  const safeAmount = Number(amount);
-  const code = String(currency || "ZAR").toUpperCase();
-
-  return new Intl.NumberFormat("en", {
-    style: "currency",
-    currency: code,
-    maximumFractionDigits: 2,
-  }).format(Number.isFinite(safeAmount) ? safeAmount : 0);
-};
 
 const formatDisplayTime = (value) => {
   if (!value) return "";

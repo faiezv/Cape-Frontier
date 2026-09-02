@@ -15,6 +15,8 @@ import vehicles from "../data/vehicles.js";
 import { KIDS_ACTIVITIES } from "../data/kidsActivities";
 
 import { resolveImage } from "../utils/ImageLoader.js";
+import { formatMoney } from '../components/Tours/Helpers.jsx';
+import Seo from '../components/Seo.jsx'
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -82,16 +84,6 @@ const convertFromZar = (amountZar, currency) => {
   return safeAmount * rate;
 };
 
-const formatMoney = (amount, currency) => {
-  const safeAmount = Number(amount);
-  const code = String(currency || "ZAR").toUpperCase();
-
-  return new Intl.NumberFormat("en", {
-    style: "currency",
-    currency: code,
-    maximumFractionDigits: 2,
-  }).format(Number.isFinite(safeAmount) ? safeAmount : 0);
-};
 
 const formatDisplayTime = (value) => {
   if (!value) return "";
@@ -183,9 +175,8 @@ const SummaryRow = ({ label, value, strong = false }) => (
   <div className="flex items-start justify-between gap-4 text-sm">
     <span className="text-slate-500">{label}</span>
     <span
-      className={`max-w-[62%] text-right leading-5 ${
-        strong ? "font-bold text-slate-950" : "font-semibold text-slate-700"
-      }`}
+      className={`max-w-[62%] text-right leading-5 ${strong ? "font-bold text-slate-950" : "font-semibold text-slate-700"
+        }`}
     >
       {value}
     </span>
@@ -241,11 +232,10 @@ const RevealButton = ({ active, title, detail, onClick }) => (
   <button
     type="button"
     onClick={onClick}
-    className={`group flex w-full items-center justify-between gap-3 rounded-[1.25rem] border p-4 text-left transition ${
-      active
+    className={`group flex w-full items-center justify-between gap-3 rounded-[1.25rem] border p-4 text-left transition ${active
         ? "border-green-300 bg-green-200 text-green-950"
         : "border-black/5 bg-white/82 text-slate-700 shadow-[0_10px_24px_rgba(7,31,79,0.04)] hover:-translate-y-0.5 hover:bg-white"
-    }`}
+      }`}
   >
     <span>
       <span className="block text-sm font-bold">{title}</span>
@@ -259,11 +249,10 @@ const RevealButton = ({ active, title, detail, onClick }) => (
     </span>
 
     <span
-      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg font-bold transition ${
-        active
+      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg font-bold transition ${active
           ? "bg-white/70 rotate-45 text-green-950"
           : "bg-slate-50 group-hover:bg-[#eef4ff]"
-      }`}
+        }`}
     >
       +
     </span>
@@ -273,17 +262,15 @@ const RevealButton = ({ active, title, detail, onClick }) => (
 const RevealPanel = ({ open, children }) => {
   return (
     <div
-      className={`overflow-hidden rounded-[1.5rem] transition-all duration-500 ease-out ${
-        open
+      className={`overflow-hidden rounded-[1.5rem] transition-all duration-500 ease-out ${open
           ? "max-h-[3200px] translate-y-0 opacity-100"
           : "max-h-0 -translate-y-2 opacity-0 pointer-events-none"
-      }`}
+        }`}
       aria-hidden={!open}
     >
       <div
-        className={`transition-all duration-500 ease-out ${
-          open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
-        }`}
+        className={`transition-all duration-500 ease-out ${open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+          }`}
       >
         {children}
       </div>
@@ -359,7 +346,7 @@ const CheckoutForm = ({
 
   const totalMinorUnit = Number(
     pricingSummary?.totalMinorUnit ??
-      bookingDetails?.pricingOptions?.totalMinorUnit,
+    bookingDetails?.pricingOptions?.totalMinorUnit,
   );
 
   const handleSubmit = async (e) => {
@@ -1293,8 +1280,8 @@ const CheckoutPaystack = () => {
 
   const pickupCoordLabel = bookingDetails?.pickupCoords
     ? `${Number(bookingDetails.pickupCoords.lat).toFixed(6)}, ${Number(
-        bookingDetails.pickupCoords.lng,
-      ).toFixed(6)}`
+      bookingDetails.pickupCoords.lng,
+    ).toFixed(6)}`
     : "Not selected on map";
 
   const pickupTimeLabel = useMemo(() => {
@@ -1773,9 +1760,8 @@ const CheckoutPaystack = () => {
 
                   <RevealPanel open={openPanels.custom}>
                     <div
-                      className={`rounded-[1.5rem] p-5 shadow-[0_14px_34px_rgba(7,31,79,0.05)] ${
-                        isCustom ? "bg-white" : "bg-stone-50"
-                      }`}
+                      className={`rounded-[1.5rem] p-5 shadow-[0_14px_34px_rgba(7,31,79,0.05)] ${isCustom ? "bg-white" : "bg-stone-50"
+                        }`}
                     >
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">

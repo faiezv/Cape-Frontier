@@ -15,6 +15,8 @@ import ContactPlatforms from "/src/components/ContactPlatforms.jsx";
 import { useLoadingNavigate } from "/src/components/useLoadingNavigate.jsx";
 import { resolveTourImage as resolveImage } from "../utils/ImageLoader";
 
+import { formatMoney } from '../components/Tours/Helpers.jsx';
+
 // SEO
 import Seo from "../components/Seo.jsx";
 
@@ -46,19 +48,7 @@ gsap.registerPlugin(ScrollToPlugin, ScrollTrigger);
 
 const PIN_TOP_OFFSET = 96;
 
-const formatMoney = (amount, currencyCode = "ZAR") =>
-  new Intl.NumberFormat("en-ZA", {
-    style: "currency",
-    currency: currencyCode,
-    maximumFractionDigits: 2,
-  }).format(amount);
-
-const formatCompactMoney = (amount, currencyCode = "ZAR") =>
-  new Intl.NumberFormat("en-ZA", {
-    style: "currency",
-    currency: currencyCode,
-    maximumFractionDigits: 0,
-  }).format(amount);
+const formatCompactMoney = (amount, currencyCode = "ZAR") => formatMoney(amount, currencyCode);
 
 const getItemText = (item) => {
   if (!item) return "";

@@ -440,7 +440,7 @@ const Stories = () => {
               >
                 {storyImages.map((src, index) => (
                   <img
-                    key={src}
+                    key={`${src}-${index}`}
                     ref={(el) => {
                       imageRefs.current[index] = el
                     }}

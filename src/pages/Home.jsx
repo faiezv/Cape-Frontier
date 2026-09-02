@@ -4,7 +4,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 // SEO
-import Seo from '../components/Seo.jsx'
+import Seo from "../components/Seo.jsx";
 
 import Hero from "../components/Hero.jsx";
 import About from "../components/About/About.jsx";
@@ -40,21 +40,14 @@ const Home = () => {
   const [isToursVisible, setIsToursVisible] = useState(false);
   const [isContactVisible, setIsContactVisible] = useState(false);
 
-  // ---------- DISABLE BROWSER SCROLL RESTORATION ----------
-  useLayoutEffect(() => {
-    if ("scrollRestoration" in window.history) {
-      const previous = window.history.scrollRestoration;
-      window.history.scrollRestoration = "manual";
-      return () => {
-        window.history.scrollRestoration = previous;
-      };
-    }
-  }, []);
-
   // ---------- HASH OVERRIDE ----------
   useEffect(() => {
     if (location.hash) {
-      window.history.replaceState(null, "", location.pathname + location.search);
+      window.history.replaceState(
+        null,
+        "",
+        location.pathname + location.search,
+      );
       window.scrollTo(0, 0);
       if (window.lenis) {
         window.lenis.scrollTo(0, { immediate: true, force: true });
@@ -204,24 +197,20 @@ const Home = () => {
   }, [location.key]);
 
   // ---------- REFRESH ONCE TOURS' LAYOUT ACTUALLY SETTLES ----------
-  // Tours is the heaviest, slowest-to-stabilize subtree on this page
-  // (carousel, category nav, image loads). The old approach refreshed
-  // ScrollTrigger on blind timers (80/320/900ms) that raced Tours'
-  // real layout settling — if a refresh fired mid-shift, ScrollTrigger
-  // recalculated the Hero pin against a still-moving page and then
-  // visibly corrected once Tours finished. ToursBrowser now dispatches
-  // 'tours:stable' once its own ResizeObserver reports no size change
-  // for 150ms, so this refresh only ever runs against a settled layout.
   useEffect(() => {
     const onStable = () => ScrollTrigger.refresh(true);
     window.addEventListener("tours:stable", onStable);
     return () => window.removeEventListener("tours:stable", onStable);
   }, []);
 
-  // ---------- HERO & ABOUT ANIMATIONS ----------
-  useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      if (!heroRef.current || !aboutRef.current) return;
+  // ---------- HERO & ABOUT ANIMATIONS (DELAYED PIN) ----------
+  // We'll keep the ScrollTrigger pin but delay its creation until after load
+  const [pinCreated, setPinCreated] = useState(false);
+
+  useEffect(() => {
+    // Only run once after everything is stable
+    const createPin = () => {
+      if (!heroRef.current || !aboutRef.current || pinCreated) return;
 
       const touchDevice = isTouchDevice();
 
@@ -263,14 +252,14 @@ const Home = () => {
           start: "top top",
           end: () =>
             `+=${Math.round(
-              getHeroScrollDistance() * (touchDevice ? 1.15 : 1)
+              getHeroScrollDistance() * (touchDevice ? 1.15 : 1),
             )}`,
           scrub: touchDevice ? 0.55 : 0.3,
           pin: heroRef.current,
           pinSpacing: false,
           anticipatePin: touchDevice ? 0 : 1,
           invalidateOnRefresh: true,
-          refreshPriority: 2,
+          refreshPriority: 5,
           onRefreshInit: () => {
             if (window.scrollY <= 2) resetHero();
           },
@@ -291,30 +280,33 @@ const Home = () => {
           force3D: true,
           ease: "none",
         },
-        0
+        0,
       );
 
-      // Keep the load/fonts refresh — cheap, and covers late web-font
-      // metric shifts that affect Hero/About text height specifically.
-      // The Tours-driven refresh above is now what handles the heavy,
-      // unpredictable layout settling instead of a blind timer chain.
-      const refresh = () => {
-        if (window.scrollY <= 2) resetHero();
-        ScrollTrigger.refresh(true);
-      };
+      setPinCreated(true);
+      // Force a final refresh after pin creation
+      ScrollTrigger.refresh(true);
+    };
 
-      window.addEventListener("load", refresh, { once: true });
-      if (document.fonts?.ready) {
-        document.fonts.ready.then(refresh).catch(() => { });
+    // Wait for the DOM to settle
+    const setup = () => {
+      // If already loaded, create immediately
+      if (document.readyState === "complete") {
+        setTimeout(createPin, 200);
+        return;
       }
+      // Otherwise wait for load
+      window.addEventListener("load", () => {
+        setTimeout(createPin, 300);
+      }, { once: true });
+    };
 
-      return () => {
-        window.removeEventListener("load", refresh);
-      };
-    }, pageRef);
+    setup();
 
-    return () => ctx.revert();
-  }, []);
+    return () => {
+      // Cleanup if needed
+    };
+  }, [pinCreated]);
 
   // ---------- RENDER ----------
   return (
@@ -364,10 +356,11 @@ const Home = () => {
 
         {/* Fixed button */}
         <div
-          className={`fixed left-1/2 top-20 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${showButton
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-            }`}
+          className={`fixed left-1/2 top-20 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${
+            showButton
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
+          }`}
         >
           <button
             onClick={scrollToTourSelect}
@@ -389,8 +382,9 @@ const Home = () => {
               />
             </svg>
             <span
-              className={`ml-2 font-medium text-white transition-all duration-500 delay-150 ${showButton ? "opacity-100" : "opacity-0"
-                }`}
+              className={`ml-2 font-medium text-white transition-all duration-500 delay-150 ${
+                showButton ? "opacity-100" : "opacity-0"
+              }`}
             >
               Tour Select
             </span>

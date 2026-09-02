@@ -11,6 +11,8 @@ import { useNavigate } from 'react-router-dom'
 import { useLoadingNavigate } from "../useLoadingNavigate.jsx"
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+import { formatMoney } from './Helpers.jsx'; // or '../Tours/Helpers.jsx' depending on path
+
 // -----------------------------------------------------------------------------
 // data helpers (unchanged)
 // -----------------------------------------------------------------------------
@@ -66,13 +68,10 @@ const formatTourPrice = (tour) => {
   if (!amount) return null
 
   try {
-    return new Intl.NumberFormat('en-ZA', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0,
-    }).format(Number(amount))
-  } catch {
-    return `${currency} ${Number(amount).toLocaleString('en-ZA')}`
+    return formatMoney(Number(amount), currency)
+  } catch (error) {
+    console.error('Error formatting price:', error)
+    return `${currency} ${Number(amount).toFixed(2)}`
   }
 }
 
