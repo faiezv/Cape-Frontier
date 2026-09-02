@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import gsap from "gsap";
+import Seo from '../components/Seo.jsx'
 
 // ---------- Helpers (unchanged) ----------
 const formatDate = (dateValue) => {
@@ -105,24 +106,21 @@ const DetailCard = ({ label, value, note, tone = "white" }) => {
       className={`rounded-[1.35rem] p-4 shadow-[0_12px_30px_rgba(7,31,79,0.06)] ${tones[tone] || tones.white}`}
     >
       <p
-        className={`text-[10px] font-bold uppercase tracking-[0.2em] ${
-          tone === "dark" ? "text-white/45" : "text-slate-400"
-        }`}
+        className={`text-[10px] font-bold uppercase tracking-[0.2em] ${tone === "dark" ? "text-white/45" : "text-slate-400"
+          }`}
       >
         {label}
       </p>
       <p
-        className={`mt-2 break-words font-frank text-2xl font-bold leading-none ${
-          tone === "dark" ? "text-white" : "text-[#071f4f]"
-        }`}
+        className={`mt-2 break-words font-frank text-2xl font-bold leading-none ${tone === "dark" ? "text-white" : "text-[#071f4f]"
+          }`}
       >
         {value}
       </p>
       {note && (
         <p
-          className={`mt-2 text-xs leading-5 ${
-            tone === "dark" ? "text-white/60" : "text-slate-500"
-          }`}
+          className={`mt-2 text-xs leading-5 ${tone === "dark" ? "text-white/60" : "text-slate-500"
+            }`}
         >
           {note}
         </p>
@@ -365,7 +363,7 @@ const CheckoutSuccessPaystack = () => {
         setPaymentStatus("error");
         setPaymentMessage(
           error.message ||
-            "Payment verification failed. Please contact Cape Frontier with your reference.",
+          "Payment verification failed. Please contact Cape Frontier with your reference.",
         );
         setEmailStatus("failed"); // leave "pending" state
       }
