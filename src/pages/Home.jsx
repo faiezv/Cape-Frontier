@@ -3,6 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+// SEO
+import Seo from '../components/Seo.jsx'
+
 import Hero from "../components/Hero.jsx";
 import About from "../components/About/About.jsx";
 import Stories from "../components/Stories/Stories.jsx";
@@ -302,7 +305,7 @@ const Home = () => {
 
       window.addEventListener("load", refresh, { once: true });
       if (document.fonts?.ready) {
-        document.fonts.ready.then(refresh).catch(() => {});
+        document.fonts.ready.then(refresh).catch(() => { });
       }
 
       return () => {
@@ -315,81 +318,86 @@ const Home = () => {
 
   // ---------- RENDER ----------
   return (
-    <div
-      ref={pageRef}
-      className="relative flex flex-col overflow-x-hidden bg-white text-white"
-    >
-      <section className="absolute z-30 w-full overflow-x-hidden overflow-y-visible">
-        <div ref={tourSelectSectionRef} className="mx-auto max-w-5xl mt-20">
-          <TourSelect />
-        </div>
-      </section>
-
-      <section
-        id="home"
-        ref={heroRef}
-        className="relative z-10 overflow-hidden"
-      >
-        <Hero />
-      </section>
-
-      <section
-        id="about"
-        ref={aboutRef}
-        className="relative z-20 -mt-6 rounded-t-[2rem] bg-white text-black sm:-mt-8 lg:-mt-10"
-      >
-        <About />
-      </section>
-
-      <section id="stories" className="relative z-26">
-        <Stories />
-      </section>
-
-      <section id="tours" ref={toursSectionRef} className="relative z-26">
-        <Tours />
-      </section>
-
-      <section id="contact" ref={contactSectionRef} className="relative z-26">
-        <Contact />
-      </section>
-
-      {/* Fixed button */}
+    <>
+      <Seo
+        title="Cape Frontier Travel | Guided Tours in South Africa"
+        description="Small-group and custom tours across the Western Cape."
+        path="/"
+      />
       <div
-        className={`fixed left-1/2 top-20 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${
-          showButton
+        ref={pageRef}
+        className="relative flex flex-col overflow-x-hidden bg-white text-white"
+      >
+        <section className="absolute z-30 w-full overflow-x-hidden overflow-y-visible">
+          <div ref={tourSelectSectionRef} className="mx-auto max-w-5xl mt-20">
+            <TourSelect />
+          </div>
+        </section>
+
+        <section
+          id="home"
+          ref={heroRef}
+          className="relative z-10 overflow-hidden"
+        >
+          <Hero />
+        </section>
+
+        <section
+          id="about"
+          ref={aboutRef}
+          className="relative z-20 -mt-6 rounded-t-[2rem] bg-white text-black sm:-mt-8 lg:-mt-10"
+        >
+          <About />
+        </section>
+
+        <section id="stories" className="relative z-26">
+          <Stories />
+        </section>
+
+        <section id="tours" ref={toursSectionRef} className="relative z-26">
+          <Tours />
+        </section>
+
+        <section id="contact" ref={contactSectionRef} className="relative z-26">
+          <Contact />
+        </section>
+
+        {/* Fixed button */}
+        <div
+          className={`fixed left-1/2 top-20 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${showButton
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
-        }`}
-      >
-        <button
-          onClick={scrollToTourSelect}
-          className="flex items-center rounded-full bg-blue-600 px-5 py-2.5 shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          aria-label="Jump to tour selection"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 text-white"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 15l7-7 7 7"
-            />
-          </svg>
-          <span
-            className={`ml-2 font-medium text-white transition-all duration-500 delay-150 ${
-              showButton ? "opacity-100" : "opacity-0"
             }`}
+        >
+          <button
+            onClick={scrollToTourSelect}
+            className="flex items-center rounded-full bg-blue-600 px-5 py-2.5 shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            aria-label="Jump to tour selection"
           >
-            Tour Select
-          </span>
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 15l7-7 7 7"
+              />
+            </svg>
+            <span
+              className={`ml-2 font-medium text-white transition-all duration-500 delay-150 ${showButton ? "opacity-100" : "opacity-0"
+                }`}
+            >
+              Tour Select
+            </span>
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

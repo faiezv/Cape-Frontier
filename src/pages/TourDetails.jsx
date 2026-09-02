@@ -15,10 +15,13 @@ import ContactPlatforms from "/src/components/ContactPlatforms.jsx";
 import { useLoadingNavigate } from "/src/components/useLoadingNavigate.jsx";
 import { resolveTourImage as resolveImage } from "../utils/ImageLoader";
 
+// SEO
+import Seo from "../components/Seo.jsx";
+
 // Shared
 import TourHero from "../components/TourDetails/TourHero";
 import TourQuickInfo from "../components/TourDetails/TourQuickInfo";
-import TourPricing from "../components/TourDetails/TourPricing";  
+import TourPricing from "../components/TourDetails/TourPricing";
 import AdditionalPricing from "../components/TourDetails/TourAdditionalPricing";
 import TourGroupPricing from "../components/TourDetails/TourGroupPricing";
 import TourGallery from "../components/TourDetails/TourGallery";
@@ -27,7 +30,7 @@ import TourHighlights from "../components/TourDetails/TourHighlights";
 import TourRequirements from "../components/TourDetails/TourRequirements";
 import Arrangements from "../components/TourDetails/Arrangements";
 import TourWeatherPolicy from "../components/TourDetails/TourWeatherPolicy";
-import TourCancellationPolicy from "../components/TourDetails/TourCancellationPolicy"
+import TourCancellationPolicy from "../components/TourDetails/TourCancellationPolicy";
 import TourSafetyPolicy from "../components/TourDetails/TourSafetyPolicy";
 
 // Cobra
@@ -71,7 +74,7 @@ const formatTimeWithPeriod = (value = "") => {
   if (!value) return "";
 
   const text = String(value).replace(/\b(am|pm)\b/gi, (match) =>
-    match.toUpperCase()
+    match.toUpperCase(),
   );
 
   return text.replace(
@@ -82,7 +85,7 @@ const formatTimeWithPeriod = (value = "") => {
       const displayHour = hour % 12 || 12;
 
       return `${displayHour}:${minuteText} ${period}`;
-    }
+    },
   );
 };
 
@@ -93,7 +96,7 @@ const getAllTourGalleryImages = (tour) => {
 
   if (Array.isArray(tour.destinationGalleries)) {
     destinationImages = tour.destinationGalleries.flatMap(
-      (destination) => destination.images || []
+      (destination) => destination.images || [],
     );
   } else if (
     tour.destinationGalleries &&
@@ -107,9 +110,7 @@ const getAllTourGalleryImages = (tour) => {
     ...(tour.images || []),
     ...destinationImages,
     ...(tour.stops || [])
-      .filter(
-        (stop) => stop.id !== "pickup" && stop.id !== "return"
-      )
+      .filter((stop) => stop.id !== "pickup" && stop.id !== "return")
       .flatMap((stop) => stop.images || []),
   ]
     .filter(Boolean)
@@ -144,24 +145,24 @@ const getRelatedTours = (tour) => {
   if (!tour) return [];
 
   const sameType = tours.filter(
-    (item) => item.slug !== tour.slug && item.type === tour.type
+    (item) => item.slug !== tour.slug && item.type === tour.type,
   );
 
   const sameCategory = tours.filter(
     (item) =>
       item.slug !== tour.slug &&
       item.category === tour.category &&
-      !sameType.some((match) => match.slug === item.slug)
+      !sameType.some((match) => match.slug === item.slug),
   );
 
   const capeTownFallback = tours.filter(
     (item) =>
       item.slug !== tour.slug &&
       /cape town|sea point|cbd|camps bay|peninsula|table/i.test(
-        `${item.location || ""} ${item.title || ""}`
+        `${item.location || ""} ${item.title || ""}`,
       ) &&
       !sameType.some((match) => match.slug === item.slug) &&
-      !sameCategory.some((match) => match.slug === item.slug)
+      !sameCategory.some((match) => match.slug === item.slug),
   );
 
   return [...sameType, ...sameCategory, ...capeTownFallback].slice(0, 3);
@@ -252,10 +253,11 @@ export default function TourDetails() {
 
   const mobileHiddenGalleryCount = Math.max(
     galleryImages.length - mobileGalleryVisibleCount,
-    0
+    0,
   );
 
-  const hasMoreMobileGalleryImages = isCompactLayout && mobileHiddenGalleryCount > 0;
+  const hasMoreMobileGalleryImages =
+    isCompactLayout && mobileHiddenGalleryCount > 0;
 
   const galleryImagesForLayout = useMemo(() => {
     if (isCompactLayout) {
@@ -263,7 +265,12 @@ export default function TourDetails() {
     }
 
     return visibleGalleryImages;
-  }, [galleryImages, isCompactLayout, mobileGalleryVisibleCount, visibleGalleryImages]);
+  }, [
+    galleryImages,
+    isCompactLayout,
+    mobileGalleryVisibleCount,
+    visibleGalleryImages,
+  ]);
 
   const heroBadges = useMemo(() => getHeroBadges(tour), [tour]);
 
@@ -315,7 +322,7 @@ export default function TourDetails() {
     metaDescription.setAttribute("name", "description");
     metaDescription.setAttribute(
       "content",
-      tour.seo?.description || tour.description
+      tour.seo?.description || tour.description,
     );
 
     document.head.appendChild(metaDescription);
@@ -326,7 +333,8 @@ export default function TourDetails() {
     Only styling around the pinned card changed.
   */
   useLayoutEffect(() => {
-    if (!tour || !readyCardRef.current || !desktopContentSectionRef.current) return;
+    if (!tour || !readyCardRef.current || !desktopContentSectionRef.current)
+      return;
 
     const mm = gsap.matchMedia();
 
@@ -423,7 +431,10 @@ export default function TourDetails() {
           onUpdate: (self) => {
             const nextIndex = Math.max(
               0,
-              Math.min(stopCount - 1, Math.round(self.progress * (stopCount - 1)))
+              Math.min(
+                stopCount - 1,
+                Math.round(self.progress * (stopCount - 1)),
+              ),
             );
 
             if (activeItineraryIndexRef.current !== nextIndex) {
@@ -458,7 +469,7 @@ export default function TourDetails() {
             duration: 0.18,
             ease: "none",
           },
-          transitionStart
+          transitionStart,
         );
 
         tl.to(
@@ -471,7 +482,7 @@ export default function TourDetails() {
             duration: 0.18,
             ease: "none",
           },
-          transitionStart + 0.14
+          transitionStart + 0.14,
         );
 
         tl.to(
@@ -482,7 +493,7 @@ export default function TourDetails() {
             duration: 0.34,
             ease: "none",
           },
-          transitionStart
+          transitionStart,
         );
 
         tl.to(
@@ -493,7 +504,7 @@ export default function TourDetails() {
             duration: 0.34,
             ease: "none",
           },
-          transitionStart
+          transitionStart,
         );
       });
 
@@ -606,7 +617,7 @@ export default function TourDetails() {
 
   const showMoreMobileGalleryImages = () => {
     setMobileGalleryVisibleCount((current) =>
-      Math.min(current + 3, galleryImages.length)
+      Math.min(current + 3, galleryImages.length),
     );
 
     requestAnimationFrame(() => {
@@ -619,25 +630,31 @@ export default function TourDetails() {
   };
 
   useEffect(() => {
-    if (!location.hash) return
+    if (!location.hash) return;
 
-    const id = location.hash.replace('#', '')
+    const id = location.hash.replace("#", "");
 
-    const element = document.getElementById(id)
+    const element = document.getElementById(id);
 
-    if (!element) return
+    if (!element) return;
 
     requestAnimationFrame(() => {
       element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      })
-    })
-  }, [location])
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }, [location]);
 
   return (
-    <main className="bg-white text-black">
-      <style>{`
+    <>
+      <Seo
+        title={`${tour.name} | Cape Frontier Travel`}
+        description={tour.shortDescription}
+        path={`/tours/${slug}`}
+      />
+      <main className="bg-white text-black">
+        <style>{`
         .short-screen-route-skip {
           display: none;
         }
@@ -652,377 +669,370 @@ export default function TourDetails() {
           }
         }
       `}</style>
-      {/* HERO */}
-      <TourHero tour={tour} />
+        {/* HERO */}
+        <TourHero tour={tour} />
 
-      {/* QUICK INFO BAR*/}
-      <TourQuickInfo 
-        tour={tour}
-        formatMoney={formatMoney} 
-        formatCompactMoney={formatCompactMoney} 
-        getShortLocation={getShortLocation} 
-        PriceIcon={PriceIcon} MapPinIcon={MapPinIcon} DurationIcon={DurationIcon} RatingIcon={RatingIcon} />
+        {/* QUICK INFO BAR*/}
+        <TourQuickInfo
+          tour={tour}
+          formatMoney={formatMoney}
+          formatCompactMoney={formatCompactMoney}
+          getShortLocation={getShortLocation}
+          PriceIcon={PriceIcon}
+          MapPinIcon={MapPinIcon}
+          DurationIcon={DurationIcon}
+          RatingIcon={RatingIcon}
+        />
 
-      {/* TOUR CONTENT: PRICING,  */}
-      <section
-        ref={desktopContentSectionRef}
-        className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 pt-12 pb-12 sm:px-5 lg:px-5 lg:pt-20 lg:pb-14 lg:grid-cols-[1.32fr_0.68fr] xl:gap-10"
-      >
-        <div ref={contentColumnRef} className="space-y-9">
-          {/* PRICING */}
-          <ContentBlock eyebrow="Pricing" title="Tour Pricing">
-            {/* BASE PRICE */}
-            <TourPricing pricing={tour.pricing} />
-            
-            {/* ADDIOTNAL PRICING */}
-            {tour.additionalPricing?.length > 0 && (
-              <AdditionalPricing
-                pricing={tour.additionalPricing}
-              />
-            )}
+        {/* TOUR CONTENT: PRICING,  */}
+        <section
+          ref={desktopContentSectionRef}
+          className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 pt-12 pb-12 sm:px-5 lg:px-5 lg:pt-20 lg:pb-14 lg:grid-cols-[1.32fr_0.68fr] xl:gap-10"
+        >
+          <div ref={contentColumnRef} className="space-y-9">
+            {/* PRICING */}
+            <ContentBlock eyebrow="Pricing" title="Tour Pricing">
+              {/* BASE PRICE */}
+              <TourPricing pricing={tour.pricing} />
 
-            {/* GROUP PRICE */}
-            {tour.groupPricing?.enabled && (
-              <TourGroupPricing groupPricing={tour.groupPricing} />
-            )}
-          </ContentBlock>
-          
+              {/* ADDIOTNAL PRICING */}
+              {tour.additionalPricing?.length > 0 && (
+                <AdditionalPricing pricing={tour.additionalPricing} />
+              )}
 
-          {/* DESCRIPTION */}
-          <ContentBlock eyebrow="Overview" title="About this experience">
-            <p className="font-bitter text-lg text-black">
-              {tour.description}
-            </p>
-
-          </ContentBlock>
-
-          {/* GALLERY */}
-          <TourGallery tour={tour} imageFolder={tour.imageFolder} />
-
-          {/* INCLUDED AND EXCLUDED */}
-          <TourIncludedExcluded tour={tour} />
-
-          {/* HIGHLIGHTS */}
-          {tour.highlights && (
-            <TourHighlights highlights={tour.highlights} />
-          )}
-            
-          {/* REQUIREMENTS */}
-          {tour.requirements?.length > 0 && (
-            <TourRequirements requirements={tour.requirements} />
-          )}
-
-          {/* ARRANGEMENTS */}
-          {tour.arrangements && (
-            <Arrangements arrangements={tour.arrangements} />
-          )}
-          
-          {/* WEATHER POLICY */}
-          {tour.weatherPolicy && (
-            <TourWeatherPolicy weather={tour.weatherPolicy} />
-          )}
-
-          {/* CANCELLATION POLICY */}
-          {tour.cancellationPolicy && (
-            <TourCancellationPolicy
-              policy={tour.cancellationPolicy}
-            />
-          )}
-
-         {/* SAFETY POLICY */}
-          {tour.safetyPolicy &&
-            <TourSafetyPolicy safety={tour.safetyPolicy} />
-          }
-
-
-          {/* ----------------- COBRA ------------------ */}
-          {/* COBRA SPECIFIC */}
-          {tour.vehicle && (
-            <VehicleDetails vehicle={tour.vehicle} />
-          )}
-
-          {/* COBRA SPECIFIC */}
-          {tour.routeInformation && (
-            <RouteInformation route={tour.routeInformation} />
-          )}
-
-          {/* COBRA SPECIFIC */}
-          {tour.securityAndLiability && (
-            <SecurityAndLiability
-              security={tour.securityAndLiability}
-            />
-          )}
-          {/* ------------------------------------------- */}
-
-          {/* NEED TO KNOW + FAQ */}
-          <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-12 sm:px-5 lg:px-5 lg:py-14 lg:grid-cols-2">
-            <ContentBlock eyebrow="Before you book..." title="Need to know">
-              <div className="grid grid-cols-1 gap-3">
-                {tour.needToKnow?.map((item, index) => (
-                  <TickCard key={index} text={getItemText(item)} />
-                ))}
-              </div>
+              {/* GROUP PRICE */}
+              {tour.groupPricing?.enabled && (
+                <TourGroupPricing groupPricing={tour.groupPricing} />
+              )}
             </ContentBlock>
-            
-            <TourFAQ faqs={tour.faqs} />
-            
-          </section>
-        </div>
 
-        {/* ================================================================================================== */}
-        {/* SIDEBAR */}
-        <aside className="hidden h-fit lg:block">
-          <div ref={readyCardRef} className="space-y-6">
+            {/* DESCRIPTION */}
+            <ContentBlock eyebrow="Overview" title="About this experience">
+              <p className="font-bitter text-lg text-black">
+                {tour.description}
+              </p>
+            </ContentBlock>
 
-            {/* BACK */}
-            <button
-              type="button"
-              onClick={goBackToPreviousScroll}
-              className="group inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white px-4 py-2 font-bitter text-xs font-bold text-blue-700 transition-all duration-200 hover:border-blue-200 hover:bg-blue-50"
-            >
-              <span
-                aria-hidden="true"
-                className="transition-transform duration-200 group-hover:-translate-x-0.5"
-              >
-                ←
-              </span>
-              Back to tours
-            </button>
+            {/* GALLERY */}
+            <TourGallery tour={tour} imageFolder={tour.imageFolder} />
 
-            {/* RELATED TOURS */}
-            {relatedTours.length > 0 && (
-              <section className="border-t border-neutral-200 pt-5">
-                <div className="flex items-end justify-between">
-                  <div>
-                    <p className="font-bitter text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600">
-                      Explore more
-                    </p>
+            {/* INCLUDED AND EXCLUDED */}
+            <TourIncludedExcluded tour={tour} />
 
-                    <h3 className="mt-1 font-frank text-xl font-bold leading-tight text-neutral-900">
-                      Related tours
-                    </h3>
-                  </div>
+            {/* HIGHLIGHTS */}
+            {tour.highlights && <TourHighlights highlights={tour.highlights} />}
 
-                  <span className="font-bitter text-[10px] font-semibold text-neutral-400">
-                    {relatedTours.length}
-                  </span>
-                </div>
+            {/* REQUIREMENTS */}
+            {tour.requirements?.length > 0 && (
+              <TourRequirements requirements={tour.requirements} />
+            )}
 
-                <div className="mt-3 space-y-2">
-                  {relatedTours.map((item) => (
-                    <RelatedTourCard
-                      key={item.slug}
-                      tour={item}
-                      onClick={() => navigate(`/tours/${item.slug}`)}
-                    />
+            {/* ARRANGEMENTS */}
+            {tour.arrangements && (
+              <Arrangements arrangements={tour.arrangements} />
+            )}
+
+            {/* WEATHER POLICY */}
+            {tour.weatherPolicy && (
+              <TourWeatherPolicy weather={tour.weatherPolicy} />
+            )}
+
+            {/* CANCELLATION POLICY */}
+            {tour.cancellationPolicy && (
+              <TourCancellationPolicy policy={tour.cancellationPolicy} />
+            )}
+
+            {/* SAFETY POLICY */}
+            {tour.safetyPolicy && (
+              <TourSafetyPolicy safety={tour.safetyPolicy} />
+            )}
+
+            {/* ----------------- COBRA ------------------ */}
+            {/* COBRA SPECIFIC */}
+            {tour.vehicle && <VehicleDetails vehicle={tour.vehicle} />}
+
+            {/* COBRA SPECIFIC */}
+            {tour.routeInformation && (
+              <RouteInformation route={tour.routeInformation} />
+            )}
+
+            {/* COBRA SPECIFIC */}
+            {tour.securityAndLiability && (
+              <SecurityAndLiability security={tour.securityAndLiability} />
+            )}
+            {/* ------------------------------------------- */}
+
+            {/* NEED TO KNOW + FAQ */}
+            <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-12 sm:px-5 lg:px-5 lg:py-14 lg:grid-cols-2">
+              <ContentBlock eyebrow="Before you book..." title="Need to know">
+                <div className="grid grid-cols-1 gap-3">
+                  {tour.needToKnow?.map((item, index) => (
+                    <TickCard key={index} text={getItemText(item)} />
                   ))}
                 </div>
-              </section>
-            )}
+              </ContentBlock>
 
-            {/* REQUEST CURRENT TOUR */}
-            <section className="relative overflow-hidden rounded-[1.35rem] border 
+              <TourFAQ faqs={tour.faqs} />
+            </section>
+          </div>
+
+          {/* ================================================================================================== */}
+          {/* SIDEBAR */}
+          <aside className="hidden h-fit lg:block">
+            <div ref={readyCardRef} className="space-y-6">
+              {/* BACK */}
+              <button
+                type="button"
+                onClick={goBackToPreviousScroll}
+                className="group inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white px-4 py-2 font-bitter text-xs font-bold text-blue-700 transition-all duration-200 hover:border-blue-200 hover:bg-blue-50"
+              >
+                <span
+                  aria-hidden="true"
+                  className="transition-transform duration-200 group-hover:-translate-x-0.5"
+                >
+                  ←
+                </span>
+                Back to tours
+              </button>
+
+              {/* RELATED TOURS */}
+              {relatedTours.length > 0 && (
+                <section className="border-t border-neutral-200 pt-5">
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p className="font-bitter text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600">
+                        Explore more
+                      </p>
+
+                      <h3 className="mt-1 font-frank text-xl font-bold leading-tight text-neutral-900">
+                        Related tours
+                      </h3>
+                    </div>
+
+                    <span className="font-bitter text-[10px] font-semibold text-neutral-400">
+                      {relatedTours.length}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 space-y-2">
+                    {relatedTours.map((item) => (
+                      <RelatedTourCard
+                        key={item.slug}
+                        tour={item}
+                        onClick={() => navigate(`/tours/${item.slug}`)}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* REQUEST CURRENT TOUR */}
+              <section
+                className="relative overflow-hidden rounded-[1.35rem] border 
             border-blue-100 text-white
-            hero-gradient-bl p-5 shadow-[0_18px_50px_rgba(37,99,235,0.08)]">
+            hero-gradient-bl p-5 shadow-[0_18px_50px_rgba(37,99,235,0.08)]"
+              >
+                {/* subtle accent */}
+                <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-blue-200/30 blur-2xl" />
 
-              {/* subtle accent */}
-              <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-blue-200/30 blur-2xl" />
+                <div className="relative">
+                  <div className="flex items-center justify-between">
+                    {/* image */}
+                    <img
+                      src={resolveImage(tour.image)}
+                      alt="current-tour"
+                      className="top-0 h-24 w-24 object-cover rounded-full border-white border-2"
+                    />
 
-              <div className="relative">
-                <div className="flex items-center justify-between">
-                  {/* image */}
-                  <img 
-                    src={resolveImage(tour.image)} 
-                    alt="current-tour" 
-                    className="top-0 h-24 w-24 object-cover rounded-full border-white border-2" 
-                  />
-
-                  <div className="flex flex-col p-2">
-                    {/* <span className="rounded-full bg-green-200 px-3 py-2 font-bitter text-[10px] 
+                    <div className="flex flex-col p-2">
+                      {/* <span className="rounded-full bg-green-200 px-3 py-2 font-bitter text-[10px] 
                     font-bold w-fit uppercase text-black">
                       Request this tour.
                     </span> */}
-                    <h3 className="font-frank text-2xl font-bold leading-[0.95] text-white">
-                      {tour.title}
-                    </h3>
+                      <h3 className="font-frank text-2xl font-bold leading-[0.95] text-white">
+                        {tour.title}
+                      </h3>
+                    </div>
                   </div>
 
-                </div>
+                  <p className="mt-3 font-bitter text-sm leading-relaxed text-white">
+                    Ready to go? Start your request for{" "}
+                    <strong className="text-white font-bold">
+                      {tour.title}
+                    </strong>
+                    .
+                  </p>
 
-
-                <p className="mt-3 font-bitter text-sm leading-relaxed text-white">
-                  Ready to go? Start your request for{" "}
-                  <strong className="text-white font-bold">{tour.title}</strong>.
-                </p>
-
-                <button
-                  type="button"
-                  onClick={scrollToBooking}
-                  className="bg-white border-blue-500 border group mt-5 flex w-full items-center justify-center gap-2 
+                  <button
+                    type="button"
+                    onClick={scrollToBooking}
+                    className="bg-white border-blue-500 border group mt-5 flex w-full items-center justify-center gap-2 
                   rounded-full px-6 py-3.5 font-bitter text-sm font-semibold text-black/90 shadow-[0_8px_24px_rgba(37,99,235,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(37,99,235,0.24)]"
-                >
-                  <BookingIcon />
-
-                  <span>Request this tour</span>
-
-                  <span
-                    aria-hidden="true"
-                    className="text-base transition-transform duration-200 group-hover:translate-x-0.5"
                   >
-                    →
-                  </span>
-                </button>
-              </div>
-            </section>
+                    <BookingIcon />
 
-          </div>
-        </aside>
-      </section>
+                    <span>Request this tour</span>
 
-      {/* STOPS / ITINERARY */}
-      {tour.stops?.length > 0 ? (
-        /* =========================================================
+                    <span
+                      aria-hidden="true"
+                      className="text-base transition-transform duration-200 group-hover:translate-x-0.5"
+                    >
+                      →
+                    </span>
+                  </button>
+                </div>
+              </section>
+            </div>
+          </aside>
+        </section>
+
+        {/* STOPS / ITINERARY */}
+        {tour.stops?.length > 0 ? (
+          /* =========================================================
           STANDARD TOUR — STOP-BY-STOP ITINERARY
           ========================================================= */
-        <section
-          ref={itinerarySectionRef}
-          id="itinerary"
-          className="overflow-hidden border-y border-blue-100 bg-blue-50/45"
-        >
-          <div
-            ref={itineraryPinRef}
-            className="mx-auto max-w-6xl px-4 py-10 lg:px-5 lg:py-10"
+          <section
+            ref={itinerarySectionRef}
+            id="itinerary"
+            className="overflow-hidden border-y border-blue-100 bg-blue-50/45"
           >
-            <div className="relative z-30 flex flex-col gap-5 rounded-[1.25rem] bg-blue-50/85 p-4 lg:flex-row lg:items-end lg:justify-between lg:gap-6 lg:p-5">
-              <div className="max-w-2xl">
-                <span className="font-bitter text-[11px] uppercase tracking-[0.24em] text-blue-600">
-                  Full Itinerary
-                </span>
+            <div
+              ref={itineraryPinRef}
+              className="mx-auto max-w-6xl px-4 py-10 lg:px-5 lg:py-10"
+            >
+              <div className="relative z-30 flex flex-col gap-5 rounded-[1.25rem] bg-blue-50/85 p-4 lg:flex-row lg:items-end lg:justify-between lg:gap-6 lg:p-5">
+                <div className="max-w-2xl">
+                  <span className="font-bitter text-[11px] uppercase tracking-[0.24em] text-blue-600">
+                    Full Itinerary
+                  </span>
 
-                <h2 className="mt-2 font-frank text-3xl font-bold leading-none sm:text-4xl lg:text-5xl">
-                  Your route, stop by stop
-                </h2>
+                  <h2 className="mt-2 font-frank text-3xl font-bold leading-none sm:text-4xl lg:text-5xl">
+                    Your route, stop by stop
+                  </h2>
 
-                <p className="mt-3 font-bitter text-sm leading-relaxed text-neutral-600 lg:hidden">
-                  Compact route preview. Open a stop only when you need more
-                  detail.
-                </p>
+                  <p className="mt-3 font-bitter text-sm leading-relaxed text-neutral-600 lg:hidden">
+                    Compact route preview. Open a stop only when you need more
+                    detail.
+                  </p>
 
-                <p className="mt-4 hidden font-bitter leading-relaxed text-neutral-600 lg:block">
-                  Scroll through the route while each stop detail and image snaps
-                  into the same focused frame.
-                </p>
+                  <p className="mt-4 hidden font-bitter leading-relaxed text-neutral-600 lg:block">
+                    Scroll through the route while each stop detail and image
+                    snaps into the same focused frame.
+                  </p>
+                </div>
+
+                <div className="hidden rounded-full border border-blue-100 bg-white px-4 py-2 font-bitter text-xs font-semibold text-neutral-500 shadow-[0_12px_30px_rgba(37,99,235,0.06)] lg:block">
+                  snap through {tour.stops.length} stops
+                </div>
               </div>
 
-              <div className="hidden rounded-full border border-blue-100 bg-white px-4 py-2 font-bitter text-xs font-semibold text-neutral-500 shadow-[0_12px_30px_rgba(37,99,235,0.06)] lg:block">
-                snap through {tour.stops.length} stops
-              </div>
-            </div>
-
-            {/* DESKTOP */}
-            <div className="hidden lg:grid lg:grid-cols-[0.96fr_1.04fr] lg:items-start lg:gap-8">
-              {/* STOP INFORMATION */}
-              <div className="relative min-h-[460px] overflow-hidden rounded-[1.5rem] border border-blue-100 bg-white p-7 shadow-[0_20px_65px_rgba(37,99,235,0.08)] lg:min-h-[500px] lg:p-8">
-                {tour.stops.map((stop, index) => (
-                  <div
-                    key={`${stop.id || stop.name}-text-${index}`}
-                    ref={(el) => {
-                      itineraryTextRefs.current[index] = el;
-                    }}
-                    className="relative"
-                  >
-                    <ItineraryTextFrame
-                      stop={stop}
-                      index={index}
-                      activeTime={tour.stops[activeItineraryIndex]?.time}
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {/* STOP IMAGES */}
-              <div className="space-y-4">
-                <div className="relative min-h-[460px] overflow-hidden rounded-[1.5rem] lg:min-h-[500px]">
+              {/* DESKTOP */}
+              <div className="hidden lg:grid lg:grid-cols-[0.96fr_1.04fr] lg:items-start lg:gap-8">
+                {/* STOP INFORMATION */}
+                <div className="relative min-h-[460px] overflow-hidden rounded-[1.5rem] border border-blue-100 bg-white p-7 shadow-[0_20px_65px_rgba(37,99,235,0.08)] lg:min-h-[500px] lg:p-8">
                   {tour.stops.map((stop, index) => (
                     <div
-                      key={`${stop.id || stop.name}-image-${index}`}
+                      key={`${stop.id || stop.name}-text-${index}`}
                       ref={(el) => {
-                        itineraryImageRefs.current[index] = el;
+                        itineraryTextRefs.current[index] = el;
                       }}
                       className="relative"
                     >
-                      <ItineraryImageFrame
-                        tour={tour}
+                      <ItineraryTextFrame
                         stop={stop}
                         index={index}
+                        activeTime={tour.stops[activeItineraryIndex]?.time}
                       />
                     </div>
                   ))}
                 </div>
 
-                <div className="short-screen-route-skip justify-center">
-                  <button
-                    type="button"
-                    onClick={scrollToBooking}
-                    className="hero-gradient inline-flex items-center justify-center rounded-full px-7 py-3 font-bitter text-sm font-semibold text-white shadow-[0_14px_34px_rgba(0,0,0,0.14)] transition hover:-translate-y-0.5 active:scale-95"
-                  >
-                    Skip to booking form
-                  </button>
+                {/* STOP IMAGES */}
+                <div className="space-y-4">
+                  <div className="relative min-h-[460px] overflow-hidden rounded-[1.5rem] lg:min-h-[500px]">
+                    {tour.stops.map((stop, index) => (
+                      <div
+                        key={`${stop.id || stop.name}-image-${index}`}
+                        ref={(el) => {
+                          itineraryImageRefs.current[index] = el;
+                        }}
+                        className="relative"
+                      >
+                        <ItineraryImageFrame
+                          tour={tour}
+                          stop={stop}
+                          index={index}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="short-screen-route-skip justify-center">
+                    <button
+                      type="button"
+                      onClick={scrollToBooking}
+                      className="hero-gradient inline-flex items-center justify-center rounded-full px-7 py-3 font-bitter text-sm font-semibold text-white shadow-[0_14px_34px_rgba(0,0,0,0.14)] transition hover:-translate-y-0.5 active:scale-95"
+                    >
+                      Skip to booking form
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* DESKTOP BOOKING BUTTON */}
-            <div className="normal-route-skip relative z-40 mt-6 hidden justify-center lg:flex">
-              <button
-                type="button"
-                onClick={scrollToBooking}
-                className="hero-gradient inline-flex items-center justify-center rounded-full px-7 py-3 font-bitter text-sm font-semibold text-white shadow-[0_14px_34px_rgba(0,0,0,0.14)] transition hover:-translate-y-0.5 active:scale-95"
-              >
-                Skip to booking form
-              </button>
-            </div>
+              {/* DESKTOP BOOKING BUTTON */}
+              <div className="normal-route-skip relative z-40 mt-6 hidden justify-center lg:flex">
+                <button
+                  type="button"
+                  onClick={scrollToBooking}
+                  className="hero-gradient inline-flex items-center justify-center rounded-full px-7 py-3 font-bitter text-sm font-semibold text-white shadow-[0_14px_34px_rgba(0,0,0,0.14)] transition hover:-translate-y-0.5 active:scale-95"
+                >
+                  Skip to booking form
+                </button>
+              </div>
 
-            {/* MOBILE / TABLET */}
-            <div className="mt-8 lg:hidden">
-              <MobileItineraryCarousel tour={tour} stops={tour.stops} />
-            </div>
+              {/* MOBILE / TABLET */}
+              <div className="mt-8 lg:hidden">
+                <MobileItineraryCarousel tour={tour} stops={tour.stops} />
+              </div>
 
-            <div className="mt-6 lg:hidden">
-              <MobileRequestCard
-                tour={tour}
-                relatedTours={relatedTours}
-                scrollToBooking={scrollToBooking}
-                navigate={navigate}
-              />
+              <div className="mt-6 lg:hidden">
+                <MobileRequestCard
+                  tour={tour}
+                  relatedTours={relatedTours}
+                  scrollToBooking={scrollToBooking}
+                  navigate={navigate}
+                />
+              </div>
             </div>
-          </div>
-        </section>
-      ) : tour.itinerary ? (
-        /* =========================================================
+          </section>
+        ) : tour.itinerary ? (
+          /* =========================================================
           MULTI-DAY TOUR — FULL ITINERARY
           ========================================================= */
-        <TourItinerary itinerary={tour.itinerary} />
-      ) : null}
+          <TourItinerary itinerary={tour.itinerary} />
+        ) : null}
 
-      {/* BOOKING FORM AT BOTTOM */}
-      <section
-        ref={(el) => {
-          mobileBookingRef.current = el;
-          desktopBookingRef.current = el;
-        }}
-        id="booking"
-        className="py-12 text-white sm:py-14 lg:py-16"
-      >
-        <Booking embeddedTour={tour} bookingData={location.state?.bookingData} />
-      </section>
+        {/* BOOKING FORM AT BOTTOM */}
+        <section
+          ref={(el) => {
+            mobileBookingRef.current = el;
+            desktopBookingRef.current = el;
+          }}
+          id="booking"
+          className="py-12 text-white sm:py-14 lg:py-16"
+        >
+          <Booking
+            embeddedTour={tour}
+            bookingData={location.state?.bookingData}
+          />
+        </section>
 
-      {/* CONTACT OPTIONS */}
-      <section className="max-w-5xl mx-auto flex justify-center border border-black/5 px-4 py-10 sm:px-5 lg:py-12">
-        <ContactPlatforms />
-      </section>
-
-    </main>
+        {/* CONTACT OPTIONS */}
+        <section className="max-w-5xl mx-auto flex justify-center border border-black/5 px-4 py-10 sm:px-5 lg:py-12">
+          <ContactPlatforms />
+        </section>
+      </main>
+    </>
   );
 }
 
@@ -1077,7 +1087,6 @@ function RatingIcon() {
   );
 }
 
-
 function MobileTripEssentials({ tour, galleryImages, scrollToBooking }) {
   const visibleGallery = galleryImages.slice(0, 4);
 
@@ -1114,7 +1123,11 @@ function MobileTripEssentials({ tour, galleryImages, scrollToBooking }) {
 
         <div className="mt-4 space-y-2">
           {tour.included?.length > 0 && (
-            <MobileAccordion title="Included" count={tour.included.length} defaultOpen>
+            <MobileAccordion
+              title="Included"
+              count={tour.included.length}
+              defaultOpen
+            >
               <div className="grid gap-2 sm:grid-cols-2">
                 {tour.included.slice(0, 6).map((item, index) => (
                   <CompactLineItem key={index} text={getItemText(item)} />
@@ -1138,10 +1151,7 @@ function MobileTripEssentials({ tour, galleryImages, scrollToBooking }) {
           )}
 
           {tour.highlights?.length > 0 && (
-            <MobileAccordion
-              title="Highlights"
-              count={tour.highlights.length}
-            >
+            <MobileAccordion title="Highlights" count={tour.highlights.length}>
               <div className="grid gap-2 sm:grid-cols-2">
                 {tour.highlights.slice(0, 4).map((item, index) => (
                   <CompactLineItem key={index} text={getItemText(item)} />
@@ -1260,10 +1270,11 @@ function CompactLineItem({ text, variant = "tick" }) {
   return (
     <div className="flex gap-2 rounded-[0.9rem] border border-blue-100 bg-white p-3">
       <span
-        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-bitter text-xs font-bold ${variant === "plain"
-          ? "bg-blue-50 text-blue-500"
-          : "bg-green-200 text-green-950"
-          }`}
+        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-bitter text-xs font-bold ${
+          variant === "plain"
+            ? "bg-blue-50 text-blue-500"
+            : "bg-green-200 text-green-950"
+        }`}
       >
         {variant === "plain" ? "—" : "✓"}
       </span>
@@ -1291,7 +1302,6 @@ function ContentBlock({ eyebrow, title, children }) {
   );
 }
 
-
 function TickCard({ text }) {
   return (
     <div className="flex gap-3 rounded-[1.1rem] border border-blue-100 bg-blue-50/55 p-4">
@@ -1318,7 +1328,8 @@ function MobileRequestCard({ tour, relatedTours, scrollToBooking, navigate }) {
       </h3>
 
       <p className="mt-3 font-bitter text-sm leading-relaxed text-neutral-600">
-        This opens the booking form with <strong>{tour.title}</strong> already attached.
+        This opens the booking form with <strong>{tour.title}</strong> already
+        attached.
       </p>
 
       <button
@@ -1478,7 +1489,7 @@ function AnimatedStopTime({ time }) {
         duration: 0.24,
         ease: "power2.out",
         stagger: 0.025,
-      }
+      },
     );
 
     return () => tl.kill();
@@ -1620,7 +1631,7 @@ function ItineraryTextFrame({ stop, index, activeTime }) {
   );
 }
 
-function ItineraryImageFrame({tour, stop, index }) {
+function ItineraryImageFrame({ tour, stop, index }) {
   const stopImages = stop.images || [];
   const isPickupStop =
     stop.id?.toLowerCase().includes("pickup") ||
@@ -1638,7 +1649,7 @@ function ItineraryImageFrame({tour, stop, index }) {
         </span>
 
         <span className="inline-flex rounded-full border border-blue-100 bg-white px-3 py-1 font-bitter text-[11px] font-semibold uppercase tracking-[0.16em] text-blue-500 shadow-[0_10px_24px_rgba(37,99,235,0.06)]">
-          {isPickupStop ? "pickup preview": ""}
+          {isPickupStop ? "pickup preview" : ""}
         </span>
       </div>
 
@@ -1649,13 +1660,15 @@ function ItineraryImageFrame({tour, stop, index }) {
           loading="lazy"
           decoding="async"
           onLoad={() => ScrollTrigger.refresh()}
-          className={`w-full rounded-[1.35rem] border border-blue-100 bg-neutral-100 object-cover shadow-[0_18px_45px_rgba(0,0,0,0.10)] ${isPickupStop ? "h-[338px]" : "h-[224px]"
-            }`}
+          className={`w-full rounded-[1.35rem] border border-blue-100 bg-neutral-100 object-cover shadow-[0_18px_45px_rgba(0,0,0,0.10)] ${
+            isPickupStop ? "h-[338px]" : "h-[224px]"
+          }`}
         />
       ) : (
         <div
-          className={`flex items-center justify-center rounded-[1.35rem] border border-blue-100 bg-neutral-100 font-bitter text-sm text-neutral-400 shadow-[0_18px_45px_rgba(0,0,0,0.10)] ${isPickupStop ? "h-[338px]" : "h-[224px]"
-            }`}
+          className={`flex items-center justify-center rounded-[1.35rem] border border-blue-100 bg-neutral-100 font-bitter text-sm text-neutral-400 shadow-[0_18px_45px_rgba(0,0,0,0.10)] ${
+            isPickupStop ? "h-[338px]" : "h-[224px]"
+          }`}
         >
           Stop image coming soon
         </div>
@@ -1685,8 +1698,8 @@ function MobileItineraryCarousel({ tour, stops }) {
 
   return (
     <div className="-mx-4 overflow-visible sm:-mx-5">
-        {/* <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 overscroll-x-contain touch-pan-x sm:px-5 [scrollbar-width:thin]"> */}
-          <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 sm:px-5 [scrollbar-width:thin]">
+      {/* <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 overscroll-x-contain touch-pan-x sm:px-5 [scrollbar-width:thin]"> */}
+      <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 sm:px-5 [scrollbar-width:thin]">
         {stops.map((stop, index) => {
           // const mainImage = stop.images?.[0];
           const mainImage = `images/tours/${tour.imageFolder}/stops/${index + 1}.webp`;
@@ -1774,82 +1787,89 @@ function MobileItineraryCarousel({ tour, stops }) {
 function MobileItineraryStop({ stop, index }) {
   const hasMapLink = Boolean(stop.exactLocation?.googleMapsUrl);
   const hasExtraDetail = Boolean(
-    stop.description || stop.note || stop.exactLocation
+    stop.description || stop.note || stop.exactLocation,
   );
 
   return (
-    <article className="rounded-[1.1rem] border border-blue-100 bg-white p-4 shadow-[0_12px_35px_rgba(37,99,235,0.06)]">
-      <div className="flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-200 font-bitter text-xs font-bold text-green-950">
-          {index + 1}
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <span className="block truncate font-bitter text-[10px] uppercase tracking-[0.18em] text-blue-600">
-            {formatTimeWithPeriod(stop.time) || "Tour stop"} {stop.duration ? `· ${stop.duration}` : ""}
-          </span>
-
-          <h3 className="mt-1 truncate font-frank text-2xl font-bold leading-none text-neutral-950">
-            {stop.name}
-          </h3>
-        </div>
-
-        {hasMapLink && (
-          <a
-            href={stop.exactLocation.googleMapsUrl}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={`Open ${stop.name} on map`}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-blue-100 bg-blue-50"
-          >
-            <img
-              src="/icons/mapPin.png"
-              alt=""
-              className="h-4 w-4 object-contain"
-            />
-          </a>
-        )}
-      </div>
-
-      {hasExtraDetail && (
-        <details className="group mt-4">
-          <summary className="flex cursor-pointer list-none items-center justify-between rounded-[0.9rem] bg-blue-50 px-3 py-2 font-bitter text-xs font-semibold text-neutral-600 [&::-webkit-details-marker]:hidden">
-            View stop details
-
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-bold transition-transform group-open:rotate-45">
-              +
-            </span>
-          </summary>
-
-          <div className="mt-3 rounded-[1rem] border border-blue-100 bg-blue-50/70 p-3">
-            {(stop.description || stop.note) && (
-              <p className="font-bitter text-xs leading-relaxed text-neutral-600">
-                {stop.description || stop.note}
-              </p>
-            )}
-
-            {stop.exactLocation && (
-              <div className="mt-3 flex gap-2">
-                <img
-                  src="/icons/mapPin.png"
-                  alt=""
-                  className="mt-0.5 h-4 w-4 object-contain opacity-70"
-                />
-
-                <div>
-                  <p className="font-bitter text-xs font-semibold text-neutral-900">
-                    {stop.exactLocation.label}
-                  </p>
-
-                  <p className="mt-0.5 font-bitter text-[11px] leading-relaxed text-neutral-500">
-                    {stop.exactLocation.address}
-                  </p>
-                </div>
-              </div>
-            )}
+    <>
+      <Seo
+        title={`${tour.name} | Cape Frontier Travel`}
+        description={tour.shortDescription}
+        path={`/tours/${slug}`}
+      />
+      <article className="rounded-[1.1rem] border border-blue-100 bg-white p-4 shadow-[0_12px_35px_rgba(37,99,235,0.06)]">
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-200 font-bitter text-xs font-bold text-green-950">
+            {index + 1}
           </div>
-        </details>
-      )}
-    </article>
+
+          <div className="min-w-0 flex-1">
+            <span className="block truncate font-bitter text-[10px] uppercase tracking-[0.18em] text-blue-600">
+              {formatTimeWithPeriod(stop.time) || "Tour stop"}{" "}
+              {stop.duration ? `· ${stop.duration}` : ""}
+            </span>
+
+            <h3 className="mt-1 truncate font-frank text-2xl font-bold leading-none text-neutral-950">
+              {stop.name}
+            </h3>
+          </div>
+
+          {hasMapLink && (
+            <a
+              href={stop.exactLocation.googleMapsUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`Open ${stop.name} on map`}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-blue-100 bg-blue-50"
+            >
+              <img
+                src="/icons/mapPin.png"
+                alt=""
+                className="h-4 w-4 object-contain"
+              />
+            </a>
+          )}
+        </div>
+
+        {hasExtraDetail && (
+          <details className="group mt-4">
+            <summary className="flex cursor-pointer list-none items-center justify-between rounded-[0.9rem] bg-blue-50 px-3 py-2 font-bitter text-xs font-semibold text-neutral-600 [&::-webkit-details-marker]:hidden">
+              View stop details
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-bold transition-transform group-open:rotate-45">
+                +
+              </span>
+            </summary>
+
+            <div className="mt-3 rounded-[1rem] border border-blue-100 bg-blue-50/70 p-3">
+              {(stop.description || stop.note) && (
+                <p className="font-bitter text-xs leading-relaxed text-neutral-600">
+                  {stop.description || stop.note}
+                </p>
+              )}
+
+              {stop.exactLocation && (
+                <div className="mt-3 flex gap-2">
+                  <img
+                    src="/icons/mapPin.png"
+                    alt=""
+                    className="mt-0.5 h-4 w-4 object-contain opacity-70"
+                  />
+
+                  <div>
+                    <p className="font-bitter text-xs font-semibold text-neutral-900">
+                      {stop.exactLocation.label}
+                    </p>
+
+                    <p className="mt-0.5 font-bitter text-[11px] leading-relaxed text-neutral-500">
+                      {stop.exactLocation.address}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </details>
+        )}
+      </article>
+    </>
   );
 }

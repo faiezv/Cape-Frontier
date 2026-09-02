@@ -1,4 +1,10 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import gsap from "gsap";
 
@@ -167,7 +173,7 @@ const CheckoutSuccessPaystack = () => {
   // ---------- Paystack reference ----------
   const searchParams = useMemo(
     () => new URLSearchParams(location.search),
-    [location.search]
+    [location.search],
   );
   const reference = searchParams.get("reference") || searchParams.get("trxref");
 
@@ -201,12 +207,12 @@ const CheckoutSuccessPaystack = () => {
 
   // Payment status
   const [paymentStatus, setPaymentStatus] = useState(
-    reference ? "verifying" : "error"
+    reference ? "verifying" : "error",
   );
   const [paymentMessage, setPaymentMessage] = useState(
     reference
       ? "Verifying your Paystack payment before finalising the booking."
-      : "No payment reference found. Please contact support."
+      : "No payment reference found. Please contact support.",
   );
 
   // Email status
@@ -254,27 +260,27 @@ const CheckoutSuccessPaystack = () => {
         ? bookingDetails.participantEmails
         : storedCheckout?.emailPayload?.ccParticipantEmails?.length
           ? storedCheckout.emailPayload.ccParticipantEmails
-          : storedCheckout?.emailPayload?.participantEmails
+          : storedCheckout?.emailPayload?.participantEmails,
   );
 
   const pickupLocation = getPickupLocation(
-    bookingDetails || storedCheckout?.emailPayload
+    bookingDetails || storedCheckout?.emailPayload,
   );
 
   const pickupTime = getPickupTime(
-    bookingDetails || storedCheckout?.emailPayload
+    bookingDetails || storedCheckout?.emailPayload,
   );
 
   const isPrivate = Boolean(
     bookingDetails?.isPrivate ||
-      bookingDetails?.pricingOptions?.isPrivate ||
-      storedCheckout?.emailPayload?.isPrivate
+    bookingDetails?.pricingOptions?.isPrivate ||
+    storedCheckout?.emailPayload?.isPrivate,
   );
 
   const isCustom = Boolean(
     bookingDetails?.isCustom ||
-      bookingDetails?.pricingOptions?.isCustom ||
-      storedCheckout?.emailPayload?.isCustom
+    bookingDetails?.pricingOptions?.isCustom ||
+    storedCheckout?.emailPayload?.isCustom,
   );
 
   const participants =
@@ -320,11 +326,12 @@ const CheckoutSuccessPaystack = () => {
         // Payment confirmed
         setPaymentStatus("success");
         setPaymentMessage(
-          "Payment verified. Cape Frontier will confirm final pickup and vehicle details via WhatsApp."
+          "Payment verified. Cape Frontier will confirm final pickup and vehicle details via WhatsApp.",
         );
 
         // Build final checkout data using the REF, not the state variable
-        const currentCheckout = storedCheckoutRef.current || getStoredCheckout() || {};
+        const currentCheckout =
+          storedCheckoutRef.current || getStoredCheckout() || {};
         const finalBookingReference =
           currentCheckout.bookingReference ||
           currentCheckout.emailPayload?.bookingReference ||
@@ -347,7 +354,7 @@ const CheckoutSuccessPaystack = () => {
           paymentProvider: "paystack",
         };
 
-        setStoredCheckout(updatedCheckout);  // updates state but will NOT re-run this effect
+        setStoredCheckout(updatedCheckout); // updates state but will NOT re-run this effect
         setStoredCheckoutState(updatedCheckout);
 
         // Send booking email
@@ -358,7 +365,7 @@ const CheckoutSuccessPaystack = () => {
         setPaymentStatus("error");
         setPaymentMessage(
           error.message ||
-            "Payment verification failed. Please contact Cape Frontier with your reference."
+            "Payment verification failed. Please contact Cape Frontier with your reference.",
         );
         setEmailStatus("failed"); // leave "pending" state
       }
@@ -432,7 +439,11 @@ const CheckoutSuccessPaystack = () => {
 
       gsap.set(animatedItems, { opacity: 0, y: 22, filter: "blur(5px)" });
       if (badgeRef.current) {
-        gsap.set(badgeRef.current, { scale: 0.72, y: -14, filter: "blur(4px)" });
+        gsap.set(badgeRef.current, {
+          scale: 0.72,
+          y: -14,
+          filter: "blur(4px)",
+        });
       }
 
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
@@ -445,10 +456,26 @@ const CheckoutSuccessPaystack = () => {
           duration: 0.62,
           ease: "back.out(1.75)",
         })
-        .to(titleRef.current, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.58 }, "-=0.34")
-        .to(subtitleRef.current, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.48 }, "-=0.34")
-        .to(firstScreenCardsRef.current, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.58 }, "-=0.26")
-        .to(ctaRowRef.current, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.42 }, "-=0.2");
+        .to(
+          titleRef.current,
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.58 },
+          "-=0.34",
+        )
+        .to(
+          subtitleRef.current,
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.48 },
+          "-=0.34",
+        )
+        .to(
+          firstScreenCardsRef.current,
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.58 },
+          "-=0.26",
+        )
+        .to(
+          ctaRowRef.current,
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.42 },
+          "-=0.2",
+        );
 
       gsap.to(glowLeftRef.current, {
         x: 18,
@@ -502,197 +529,210 @@ const CheckoutSuccessPaystack = () => {
 
   // ---------- JSX (unchanged) ----------
   return (
-    <div
-      ref={pageRef}
-      className="relative min-h-screen overflow-x-hidden bg-[#eef7f6] text-slate-950"
-    >
-      <img
-        src="/images/section2-bg.png"
-        alt=""
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-10"
-      />
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(232,246,255,0.88)_48%,rgba(220,252,231,0.9)_100%)]" />
-
-      <div
-        ref={glowLeftRef}
-        className="pointer-events-none absolute left-[6%] top-[12%] h-52 w-52 rounded-full bg-green-200/55 blur-3xl md:h-72 md:w-72"
+    <>
+      <Seo
+        title="Booking Confirmed | Cape Frontier Travel"
+        path="/success"
+        noindex
       />
       <div
-        ref={glowRightRef}
-        className="pointer-events-none absolute right-[7%] top-[15%] h-56 w-56 rounded-full bg-blue-400/20 blur-3xl md:h-80 md:w-80"
-      />
+        ref={pageRef}
+        className="relative min-h-screen overflow-x-hidden bg-[#eef7f6] text-slate-950"
+      >
+        <img
+          src="/images/section2-bg.png"
+          alt=""
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-10"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(232,246,255,0.88)_48%,rgba(220,252,231,0.9)_100%)]" />
 
-      <div className="relative z-10">
-        <section
-          ref={heroRef}
-          className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 md:px-10 xl:px-16"
-        >
-          <div className="mx-auto w-full max-w-6xl">
-            <div className="grid items-center gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-              <div className="text-center lg:text-left">
-                <div
-                  ref={badgeRef}
-                  className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-green-200 to-blue-400 shadow-[0_20px_60px_rgba(96,165,250,0.28)] lg:mx-0 md:h-24 md:w-24"
-                >
-                  {isVerifyingPayment ? (
-                    <span className="h-10 w-10 animate-spin rounded-full border-4 border-white/45 border-t-[#071f4f] md:h-12 md:w-12" />
-                  ) : isPaymentError ? (
-                    <span className="font-frank text-4xl font-black text-red-700">!</span>
-                  ) : (
-                    <img
-                      src="/icons/approved.png"
-                      alt="Success"
-                      className="h-10 w-10 md:h-12 md:w-12"
-                    />
-                  )}
-                </div>
+        <div
+          ref={glowLeftRef}
+          className="pointer-events-none absolute left-[6%] top-[12%] h-52 w-52 rounded-full bg-green-200/55 blur-3xl md:h-72 md:w-72"
+        />
+        <div
+          ref={glowRightRef}
+          className="pointer-events-none absolute right-[7%] top-[15%] h-56 w-56 rounded-full bg-blue-400/20 blur-3xl md:h-80 md:w-80"
+        />
 
-                <p className="mt-5 font-bitter text-[10px] font-black uppercase tracking-[0.3em] text-blue-500">
-                  {isVerifyingPayment
-                    ? "Verifying payment"
-                    : isPaymentError
-                      ? "Payment needs review"
-                      : "Payment complete"}
-                </p>
-
-                <h1
-                  ref={titleRef}
-                  className="mt-3 font-frank text-5xl font-bold leading-[0.86] text-[#071f4f] sm:text-6xl md:text-7xl"
-                >
-                  {isVerifyingPayment
-                    ? "Confirming booking."
-                    : isPaymentError
-                      ? "Payment not confirmed."
-                      : "Booking confirmed."}
-                </h1>
-
-                <p
-                  ref={subtitleRef}
-                  className="mx-auto mt-4 max-w-xl font-bitter text-sm leading-6 text-slate-600 sm:text-base md:text-lg lg:mx-0"
-                >
-                  {paymentMessage}
-                </p>
-
-                <div ref={ctaRowRef} className="mt-6 flex flex-col gap-3 sm:flex-row lg:justify-start">
-                  <button
-                    onClick={() => window.print()}
-                    className="rounded-full bg-white px-6 py-3 text-sm font-bold text-slate-700 shadow-[0_10px_28px_rgba(7,31,79,0.06)] transition hover:-translate-y-0.5 hover:bg-green-200 hover:text-green-950"
+        <div className="relative z-10">
+          <section
+            ref={heroRef}
+            className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 md:px-10 xl:px-16"
+          >
+            <div className="mx-auto w-full max-w-6xl">
+              <div className="grid items-center gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+                <div className="text-center lg:text-left">
+                  <div
+                    ref={badgeRef}
+                    className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-green-200 to-blue-400 shadow-[0_20px_60px_rgba(96,165,250,0.28)] lg:mx-0 md:h-24 md:w-24"
                   >
-                    Print receipt
-                  </button>
-                  <button
-                    onClick={() => navigate("/")}
-                    className="hero-gradient-bl rounded-full px-6 py-3 font-frank text-sm font-bold text-white shadow-[0_14px_34px_rgba(7,31,79,0.18)] transition hover:-translate-y-0.5"
-                  >
-                    Return home
-                  </button>
-                </div>
-
-                <p className="mt-4 text-sm text-slate-500">
-                  Returning to home in {formatCountdown(countdown)}
-                </p>
-              </div>
-
-              <div
-                ref={firstScreenCardsRef}
-                className="rounded-[2rem] bg-white/94 p-4 shadow-[0_22px_70px_rgba(7,31,79,0.09)] sm:p-5 md:p-6"
-              >
-                <div className="rounded-[1.5rem] bg-[#071f4f] p-5 text-white">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">
-                    Customer confirmation
-                  </p>
-                  <h2 className="mt-2 font-frank text-3xl font-bold leading-none">
-                    {emailStatus === "sent"
-                      ? "Email sent to customer."
-                      : emailStatus === "sending"
-                        ? "Sending customer email."
-                        : emailStatus === "failed"
-                          ? "Email needs manual follow-up."
-                          : "Email pending."}
-                  </h2>
-                  <p className="mt-3 break-words text-sm font-semibold leading-6 text-white/72">
-                    {emailStatus === "sent"
-                      ? "Confirmation details have been sent to "
-                      : emailStatus === "sending"
-                        ? "Confirmation details are being sent to "
-                        : emailStatus === "failed"
-                          ? "Payment is verified, but the email should be checked manually for "
-                          : "Email confirmation will be sent to "}
-                    <span className="text-green-200">{customerEmail}</span>.
-                  </p>
-                  {ccParticipantEmails.length > 0 && (
-                    <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-4">
-                      {ccParticipantEmails.map((email) => (
-                        <EmailChip key={email} email={email} />
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <DetailCard
-                    label="Booking ref"
-                    value={bookingReference}
-                    note="Save this reference for support."
-                  />
-                  <DetailCard
-                    label="Amount paid"
-                    value={totalAmountLabel || "Paid"}
-                    note={selectedCurrency}
-                    tone="green"
-                  />
-                  <DetailCard
-                    label="Pickup time"
-                    value={pickupTime}
-                    note="Final timing is manually confirmed."
-                    tone="dark"
-                  />
-                  <DetailCard
-                    label="Trip date"
-                    value={formatDate(bookingDetails?.date)}
-                    note={`${participants} guest${Number(participants) > 1 ? "s" : ""}`}
-                    tone="blue"
-                  />
-                </div>
-
-                <div className="mt-4 rounded-[1.5rem] bg-stone-50 p-4">
-                  <div className="flex items-start gap-3">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
+                    {isVerifyingPayment ? (
+                      <span className="h-10 w-10 animate-spin rounded-full border-4 border-white/45 border-t-[#071f4f] md:h-12 md:w-12" />
+                    ) : isPaymentError ? (
+                      <span className="font-frank text-4xl font-black text-red-700">
+                        !
+                      </span>
+                    ) : (
                       <img
-                        src="/icons/mapPin.png"
-                        alt=""
-                        className="h-5 w-5 object-contain"
+                        src="/icons/approved.png"
+                        alt="Success"
+                        className="h-10 w-10 md:h-12 md:w-12"
                       />
-                    </span>
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                        Pickup location
-                      </p>
-                      <p className="mt-1 text-sm font-bold text-slate-900">
-                        {pickupLocation}
-                      </p>
-                      <p className="mt-1 text-xs leading-5 text-slate-500">
-                        Vehicle is confirmed after purchase and selected based on group
-                        size, route, luggage, availability, and operations.
-                      </p>
+                    )}
+                  </div>
+
+                  <p className="mt-5 font-bitter text-[10px] font-black uppercase tracking-[0.3em] text-blue-500">
+                    {isVerifyingPayment
+                      ? "Verifying payment"
+                      : isPaymentError
+                        ? "Payment needs review"
+                        : "Payment complete"}
+                  </p>
+
+                  <h1
+                    ref={titleRef}
+                    className="mt-3 font-frank text-5xl font-bold leading-[0.86] text-[#071f4f] sm:text-6xl md:text-7xl"
+                  >
+                    {isVerifyingPayment
+                      ? "Confirming booking."
+                      : isPaymentError
+                        ? "Payment not confirmed."
+                        : "Booking confirmed."}
+                  </h1>
+
+                  <p
+                    ref={subtitleRef}
+                    className="mx-auto mt-4 max-w-xl font-bitter text-sm leading-6 text-slate-600 sm:text-base md:text-lg lg:mx-0"
+                  >
+                    {paymentMessage}
+                  </p>
+
+                  <div
+                    ref={ctaRowRef}
+                    className="mt-6 flex flex-col gap-3 sm:flex-row lg:justify-start"
+                  >
+                    <button
+                      onClick={() => window.print()}
+                      className="rounded-full bg-white px-6 py-3 text-sm font-bold text-slate-700 shadow-[0_10px_28px_rgba(7,31,79,0.06)] transition hover:-translate-y-0.5 hover:bg-green-200 hover:text-green-950"
+                    >
+                      Print receipt
+                    </button>
+                    <button
+                      onClick={() => navigate("/")}
+                      className="hero-gradient-bl rounded-full px-6 py-3 font-frank text-sm font-bold text-white shadow-[0_14px_34px_rgba(7,31,79,0.18)] transition hover:-translate-y-0.5"
+                    >
+                      Return home
+                    </button>
+                  </div>
+
+                  <p className="mt-4 text-sm text-slate-500">
+                    Returning to home in {formatCountdown(countdown)}
+                  </p>
+                </div>
+
+                <div
+                  ref={firstScreenCardsRef}
+                  className="rounded-[2rem] bg-white/94 p-4 shadow-[0_22px_70px_rgba(7,31,79,0.09)] sm:p-5 md:p-6"
+                >
+                  <div className="rounded-[1.5rem] bg-[#071f4f] p-5 text-white">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">
+                      Customer confirmation
+                    </p>
+                    <h2 className="mt-2 font-frank text-3xl font-bold leading-none">
+                      {emailStatus === "sent"
+                        ? "Email sent to customer."
+                        : emailStatus === "sending"
+                          ? "Sending customer email."
+                          : emailStatus === "failed"
+                            ? "Email needs manual follow-up."
+                            : "Email pending."}
+                    </h2>
+                    <p className="mt-3 break-words text-sm font-semibold leading-6 text-white/72">
+                      {emailStatus === "sent"
+                        ? "Confirmation details have been sent to "
+                        : emailStatus === "sending"
+                          ? "Confirmation details are being sent to "
+                          : emailStatus === "failed"
+                            ? "Payment is verified, but the email should be checked manually for "
+                            : "Email confirmation will be sent to "}
+                      <span className="text-green-200">{customerEmail}</span>.
+                    </p>
+                    {ccParticipantEmails.length > 0 && (
+                      <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-4">
+                        {ccParticipantEmails.map((email) => (
+                          <EmailChip key={email} email={email} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <DetailCard
+                      label="Booking ref"
+                      value={bookingReference}
+                      note="Save this reference for support."
+                    />
+                    <DetailCard
+                      label="Amount paid"
+                      value={totalAmountLabel || "Paid"}
+                      note={selectedCurrency}
+                      tone="green"
+                    />
+                    <DetailCard
+                      label="Pickup time"
+                      value={pickupTime}
+                      note="Final timing is manually confirmed."
+                      tone="dark"
+                    />
+                    <DetailCard
+                      label="Trip date"
+                      value={formatDate(bookingDetails?.date)}
+                      note={`${participants} guest${Number(participants) > 1 ? "s" : ""}`}
+                      tone="blue"
+                    />
+                  </div>
+
+                  <div className="mt-4 rounded-[1.5rem] bg-stone-50 p-4">
+                    <div className="flex items-start gap-3">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
+                        <img
+                          src="/icons/mapPin.png"
+                          alt=""
+                          className="h-5 w-5 object-contain"
+                        />
+                      </span>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                          Pickup location
+                        </p>
+                        <p className="mt-1 text-sm font-bold text-slate-900">
+                          {pickupLocation}
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-slate-500">
+                          Vehicle is confirmed after purchase and selected based
+                          on group size, route, luggage, availability, and
+                          operations.
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {isPrivate && <Pill tone="green">Private tour</Pill>}
-                  {isCustom && <Pill tone="green">Custom trip</Pill>}
-                  <Pill tone={emailStatus === "failed" ? "neutral" : "blue"}>
-                    {emailStatusLabel}
-                  </Pill>
-                  <Pill tone="dark">Vehicle confirmed later</Pill>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {isPrivate && <Pill tone="green">Private tour</Pill>}
+                    {isCustom && <Pill tone="green">Custom trip</Pill>}
+                    <Pill tone={emailStatus === "failed" ? "neutral" : "blue"}>
+                      {emailStatusLabel}
+                    </Pill>
+                    <Pill tone="dark">Vehicle confirmed later</Pill>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

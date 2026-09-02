@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import ReactDOM from "react-dom";
+import { createPortal } from "react-dom"; // ✅ use createPortal directly
 import { useLoadingNavigate } from "../useLoadingNavigate.jsx";
 import {
   CTA_LABELS,
@@ -77,6 +77,12 @@ export default function TourCard({ tour, isMobile, isCarousel = false }) {
 
   // ── Modal state ───────────────────────────────────────────
   const [modalOpen, setModalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false); // ✅ track client mount
+
+  // ✅ set mounted to true after client hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
@@ -99,6 +105,7 @@ export default function TourCard({ tour, isMobile, isCarousel = false }) {
   };
 
   const handleContactClick = () => {
+    // Safe: runs only on client (click handler)
     document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
@@ -183,7 +190,7 @@ export default function TourCard({ tour, isMobile, isCarousel = false }) {
     );
   };
 
-  // ── Modal component (now using a portal) ──────────────────
+  // ── Modal component (now using createPortal) ──────────────────
   const ModalContent = () => {
     if (!modalOpen) return null;
     return (
@@ -448,8 +455,8 @@ export default function TourCard({ tour, isMobile, isCarousel = false }) {
         </div>
       </article>
 
-      {/* Render modal via portal to escape transformed ancestors */}
-      {ReactDOM.createPortal(
+      {/* ✅ Render modal via portal only after client mount */}
+      {mounted && createPortal(
         <ModalContent />,
         document.body
       )}
