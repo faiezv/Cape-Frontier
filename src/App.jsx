@@ -50,7 +50,14 @@ const App = () => {
       // Force a final refresh and reset scroll
       requestAnimationFrame(() => {
         refresh()
-        lenis.scrollTo(0, { immediate: true, force: true })
+        // Only snap to top if the user hasn't already scrolled themselves -
+        // otherwise this yanks them back to 0 mid-read.
+        if (window.scrollY <= 2) {
+          lenis.scrollTo(0, { immediate: true, force: true })
+        }
+        // Tell any component waiting to create scroll-driven animations
+        // (e.g. the hero pin) that layout is now trustworthy.
+        window.dispatchEvent(new Event('app:layout-stable'))
       })
     }
 

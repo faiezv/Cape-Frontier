@@ -204,8 +204,11 @@ const Home = () => {
   }, []);
 
   // ---------- HERO & ABOUT ANIMATIONS (DELAYED PIN) ----------
-  // We'll keep the ScrollTrigger pin but delay its creation until after load
+  // We'll keep the ScrollTrigger pin but delay its creation until layout
+  // (fonts + images + ResizeObserver) is confirmed stable by App.jsx.
+  // Hero stays invisible until then so no wrong-height frame is ever shown.
   const [pinCreated, setPinCreated] = useState(false);
+  const [heroReady, setHeroReady] = useState(false);
 
   useEffect(() => {
     // Only run once after everything is stable
@@ -284,27 +287,25 @@ const Home = () => {
       );
 
       setPinCreated(true);
+      setHeroReady(true);
       // Force a final refresh after pin creation
       ScrollTrigger.refresh(true);
     };
 
-    // Wait for the DOM to settle
-    const setup = () => {
-      // If already loaded, create immediately
-      if (document.readyState === "complete") {
-        setTimeout(createPin, 200);
-        return;
-      }
-      // Otherwise wait for load
-      window.addEventListener("load", () => {
-        setTimeout(createPin, 300);
-      }, { once: true });
-    };
+    // Wait for App.jsx's single source of truth for "layout is stable"
+    // (fonts loaded, images loaded, ResizeObserver settled) instead of a
+    // fixed timeout after `load`, which fires before web fonts swap in and
+    // was the actual cause of the hero jumping/settling after a beat.
+    const onLayoutStable = () => createPin();
+    window.addEventListener("app:layout-stable", onLayoutStable, { once: true });
 
-    setup();
+    // Safety net: if the event never fires for some reason (e.g. no
+    // ResizeObserver support), don't leave the hero hidden forever.
+    const fallback = setTimeout(createPin, 3000);
 
     return () => {
-      // Cleanup if needed
+      window.removeEventListener("app:layout-stable", onLayoutStable);
+      clearTimeout(fallback);
     };
   }, [pinCreated]);
 
@@ -329,7 +330,8 @@ const Home = () => {
         <section
           id="home"
           ref={heroRef}
-          className="relative z-10 overflow-hidden"
+          className={`relative z-10 overflow-hidden transition-opacity duration-200 ${heroReady ? "opacity-100" : "opacity-0"
+            }`}
         >
           <Hero />
         </section>
@@ -337,7 +339,8 @@ const Home = () => {
         <section
           id="about"
           ref={aboutRef}
-          className="relative z-20 -mt-6 rounded-t-[2rem] bg-white text-black sm:-mt-8 lg:-mt-10"
+          className={`relative z-20 -mt-6 rounded-t-[2rem] bg-white text-black sm:-mt-8 lg:-mt-10 transition-opacity duration-200 ${heroReady ? "opacity-100" : "opacity-0"
+            }`}
         >
           <About />
         </section>
@@ -356,11 +359,10 @@ const Home = () => {
 
         {/* Fixed button */}
         <div
-          className={`fixed left-1/2 top-20 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${
-            showButton
+          className={`fixed left-1/2 top-20 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${showButton
               ? "opacity-100 pointer-events-auto"
               : "opacity-0 pointer-events-none"
-          }`}
+            }`}
         >
           <button
             onClick={scrollToTourSelect}
@@ -382,9 +384,8 @@ const Home = () => {
               />
             </svg>
             <span
-              className={`ml-2 font-medium text-white transition-all duration-500 delay-150 ${
-                showButton ? "opacity-100" : "opacity-0"
-              }`}
+              className={`ml-2 font-medium text-white transition-all duration-500 delay-150 ${showButton ? "opacity-100" : "opacity-0"
+                }`}
             >
               Tour Select
             </span>
