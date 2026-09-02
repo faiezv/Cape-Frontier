@@ -138,8 +138,6 @@ const PENINSULA_2_DESTINATIONS = [
   "simons-town",
 ];
 
-
-
 /*
 adrenaline - shark, gun-range, paragliding, 2hr-cobra, 
 hiking - 
@@ -233,13 +231,6 @@ export const tours = [
       ],
     },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
 
     description:
       "Experience one of South Africa's most thrilling ocean encounters — Shark Cage Diving in Gansbaai, the global hotspot for Great White Sharks. This all‑inclusive adventure includes hotel pick‑up and drop‑off in Cape Town, professional crew, and a safe, unforgettable dive experience.",
@@ -607,14 +598,6 @@ export const tours = [
       tiers: [],
     },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
-
     description:
       "Experience a thrilling outdoor shooting session at one of Cape Town's accredited licensed gun ranges. Perfect for beginners and experienced shooters, this activity includes full safety instruction, professional supervision, and a variety of firearm options.",
 
@@ -896,13 +879,7 @@ export const tours = [
       ],
     },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
+  
 
     description:
       "Experience one of Cape Town's most iconic adventures — a scenic tandem paragliding flight over the Atlantic coastline. Guests enjoy breathtaking views of Sea Point, the Twelve Apostles, and the city bowl while flying with a licensed and accredited tandem paragliding operator.",
@@ -1210,15 +1187,6 @@ export const tours = [
         },
       ],
     },
-
-    rating: 4.9,
-    stars: 5,
-    mainReviewerName: "Mia Thompson",
-    mainReviewerCountry: "US",
-    reviewYear: 2025,
-    otherReviews: 58,
-    mainReview:
-      "A spectacular way to experience Cape Town at sunset. Driving the Cobra along the coastline made the evening unforgettable.",
 
     description:
       "A sunset drive along Cape Town's coastline is one of the most unforgettable ways to end the day — and nothing compares to experiencing it from behind the wheel of a Cobra. Enjoy the freedom of an open-top V8 as the Atlantic horizon turns gold. Not sure where to go? We'll guide you in planning the perfect sunset route.",
@@ -1626,13 +1594,6 @@ export const tours = [
       tiers: [],
     },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
 
     description:
       "Since Carroll Shelby introduced the first Cobra in 1962, this iconic machine has captured the imagination of drivers worldwide. If touring the Cape Peninsula in a bus or standard rental car doesn't excite you, elevate your adventure — drive a Cobra and make the journey part of the experience. This popular 24‑hour option allows you to explore Cape Point and all the top highlights at your own pace.",
@@ -2014,14 +1975,6 @@ export const tours = [
       tiers: [],
     },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
-
     description:
       "Slip into the low‑slung seat of a classic Cobra, feel the rumble under you, and let Cape Town's most iconic roads unfold in front of you. This isn't just a drive — it's a head‑turning, wind‑in‑your‑hair, open‑top adrenaline moment wrapped in pure luxury. For the next few hours, the city becomes your playground, and the Cobra becomes your statement piece.",
 
@@ -2395,7 +2348,6 @@ export const tours = [
       tiers: [],
     },
 
-    rating: null,
     stars: null,
     mainReviewerName: "",
     mainReviewerCountry: "",
@@ -2687,16 +2639,7 @@ export const tours = [
       ],
     },
 
-    rating: 4.8,
-    stars: 5,
-    mainReviewerName: "Daniel Green",
-    mainReviewerCountry: "ZA",
-    reviewYear: 2025,
-    otherReviews: 46,
-    mainReview:
-      "The hike was perfectly paced and the guide knew all the best photo spots. The views were worth every step.",
-
-    description:
+     description:
       "A guided hike up one of Cape Town’s most iconic mountains. Lion’s Head offers panoramic views of the city, Table Mountain, Camps Bay, and the Atlantic Ocean.",
 
     highlights: [
@@ -2856,14 +2799,6 @@ export const tours = [
       ],
     },
 
-    rating: 4.7,
-    stars: 4,
-    mainReviewerName: "Emma Wilson",
-    mainReviewerCountry: "CA",
-    reviewYear: 2025,
-    otherReviews: 35,
-    mainReview:
-      "A challenging but rewarding route. The guide kept the pace steady and the views at the top were incredible.",
 
     description:
       "A guided hike up Platteklip Gorge, one of the most direct routes to the top of Table Mountain. This route is steep, scenic, and rewarding for active travellers.",
@@ -3064,13 +2999,6 @@ export const tours = [
       ],
     },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
 
     description:
       "Langa Township, meaning 'sun' in isiXhosa, is Cape Town's oldest township and a vibrant destination for experiencing South Africa's culture, history, and community spirit. Established formally in 1927 following the 1923 Urban Areas Act, Langa is one of South Africa's oldest townships and played a pivotal role in the anti-apartheid struggle. It was initially developed to house Black Africans under strict apartheid regulations. The name 'Langa' derives from Chief Langalibalele, who resisted colonial authorities and was imprisoned on Robben Island, while 'sun' reflects its Xhosa meaning.",
@@ -3410,13 +3338,6 @@ export const tours = [
       tiers: [],
     },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
 
     description:
       "Robben Island is a small island off the coast of Cape Town, South Africa, historically used as a prison for political prisoners, including Nelson Mandela, and now serves as a UNESCO World Heritage Site and museum symbolizing the triumph of the human spirit over oppression. Robben Island, whose name derives from the Dutch word for 'seals,' spans roughly 5 square miles and lies about 7 kilometres from Cape Town. The island has a long and complex history stretching over 400 years. Other prominent prisoners included Robert Sobukwe, Ahmed Kathrada, and Walter Sisulu. Today, Robben Island is a UNESCO World Heritage Site and home to the Robben Island Museum. Visitors can explore the former prison, historical buildings, and natural landscapes, often guided by former inmates who share firsthand experiences. The island's enduring legacy lies in its poignant symbolism of resistance, resilience, and reconciliation, making it a major site of learning and reflection on South African history.",
@@ -3710,13 +3631,6 @@ export const tours = [
       ],
     },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
 
     description:
       "A powerful cultural immersion into Cape Town's Coloured heritage — exploring Islamic and Christian roots, slavery, forced removals, and modern community life. Guests enjoy a traditional Cape Malay lunch and take part in meaningful community upliftment through food distribution. Every booking directly supports underprivileged families.",
@@ -4159,13 +4073,6 @@ export const tours = [
       ],
     },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
 
     description:
       "Discover the history, culture and iconic landmarks of Cape Town on a private full-day city experience. Begin with artisan coffee at the famous Truth Coffee before exploring some of the city's most important heritage sites, including District Six Museum, the Slave Lodge and the Castle of Good Hope. Continue through the colourful streets of Bo-Kaap, experience South Africa's gemstone industry at Afrogem, and finish the day at Table Mountain for panoramic views across Cape Town, the Atlantic Ocean and surrounding mountains. This experience combines Cape Town's complex history, vibrant communities, creative culture and spectacular scenery into one comprehensive private city tour.",
@@ -4795,15 +4702,6 @@ export const tours = [
       ],
     },
 
-    rating: 4.9,
-    stars: 5,
-    mainReviewerName: "Grace Miller",
-    mainReviewerCountry: "US",
-    reviewYear: 2025,
-    otherReviews: 82,
-    mainReview:
-      "This was the highlight of our Cape Town trip. The route had beaches, penguins, mountains and amazing views.",
-
     description:
       "A premium Cape Peninsula sightseeing route featuring some of Cape Town’s best coastal, mountain, beach, and wildlife stops. A strong choice for first-time visitors.",
 
@@ -5076,14 +4974,6 @@ export const tours = [
       ],
     },
 
-    rating: 4.9,
-    stars: 5,
-    mainReviewerName: "Isabella Rossi",
-    mainReviewerCountry: "IT",
-    reviewYear: 2025,
-    otherReviews: 64,
-    mainReview:
-      "Elegant, scenic and relaxed. The estates were beautiful and the whole day felt premium from start to finish.",
 
     description:
       "A premium private Stellenbosch wine experience visiting three exceptional estates: Spier Wine Farm, Delaire Graff Estate and Rust en Vrede. Enjoy wine tastings and cheese pairings at Spier and Delaire Graff, followed by a wine tasting and lunch at historic Rust en Vrede. The experience combines scenic Cape Winelands landscapes, historic estates, premium wine, food pairings and a professional private driver-guide.",
@@ -5401,15 +5291,6 @@ export const tours = [
         },
       ],
     },
-
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
-
     description:
       "A powerful, emotionally rich half‑day experience connecting Cape Town's past, present, and community future. This combined tour brings together District Six — the heart of forced removals — and Langa, Cape Town's oldest Black township. Guests experience two deeply significant communities in one seamless narrative: displacement → resilience → cultural revival.",
 
@@ -5808,17 +5689,6 @@ export const tours = [
         },
       ],
     },
-
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
-
-    description:
-      "The Garden Route is one of South Africa's most famous and beautiful travel regions — a 300 km stretch of coastline from Mossel Bay to Storms River, known for forests, beaches, lagoons, wildlife, adventure activities, and charming towns. It's a place where mountains meet the ocean, where ancient forests run alongside sparkling lakes, and where every town offers its own unique charm — from seaside villages to nature‑rich reserves. The region is celebrated for its mild climate, making it a year‑round destination for travellers seeking both relaxation and adventure. The Garden Route blends coastal beauty, indigenous forests, mountain passes, and protected national parks, offering everything from whale watching and hiking to boat cruises, game drives, and world‑class cuisine. With its mix of natural wonders and cultural heritage, it remains South Africa's most iconic road‑trip route — perfect for families, couples, and adventure seekers alike.",
 
     highlights: [
       {
@@ -6440,15 +6310,6 @@ export const tours = [
         },
       ],
     },
-
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
-
     description:
       "Experience the Garden Route in comfort and style with a private driver/guide and hand‑selected accommodation. Your adventure begins with a luxury safari at Botlierskop Private Game Reserve, followed by the scenic Route 62, the world‑famous Cango Caves, the lagoon views of Knysna, and the forested trails of Tsitsikamma National Park. The final day includes Hermanus, Benguela Cove, and the penguins of Betty's Bay, ending with the breathtaking Clarence Drive back to Cape Town. This tour offers a perfect balance of adventure, scenery, wildlife, and relaxation — ideal for families, couples, solo travellers, and small groups.",
 
@@ -7342,14 +7203,6 @@ export const tours = [
       ],
     },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
-
     description:
       "This 5‑day journey combines the very best of the Garden Route with an exclusive Big 5 safari experience at Gondwana Game Reserve. Travellers enjoy a seamless blend of wildlife, mountain passes, forests, coastline, wine tasting, and charming towns — all guided privately and comfortably. The tour begins with a luxury safari stay at Gondwana, followed by the scenic Route 62, the dramatic Cango Caves, the lagoon views of Knysna, and the adventure‑rich Tsitsikamma National Park. The final day includes Hermanus, Benguela Cove, and the penguins of Betty's Bay before returning to Cape Town via the iconic Clarence Drive. With 4 nights of hand‑selected accommodation, breakfast included, and a dedicated driver/guide throughout, this itinerary offers a complete Garden Route experience with the added value of a premium Big 5 safari.",
 
@@ -8199,13 +8052,7 @@ export const tours = [
       tiers: [],
     },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
+
 
     description:
       "A full-day guided experience starting and ending in Cape Town. Guests enjoy a mix of adrenaline, animal encounters, artisanal chocolate tasting, scenic Winelands views, Franschhoek village exploration, and the world-famous Babylonstoren gardens. Perfect for families, couples, and small groups.",
@@ -8590,13 +8437,7 @@ export const tours = [
       ],
     },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
+
 
     description:
       "This full-day family-friendly experience combines the beauty of the Stellenbosch Winelands with activities designed to keep children entertained. Adults can enjoy a premium wine tasting at Vredenheim while children explore the Big Cats Park, farm animals, jungle gym and gardens. The day continues with a choice of Butterfly World or Giraffe House, a relaxed lunch in Stellenbosch, a historic town walk, scenic views along Helshoogte Pass and seasonal strawberry picking at Mooiberge. With comfortable private transport, bottled water and structured timing, this tour offers a relaxed and memorable Cape Winelands experience for the whole family.",
@@ -9047,13 +8888,7 @@ export const tours = [
       ],
     },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
+   
 
     description:
       "A luxurious full-day journey through the Stellenbosch and Franschhoek Winelands, featuring three premium wine estates, breathtaking scenery, included cheese OR chocolate pairings, and the iconic Franschhoek Wine Tram. Perfect for couples, families and wine lovers seeking a relaxed, scenic and unforgettable Cape Winelands experience. The tour is family-friendly, with spacious wine-estate lawns, mountain scenery, outdoor areas and an open-air Wine Tram experience that children can enjoy.",
@@ -9538,14 +9373,6 @@ export const tours = [
       tiers: [],
     },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
-
     description:
       "This curated Cape Town experience blends African craftsmanship, botanical beauty and the historic Constantia wine valley, the birthplace of South African winemaking. The journey begins in the CBD at AfroGem, where guests explore African gemstones and jewellery artistry. From there, travel to Kirstenbosch National Botanical Garden to discover indigenous fynbos, proteas, sculptures, the iconic Boomslang walkway and spectacular mountain scenery. The route continues into Constantia, where guests visit the historic Groot Constantia estate, learn about Klein Constantia and the legendary Vin de Constance, and finish with a standard wine tasting at boutique Constantia Glen. With private transport, bottled water and entry fees included, this is a relaxed and scenic experience combining culture, nature, wine and heritage.",
 
@@ -10009,13 +9836,6 @@ export const tours = [
     ],
   },
 
-    rating: null,
-    stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
-    mainReview: "",
 
     description:
       "A private full-day journey along the Cape West Coast, combining the natural beauty of West Coast National Park, the turquoise lagoon waters of Kraalbaai and the peaceful countryside setting of Groote Post Winery. Guests can enjoy wildlife viewing, scenic lagoon viewpoints, beach time, photography stops and a standard wine tasting at Groote Post. The experience also includes private transport, a professional driver-guide, onboard Wi-Fi, bottled water and all listed entry fees.",

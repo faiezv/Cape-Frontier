@@ -4,6 +4,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 import tours from '../../data/tours.js'
+import allReviews from '../../data/reviews.js'
 import { resolveTourImage } from '../../utils/ImageLoader.js'
 
 // Import icons directly (or resolve via resolveImage)
@@ -94,6 +95,13 @@ const getTourSearchText = (tour = {}) =>
   )
 
 const findTourForReview = (review = {}) => {
+  // If the review was moderated in with an explicit tourSlug, trust that —
+  // no need to guess via text matching.
+  if (review.tourSlug && Array.isArray(tours)) {
+    const exact = tours.find((tour) => tour.slug === review.tourSlug)
+    if (exact) return exact
+  }
+
   const reviewText = getReviewSearchText(review)
   const reviewCompact = compactText(reviewText)
 
@@ -355,7 +363,12 @@ const ReviewSuccessPanel = ({ onClose }) => (
 const EMPTY_REVIEW_FORM = { tour: '', title: '', rating: 5, review: '', name: '', email: '' }
 
 function ReviewsShowcase({
-  reviews = [],
+  // Optional override. When omitted, the component reads directly from
+  // src/data/reviews.js (only entries with verified: true) — that's the
+  // moderated, publish-ready set. Pass `tourSlug` instead if you just want
+  // this narrowed to one tour's reviews (e.g. embedded on a tour page).
+  reviews,
+  tourSlug,
   NumberBadge = DefaultNumberBadge,
   onSeeAllReviews,
   onSubmitReview,
@@ -383,10 +396,28 @@ function ReviewsShowcase({
   const touchStartRef = useRef({ x: 0, y: 0 })
 
   // ---------------------------------------------------------------------------
+  // Source list: explicit `reviews` prop wins if passed (even an empty array,
+  // e.g. "show none"), otherwise fall back to the real moderated data —
+  // verified only, optionally narrowed to a single tour via tourSlug.
+  // ---------------------------------------------------------------------------
+  const sourceReviews = useMemo(() => {
+    if (reviews) return reviews
+
+    const verified = allReviews.filter((r) => r.verified)
+
+    if (!tourSlug) return verified
+
+    const forTour = verified.filter((r) => r.tourSlug === tourSlug)
+    // If this specific tour has no verified reviews yet, show the general
+    // pool rather than an empty/broken carousel.
+    return forTour.length ? forTour : verified
+  }, [reviews, tourSlug])
+
+  // ---------------------------------------------------------------------------
   // Resolve all images in the reviews data (memoized)
   // ---------------------------------------------------------------------------
   const resolvedReviews = useMemo(() => {
-    const list = reviews.length ? reviews : [
+    const list = sourceReviews.length ? sourceReviews : [
       {
         img: '/images/tours/default/1.webp', // fallback
         title: 'A truly memorable Cape Town route',
@@ -394,8 +425,9 @@ function ReviewsShowcase({
         name: 'Aaliyah M',
         date: 'May 2026',
         avatar: '/images/content/reviews/profile-photos/1.webp',
-        rating: 4.9,
+        rating: 5,
         breakdown: [72, 18, 7, 2, 1],
+        verified: true,
       },
     ]
 
@@ -404,7 +436,7 @@ function ReviewsShowcase({
       img: resolveTourImage(review.img),
       avatar: resolveTourImage(review.avatar),
     }))
-  }, [reviews])
+  }, [sourceReviews])
 
   // Use resolvedReviews throughout
   const review = resolvedReviews[currentReviewIndex]
@@ -1138,9 +1170,11 @@ function ReviewsShowcase({
                         </div>
                       </div>
 
-                      <div className="rounded-full bg-white/75 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-black/50 shadow-sm">
-                        Verified
-                      </div>
+                      {review.verified && (
+                        <div className="rounded-full bg-white/75 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-black/50 shadow-sm">
+                          Verified
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

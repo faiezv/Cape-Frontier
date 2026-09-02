@@ -19,6 +19,9 @@ import { formatMoney } from '../components/Tours/Helpers.jsx';
 
 // SEO
 import Seo from "../components/Seo.jsx";
+import { buildTourSchema } from "../utils/tourSchema.js";
+import reviews from '../data/reviews.js';
+
 
 // Shared
 import TourHero from "../components/TourDetails/TourHero";
@@ -298,25 +301,6 @@ export default function TourDetails() {
     activeItineraryIndexRef.current = 0;
     setActiveItineraryIndex(0);
   }, [slug]);
-
-  useEffect(() => {
-    if (!tour) return;
-
-    document.title =
-      tour.seo?.title || `${tour.title} | Cape Frontier Travel & Tours`;
-
-    const metaDescription =
-      document.querySelector("meta[name='description']") ||
-      document.createElement("meta");
-
-    metaDescription.setAttribute("name", "description");
-    metaDescription.setAttribute(
-      "content",
-      tour.seo?.description || tour.description,
-    );
-
-    document.head.appendChild(metaDescription);
-  }, [tour]);
 
   /*
     KEEP: desktop booking card pin logic.
@@ -639,10 +623,13 @@ export default function TourDetails() {
   return (
     <>
       <Seo
-        title={`${tour.name} | Cape Frontier Travel`}
-        description={tour.shortDescription}
+        title={tour.seo?.title || `${tour.title} | Cape Frontier Travel`}
+        description={tour.seo?.description || tour.description}
         path={`/tours/${slug}`}
+        image={tour.image}
+        jsonLd={buildTourSchema(tour, reviews)}
       />
+
       <main className="bg-white text-black">
         <style>{`
         .short-screen-route-skip {
@@ -1771,95 +1758,5 @@ function MobileItineraryCarousel({ tour, stops }) {
         swipe through all {stops.length} stops
       </p>
     </div>
-  );
-}
-
-function MobileItineraryStop({ stop, index }) {
-  const hasMapLink = Boolean(stop.exactLocation?.googleMapsUrl);
-  const hasExtraDetail = Boolean(
-    stop.description || stop.note || stop.exactLocation,
-  );
-
-  return (
-    <>
-      <Seo
-        title={`${tour.name} | Cape Frontier Travel`}
-        description={tour.shortDescription}
-        path={`/tours/${slug}`}
-      />
-      <article className="rounded-[1.1rem] border border-blue-100 bg-white p-4 shadow-[0_12px_35px_rgba(37,99,235,0.06)]">
-        <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-200 font-bitter text-xs font-bold text-green-950">
-            {index + 1}
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <span className="block truncate font-bitter text-[10px] uppercase tracking-[0.18em] text-blue-600">
-              {formatTimeWithPeriod(stop.time) || "Tour stop"}{" "}
-              {stop.duration ? `· ${stop.duration}` : ""}
-            </span>
-
-            <h3 className="mt-1 truncate font-frank text-2xl font-bold leading-none text-neutral-950">
-              {stop.name}
-            </h3>
-          </div>
-
-          {hasMapLink && (
-            <a
-              href={stop.exactLocation.googleMapsUrl}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={`Open ${stop.name} on map`}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-blue-100 bg-blue-50"
-            >
-              <img
-                src="/icons/mapPin.png"
-                alt=""
-                className="h-4 w-4 object-contain"
-              />
-            </a>
-          )}
-        </div>
-
-        {hasExtraDetail && (
-          <details className="group mt-4">
-            <summary className="flex cursor-pointer list-none items-center justify-between rounded-[0.9rem] bg-blue-50 px-3 py-2 font-bitter text-xs font-semibold text-neutral-600 [&::-webkit-details-marker]:hidden">
-              View stop details
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-bold transition-transform group-open:rotate-45">
-                +
-              </span>
-            </summary>
-
-            <div className="mt-3 rounded-[1rem] border border-blue-100 bg-blue-50/70 p-3">
-              {(stop.description || stop.note) && (
-                <p className="font-bitter text-xs leading-relaxed text-neutral-600">
-                  {stop.description || stop.note}
-                </p>
-              )}
-
-              {stop.exactLocation && (
-                <div className="mt-3 flex gap-2">
-                  <img
-                    src="/icons/mapPin.png"
-                    alt=""
-                    className="mt-0.5 h-4 w-4 object-contain opacity-70"
-                  />
-
-                  <div>
-                    <p className="font-bitter text-xs font-semibold text-neutral-900">
-                      {stop.exactLocation.label}
-                    </p>
-
-                    <p className="mt-0.5 font-bitter text-[11px] leading-relaxed text-neutral-500">
-                      {stop.exactLocation.address}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </details>
-        )}
-      </article>
-    </>
   );
 }
