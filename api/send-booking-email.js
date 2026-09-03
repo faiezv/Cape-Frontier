@@ -8,7 +8,7 @@ const BRAND = {
   website: process.env.BRAND_WEBSITE_URL || "https://preview.cape-frontier.co.za",
   logoUrl:
     process.env.BRAND_LOGO_URL ||
-    "https://preview.cape-frontier.co.za/assets/brand/logo.png",
+    "https://preview.cape-frontier.co.za/assets/brand/logo-cf.webp",
   primary: "#071f4f",
   greenSoft: "#dcfce7",
   greenBorder: "#bbf7d0",

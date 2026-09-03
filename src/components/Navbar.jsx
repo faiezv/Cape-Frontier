@@ -57,7 +57,7 @@ const megaMenus = {
     eyebrow: 'About Cape Frontier',
     title: 'What makes the journey feel premium',
     desc: 'A quick guide to the sections that explain the travel experience, local support, pickup flow, and booking process.',
-    logo: '/assets/brand/logo-removebg.png',
+    logo: '/assets/brand/logo-cf.webp',
     layout: 'links',
     links: [
       {
@@ -852,7 +852,7 @@ const Navbar = () => {
           >
             <img
               ref={mainLogoRef}
-              src="/assets/brand/logo-removebg.png"
+              src="/assets/brand/logo-cf.webp"
               alt="Cape Frontier Travel & Tours"
               className="
                 block
@@ -1831,7 +1831,7 @@ const Navbar = () => {
                   </button>
 
                   <img
-                    src="/assets/brand/logo-removebg.webp"
+                    src="/assets/brand/logo-cf.webp"
                     alt="Cape Frontier logo"
                     className="
                       block

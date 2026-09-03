@@ -322,7 +322,7 @@ const Contact = () => {
               className="relative w-full max-w-[rem] sm:max-w-[rem] lg:max-w-[rem]"
             >
               <img
-                src="/assets/brand/logo-removebg.png"
+                src="/assets/brand/logo-cf.webp"
                 alt="Cape Frontier"
                 className="relative z-10 h-auto w-full object-contain opacity-[0.98] drop-shadow-[0_18px_40px_rgba(0,0,0,0.16)]"
               />

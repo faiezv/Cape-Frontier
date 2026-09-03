@@ -89,10 +89,5 @@ export function buildOrganizationSchema() {
     '@type': 'TravelAgency',
     name: 'Cape Frontier',
     url: SITE_URL,
-    // logo: `${SITE_URL}/logo.png`,
-    // sameAs: [
-    //   'https://www.instagram.com/capefrontier',
-    //   'https://www.facebook.com/capefrontier',
-    // ],
   }
 }

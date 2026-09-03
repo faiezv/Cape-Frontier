@@ -143,7 +143,7 @@ const ClassicTourBanner = () => {
             <div className="flex justify-center lg:justify-start">
               <img
                 ref={logoRef}
-                src="/assets/brand/logo-removebg.png"
+                src="/assets/brand/logo-cf.webp"
                 className="max-h-20 object-contain sm:max-h-24 lg:max-h-28"
                 alt="Cape Frontier"
               />
