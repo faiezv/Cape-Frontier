@@ -65,6 +65,21 @@ const policies = [
     ],
   },
 
+  // ---- NEW POLICY STARTS HERE ----
+  {
+    id: "booking-confirmation",
+    eyebrow: "Booking Confirmation",
+    title: "Booking Confirmation & Lead Times",
+    summary:
+      "All bookings are manually confirmed after payment, and same‑day bookings are not accepted.",
+    points: [
+      "Same‑day bookings are not permitted. All tours must be booked at least 24 hours in advance (or more, depending on the tour).",
+      "After booking and payment, you will receive an email receipt. Cape Frontier will then contact you via your preferred contact method (WhatsApp, email, or phone) to confirm vehicle details, pickup times, and any other relevant tour information not included in the receipt.",
+      "For multi‑day tours, we require a minimum of 14 days' advance booking to secure accommodation and confirm all logistics. Bookings made with less notice may be subject to availability.",
+    ],
+  },
+  // ---- NEW POLICY ENDS HERE ----
+
   {
     id: "vehicle-identification",
     eyebrow: "Vehicle Identification",
@@ -285,11 +300,10 @@ const Policies = () => {
                         key={policy.id}
                         type="button"
                         onClick={() => goToPolicy(policy.id)}
-                        className={`rounded-[1.25rem] border p-3 text-left transition ${
-                          active
+                        className={`rounded-[1.25rem] border p-3 text-left transition ${active
                             ? "border-green-300 bg-green-200 text-green-950"
                             : "border-black/5 bg-neutral-50 text-neutral-650 hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_10px_24px_rgba(0,0,0,0.06)]"
-                        }`}
+                          }`}
                       >
                         <p className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-55">
                           0{index + 1}
@@ -325,11 +339,10 @@ const Policies = () => {
                   key={policy.id}
                   type="button"
                   onClick={() => goToPolicy(policy.id)}
-                  className={`rounded-2xl px-3 py-3 text-left text-sm font-semibold transition ${
-                    policy.id === activeHash
+                  className={`rounded-2xl px-3 py-3 text-left text-sm font-semibold transition ${policy.id === activeHash
                       ? "bg-blue-400 text-white"
                       : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-950"
-                  }`}
+                    }`}
                 >
                   {policy.eyebrow}
                 </button>
