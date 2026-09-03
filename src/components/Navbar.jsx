@@ -1831,7 +1831,7 @@ const Navbar = () => {
                   </button>
 
                   <img
-                    src="/assets/brand/logo-removebg.png"
+                    src="/assets/brand/logo-removebg.webp"
                     alt="Cape Frontier logo"
                     className="
                       block
