@@ -851,9 +851,11 @@ const Navbar = () => {
             "
           >
             <img
-              ref={mainLogoRef}
               src="/assets/brand/logo-cf.webp"
               alt="Cape Frontier Travel & Tours"
+              fetchPriority="high"
+              loading="eager"
+              decoding="async"
               className="
                 block
                 h-11
