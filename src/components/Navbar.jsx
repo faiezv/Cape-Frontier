@@ -1136,7 +1136,7 @@ const Navbar = () => {
             </nav>
 
             {/* KIDS ACTIVITIES */}
-            {/* <KidsActivitiesNavbar /> */}
+            <KidsActivitiesNavbar />
 
             {/* =================================================
                 CONTACT
