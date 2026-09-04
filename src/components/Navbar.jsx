@@ -856,18 +856,32 @@ const Navbar = () => {
               fetchPriority="high"
               loading="eager"
               decoding="async"
+              // className="
+              //   block
+              //   h-14
+              //   w-auto
+              //   max-w-[210px]
+              //   shrink-0
+              //   object-contain
+              //   object-center
+              //   sm:h-15
+              //   sm:max-w-[220px]
+              //   md:h-16
+              //   md:max-w-[230px]
+              //   lg:h-17
+              // "
               className="
                 block
-                h-11
+                h-14
                 w-auto
-                max-w-[170px]
+                max-w-[220px]
                 shrink-0
                 object-contain
                 object-center
-                sm:h-12
-                sm:max-w-[190px]
-                md:h-12
-                lg:h-13
+                sm:h-16
+                sm:max-w-[235px]
+                lg:h-[68px]
+                lg:max-w-[250px]
               "
             />
           </a>

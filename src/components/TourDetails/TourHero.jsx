@@ -175,12 +175,32 @@ const TourHero = ({ tour }) => {
 
           <div className="flex w-full max-w-4xl flex-col items-center">
 
+
+
+            {/* ------------------------------------------------ */}
+            {/* TITLE                                              */}
+            {/* ------------------------------------------------ */}
+
+            <h1
+              className="
+                max-w-5xl
+                font-bitter text-5xl font-bold
+                leading-[0.94] tracking-[-0.025em]
+                text-white
+                drop-shadow-[0_4px_20px_rgba(0,0,0,0.75)]
+                sm:text-6xl
+                md:text-7xl
+                lg:text-8xl
+              "
+            >
+              {tour?.title || "Cape Frontier Tour"}
+            </h1>
             {/* ------------------------------------------------ */}
             {/* TAGS                                              */}
             {/* ------------------------------------------------ */}
 
             {tags.length > 0 && (
-              <div className="mb-7 flex flex-wrap justify-center gap-2">
+              <div className="mt-8 flex flex-wrap justify-center gap-2">
                 {tags.map((tag, index) => (
                   <span
                     key={`${tag}-${index}`}
@@ -204,25 +224,6 @@ const TourHero = ({ tour }) => {
             )}
 
             {/* ------------------------------------------------ */}
-            {/* TITLE                                              */}
-            {/* ------------------------------------------------ */}
-
-            <h1
-              className="
-                max-w-5xl
-                font-bitter text-5xl font-bold
-                leading-[0.94] tracking-[-0.025em]
-                text-white
-                drop-shadow-[0_4px_20px_rgba(0,0,0,0.75)]
-                sm:text-6xl
-                md:text-7xl
-                lg:text-8xl
-              "
-            >
-              {tour?.title || "Cape Frontier Tour"}
-            </h1>
-
-            {/* ------------------------------------------------ */}
             {/* DESCRIPTION                                       */}
             {/* ------------------------------------------------ */}
 
@@ -240,39 +241,6 @@ const TourHero = ({ tour }) => {
                 {heroDescription}
               </p>
             )}
-
-            {/* ------------------------------------------------ */}
-            {/* META                                              */}
-            {/* ------------------------------------------------ */}
-
-            <div className="mt-9 flex flex-wrap justify-center gap-x-7 gap-y-4">
-
-              {/* LOCATION */}
-              {tour?.location && (
-                <HeroMeta
-                  icon={<LocationIcon />}
-                  text={tour.location}
-                />
-              )}
-
-              {/* DURATION */}
-              {tour?.duration && (
-                <HeroMeta
-                  icon={<ClockIcon />}
-                  text={tour.duration}
-                />
-              )}
-
-              {/* RATING */}
-              {tour?.rating && (
-                <HeroMeta
-                  icon={<StarIcon />}
-                  text={`${tour.rating} / 5`}
-                  highlight
-                />
-              )}
-
-            </div>
           </div>
         </div>
       </div>
@@ -289,41 +257,6 @@ const TourHero = ({ tour }) => {
 };
 
 
-/* ============================================================ */
-/* HERO META                                                     */
-/* ============================================================ */
-
-function HeroMeta({
-  icon,
-  text,
-  highlight = false,
-}) {
-  return (
-    <div className="flex items-center gap-2.5">
-
-      <span
-        className={`
-          flex h-9 w-9 shrink-0 items-center justify-center
-          rounded-full
-          shadow-lg
-          ${
-            highlight
-              ? "border border-white/30 bg-white text-blue-700"
-              : "border border-white/20 bg-white/10 text-white backdrop-blur-md"
-          }
-        `}
-      >
-        {icon}
-      </span>
-
-      <span className="font-bitter text-sm font-bold text-white drop-shadow-md">
-        {text}
-      </span>
-
-    </div>
-  );
-}
-
 
 /* ============================================================ */
 /* TAG FORMATTING                                                */
@@ -335,76 +268,6 @@ function formatTag(value) {
   return String(value)
     .replace(/[_-]+/g, " ")
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-
-/* ============================================================ */
-/* ICONS                                                          */
-/* ============================================================ */
-
-function LocationIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      className="h-4 w-4"
-      aria-hidden="true"
-    >
-      <path
-        d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-
-      <circle
-        cx="12"
-        cy="10"
-        r="2.5"
-      />
-    </svg>
-  );
-}
-
-
-function ClockIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      className="h-4 w-4"
-      aria-hidden="true"
-    >
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-      />
-
-      <path
-        d="M12 7v5l3 2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-
-function StarIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className="h-4 w-4"
-      aria-hidden="true"
-    >
-      <path d="m12 3 2.78 5.63 6.22.9L16.5 13.01l1.06 6.2L12 16.28 6.44 19.2l1.06-6.2L3 9.53l6.22-.9L12 3Z" />
-    </svg>
-  );
 }
 
 

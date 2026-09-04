@@ -1135,11 +1135,10 @@ export const tours = [
     imageFolder: "adrenaline/cobra/cobra-2hr",
 
     videos: [
-      "/videos/tours/adrenaline/cobra/Vid 1.mp4",
-      "/videos/tours/adrenaline/cobra/Vid 3.mp4",
-      "/videos/tours/adrenaline/cobra/Vid 4.mp4",
-      "/videos/tours/adrenaline/cobra/VID 5.mp4",
-      "/videos/tours/adrenaline/cobra/7.mp4",
+      "/src/assets/videos/tours/adrenaline/cobra/Vid 1.mp4",
+      "/src/assets/videos/tours/adrenaline/cobra/Vid 3.mp4",
+      "/src/assets/videos/tours/adrenaline/cobra/Vid 4.mp4",
+      "/src/assets/videos/tours/adrenaline/cobra/VID 5.mp4",
     ],
 
     location: "Foreshore, Cape Town, 8001",
@@ -1551,8 +1550,12 @@ export const tours = [
     images: getTourImages("adrenaline/cobra/cobra-24hr", 3),
     imageFolder: "adrenaline/cobra/cobra-24hr",
 
-    videos: [],
-
+    videos: [
+      "/src/assets/videos/tours/adrenaline/cobra/Vid 1.mp4",
+      "/src/assets/videos/tours/adrenaline/cobra/Vid 3.mp4",
+      "/src/assets/videos/tours/adrenaline/cobra/Vid 4.mp4",
+      "/src/assets/videos/tours/adrenaline/cobra/VID 5.mp4",
+    ],
     location: "Foreshore, Cape Town, 8001",
     duration: "24 hours (Collect 08:30 • Return Next Day 08:30)",
 
@@ -1933,7 +1936,12 @@ export const tours = [
     images: getTourImages("adrenaline/cobra/cobra-8hr", 3),
     imageFolder: "adrenaline/cobra/cobra-8hr",
 
-    videos: [],
+    videos: [
+      "/src/assets/videos/tours/adrenaline/cobra/Vid 1.mp4",
+      "/src/assets/videos/tours/adrenaline/cobra/Vid 3.mp4",
+      "/src/assets/videos/tours/adrenaline/cobra/Vid 4.mp4",
+      "/src/assets/videos/tours/adrenaline/cobra/VID 5.mp4",
+    ],
 
     location: "Foreshore, Cape Town, 8001",
     duration: "8 hours (08:30 – 16:30)",

@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import TourSelect from './Tours/TourSelect.jsx'
@@ -15,17 +15,10 @@ gsap.registerPlugin(ScrollTrigger)
 const slides = [
   { image: kaap, location: 'Bo-Kaap, Cape Town' },
   { image: cobra1, location: 'Cobra Sundowner, Cape Town' },
-  { image: simonsTown, location: 'Simon\'s Town, Cape Town' },
+  { image: simonsTown, location: "Simon's Town, Cape Town" },
   { image: cobra2, location: 'Cobra Sundowner, Cape Town' },
   { image: landing, location: 'Cape Town' },
   { image: image3, location: 'Cape Town' },
-]
-
-const trustItems = [
-  { title: 'Trusted Local Guides', subtitle: 'Licensed & experienced', type: 'shield' },
-  { title: 'Top Rated Experiences', subtitle: 'Loved by travellers', type: 'star' },
-  { title: '24/7 Support', subtitle: 'We\'re here for you', type: 'support' },
-  { title: 'Secure Booking', subtitle: 'Safe & flexible payments', type: 'lock' },
 ]
 
 const quickActions = [
@@ -39,46 +32,14 @@ const getViewport = () => ({
   height: typeof window !== 'undefined' ? window.innerHeight : 900,
 })
 
-const Icon = ({ type }) => {
-  const cls = 'h-[18px] w-[18px] sm:h-5 sm:w-5'
-
-  if (type === 'shield') {
-    return (
-      <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M12 3l7 3v6c0 4.7-3.1 8-7 9.5C8.1 20 5 16.7 5 12V6l7-3Z" />
-      </svg>
-    )
-  }
-
-  if (type === 'star') {
-    return (
-      <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="m12 3.8 2.5 5.2 5.8.8-4.2 4 .9 5.7L12 16.8 7 19.5l1-5.7-4.2-4 5.7-.8L12 3.8Z" />
-      </svg>
-    )
-  }
-
-  if (type === 'support') {
-    return (
-      <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M4 13a8 8 0 1 1 16 0" />
-        <rect x="3" y="12" width="4" height="7" rx="2" />
-        <rect x="17" y="12" width="4" height="7" rx="2" />
-        <path d="M19 19a3 3 0 0 1-3 3h-2" />
-      </svg>
-    )
-  }
-
-  return (
-    <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <rect x="5" y="11" width="14" height="10" rx="2" />
-      <path d="M8 11V8a4 4 0 1 1 8 0v3" />
-    </svg>
-  )
-}
-
 const ArrowDown = ({ className = 'h-4 w-4' }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.2"
+  >
     <path d="m6 9 6 6 6-6" />
   </svg>
 )
@@ -95,9 +56,6 @@ const Hero = () => {
   const titleRef = useRef(null)
   const titleShineRef = useRef(null)
   const subRef = useRef(null)
-  const trustRefs = useRef([])
-  const trustTrackRef = useRef(null)
-  const trustSetRef = useRef(null)
   const scrollRef = useRef(null)
   const shineRef = useRef(null)
   const arrowRef = useRef(null)
@@ -110,34 +68,42 @@ const Hero = () => {
   const isVeryShort = viewport.height < 760
   const showSubtitle = !(isMobile && isVeryShort)
 
-  const visibleTrustItems = useMemo(() => {
-    if (!isMobile) return trustItems
-    if (isVeryShort) return trustItems.slice(0, 2)
-    if (isShort) return trustItems.slice(0, 3)
-    return trustItems
-  }, [isMobile, isShort, isVeryShort])
-
   const safeScroll = (id) => {
     const el = document.getElementById(id)
+
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      el.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
       return
     }
-    window.scrollBy({ top: window.innerHeight * 0.9, behavior: 'smooth' })
+
+    window.scrollBy({
+      top: window.innerHeight * 0.9,
+      behavior: 'smooth',
+    })
   }
 
   useEffect(() => {
     const onResize = () => setViewport(getViewport())
+
     onResize()
+
     window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
+
+    return () => {
+      window.removeEventListener('resize', onResize)
+    }
   }, [])
 
   // Pin TourSelect while the hero scrolls away
   useEffect(() => {
     const mm = gsap.matchMedia()
+
     mm.add('(min-width: 768px)', () => {
       if (!heroRef.current || !tourSelectRef.current) return
+
       const st = ScrollTrigger.create({
         trigger: heroRef.current,
         start: 'top top',
@@ -145,18 +111,27 @@ const Hero = () => {
         pin: tourSelectRef.current,
         pinSpacing: false,
       })
+
       return () => st.kill()
     })
+
     return () => mm.revert()
   }, [])
 
-  // Existing animations
+  // Hero animations
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       if (!bgRefs.current.length) return
 
-      gsap.set(bgRefs.current, { opacity: 0, scale: 1.02 })
-      gsap.set(bgRefs.current[0], { opacity: 0.98, scale: 1.02 })
+      gsap.set(bgRefs.current, {
+        opacity: 0,
+        scale: 1.02,
+      })
+
+      gsap.set(bgRefs.current[0], {
+        opacity: 0.98,
+        scale: 1.02,
+      })
 
       if (bgRefs.current[0]) {
         gsap.to(bgRefs.current[0], {
@@ -166,7 +141,11 @@ const Hero = () => {
         })
       }
 
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+      const tl = gsap.timeline({
+        defaults: {
+          ease: 'power3.out',
+        },
+      })
 
       if (tourSelectRef.current) {
         tl.from(tourSelectRef.current, {
@@ -217,20 +196,6 @@ const Hero = () => {
             duration: 0.45,
           },
           '-=0.35'
-        )
-      }
-
-      if (trustRefs.current.length) {
-        tl.from(
-          trustRefs.current,
-          {
-            y: 60,
-            opacity: 0,
-            stagger: 0.2,
-            duration: 0.5,
-            ease: 'power3.out',
-          },
-          '-=0.2'
         )
       }
 
@@ -292,26 +257,6 @@ const Hero = () => {
         )
       }
 
-      if (trustTrackRef.current && trustSetRef.current) {
-        const setWidth = trustSetRef.current.offsetWidth
-
-        gsap.set(trustTrackRef.current, { x: 0 })
-
-        gsap.to(trustTrackRef.current, {
-          x: -setWidth,
-          duration: 22,
-          ease: 'none',
-          repeat: -1,
-          delay: 1.6,
-          modifiers: {
-            x: (value) => {
-              const x = parseFloat(value)
-              return `${((x % -setWidth) + -setWidth) % -setWidth}px`
-            },
-          },
-        })
-      }
-
       if (contentRef.current) {
         gsap.to(contentRef.current, {
           opacity: 0,
@@ -328,39 +273,81 @@ const Hero = () => {
     }, heroRef)
 
     return () => ctx.revert()
-  }, [showSubtitle, visibleTrustItems.length])
+  }, [showSubtitle])
 
+  // Automatic hero slideshow
   useEffect(() => {
     if (slides.length <= 1) return
+
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length)
     }, 6500)
+
     return () => clearInterval(interval)
   }, [])
 
+  // Slide transition
   useEffect(() => {
     const prev = prevSlide.current
     const next = currentSlide
+
     if (prev === next) return
 
     const prevBg = bgRefs.current[prev]
     const nextBg = bgRefs.current[next]
+
     if (!prevBg || !nextBg) return
 
     gsap.killTweensOf([prevBg, nextBg])
-    gsap.set(nextBg, { opacity: 0, scale: 1.02 })
+
+    gsap.set(nextBg, {
+      opacity: 0,
+      scale: 1.02,
+    })
 
     gsap
       .timeline()
-      .to(prevBg, { opacity: 0, duration: 1.2, ease: 'power2.inOut' }, 0)
-      .to(nextBg, { opacity: 1, duration: 1.2, ease: 'power2.inOut' }, 0)
-      .to(nextBg, { scale: 1.08, duration: 6.5, ease: 'power1.out' }, 0)
+      .to(
+        prevBg,
+        {
+          opacity: 0,
+          duration: 1.2,
+          ease: 'power2.inOut',
+        },
+        0
+      )
+      .to(
+        nextBg,
+        {
+          opacity: 1,
+          duration: 1.2,
+          ease: 'power2.inOut',
+        },
+        0
+      )
+      .to(
+        nextBg,
+        {
+          scale: 1.08,
+          duration: 6.5,
+          ease: 'power1.out',
+        },
+        0
+      )
 
     if (locationRef.current) {
       gsap.fromTo(
         locationRef.current,
-        { y: 10, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.45, ease: 'power2.out' }
+        {
+          y: 10,
+          opacity: 0,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.45,
+          ease: 'power2.out',
+        }
       )
     }
 
@@ -370,9 +357,22 @@ const Hero = () => {
   return (
     <section
       ref={heroRef}
-      className="relative h-[100svh] min-h-[100svh] w-full max-w-full overflow-x-hidden overflow-y-clip text-white font-frank"
-      style={{ aspectRatio: '16 / 9' }} // Force fixed aspect ratio to prevent layout shift
+      className="
+        relative
+        h-[100svh]
+        min-h-[100svh]
+        w-full
+        max-w-full
+        overflow-x-hidden
+        overflow-y-clip
+        font-frank
+        text-white
+      "
+      style={{
+        aspectRatio: '16 / 9',
+      }}
     >
+      {/* Background slides */}
       {slides.map((slide, index) => (
         <div
           key={`${slide.location}-${index}`}
@@ -388,58 +388,92 @@ const Hero = () => {
         />
       ))}
 
+      {/* Background glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.14),transparent_36%)]" />
 
       <div className="relative z-20 flex h-full flex-col">
-        <div ref={contentRef}
-          className="flex flex-1 flex-col items-center px-4 pt-24 pb-24 sm:px-6 sm:pt-12 sm:pb-12 md:px-8 md:pt-28 md:pb-24 lg:px-10 lg:pt-32"
+        <div
+          ref={contentRef}
+          className="
+            flex
+            flex-1
+            flex-col
+            items-center
+            px-4
+            pb-24
+            pt-24
+            sm:px-6
+            sm:pb-12
+            sm:pt-12
+            md:px-8
+            md:pb-24
+            md:pt-28
+            lg:px-10
+            lg:pt-32
+          "
         >
-          {/* Tour Select is rendered inside Home, so we don't need it here */}
-          {/* But we keep the ref for pinning */}
-          <div ref={tourSelectRef} className="w-full max-w-5xl">
-            {/* The actual TourSelect component is rendered in Home, this is just a placeholder */}
-          </div>
+          {/* Tour Select is rendered inside Home.
+              This placeholder remains for the desktop pinning logic. */}
+          <div
+            ref={tourSelectRef}
+            className="w-full max-w-5xl"
+          />
 
-          {/* The rest of the hero content would go here, but your original code had it commented out */}
-          {/* I'll keep it minimal because your original hero only had the background images and trust items */}
-          <div className="mt-auto flex w-full flex-col items-center justify-end pb-8">
-            <div className="mt-4 w-full max-w-5xl overflow-hidden">
-              <div className="relative w-full overflow-hidden">
-                <div ref={trustTrackRef} className="flex w-max flex-nowrap gap-3 will-change-transform">
-                  {visibleTrustItems.map((item, idx) => (
-                    <div
-                      key={idx}
-                      ref={(el) => { trustRefs.current[idx] = el }}
-                      className="flex shrink-0 items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 backdrop-blur-sm"
-                    >
-                      <Icon type={item.type} />
-                      <span className="text-xs font-bold tracking-wide">{item.title}</span>
-                      <span className="text-[10px] text-white/70">{item.subtitle}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-[linear-gradient(90deg,rgba(2,8,23,0.62)_0%,rgba(2,8,23,0.28)_42%,rgba(2,8,23,0)_100%)] sm:w-24" />
-                <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-[linear-gradient(270deg,rgba(2,8,23,0.62)_0%,rgba(2,8,23,0.28)_42%,rgba(2,8,23,0)_100%)] sm:w-24" />
-              </div>
-            </div>
-          </div>
+          {/* Main hero content can be placed here */}
+
         </div>
 
+        {/* Bottom scroll CTA */}
         <button
           ref={scrollRef}
           onClick={() => safeScroll('featured-tours')}
-          className="absolute bottom-0 left-0 z-30 flex w-full max-w-full items-center justify-center overflow-hidden border-t border-white/10 bg-[linear-gradient(90deg,#002dcb_0%,#0938ef_50%,#002dcb_100%)] px-4 py-3 text-sm font-medium text-white/95 shadow-[0_-8px_30px_rgba(0,0,0,0.16)] backdrop-blur-md sm:py-4 sm:text-base md:text-lg"
+          className="
+            absolute
+            bottom-0
+            left-0
+            z-30
+            flex
+            w-full
+            max-w-full
+            items-center
+            justify-center
+            overflow-hidden
+            border-t
+            border-white/10
+            bg-[linear-gradient(90deg,#002dcb_0%,#0938ef_50%,#002dcb_100%)]
+            px-4
+            py-3
+            text-sm
+            font-medium
+            text-white/95
+            shadow-[0_-8px_30px_rgba(0,0,0,0.16)]
+            backdrop-blur-md
+            sm:py-4
+            sm:text-base
+            md:text-lg
+          "
         >
           <div
             ref={shineRef}
-            className="pointer-events-none absolute inset-y-0 left-[-30%] w-[26%] skew-x-[-24deg] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.24),transparent)]"
+            className="
+              pointer-events-none
+              absolute
+              inset-y-0
+              left-[-30%]
+              w-[26%]
+              skew-x-[-24deg]
+              bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.24),transparent)]
+            "
           />
+
           <div className="relative z-10 flex items-center gap-3 leading-none">
             <div className="flex gap-6">
               <span>Explore beyond the ordinary.</span>
+
               <span ref={arrowRef}>
                 <ArrowDown className="h-5 w-5 -translate-y-1" />
               </span>
+
               <span>Scroll to see more.</span>
             </div>
           </div>

@@ -1,5 +1,81 @@
 import React, { useEffect, useRef, useState } from "react";
 
+/*
+ * ============================================================
+ * VIDEO ASSETS
+ * ============================================================
+ *
+ * Vite needs assets inside /src/assets to be imported.
+ *
+ * This glob converts:
+ *
+ * /src/assets/videos/tours/...
+ *
+ * into Vite-generated production URLs.
+ */
+const VIDEO_ASSETS = import.meta.glob(
+  "/src/assets/videos/tours/**/*.{mp4,webm,mov}",
+  {
+    eager: true,
+    query: "?url",
+    import: "default",
+  }
+);
+
+/*
+ * Resolve a tour video path into the actual Vite asset URL.
+ */
+function resolveVideo(videoPath) {
+  if (!videoPath) return "";
+
+  // Already a URL
+  if (
+    videoPath.startsWith("http://") ||
+    videoPath.startsWith("https://") ||
+    videoPath.startsWith("blob:")
+  ) {
+    return videoPath;
+  }
+
+  // Normalize slashes
+  const normalizedPath = videoPath.replace(/\\/g, "/");
+
+  /*
+   * Direct match.
+   *
+   * Example:
+   * /src/assets/videos/tours/adrenaline/cobra/Vid 1.mp4
+   */
+  if (VIDEO_ASSETS[normalizedPath]) {
+    return VIDEO_ASSETS[normalizedPath];
+  }
+
+  /*
+   * Fallback:
+   * Compare normalized paths in case Vite's glob key
+   * differs slightly.
+   */
+  const match = Object.entries(VIDEO_ASSETS).find(
+    ([key]) => key.replace(/\\/g, "/") === normalizedPath
+  );
+
+  if (match) {
+    return match[1];
+  }
+
+  /*
+   * Helpful warning during development.
+   */
+  console.warn("Tour video could not be resolved:", videoPath);
+
+  return "";
+}
+
+
+/* ============================================================ */
+/* COMPONENT                                                    */
+/* ============================================================ */
+
 const TourVideoStrip = ({ videos }) => {
   const scrollRef = useRef(null);
 
@@ -11,13 +87,12 @@ const TourVideoStrip = ({ videos }) => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
 
-
   const DRAG_THRESHOLD = 8;
 
 
-  /* ========================================= */
-  /* DRAG START                                */
-  /* ========================================= */
+  /* ========================================================== */
+  /* DRAG START                                                 */
+  /* ========================================================== */
 
   const handlePointerDown = (event) => {
     /*
@@ -40,9 +115,9 @@ const TourVideoStrip = ({ videos }) => {
   };
 
 
-  /* ========================================= */
-  /* DRAG MOVE                                 */
-  /* ========================================= */
+  /* ========================================================== */
+  /* DRAG MOVE                                                  */
+  /* ========================================================== */
 
   const handlePointerMove = (event) => {
     const container = scrollRef.current;
@@ -58,7 +133,7 @@ const TourVideoStrip = ({ videos }) => {
     /*
      * Ignore tiny movements.
      *
-     * This is what allows a normal click to remain
+     * This allows a normal click to remain
      * a normal click.
      */
     if (
@@ -78,8 +153,7 @@ const TourVideoStrip = ({ videos }) => {
 
 
     /*
-     * Prevent the browser from selecting text/images
-     * while dragging.
+     * Prevent browser selection while dragging.
      */
     event.preventDefault();
 
@@ -90,9 +164,9 @@ const TourVideoStrip = ({ videos }) => {
   };
 
 
-  /* ========================================= */
-  /* DRAG END                                  */
-  /* ========================================= */
+  /* ========================================================== */
+  /* DRAG END                                                   */
+  /* ========================================================== */
 
   const handlePointerUp = () => {
     if (!isPointerDown.current) {
@@ -105,10 +179,8 @@ const TourVideoStrip = ({ videos }) => {
 
 
     /*
-     * IMPORTANT:
-     *
-     * Keep hasDragged true long enough for the browser's
-     * click event to occur.
+     * Keep hasDragged true long enough for
+     * the browser's click event to occur.
      */
     if (hasDragged.current) {
       setTimeout(() => {
@@ -118,9 +190,9 @@ const TourVideoStrip = ({ videos }) => {
   };
 
 
-  /* ========================================= */
-  /* POINTER CANCEL                            */
-  /* ========================================= */
+  /* ========================================================== */
+  /* POINTER CANCEL                                             */
+  /* ========================================================== */
 
   const handlePointerCancel = () => {
     isPointerDown.current = false;
@@ -130,14 +202,14 @@ const TourVideoStrip = ({ videos }) => {
   };
 
 
-  /* ========================================= */
-  /* VIDEO CLICK                               */
-  /* ========================================= */
+  /* ========================================================== */
+  /* VIDEO CLICK                                                */
+  /* ========================================================== */
 
   const handleVideoClick = (video) => {
     /*
-     * If the user dragged the carousel, don't open
-     * the video.
+     * If the user dragged the carousel,
+     * don't open the video.
      */
     if (hasDragged.current) {
       return;
@@ -147,9 +219,9 @@ const TourVideoStrip = ({ videos }) => {
   };
 
 
-  /* ========================================= */
-  /* WHEEL / TRACKPAD                          */
-  /* ========================================= */
+  /* ========================================================== */
+  /* WHEEL / TRACKPAD                                           */
+  /* ========================================================== */
 
   const handleWheel = (event) => {
     const container = scrollRef.current;
@@ -163,13 +235,11 @@ const TourVideoStrip = ({ videos }) => {
       return;
     }
 
-
     const movement =
       Math.abs(event.deltaX) >
       Math.abs(event.deltaY)
         ? event.deltaX
         : event.deltaY;
-
 
     if (!movement) return;
 
@@ -179,9 +249,9 @@ const TourVideoStrip = ({ videos }) => {
   };
 
 
-  /* ========================================= */
-  /* BODY LOCK                                 */
-  /* ========================================= */
+  /* ========================================================== */
+  /* BODY LOCK                                                   */
+  /* ========================================================== */
 
   useEffect(() => {
     if (!selectedVideo) return;
@@ -198,9 +268,9 @@ const TourVideoStrip = ({ videos }) => {
   }, [selectedVideo]);
 
 
-  /* ========================================= */
-  /* ESC                                       */
-  /* ========================================= */
+  /* ========================================================== */
+  /* ESC                                                         */
+  /* ========================================================== */
 
   useEffect(() => {
     if (!selectedVideo) return;
@@ -225,44 +295,57 @@ const TourVideoStrip = ({ videos }) => {
   }, [selectedVideo]);
 
 
+  /* ========================================================== */
+  /* EMPTY STATE                                                 */
+  /* ========================================================== */
+
   if (!videos?.length) {
     return null;
   }
 
 
+  /* ========================================================== */
+  /* RESOLVE VIDEO URLS                                          */
+  /* ========================================================== */
+
+  const resolvedVideos = videos
+    .map((video) => ({
+      original: video,
+      url: resolveVideo(video),
+    }))
+    .filter((video) => video.url);
+
+
+  if (!resolvedVideos.length) {
+    return null;
+  }
+
+
+  /* ========================================================== */
+  /* RENDER                                                      */
+  /* ========================================================== */
+
   return (
     <>
       <section className="relative z-10 mx-auto -mt-12 max-w-6xl px-4 lg:-mt-16 lg:px-5">
+
         <div className="rounded-[1.5rem] border border-blue-100 bg-white p-3 shadow-[0_24px_70px_rgba(15,23,42,0.16)] sm:p-4">
 
 
-          {/* ================================= */}
-          {/* HEADER                            */}
-          {/* ================================= */}
+          {/* ================================================== */}
+          {/* HEADER                                             */}
+          {/* ================================================== */}
 
           <div className="mb- flex items-end justify-between px-1 sm:px-2">
-            {/* <div>
-              <span className="font-bitter text-[10px] font-bold uppercase tracking-[0.14em] text-blue-500">
-                Experience
-              </span>
 
-              <h2 className="mt-1 font-bitter text-lg font-bold text-neutral-950 sm:text-xl">
-                Watch the experience
-              </h2>
-            </div> */}
+            {/* Header intentionally hidden */}
 
-            {/* <span className="font-bitter text-xs font-medium text-neutral-400">
-              {videos.length}{" "}
-              {videos.length === 1
-                ? "video"
-                : "videos"}
-            </span> */}
           </div>
 
 
-          {/* ================================= */}
-          {/* CAROUSEL                           */}
-          {/* ================================= */}
+          {/* ================================================== */}
+          {/* CAROUSEL                                           */}
+          {/* ================================================== */}
 
           <div
             ref={scrollRef}
@@ -292,156 +375,160 @@ const TourVideoStrip = ({ videos }) => {
                * while still allowing horizontal dragging.
                */
               touchAction: "pan-y",
+
               scrollBehavior: isDragging
                 ? "auto"
                 : "smooth",
             }}
           >
 
+            {resolvedVideos.map(
+              ({ url, original }, index) => (
 
-            {videos.map((video, index) => (
-              <button
-                key={`${video}-${index}`}
-                type="button"
-                draggable={false}
-
-                /*
-                 * NORMAL CLICK
-                 */
-                onClick={() =>
-                  handleVideoClick(video)
-                }
-
-                className="
-                  group
-                  relative
-                  w-[82vw]
-                  shrink-0
-                  overflow-hidden
-                  rounded-[1.15rem]
-                  bg-neutral-950
-                  text-left
-                  sm:w-[320px]
-                  lg:w-[360px]
-                "
-              >
-
-                {/* VIDEO THUMBNAIL */}
-
-                <video
-                  src={video}
-                  preload="metadata"
-                  muted
-                  playsInline
+                <button
+                  key={`${original}-${index}`}
+                  type="button"
                   draggable={false}
+
+                  onClick={() =>
+                    handleVideoClick(url)
+                  }
+
                   className="
-                    pointer-events-none
-                    aspect-video
-                    w-full
-                    object-cover
-                    transition
-                    duration-500
-                    group-hover:scale-[1.035]
-                  "
-                />
-
-
-                {/* HOVER */}
-
-                <span
-                  className="
-                    pointer-events-none
-                    absolute
-                    inset-0
-                    bg-black/0
-                    transition
-                    duration-300
-                    group-hover:bg-black/20
-                  "
-                />
-
-
-                {/* PLAY BUTTON */}
-
-                <span
-                  className="
-                    pointer-events-none
-                    absolute
-                    left-1/2
-                    top-1/2
-                    flex
-                    h-14
-                    w-14
-                    -translate-x-1/2
-                    -translate-y-1/2
-                    items-center
-                    justify-center
-                    rounded-full
-                    bg-white/95
-                    text-blue-700
-                    shadow-[0_8px_30px_rgba(0,0,0,0.25)]
-                    transition-all
-                    duration-300
-                    group-hover:scale-110
+                    group
+                    relative
+                    w-[82vw]
+                    shrink-0
+                    overflow-hidden
+                    rounded-[1.15rem]
+                    bg-neutral-950
+                    text-left
+                    sm:w-[320px]
+                    lg:w-[360px]
                   "
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="ml-1 h-5 w-5"
+
+                  {/* ======================================== */}
+                  {/* VIDEO THUMBNAIL                          */}
+                  {/* ======================================== */}
+
+                  <video
+                    src={url}
+                    preload="metadata"
+                    muted
+                    playsInline
+                    draggable={false}
+                    className="
+                      pointer-events-none
+                      aspect-video
+                      w-full
+                      object-cover
+                      transition
+                      duration-500
+                      group-hover:scale-[1.035]
+                    "
+                  />
+
+
+                  {/* ======================================== */}
+                  {/* HOVER                                     */}
+                  {/* ======================================== */}
+
+                  <span
+                    className="
+                      pointer-events-none
+                      absolute
+                      inset-0
+                      bg-black/0
+                      transition
+                      duration-300
+                      group-hover:bg-black/20
+                    "
+                  />
+
+
+                  {/* ======================================== */}
+                  {/* PLAY BUTTON                               */}
+                  {/* ======================================== */}
+
+                  <span
+                    className="
+                      pointer-events-none
+                      absolute
+                      left-1/2
+                      top-1/2
+                      flex
+                      h-14
+                      w-14
+                      -translate-x-1/2
+                      -translate-y-1/2
+                      items-center
+                      justify-center
+                      rounded-full
+                      bg-white/95
+                      text-blue-700
+                      shadow-[0_8px_30px_rgba(0,0,0,0.25)]
+                      transition-all
+                      duration-300
+                      group-hover:scale-110
+                    "
                   >
-                    <path d="M8 5v14l11-7L8 5Z" />
-                  </svg>
-                </span>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="ml-1 h-5 w-5"
+                    >
+                      <path d="M8 5v14l11-7L8 5Z" />
+                    </svg>
+                  </span>
 
 
-                
-                {/* WATCH LABEL */}
-                <span
-                className="
-                    pointer-events-none
-                    absolute
-                    bottom-3
-                    left-3
-                    rounded-full
-                    border
-                    border-white/20
-                    bg-black/50
-                    px-3
-                    py-1.5
-                    font-bitter
-                    text-[10px]
-                    font-bold
-                    uppercase
-                    tracking-[0.1em]
-                    text-white
-                    backdrop-blur-md
+                  {/* ======================================== */}
+                  {/* WATCH LABEL                               */}
+                  {/* ======================================== */}
 
-                    transition-all
-                    duration-300
+                  <span
+                    className="
+                      pointer-events-none
+                      absolute
+                      bottom-3
+                      left-3
+                      rounded-full
+                      border
+                      border-white/20
+                      bg-black/50
+                      px-3
+                      py-1.5
+                      font-bitter
+                      text-[10px]
+                      font-bold
+                      uppercase
+                      tracking-[0.1em]
+                      text-white
+                      backdrop-blur-md
+                      transition-all
+                      duration-300
+                      group-hover:border-blue-500
+                      group-hover:bg-blue-600
+                      group-hover:text-white
+                      group-hover:shadow-[0_6px_20px_rgba(37,99,235,0.35)]
+                    "
+                  >
+                    Watch video
+                  </span>
 
-                    group-hover:border-blue-500
-                    group-hover:bg-blue-600
-                    group-hover:text-white
-                    group-hover:shadow-[0_6px_20px_rgba(37,99,235,0.35)]
-                "
-                >
-                Watch video
-                </span>
-                
-
-
-              </button>
-            ))}
+                </button>
+              )
+            )}
 
           </div>
 
 
-          {/* ================================= */}
-          {/* DRAG HINT                          */}
-          {/* ================================= */}
+          {/* ================================================== */}
+          {/* DRAG HINT                                          */}
+          {/* ================================================== */}
 
-          {videos.length > 1 && (
+          {resolvedVideos.length > 1 && (
             <div className="mt-3 flex items-center justify-center gap-2">
 
               <svg
@@ -477,12 +564,13 @@ const TourVideoStrip = ({ videos }) => {
           )}
 
         </div>
+
       </section>
 
 
-      {/* ================================= */}
-      {/* VIDEO MODAL                       */}
-      {/* ================================= */}
+      {/* ====================================================== */}
+      {/* VIDEO MODAL                                            */}
+      {/* ====================================================== */}
 
       <TourVideoModal
         video={selectedVideo}
@@ -495,13 +583,20 @@ const TourVideoStrip = ({ videos }) => {
 };
 
 
-/* ========================================= */
-/* VIDEO MODAL                               */
-/* ========================================= */
+/* ============================================================ */
+/* VIDEO MODAL                                                   */
+/* ============================================================ */
 
-function TourVideoModal({ video, onClose }) {
+function TourVideoModal({
+  video,
+  onClose,
+}) {
   const [visible, setVisible] = useState(false);
 
+
+  /* ========================================================== */
+  /* OPEN ANIMATION                                             */
+  /* ========================================================== */
 
   useEffect(() => {
     if (!video) {
@@ -516,13 +611,22 @@ function TourVideoModal({ video, onClose }) {
 
     return () =>
       cancelAnimationFrame(frame);
+
   }, [video]);
 
+
+  /* ========================================================== */
+  /* EMPTY                                                      */
+  /* ========================================================== */
 
   if (!video) {
     return null;
   }
 
+
+  /* ========================================================== */
+  /* CLOSE                                                       */
+  /* ========================================================== */
 
   const closeModal = () => {
     setVisible(false);
@@ -532,6 +636,10 @@ function TourVideoModal({ video, onClose }) {
     }, 250);
   };
 
+
+  /* ========================================================== */
+  /* RENDER                                                      */
+  /* ========================================================== */
 
   return (
     <div
@@ -583,7 +691,9 @@ function TourVideoModal({ video, onClose }) {
         `}
       >
 
-        {/* CLOSE */}
+        {/* ================================================ */}
+        {/* CLOSE                                             */}
+        {/* ================================================ */}
 
         <button
           type="button"
@@ -606,11 +716,11 @@ function TourVideoModal({ video, onClose }) {
             text-white
             backdrop-blur-md
             transition
-
             hover:bg-white
             hover:text-neutral-950
           "
         >
+
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -618,6 +728,7 @@ function TourVideoModal({ video, onClose }) {
             strokeWidth="2"
             className="h-5 w-5"
           >
+
             <path
               d="M6 6l12 12"
               strokeLinecap="round"
@@ -627,11 +738,15 @@ function TourVideoModal({ video, onClose }) {
               d="M18 6 6 18"
               strokeLinecap="round"
             />
+
           </svg>
+
         </button>
 
 
-        {/* VIDEO */}
+        {/* ================================================ */}
+        {/* VIDEO                                             */}
+        {/* ================================================ */}
 
         <video
           key={video}
