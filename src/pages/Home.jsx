@@ -313,7 +313,7 @@ const Home = () => {
   return (
     <>
       <Seo
-        title="Cape Frontier Travel | Guided Tours in South Africa"
+        title="Cape Frontier Travel & Tours| Guided Tours in South Africa"
         description="Small-group and custom tours across the Western Cape."
         path="/"
       />
