@@ -149,6 +149,8 @@ const megaMenus = {
     eyebrow: 'Cape Frontier policies',
     title: 'Before you book',
     desc: 'Quick policy links for booking, pickup, payments, cancellations, private tours, and vehicle arrangements. Final details are confirmed manually by Cape Frontier.',
+    ctaLabel: 'Policies',
+    ctaTarget: '/policies',
     layout: 'links',
     links: [
       {
@@ -856,20 +858,6 @@ const Navbar = () => {
               fetchPriority="high"
               loading="eager"
               decoding="async"
-              // className="
-              //   block
-              //   h-14
-              //   w-auto
-              //   max-w-[210px]
-              //   shrink-0
-              //   object-contain
-              //   object-center
-              //   sm:h-15
-              //   sm:max-w-[220px]
-              //   md:h-16
-              //   md:max-w-[230px]
-              //   lg:h-17
-              // "
               className="
                 block
                 h-14
@@ -902,9 +890,6 @@ const Navbar = () => {
             "
           >
 
-            {/* =================================================
-                DESKTOP NAVIGATION
-            ================================================= */}
             {/* =================================================
                 CAPE TOWN TOURISM AFFILIATION
 
@@ -1460,11 +1445,29 @@ const Navbar = () => {
                     }
                   </p>
 
+                  {/*
+                    UPDATED:
+                    This button used to always call
+                    handleNavClick(activeMega, event),
+                    which for the FAQ mega menu scrolled
+                    to the #faq section on the homepage.
+
+                    Now it uses ctaTarget/ctaLabel from
+                    the mega menu data when present, so
+                    the FAQ ("Before you book") panel
+                    navigates to the /policies page
+                    instead. Every other mega menu still
+                    falls back to its original behavior
+                    since ctaTarget/ctaLabel are
+                    undefined for them.
+                  */}
+
                   <button
                     type="button"
                     onClick={(event) =>
                       handleNavClick(
-                        activeMega,
+                        activeMegaData.ctaTarget ??
+                          activeMega,
                         event
                       )
                     }
@@ -1485,7 +1488,9 @@ const Navbar = () => {
                       hover:-translate-y-0.5
                     "
                   >
-                    Open {activeMega}
+                    Open{' '}
+                    {activeMegaData.ctaLabel ??
+                      activeMega}
 
                     <span aria-hidden="true">
                       →
@@ -1887,18 +1892,6 @@ const Navbar = () => {
                     >
                       Affiliated to
                     </p>
-
-                    {/* <img
-                      src="/icons/handshake.webp"
-                      alt="Handshake Icon"
-                      className="
-                        h-8
-                        w-auto
-                        max-w-[230px]
-                        object-contain
-                        object-left
-                      "
-                    /> */}
 
                     <img
                       src="/assets/brand/logo-love-ct-blue.webp"
