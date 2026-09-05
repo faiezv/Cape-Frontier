@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Seo from "../components/Seo";
 
 gsap.registerPlugin(ScrollTrigger);
 
