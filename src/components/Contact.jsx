@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { gsap } from 'gsap'
 
-const CONTACT_EMAIL = 'admin@capefrontier.co.za'
+const CONTACT_EMAIL = 'admin@cape-frontier.co.za'
 const CONTACT_NUMBER = '(+27)72 264 7284';
 
 const socialLinks = [
