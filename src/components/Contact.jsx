@@ -422,7 +422,7 @@ const Contact = () => {
                     <div className="relative overflow-hidden rounded-2xl border border-black/5 bg-white/70 p-2 
                     shadow-[0_8px_24px_rgba(7,31,79,0.06)] transition duration-300 hover:shadow-[0_14px_32px_rgba(7,31,79,0.12)]">
                       <img
-                        src="/assets/brand/content.webp"
+                        src="/assets/brand/instagram.png"
                         alt="Scan to follow Cape Frontier on Instagram"
                         className="h-auto w-full max-w-[16rem] object-contain"
                       />
