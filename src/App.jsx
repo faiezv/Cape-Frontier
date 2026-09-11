@@ -115,8 +115,6 @@ const App = () => {
   return (
     <>
       <Helmet>
-        <meta name="description" content="Cape Frontier" />
-        <link rel="canonical" href="https://www.cape-frontier.co.za" />
         <script type="application/ld+json">
           {JSON.stringify(buildOrganizationSchema())}
         </script>
