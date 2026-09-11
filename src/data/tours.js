@@ -155,7 +155,7 @@ export const tours = [
     category: TOUR_MODIFIERS.HALF_DAY,
 
     title: "Shark Cage Diving",
-    slug: "/shark-cage-diving-gansbaai",
+    slug: "shark-cage-diving-gansbaai",
     canonicalPath: "/tours/shark-cage-diving-gansbaai",
     childFriendly: true,
 
