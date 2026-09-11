@@ -155,7 +155,7 @@ export const tours = [
     category: TOUR_MODIFIERS.HALF_DAY,
 
     title: "Shark Cage Diving",
-    slug: "shark-cage-diving-gansbaai",
+    slug: "/shark-cage-diving-gansbaai",
     canonicalPath: "/tours/shark-cage-diving-gansbaai",
     childFriendly: true,
 
@@ -3963,7 +3963,6 @@ export const tours = [
     ],
   },
   // =========================================== PACKAGES
-  // PenTour 1 - Mother City - removed
   // Cape Town City Tour
   {
     id: 13,
@@ -8001,8 +8000,8 @@ export const tours = [
     category: TOUR_MODIFIERS.FULL_DAY,
 
     title: "Cool Runnings Toboggan Park, Winelands & Adventure Loop",
-    slug: "Cool-running-toboggan-park",
-    canonicalPath: "/tours/cool-runnings",
+    slug: "cool-runnings-toboggan-park",
+    canonicalPath: "/tours/cool-runnings-toboggan-park",
     childFriendly: true,
 
     seo: {
