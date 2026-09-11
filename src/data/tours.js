@@ -3546,7 +3546,7 @@ export const tours = [
     slug: "heritage-faith-cape-flats-community-tour",
     canonicalPath: "/tours/heritage-faith-cape-flats-community-tour",
     childFriendly: true,
-
+    daysInAdvance: 3,
     seo: {
       title:
         "Full‑Day Heritage, Faith & Cape Flats Community Tour | Cape Frontier Tours",
@@ -5605,6 +5605,7 @@ export const tours = [
     slug: "3-day-garden-route-route-62-tour",
     canonicalPath: "/tours/3-day-garden-route-route-62-tour",
     childFriendly: true,
+    daysInAdvance: 14,
 
     seo: {
       title: "3‑Day Garden Route & Route 62 Tour | Cape Frontier Tours",
@@ -6215,6 +6216,7 @@ export const tours = [
     slug: "5-day-garden-route-botlierskop-safari-tour",
     canonicalPath: "/tours/5-day-garden-route-botlierskop-safari-tour",
     childFriendly: true,
+    daysInAdvance: 14,
 
     seo: {
       title:
@@ -7097,6 +7099,7 @@ export const tours = [
     slug: "5-day-garden-route-gondwana-big-5-safari",
     canonicalPath: "/tours/5-day-garden-route-gondwana-big-5-safari",
     childFriendly: true,
+    daysInAdvance: 14,
 
     seo: {
       title:

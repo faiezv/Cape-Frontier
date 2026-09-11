@@ -82,6 +82,60 @@ const getTourMeta = (tour) => {
     .join(' • ') || 'Guided Cape Town experience'
 }
 
+// -----------------------------------------------------------------------------
+// NEW: advance-booking window logic
+// -----------------------------------------------------------------------------
+// A tour can declare `daysInAdvance` (a whole number of calendar days that
+// must pass before it's bookable, e.g. 3). When a tour doesn't declare it,
+// we fall back to "no same-day bookings" — but computed conservatively:
+// the candidate date must have a *full* 24 hours of clearance from right
+// now, measured from that date's midnight (00:00). Since "now" is almost
+// never exactly midnight, this naturally rolls the minimum forward an
+// extra day whenever there isn't a full day's clearance yet — e.g. if
+// it's 7am today, "tomorrow" only gives ~17 hours of buffer before its
+// midnight, so the earliest bookable date becomes the day after that.
+const DAY_MS = 24 * 60 * 60 * 1000
+
+const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate())
+
+const getMinBookableDate = (tour, now = new Date()) => {
+  const daysInAdvance =
+    tour && typeof tour === 'object' ? tour.daysInAdvance : undefined
+
+  if (
+    typeof daysInAdvance === 'number' &&
+    !Number.isNaN(daysInAdvance) &&
+    daysInAdvance >= 0
+  ) {
+    // Explicit rule: a straightforward calendar-day offset from today.
+    const minDate = startOfDay(now)
+    minDate.setDate(minDate.getDate() + daysInAdvance)
+    return minDate
+  }
+
+  // No daysInAdvance declared => no same-day bookings, with a 24h buffer
+  // measured against the candidate date's midnight rather than just the
+  // calendar date, so a booking made in the early morning doesn't sneak
+  // through on "tomorrow" without a full day's notice.
+  const cutoff = new Date(now.getTime() + DAY_MS)
+  const cutoffMidnight = startOfDay(cutoff)
+  if (cutoff.getTime() > cutoffMidnight.getTime()) {
+    cutoffMidnight.setDate(cutoffMidnight.getDate() + 1)
+  }
+  return cutoffMidnight
+}
+
+const getAdvanceNoticeLabel = (tour) => {
+  const daysInAdvance =
+    tour && typeof tour === 'object' ? tour.daysInAdvance : undefined
+
+  if (typeof daysInAdvance === 'number' && !Number.isNaN(daysInAdvance)) {
+    if (daysInAdvance <= 0) return 'Same-day bookings allowed'
+    return `Requires at least ${daysInAdvance} day${daysInAdvance === 1 ? '' : 's'} advance notice`
+  }
+  return 'No same-day bookings — book at least a day ahead'
+}
+
 const getTourOptions = () => {
   if (!Array.isArray(tours) || !tours.length) {
     return FALLBACK_TOURS.map((title) => ({
@@ -177,6 +231,8 @@ const useScrollLock = (locked) => {
 // -----------------------------------------------------------------------------
 function TourSelect() {
   const [destination, setDestination] = useState('')
+  const [destinationId, setDestinationId] = useState(null)
+
   const [date, setDate] = useState(null)
   const [adults, setAdults] = useState(1)
   const [childAges, setChildAges] = useState([]) // each entry is a child's age (0-17)
@@ -253,14 +309,32 @@ function TourSelect() {
   // can tell whether children are allowed on it.
   // -----------------------------------------------------------------
   const selectedTourRaw = useMemo(() => {
-    const match = tourOptions.find((tour) => tour.title === destination)
+    const match = destinationId != null
+      ? tourOptions.find((tour) => tour.id === destinationId)
+      : tourOptions.find((tour) => tour.title === destination)
     return match ? match.raw : null
-  }, [tourOptions, destination])
+  }, [tourOptions, destination, destinationId])
 
   const isChildFriendly = useMemo(() => {
     if (!selectedTourRaw || typeof selectedTourRaw === 'string') return true
     return selectedTourRaw.childFriendly !== false
   }, [selectedTourRaw])
+
+  // -----------------------------------------------------------------
+  // NEW: minimum bookable date for the currently selected tour, driven
+  // by tour.daysInAdvance (see getMinBookableDate above). Recomputed
+  // whenever the tour changes or the date modal is (re)opened, so the
+  // "now" baseline doesn't go stale if the picker's been open a while.
+  // -----------------------------------------------------------------
+  const minBookableDate = useMemo(
+    () => getMinBookableDate(selectedTourRaw),
+    [selectedTourRaw, activeModal]
+  )
+
+  const advanceNoticeLabel = useMemo(
+    () => (destination ? getAdvanceNoticeLabel(selectedTourRaw) : null),
+    [destination, selectedTourRaw]
+  )
 
   // Compute unique tour types for filter
   const tourTypes = useMemo(() => {
@@ -628,6 +702,17 @@ function TourSelect() {
       }
       return
     }
+
+    // NEW: final safety check — re-validate the chosen date against this
+    // tour's advance-booking window before letting the search through.
+    if (date && date < minBookableDate) {
+      setSearchError({ id: Date.now(), message: 'Your selected date no longer meets this tour\u2019s advance-booking window. Please choose a new date.' })
+      setDate(null)
+      setParticipantsConfirmed(false)
+      if (isMobileLayout) setMobileStep(1)
+      return
+    }
+
     setSearchError(null)
     const selectedTour = tourOptions.find((tour) => tour.title === destination)
     if (!selectedTour) {
@@ -655,6 +740,7 @@ function TourSelect() {
 
   const handleResetDetails = () => {
     setDestination('')
+    setDestinationId(null)
     setDate(null)
     setAdults(1)
     setChildAges([])
@@ -708,7 +794,11 @@ function TourSelect() {
         key: 'date',
         label: 'When?',
         value: formattedDate,
-        preview: destination ? (date ? `${destination} • ${formattedDate}` : `${destination} selected`) : 'Destination required first',
+        preview: destination
+          ? (date
+            ? `${destination} • ${formattedDate}`
+            : (advanceNoticeLabel || `${destination} selected`))
+          : 'Destination required first',
         icon: './icons/calendar.png',
         status: date ? 'Done' : mobileStep === 1 ? 'Current' : 'Pending',
         complete: Boolean(date),
@@ -760,7 +850,7 @@ function TourSelect() {
         isSearch: true,
       },
     ],
-    [destination, formattedDate, adults, children, participants, participantsConfirmed, canSearch, date, mobileStep]
+    [destination, formattedDate, adults, children, participants, participantsConfirmed, canSearch, date, mobileStep, advanceNoticeLabel]
   )
 
   const currentCard = cards[Math.min(mobileStep, 2)] || cards[0]
@@ -881,27 +971,56 @@ function TourSelect() {
     setMobileStep((previousStep) => Math.min(2, previousStep + 1))
   }
 
-  const handleDestinationSelect = (tourTitle) => {
+  const handleDestinationSelect = (tourTitle, tourId) => {
     const newValue = tourTitle
     const newPreview = `Selected: ${tourTitle}`
+
+    const match = tourId != null
+      ? tourOptions.find((tour) => tour.id === tourId)
+      : tourOptions.find((tour) => tour.title === tourTitle)
+    const rawTour = match ? match.raw : null
+    const tourAllowsChildren = !(rawTour && typeof rawTour === 'object' && rawTour.childFriendly === false)
+
     setDestination(tourTitle)
+    setDestinationId(tourId ?? null) // NEW
     setParticipantsConfirmed(false)
 
     // If the newly selected tour doesn't allow children, strip any
     // children that may have been added while a different (child-friendly)
     // tour was selected — otherwise they'd carry over, already "added",
     // onto a tour that shouldn't allow them at all.
-    const match = tourOptions.find((tour) => tour.title === tourTitle)
-    const rawTour = match ? match.raw : null
-    const tourAllowsChildren = !(rawTour && typeof rawTour === 'object' && rawTour.childFriendly === false)
     if (!tourAllowsChildren) {
       setChildAges([])
+    }
+
+    // NEW: re-validate the currently selected date against the newly
+    // selected tour's advance-booking window (tour.daysInAdvance). A
+    // tour that requires more notice can invalidate a date the customer
+    // already picked, so clear it rather than silently letting a stale,
+    // too-soon date through to search/checkout.
+    const newMinDate = getMinBookableDate(rawTour)
+    if (date && date < newMinDate) {
+      setDate(null)
+      setSearchError({
+        id: Date.now(),
+        message: `${tourTitle} needs more advance notice — please pick a new date.`,
+      })
     }
 
     completeStepWithDelay(0, 1, newValue, newPreview, 0)
   }
 
   const handleDateSelect = (selectedDate) => {
+    // NEW: guard against picking (or the picker somehow returning) a date
+    // that falls before this tour's minimum advance-booking window.
+    if (minBookableDate && selectedDate < minBookableDate) {
+      setSearchError({
+        id: Date.now(),
+        message: 'That date is too soon for this tour — please choose a later date.',
+      })
+      return
+    }
+
     const newFormattedDate = selectedDate.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })
     const newValue = newFormattedDate
     const newPreview = destination ? `${destination} • ${newFormattedDate}` : newFormattedDate
@@ -962,7 +1081,10 @@ function TourSelect() {
 
   const renderDayContents = (day, dateObj) => {
     const isToday = dateObj && new Date().toDateString() === dateObj.toDateString()
-    const isDisabled = preventSameDay && isToday
+    const isBeforeMinDate = Boolean(
+      dateObj && minBookableDate && startOfDay(dateObj).getTime() < minBookableDate.getTime()
+    )
+    const isDisabled = (preventSameDay && isToday) || isBeforeMinDate
     return (
       <div className="relative flex items-center justify-center">
         <span>{day}</span>
@@ -1107,7 +1229,7 @@ function TourSelect() {
                         <div className="mt-1 flex items-center gap-2 sm:mt-2">
                           <button
                             type="button"
-                            onClick={() => handleDestinationSelect(featuredTour.title)}
+                            onClick={() => handleDestinationSelect(featuredTour.title, featuredTour.id)}
                             className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 font-bitter text-[9px] font-black uppercase tracking-[0.08em] text-black shadow-[0_10px_26px_rgba(0,0,0,0.3)] transition-all duration-300 hover:scale-105 hover:shadow-[0_14px_34px_rgba(0,0,0,0.4)] active:scale-95 sm:px-4 sm:py-1.5 sm:text-[10px]"
                           >
                             Explore this tour
@@ -1136,7 +1258,7 @@ function TourSelect() {
                         </div>
                         <button
                           type="button"
-                          onClick={() => handleDestinationSelect(featuredTour.title)}
+                          onClick={() => handleDestinationSelect(featuredTour.title, featuredTour.id)}
                           className="pointer-events-auto inline-flex shrink-0 items-center gap-1 rounded-full bg-white px-3 py-1.5 font-bitter text-[9px] font-black uppercase tracking-[0.08em] text-black shadow-[0_8px_20px_rgba(0,0,0,0.25)] transition-all duration-300 hover:scale-105 active:scale-95"
                         >
                           Select
@@ -1304,7 +1426,7 @@ function TourSelect() {
                               prev === index ? null : index
                             );
                           } else {
-                            handleDestinationSelect(tour.title);
+                            handleDestinationSelect(tour.title, tour.id);
                           }
                         }}
                       >
@@ -1482,7 +1604,7 @@ function TourSelect() {
                                   type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleDestinationSelect(tour.title);
+                                    handleDestinationSelect(tour.title, tour.id);
                                   }}
                                   className="rounded-full bg-blue-600 px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-white shadow-md transition-all duration-300 hover:bg-blue-700"
                                 >
@@ -1530,14 +1652,22 @@ function TourSelect() {
         )}
 
         {activeModal === 'date' && (
-          <div className="flex justify-center p-4 pb-6 sm:p-6 md:p-8">
+          <div className="flex flex-col items-center gap-2 p-4 pb-6 sm:p-6 md:p-8">
+            {advanceNoticeLabel && (
+              <p className="text-center font-mont text-xs font-semibold text-black/50">
+                {advanceNoticeLabel}
+              </p>
+            )}
             <div className="datepicker-large">
               <DatePicker
                 selected={date}
                 onChange={handleDateSelect}
-                minDate={new Date()}
+                minDate={minBookableDate}
                 renderDayContents={renderDayContents}
                 filterDate={(dateObj) => {
+                  if (minBookableDate && startOfDay(dateObj).getTime() < minBookableDate.getTime()) {
+                    return false
+                  }
                   if (preventSameDay) {
                     const today = new Date()
                     return dateObj.toDateString() !== today.toDateString()
