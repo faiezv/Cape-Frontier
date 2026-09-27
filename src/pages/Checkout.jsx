@@ -487,7 +487,8 @@ const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { tour, bookingDetails, selectedCurrency } = location.state || {};
+  const { tour, bookingDetails, selectedCurrency, priceToken } =
+    location.state || {};
 
   const pageRef = useRef(null);
   const heroRef = useRef(null);
@@ -1072,6 +1073,7 @@ const Checkout = () => {
             customFee,
             totalAmount: totalPrice,
             totalMinorUnit,
+            priceToken,
             pricingOptions: {
               isPrivate,
               isCustom,
@@ -1123,6 +1125,7 @@ const Checkout = () => {
     subtotalTours,
     totalPrice,
     totalMinorUnit,
+    priceToken,
   ]);
 
   if (!tour || !bookingDetails) return null;
@@ -1702,7 +1705,7 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  {/* --- PAYMENT FORM (unchanged) --- */}
+                  {/* --- PAYMENT FORM --- */}
                   <div
                     onPointerDown={() => setPaymentCompact(true)}
                     onMouseEnter={() => setPaymentCompact(true)}
@@ -1716,6 +1719,12 @@ const Checkout = () => {
                       </div>
                       <span className="rounded-full bg-[#071f4f] px-3 py-1.5 text-xs font-bold text-white">Secure</span>
                     </div>
+
+                    {!priceToken && (
+                      <p className="mx-1 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold leading-5 text-amber-800">
+                        Final price will be re-verified before payment.
+                      </p>
+                    )}
 
                     {clientSecret ? (
                       <Elements stripe={stripePromise} options={options} key={clientSecret}>

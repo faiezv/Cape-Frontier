@@ -169,10 +169,15 @@ const CheckoutSummary = ({
   const _effectiveChildPrice = toNum(effectiveChildPrice) ?? 0;
   const _effectiveToddlerPrice = toNum(effectiveToddlerPrice) ?? 0;
 
-  const adultRowSubtotal   = toNum(adultSubtotal)   ?? adults   * _effectiveAdultPrice;
-  const teenRowSubtotal    = toNum(teenSubtotal)    ?? teens    * _effectiveTeenPrice;
-  const childRowSubtotal   = toNum(childSubtotal)   ?? effectiveChildren * _effectiveChildPrice;
-  const toddlerRowSubtotal = toNum(toddlerSubtotal) ?? effectiveToddlers * _effectiveToddlerPrice;
+  // Always derive row subtotals from the *effective* (post-group-tier)
+  // per-person rates. The engine's adultSubtotal/teenSubtotal are the
+  // pre-adjustment base totals — using them here renders the base
+  // amount next to the discounted per-person rate, which is what the
+  // "subtotal shows ZAR 29400 but should show ZAR 28500" bug was.
+  const adultRowSubtotal   = adults   * _effectiveAdultPrice;
+  const teenRowSubtotal    = teens    * _effectiveTeenPrice;
+  const childRowSubtotal   = effectiveChildren * _effectiveChildPrice;
+  const toddlerRowSubtotal = effectiveToddlers * _effectiveToddlerPrice;
 
   const engineTourSubtotal =
     toNum(discountedTourTotal) ??
