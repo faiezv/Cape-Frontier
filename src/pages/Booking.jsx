@@ -472,6 +472,16 @@ const Booking = ({ embeddedTour, bookingData }) => {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
+  // Pre-flight price verification state.
+  //   "idle"     → form incomplete, nothing to verify yet
+  //   "pending"  → request in flight (or debounced)
+  //   "verified" → token cached, checkout button enabled
+  //   "failed"   → server rejected; button becomes a retry action
+  const [verifyStatus, setVerifyStatus] = useState("idle");
+  const [verifyError, setVerifyError] = useState("");
+  const [verifiedToken, setVerifiedToken] = useState(null);
+  const [verifyRetry, setVerifyRetry] = useState(0);
+
   // ─── Derived counts (category buckets for UI only) ────────────────
   const adultCount = Math.max(Number(formData.adults || 0), 1);
   const childAges = formData.childAges || [];
@@ -860,6 +870,130 @@ const Booking = ({ embeddedTour, bookingData }) => {
     return () => ctx.revert();
   }, [tour, isEmbedded]);
 
+  // ─── Pre-flight price verification ───────────────────────────────
+  // Runs whenever pricing-relevant inputs change AND the booking
+  // form is complete enough to submit. Stores the resulting signed
+  // token so /checkout can hand it to /api/payment-intent without
+  // a fresh round trip. Debounced 400ms; cancels in-flight requests
+  // when a new trigger arrives.
+  useEffect(() => {
+    if (!tour) return;
+
+    // Custom-quote tours have no fixed total to verify.
+    if (pricing.isCustomQuote) {
+      setVerifyStatus("idle");
+      setVerifyError("");
+      setVerifiedToken(null);
+      return;
+    }
+
+    const readyToVerify =
+      contactDetailsComplete &&
+      dateDetailsComplete &&
+      pickupDetailsComplete &&
+      (!pricing.hasOptions || formData.selectedOption);
+
+    if (!readyToVerify) {
+      setVerifyStatus("idle");
+      setVerifyError("");
+      setVerifiedToken(null);
+      return;
+    }
+
+    const controller = new AbortController();
+    let cancelled = false;
+
+    setVerifyStatus("pending");
+    setVerifyError("");
+    setVerifiedToken(null);
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/verify-price", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            tourId: tour.id ?? getTourSlug(tour),
+            adultCount,
+            childAges,
+            currency,
+            selectedOption: formData.selectedOption,
+            selectedExtras: formData.selectedExtras || {},
+            isPrivate: formData.isPrivate,
+            isCustom: formData.isCustom,
+            selectedKidsActivity: formData.selectedKidsActivity,
+          }),
+        });
+
+        if (cancelled) return;
+
+        const contentType = res.headers.get("content-type") || "";
+        const looksLikeHtml = contentType.includes("text/html");
+
+        // No API deployed locally — treat as "verified locally".
+        // Same engine, same number; just no signed token.
+        if (res.status === 404 || res.status === 405 || looksLikeHtml) {
+          console.warn(
+            "[Booking] /api/verify-price unavailable; using client-side price.",
+          );
+          setVerifyStatus("verified");
+          setVerifiedToken(null);
+          return;
+        }
+
+        if (!res.ok) {
+          let detail = "";
+          try {
+            const errBody = await res.json();
+            detail = errBody?.error || errBody?.message || "";
+          } catch {
+            /* body wasn't JSON */
+          }
+          throw new Error(detail || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (cancelled) return;
+
+        if (data?.isCustomQuote) {
+          setVerifyStatus("idle");
+          return;
+        }
+
+        setVerifyStatus("verified");
+        setVerifiedToken(data?.token || null);
+      } catch (err) {
+        if (cancelled || err.name === "AbortError") return;
+        console.error("[Booking] Price verification failed:", err);
+        setVerifyStatus("failed");
+        setVerifyError(err?.message || "Price verification failed");
+      }
+    }, 400);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [
+    tour,
+    adultCount,
+    JSON.stringify(childAges),
+    currency,
+    formData.selectedOption,
+    JSON.stringify(formData.selectedExtras),
+    formData.isPrivate,
+    formData.isCustom,
+    formData.selectedKidsActivity,
+    contactDetailsComplete,
+    dateDetailsComplete,
+    pickupDetailsComplete,
+    pricing.isCustomQuote,
+    pricing.hasOptions,
+    verifyRetry,
+  ]);
+
   // ─── Handlers ────────────────────────────────────────────────────
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -906,8 +1040,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
   };
 
   // Adds a child with a sensible default age for the chosen category.
-  // The age stepper is gone — the guest just picks a category and
-  // confirms. Pricing still sees a real age via this default.
   const addChildByCategory = (category) => {
     if (tour?.childFriendly === false || !canAddChild) return;
     const defaultAge =
@@ -1074,14 +1206,8 @@ const Booking = ({ embeddedTour, bookingData }) => {
   };
 
   // ─── Submit ──────────────────────────────────────────────────────
-  // The client's `pricing` value is already computed from
-  // `computePricing` — the exact same function /api/verify-price calls
-  // server-side. We still ask the server to re-derive and sign a
-  // short-lived token, because that token (not the local number) is
-  // what Paystack is initialized with at /checkout. But if the
-  // endpoint isn't deployed yet (dev, static preview), we fall
-  // through gracefully using the local number instead of failing the
-  // whole booking. A console warning fires so it's not silent.
+  // With pre-flight verification, this function no longer hits the
+  // API itself — the token is already cached in `verifiedToken`.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError("");
@@ -1109,6 +1235,18 @@ const Booking = ({ embeddedTour, bookingData }) => {
     );
     if (invalidParticipantEmail) {
       alert(`Please check this participant email: ${invalidParticipantEmail}`);
+      return;
+    }
+
+    // Retry path — user clicked "Retry verification".
+    if (verifyStatus === "failed") {
+      setVerifyRetry((n) => n + 1);
+      return;
+    }
+
+    // Pre-flight still in flight or not started.
+    if (verifyStatus !== "verified" && !pricing.isCustomQuote) {
+      setSubmitError("Please wait for the price to be verified.");
       return;
     }
 
@@ -1143,119 +1281,17 @@ const Booking = ({ embeddedTour, bookingData }) => {
       },
     };
 
-    // Custom-quote tours have no fixed total to verify — send the
-    // guest straight through to the quote-request flow.
-    if (pricing.isCustomQuote) {
-      nav("/checkout", {
-        state: {
-          tour,
-          bookingDetails,
-          selectedCurrency: currency,
-          isCustomQuote: true,
-        },
-      });
-      return;
-    }
-
     setSubmitting(true);
-
-    // Helper: no-token navigation used by both the fallback path and
-    // the "server said custom quote" path.
-    const goToCheckoutWithoutToken = (extraState = {}) =>
-      nav("/checkout", {
-        state: {
-          tour,
-          bookingDetails,
-          selectedCurrency: currency,
-          ...extraState,
-        },
-      });
-
     try {
-      const res = await fetch("/api/verify-price", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tourId: tour.id ?? getTourSlug(tour),
-          adultCount,
-          childAges,
-          currency,
-          selectedOption: formData.selectedOption,
-          selectedExtras: formData.selectedExtras || {},
-          isPrivate: formData.isPrivate,
-          isCustom: formData.isCustom,
-          selectedKidsActivity: formData.selectedKidsActivity,
-        }),
-      });
-
-      const contentType = res.headers.get("content-type") || "";
-      const looksLikeHtml = contentType.includes("text/html");
-
-      // 404/405 (route missing) or 200+text/html (Vite SPA fallback
-      // served index.html for /api/*) both mean "no API here".
-      if (res.status === 404 || res.status === 405 || looksLikeHtml) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          "[Booking] /api/verify-price unavailable; using client-side price.",
-        );
-        goToCheckoutWithoutToken();
-        return;
-      }
-
-      if (!res.ok) {
-        let detail = "";
-        try {
-          const errBody = await res.json();
-          detail = errBody?.error || errBody?.message || "";
-        } catch {
-          /* body wasn't JSON — ignore */
-        }
-        throw new Error(detail || `HTTP ${res.status}`);
-      }
-
-      const verified = await res.json();
-
-      if (verified?.isCustomQuote) {
-        goToCheckoutWithoutToken({ isCustomQuote: true });
-        return;
-      }
-
       nav("/checkout", {
         state: {
           tour,
           bookingDetails,
           selectedCurrency: currency,
-          priceToken: verified?.token,
+          priceToken: verifiedToken || undefined,
+          isCustomQuote: pricing.isCustomQuote || undefined,
         },
       });
-    } catch (err) {
-      // In dev (plain `npm run dev`), Vite has no POST handler for
-      // /api/*, so fetch() throws a TypeError before we ever see a
-      // response. Treat that the same as "endpoint not deployed" and
-      // fall back to the locally-computed price instead of failing
-      // the whole booking. Real 5xx errors from a deployed API still
-      // surface below.
-      const isNetworkError =
-        err instanceof TypeError ||
-        /failed to fetch|networkerror|load failed/i.test(err?.message || "");
-
-      if (isNetworkError) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          "[Booking] /api/verify-price unreachable; using client-side price.",
-        );
-        goToCheckoutWithoutToken();
-        return;
-      }
-
-      // eslint-disable-next-line no-console
-      console.error("[Booking] Price verification failed:", err);
-
-      setSubmitError(
-        err?.message
-          ? `Couldn't verify price — ${err.message}`
-          : "We couldn't verify the current price. Please try again.",
-      );
     } finally {
       setSubmitting(false);
     }
@@ -1931,7 +1967,9 @@ const Booking = ({ embeddedTour, bookingData }) => {
                                   >
                                     ⚠️
                                   </span>
-                                  <span>This tour is not child-friendly.</span>
+                                  <span>
+                                    This tour is not child-friendly.
+                                  </span>
                                 </div>
                               )}
 
@@ -2463,9 +2501,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
                 />
               </div>
 
-              {/* CHECKOUT SUMMARY — the price-verification error is now
-                  rendered inside CheckoutSummary, directly above the
-                  "Continue to checkout" button. */}
+              {/* CHECKOUT SUMMARY */}
               <div ref={checkoutRef} className="mt-6">
                 <CheckoutSummary
                   tour={tour}
@@ -2484,6 +2520,8 @@ const Booking = ({ embeddedTour, bookingData }) => {
                   checkoutRef={checkoutRef}
                   submitting={submitting}
                   submitError={submitError}
+                  verifyStatus={verifyStatus}
+                  verifyError={verifyError}
                 />
               </div>
             </div>

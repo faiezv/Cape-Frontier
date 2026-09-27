@@ -15,8 +15,8 @@ import vehicles from "../data/vehicles.js";
 import { KIDS_ACTIVITIES } from "../data/kidsActivities";
 
 import { resolveImage } from "../utils/ImageLoader.js";
-import { formatMoney } from '../components/Tours/Helpers.jsx';
-import Seo from '../components/Seo.jsx'
+import { formatMoney } from "../components/Tours/Helpers.jsx";
+import Seo from "../components/Seo.jsx";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -24,9 +24,8 @@ gsap.registerPlugin(ScrollTrigger);
 const DEFAULT_PRIVATE_TOUR_FEE_ZAR = 750;
 const DEFAULT_CUSTOM_TRIP_FEE_ZAR = 500;
 
-// ─── Helpers (copied from CheckoutSummary) ──────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────
 
-// Helper to get private/custom fees
 const getFee = (tour, type) => {
   const defaults = {
     private: 750,
@@ -50,8 +49,6 @@ const getFee = (tour, type) => {
 
   return defaults[type] || 0;
 };
-
-// ─── Other helpers (unchanged) ──────────────────────────────────────
 
 const getTourReturnPath = (tour) => {
   const rawSlug =
@@ -83,7 +80,6 @@ const convertFromZar = (amountZar, currency) => {
 
   return safeAmount * rate;
 };
-
 
 const formatDisplayTime = (value) => {
   if (!value) return "";
@@ -151,7 +147,7 @@ const getPickupTime = (tour, bookingDetails) => {
     : "To be confirmed";
 };
 
-// ─── UI components (unchanged) ──────────────────────────────────────
+// ─── UI components ────────────────────────────────────────────────────
 
 const InfoPill = ({ children, tone = "neutral" }) => {
   const tones = {
@@ -175,8 +171,9 @@ const SummaryRow = ({ label, value, strong = false }) => (
   <div className="flex items-start justify-between gap-4 text-sm">
     <span className="text-slate-500">{label}</span>
     <span
-      className={`max-w-[62%] text-right leading-5 ${strong ? "font-bold text-slate-950" : "font-semibold text-slate-700"
-        }`}
+      className={`max-w-[62%] text-right leading-5 ${
+        strong ? "font-bold text-slate-950" : "font-semibold text-slate-700"
+      }`}
     >
       {value}
     </span>
@@ -232,10 +229,11 @@ const RevealButton = ({ active, title, detail, onClick }) => (
   <button
     type="button"
     onClick={onClick}
-    className={`group flex w-full items-center justify-between gap-3 rounded-[1.25rem] border p-4 text-left transition ${active
+    className={`group flex w-full items-center justify-between gap-3 rounded-[1.25rem] border p-4 text-left transition ${
+      active
         ? "border-green-300 bg-green-200 text-green-950"
         : "border-black/5 bg-white/82 text-slate-700 shadow-[0_10px_24px_rgba(7,31,79,0.04)] hover:-translate-y-0.5 hover:bg-white"
-      }`}
+    }`}
   >
     <span>
       <span className="block text-sm font-bold">{title}</span>
@@ -249,10 +247,11 @@ const RevealButton = ({ active, title, detail, onClick }) => (
     </span>
 
     <span
-      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg font-bold transition ${active
+      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg font-bold transition ${
+        active
           ? "bg-white/70 rotate-45 text-green-950"
           : "bg-slate-50 group-hover:bg-[#eef4ff]"
-        }`}
+      }`}
     >
       +
     </span>
@@ -262,15 +261,17 @@ const RevealButton = ({ active, title, detail, onClick }) => (
 const RevealPanel = ({ open, children }) => {
   return (
     <div
-      className={`overflow-hidden rounded-[1.5rem] transition-all duration-500 ease-out ${open
+      className={`overflow-hidden rounded-[1.5rem] transition-all duration-500 ease-out ${
+        open
           ? "max-h-[3200px] translate-y-0 opacity-100"
           : "max-h-0 -translate-y-2 opacity-0 pointer-events-none"
-        }`}
+      }`}
       aria-hidden={!open}
     >
       <div
-        className={`transition-all duration-500 ease-out ${open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
-          }`}
+        className={`transition-all duration-500 ease-out ${
+          open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+        }`}
       >
         {children}
       </div>
@@ -329,7 +330,7 @@ const buildPaystackBookingPayload = ({
   },
 });
 
-// ─── CheckoutForm (unchanged) ──────────────────────────────────────
+// ─── CheckoutForm ─────────────────────────────────────────────────────
 
 const CheckoutForm = ({
   totalAmountLabel,
@@ -339,6 +340,9 @@ const CheckoutForm = ({
   notes,
   pricingSummary,
   checkoutStops = [],
+  priceToken = null,
+  verifyState = "ready",
+  verifyError = "",
 }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -346,13 +350,15 @@ const CheckoutForm = ({
 
   const totalMinorUnit = Number(
     pricingSummary?.totalMinorUnit ??
-    bookingDetails?.pricingOptions?.totalMinorUnit,
+      bookingDetails?.pricingOptions?.totalMinorUnit,
   );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (loading) return;
+    if (verifyState === "pending") return;
+    if (verifyState === "failed") return;
 
     setLoading(true);
     setMessage("");
@@ -404,10 +410,13 @@ const CheckoutForm = ({
         },
         body: JSON.stringify({
           email: bookingDetails.email,
+          // Sent for compatibility; server ignores it when a valid
+          // priceToken is present and uses the signed finalTotal.
           amount: totalMinorUnit,
           currency,
           bookingReference,
           callbackUrl: `${window.location.origin}/success`,
+          priceToken: priceToken || undefined,
           metadata: {
             bookingReference,
             tourId: tour.id,
@@ -456,6 +465,9 @@ const CheckoutForm = ({
     }
   };
 
+  const submitDisabled =
+    loading || verifyState === "pending" || verifyState === "failed";
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -465,12 +477,8 @@ const CheckoutForm = ({
         <>
           <style>{`
             @keyframes checkoutFadeToWhite {
-              from {
-                opacity: 0;
-              }
-              to {
-                opacity: 1;
-              }
+              from { opacity: 0; }
+              to { opacity: 1; }
             }
           `}</style>
 
@@ -494,15 +502,32 @@ const CheckoutForm = ({
             </p>
           </div>
         </div>
-
-        <p className="mt-3 text-xs leading-5 text-slate-500">
-          {/* Pay securely through Paystack. Cape Frontier confirms pickup details after payment. */}
-        </p>
       </div>
+
+      {verifyState === "pending" && (
+        <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs font-semibold text-amber-800">
+          <span className="mt-[2px] inline-block h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-amber-300 border-t-amber-700" />
+          <span>Verifying price with server…</span>
+        </div>
+      )}
+
+      {verifyState === "bypassed" && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs font-semibold leading-5 text-amber-800">
+          Price verification is unavailable in this environment. In
+          production, the amount is re-verified server-side before charge.
+        </div>
+      )}
+
+      {verifyState === "failed" && (
+        <div className="rounded-xl border border-red-300 bg-red-50 px-3 py-2.5 text-xs font-semibold leading-5 text-red-700">
+          {verifyError || "Could not verify the current price."} Please go
+          back and try again.
+        </div>
+      )}
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={submitDisabled}
         className="hero-gradient-bl group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-[1.25rem] px-6 py-4 font-frank text-xl font-black text-white shadow-[0_18px_42px_rgba(7,31,79,0.20)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_52px_rgba(7,31,79,0.28)] disabled:cursor-not-allowed disabled:opacity-60"
       >
         <span className="pointer-events-none absolute inset-0 translate-x-[-120%] bg-white/20 blur-xl transition duration-700 group-hover:translate-x-[120%]" />
@@ -528,7 +553,13 @@ const CheckoutForm = ({
           </svg>
         )}
 
-        <span className="relative">{loading ? "Redirecting..." : "Pay"}</span>
+        <span className="relative">
+          {loading
+            ? "Redirecting..."
+            : verifyState === "pending"
+            ? "Verifying…"
+            : "Pay"}
+        </span>
       </button>
 
       <p className="px-2 text-center text-[11px] font-semibold leading-5 text-slate-400">
@@ -544,13 +575,18 @@ const CheckoutForm = ({
   );
 };
 
-// ─── Main CheckoutPaystack component ──────────────────────────────
+// ─── Main CheckoutPaystack component ──────────────────────────────────
 
 const CheckoutPaystack = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { tour, bookingDetails, selectedCurrency } = location.state || {};
+  const {
+    tour,
+    bookingDetails,
+    selectedCurrency,
+    priceToken: initialPriceToken,
+  } = location.state || {};
 
   const pageRef = useRef(null);
   const heroRef = useRef(null);
@@ -574,6 +610,17 @@ const CheckoutPaystack = () => {
     policies: false,
   });
 
+  // Pre-flight price verification state. If Booking.jsx already handed
+  // us a token, we're ready. If not, we fetch one here so the page is
+  // self-sufficient (handles refresh-on-checkout or direct navigation).
+  const [verifiedPriceToken, setVerifiedPriceToken] = useState(
+    initialPriceToken || null,
+  );
+  const [verifyState, setVerifyState] = useState(
+    initialPriceToken ? "ready" : "idle",
+  );
+  const [verifyError, setVerifyError] = useState("");
+
   const togglePanel = (key) => {
     setOpenPanels((current) => ({
       ...current,
@@ -587,12 +634,8 @@ const CheckoutPaystack = () => {
     ).toUpperCase();
   }, [selectedCurrency, tour]);
 
-  // ─── Back/scroll handlers (unchanged) ─────────────────────────────
-
   const handleBackToBooking = () => {
-    if (window.lenis?.start) {
-      window.lenis.start();
-    }
+    if (window.lenis?.start) window.lenis.start();
 
     if ("scrollRestoration" in window.history) {
       window.history.scrollRestoration = "auto";
@@ -615,23 +658,14 @@ const CheckoutPaystack = () => {
 
   const handleScrollToTop = () => {
     if (window.lenis?.scrollTo) {
-      window.lenis.scrollTo(0, {
-        duration: 0.75,
-        force: true,
-      });
-
+      window.lenis.scrollTo(0, { duration: 0.75, force: true });
       return;
     }
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handlePaymentPanelWheel = (event) => {
     const deltaY = event.deltaY || 0;
-
     if (Math.abs(deltaY) < 1) return;
 
     event.preventDefault();
@@ -641,21 +675,12 @@ const CheckoutPaystack = () => {
     const nextY = Math.max(0, currentY + deltaY);
 
     if (window.lenis) {
-      window.lenis.scrollTo(nextY, {
-        duration: 0.45,
-        force: true,
-      });
-
+      window.lenis.scrollTo(nextY, { duration: 0.45, force: true });
       return;
     }
 
-    window.scrollTo({
-      top: nextY,
-      behavior: "auto",
-    });
+    window.scrollTo({ top: nextY, behavior: "auto" });
   };
-
-  // ─── Effects (unchanged) ──────────────────────────────────────────
 
   useEffect(() => {
     if (!tour || !bookingDetails) {
@@ -751,8 +776,6 @@ const CheckoutPaystack = () => {
     return () => ctx.revert();
   }, [tour, bookingDetails, loadingSession, checkoutError]);
 
-  // ─── Pin effect (unchanged) ───────────────────────────────────────
-
   useLayoutEffect(() => {
     if (!tour || !bookingDetails || loadingSession || checkoutError) return;
     if (
@@ -776,10 +799,7 @@ const CheckoutPaystack = () => {
     const getPinTop = () => 96;
 
     const resetPin = () => {
-      gsap.set(column, {
-        minHeight: "auto",
-      });
-
+      gsap.set(column, { minHeight: "auto" });
       gsap.set(pinColumn, {
         clearProps: "position,top,left,width,zIndex,x,y,transform",
       });
@@ -821,7 +841,6 @@ const CheckoutPaystack = () => {
           y: 0,
           clearProps: "transform",
         });
-
         return;
       }
 
@@ -836,7 +855,6 @@ const CheckoutPaystack = () => {
           y: 0,
           clearProps: "transform",
         });
-
         return;
       }
 
@@ -885,9 +903,7 @@ const CheckoutPaystack = () => {
       window.clearTimeout(resizeTimer);
       lateTimers.forEach((timer) => window.clearTimeout(timer));
 
-      if (rafId) {
-        window.cancelAnimationFrame(rafId);
-      }
+      if (rafId) window.cancelAnimationFrame(rafId);
 
       window.removeEventListener("scroll", requestUpdate);
       window.removeEventListener("resize", onResize);
@@ -900,18 +916,14 @@ const CheckoutPaystack = () => {
     };
   }, [tour, bookingDetails, loadingSession, checkoutError, paymentCompact]);
 
-  // ════════════════════════════════════════════════════════════════════
-  // 🆕 PRICING CALCULATION – MIRRORS CHECKOUTSUMMARY
-  // ════════════════════════════════════════════════════════════════════
+  // ─── Pricing breakdown ─────────────────────────────────────────────
 
-  // --- Extract counts from bookingDetails ---
   const adultCount = useMemo(() => {
     const raw = bookingDetails?.adultCount ?? bookingDetails?.adults;
     const parsed = parseInt(raw, 10);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
   }, [bookingDetails]);
 
-  // Child ages (if provided) – otherwise we fall back to childCount / toddlerCount
   const childAges = useMemo(() => {
     const ages = bookingDetails?.childAges;
     if (Array.isArray(ages)) {
@@ -922,12 +934,10 @@ const CheckoutPaystack = () => {
     return [];
   }, [bookingDetails]);
 
-  // Derive age categories from actual ages (or fallback to provided counts)
   const toddlers = useMemo(() => {
     if (childAges.length > 0) {
       return childAges.filter((age) => age <= 5).length;
     }
-    // Fallback: use toddlerCount from bookingDetails
     const raw = bookingDetails?.toddlers ?? bookingDetails?.toddlerCount ?? 0;
     const parsed = parseInt(raw, 10);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
@@ -937,38 +947,26 @@ const CheckoutPaystack = () => {
     if (childAges.length > 0) {
       return childAges.filter((age) => age >= 6 && age <= 11).length;
     }
-    // Fallback: use childCount (but subtract toddlers if not provided)
     const raw = bookingDetails?.childCount ?? bookingDetails?.children ?? 0;
     const parsed = parseInt(raw, 10);
-    const fallback = Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
-    // If we have a separate toddlerCount, assume children are the remainder
-    // But we don't know exactly, so we'll use the raw child count as children (and toddlers separately)
-    // This is a fallback – better to have childAges.
-    return fallback;
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
   }, [childAges, bookingDetails]);
 
   const teens = useMemo(() => {
     if (childAges.length > 0) {
       return childAges.filter((age) => age >= 12 && age <= 17).length;
     }
-    // No fallback – we assume teens are not separately provided.
     return 0;
   }, [childAges]);
 
-  // If we have no childAges, we use the provided counts (adults, children, toddlers) directly.
-  // But we need to ensure that "children" is the 6-11 group, not including teens.
-  // So we'll use the counts from bookingDetails if childAges is empty,
-  // but we won't have teens separately – we'll assume they are 0.
   const effectiveAdults = adultCount;
   const effectiveChildren = children;
   const effectiveToddlers = toddlers;
   const effectiveTeens = teens;
 
-  // Total participants
   const participants =
     effectiveAdults + effectiveChildren + effectiveToddlers + effectiveTeens;
 
-  // --- Kids activity ---
   const selectedKidsActivity = useMemo(() => {
     const id = bookingDetails?.selectedKidsActivity;
     if (!id) return null;
@@ -991,10 +989,8 @@ const CheckoutPaystack = () => {
   const kidsActivityTotal =
     kidsActivityAdultTotal + kidsActivityChildTotal + kidsActivityToddlerTotal;
 
-  // Convert to selected currency
   const kidsActivityFee = convertFromZar(kidsActivityTotal, currency);
 
-  // --- Tour option ---
   const selectedOptionId =
     bookingDetails?.selectedOption || bookingDetails?.optionId;
   const selectedOption = useMemo(() => {
@@ -1002,7 +998,6 @@ const CheckoutPaystack = () => {
     return tour.options.find((opt) => opt.id === selectedOptionId) || null;
   }, [selectedOptionId, tour]);
 
-  // --- Category pricing (with .startsWith matching) ---
   const adultPricing =
     tour?.pricing?.find((p) => p.category?.toLowerCase().startsWith("adult")) ||
     tour?.pricing?.[0];
@@ -1031,7 +1026,6 @@ const CheckoutPaystack = () => {
   const toddlerBasePrice = Number(toddlerPricing?.pricePerPerson) || 0;
   const toddlerPriceConverted = convertFromZar(toddlerBasePrice, currency);
 
-  // --- Original subtotals ---
   const adultOriginalSubtotal = effectiveAdults * adultPriceConverted;
   const teenOriginalSubtotal = effectiveTeens * teenPriceConverted;
   const childOriginalSubtotal = effectiveChildren * childPriceConverted;
@@ -1042,7 +1036,6 @@ const CheckoutPaystack = () => {
     childOriginalSubtotal +
     toddlerOriginalSubtotal;
 
-  // --- Group discount (same logic as CheckoutSummary) ---
   let discountedSubtotal = originalSubtotal;
   let groupDiscountAmount = 0;
   let groupDiscountPercent = 0;
@@ -1107,15 +1100,12 @@ const CheckoutPaystack = () => {
           effectiveAdults * groupPersonPriceConverted;
         const discountedTeenSubtotal =
           effectiveTeens * groupPersonPriceConverted;
-        // Children and toddlers keep original price
-        const unchangedChildSubtotal = childOriginalSubtotal;
-        const unchangedToddlerSubtotal = toddlerOriginalSubtotal;
 
         discountedSubtotal =
           discountedAdultSubtotal +
           discountedTeenSubtotal +
-          unchangedChildSubtotal +
-          unchangedToddlerSubtotal;
+          childOriginalSubtotal +
+          toddlerOriginalSubtotal;
 
         adultDiscountAmount = Math.max(
           0,
@@ -1174,7 +1164,6 @@ const CheckoutPaystack = () => {
     }
   }
 
-  // --- Fees ---
   const isPrivate = Boolean(
     bookingDetails?.isPrivate || bookingDetails?.pricingOptions?.isPrivate,
   );
@@ -1188,7 +1177,6 @@ const CheckoutPaystack = () => {
   const customFeeZar = isCustom ? getFee(tour, "custom") : 0;
   const customFee = convertFromZar(customFeeZar, currency);
 
-  // --- Extras ---
   const extrasTotal = useMemo(() => {
     const selectedExtras = bookingDetails?.selectedExtras || {};
     const additionalPricing =
@@ -1217,14 +1205,11 @@ const CheckoutPaystack = () => {
     return convertFromZar(total, currency);
   }, [bookingDetails, tour, currency]);
 
-  // --- Total ---
   const totalPrice =
     discountedSubtotal + privateFee + customFee + extrasTotal + kidsActivityFee;
 
   const totalAmountLabel = formatMoney(totalPrice, currency);
   const totalMinorUnit = toMinorUnit(totalPrice, currency);
-
-  // ─── Prepare summary breakdown items (for display) ──────────────
 
   const breakdownItems = [
     {
@@ -1261,8 +1246,6 @@ const CheckoutPaystack = () => {
     },
   ].filter((item) => item.count > 0);
 
-  // ─── Other derived data ──────────────────────────────────────────
-
   const participantEmails = useMemo(() => {
     return normalizeEmails(
       bookingDetails?.ccParticipantEmails?.length
@@ -1280,8 +1263,8 @@ const CheckoutPaystack = () => {
 
   const pickupCoordLabel = bookingDetails?.pickupCoords
     ? `${Number(bookingDetails.pickupCoords.lat).toFixed(6)}, ${Number(
-      bookingDetails.pickupCoords.lng,
-    ).toFixed(6)}`
+        bookingDetails.pickupCoords.lng,
+      ).toFixed(6)}`
     : "Not selected on map";
 
   const pickupTimeLabel = useMemo(() => {
@@ -1304,8 +1287,6 @@ const CheckoutPaystack = () => {
   const displayedVehicles = useMemo(() => {
     return vehicles.slice(0, 3);
   }, []);
-
-  // ─── Enriched booking details ─────────────────────────────────────
 
   const enrichedBookingDetails = useMemo(
     () => ({
@@ -1426,6 +1407,100 @@ const CheckoutPaystack = () => {
     ],
   );
 
+  // ─── Pre-flight token fetch ──────────────────────────────────────
+  // If we don't already have a signed token (from Booking.jsx), grab
+  // one now. Dev environments (Vite without the API) get "bypassed".
+  useEffect(() => {
+    if (!tour || !bookingDetails) return;
+    if (verifiedPriceToken) return;
+    if (verifyState === "bypassed") return;
+
+    let cancelled = false;
+    const controller = new AbortController();
+
+    setVerifyState("pending");
+    setVerifyError("");
+
+    (async () => {
+      try {
+        const res = await fetch("/api/verify-price", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            tourId: tour.id ?? tour.slug,
+            adultCount: effectiveAdults,
+            childAges,
+            currency,
+            selectedOption: bookingDetails.selectedOption || null,
+            selectedExtras: bookingDetails.selectedExtras || {},
+            isPrivate,
+            isCustom,
+            selectedKidsActivity: bookingDetails.selectedKidsActivity || null,
+          }),
+        });
+
+        if (cancelled) return;
+
+        const contentType = res.headers.get("content-type") || "";
+
+        if (
+          res.status === 404 ||
+          res.status === 405 ||
+          contentType.includes("text/html")
+        ) {
+          console.warn(
+            "[CheckoutPaystack] /api/verify-price unavailable; proceeding without token.",
+          );
+          setVerifyState("bypassed");
+          return;
+        }
+
+        if (!res.ok) {
+          let detail = "";
+          try {
+            const j = await res.json();
+            detail = j?.error || j?.message || "";
+          } catch {
+            /* body wasn't JSON */
+          }
+          throw new Error(detail || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (cancelled) return;
+
+        if (data?.isCustomQuote) {
+          setVerifyState("bypassed");
+          return;
+        }
+
+        setVerifiedPriceToken(data?.token || null);
+        setVerifyState(data?.token ? "ready" : "bypassed");
+      } catch (err) {
+        if (cancelled || err.name === "AbortError") return;
+        console.error("[CheckoutPaystack] verify-price failed:", err);
+        setVerifyState("failed");
+        setVerifyError(err?.message || "Could not verify price");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [
+    tour,
+    bookingDetails,
+    verifiedPriceToken,
+    verifyState,
+    effectiveAdults,
+    childAges,
+    currency,
+    isPrivate,
+    isCustom,
+  ]);
+
   // ─── Validation ──────────────────────────────────────────────────
 
   useEffect(() => {
@@ -1510,8 +1585,6 @@ const CheckoutPaystack = () => {
     );
   }
 
-  // ─── Main render ──────────────────────────────────────────────────
-
   return (
     <>
       <Seo title="Checkout | Cape Frontier Travel" path="/checkout" noindex />
@@ -1555,7 +1628,6 @@ const CheckoutPaystack = () => {
               ref={checkoutGridRef}
               className="grid overflow-visible gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.82fr)] lg:items-start lg:gap-6"
             >
-              {/* LEFT COLUMN – summary with updated pricing breakdown */}
               <section
                 ref={leftRef}
                 className="order-2 overflow-hidden rounded-[1.65rem] bg-white/92 shadow-[0_20px_60px_rgba(7,31,79,0.08)] lg:order-1 lg:rounded-[2rem]"
@@ -1596,8 +1668,6 @@ const CheckoutPaystack = () => {
                 </div>
 
                 <div className="space-y-4 p-4 md:p-6 lg:p-7">
-                  {/* Hidden grid (commented out) — same as original */}
-
                   {Object.values(openPanels).some(Boolean) && (
                     <div className="rounded-2xl border border-green-200 bg-green-50 p-3 text-center text-xs font-bold leading-5 text-green-900 sm:hidden">
                       Details open underneath the menu. Choose a card, then
@@ -1615,28 +1685,24 @@ const CheckoutPaystack = () => {
                       detail="Pickup, booking tags"
                       onClick={() => togglePanel("trip")}
                     />
-
                     <RevealButton
                       active={openPanels.custom}
                       title="Custom notes"
                       detail={isCustom ? "Editable" : "Custom off"}
                       onClick={() => togglePanel("custom")}
                     />
-
                     <RevealButton
                       active={openPanels.vehicles}
                       title="Vehicles"
                       detail="Confirmed later"
                       onClick={() => togglePanel("vehicles")}
                     />
-
                     <RevealButton
                       active={openPanels.summary}
                       title="Summary"
                       detail="Total and CS brief"
                       onClick={() => togglePanel("summary")}
                     />
-
                     <RevealButton
                       active={openPanels.policies}
                       title="Policies"
@@ -1644,8 +1710,6 @@ const CheckoutPaystack = () => {
                       onClick={() => togglePanel("policies")}
                     />
                   </div>
-
-                  {/* ─── Panels ────────────────────────────────────── */}
 
                   <RevealPanel open={openPanels.trip}>
                     <div className="grid gap-4 lg:grid-cols-[1fr_0.8fr]">
@@ -1659,7 +1723,6 @@ const CheckoutPaystack = () => {
                                 alt=""
                               />
                             </span>
-
                             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                               Trip and pickup
                             </p>
@@ -1760,8 +1823,9 @@ const CheckoutPaystack = () => {
 
                   <RevealPanel open={openPanels.custom}>
                     <div
-                      className={`rounded-[1.5rem] p-5 shadow-[0_14px_34px_rgba(7,31,79,0.05)] ${isCustom ? "bg-white" : "bg-stone-50"
-                        }`}
+                      className={`rounded-[1.5rem] p-5 shadow-[0_14px_34px_rgba(7,31,79,0.05)] ${
+                        isCustom ? "bg-white" : "bg-stone-50"
+                      }`}
                     >
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
@@ -1835,7 +1899,7 @@ const CheckoutPaystack = () => {
                         <div className="mt-4 space-y-3 text-xs leading-5 text-white/72">
                           <p>
                             Customer is booking their own group only.
-                            Participants must match the customer’s own party
+                            Participants must match the customer's own party
                             size.
                           </p>
                           <p>
@@ -1947,10 +2011,6 @@ const CheckoutPaystack = () => {
                                 : "Not added"
                             }
                           />
-                          {/* <SummaryRow
-                          label="Optional extras"
-                          value={extrasTotal > 0 ? formatMoney(extrasTotal, currency) : "None"}
-                        /> */}
 
                           {selectedKidsActivity && kidsActivityFee > 0 && (
                             <div className="mt-2 rounded-xl border border-blue-100 bg-blue-50 p-3">
@@ -2014,7 +2074,6 @@ const CheckoutPaystack = () => {
                             </div>
                           )}
 
-                          {/* Show selected request extras (free) */}
                           {(() => {
                             const selectedExtras =
                               bookingDetails?.selectedExtras || {};
@@ -2128,7 +2187,6 @@ const CheckoutPaystack = () => {
                 </div>
               </section>
 
-              {/* RIGHT COLUMN – payment with header */}
               <div
                 ref={rightColumnRef}
                 className="order-1 relative min-h-[1px] w-full self-start lg:order-2"
@@ -2140,7 +2198,6 @@ const CheckoutPaystack = () => {
                     className="h-fit max-h-[calc(100svh-1rem)] overflow-visible border border-white/75 bg-white/95 shadow-[0_20px_56px_rgba(7,31,79,0.085)] backdrop-blur-xl 
                   lg:rounded-[2rem]"
                   >
-                    {/* Header: Pickup + Main Participant */}
                     <div className="border-b border-slate-100/90 bg-white/80 px-4 py-3 sm:px-5 sm:py-4 rounded-full">
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
@@ -2210,7 +2267,6 @@ const CheckoutPaystack = () => {
                       </div>
                     </div>
 
-                    {/* Payment Form */}
                     <div
                       onPointerDown={() => setPaymentCompact(true)}
                       onMouseEnter={() => setPaymentCompact(true)}
@@ -2225,11 +2281,13 @@ const CheckoutPaystack = () => {
                         notes={isCustom ? notes : ""}
                         pricingSummary={pricingSummary}
                         checkoutStops={checkoutStops}
+                        priceToken={verifiedPriceToken}
+                        verifyState={verifyState}
+                        verifyError={verifyError}
                       />
                     </div>
                   </aside>
 
-                  {/* Payment Security Disclaimer */}
                   <div className="w-full rounded-2xl border border-blue-100 bg-blue-400/20 px-4 py-4 mt-4">
                     <div className="flex items-center gap-6">
                       <div className="flex p-3 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">

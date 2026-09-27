@@ -39,6 +39,8 @@ const CheckoutSummary = ({
 
   submitting = false,
   submitError = "",
+  verifyStatus = "idle",   // "idle" | "pending" | "verified" | "failed"
+  verifyError = "",
 }) => {
   const [activeDetail, setActiveDetail] = useState("tour");
 
@@ -169,11 +171,10 @@ const CheckoutSummary = ({
   const _effectiveChildPrice = toNum(effectiveChildPrice) ?? 0;
   const _effectiveToddlerPrice = toNum(effectiveToddlerPrice) ?? 0;
 
-  // Always derive row subtotals from the *effective* (post-group-tier)
-  // per-person rates. The engine's adultSubtotal/teenSubtotal are the
-  // pre-adjustment base totals — using them here renders the base
-  // amount next to the discounted per-person rate, which is what the
-  // "subtotal shows ZAR 29400 but should show ZAR 28500" bug was.
+  // Always derive row subtotals from effective (post-group-tier) rates.
+  // The engine's adultSubtotal/teenSubtotal are pre-adjustment base
+  // totals; using them here renders the base amount next to the
+  // discounted per-person rate.
   const adultRowSubtotal   = adults   * _effectiveAdultPrice;
   const teenRowSubtotal    = teens    * _effectiveTeenPrice;
   const childRowSubtotal   = effectiveChildren * _effectiveChildPrice;
@@ -300,9 +301,6 @@ const CheckoutSummary = ({
   ];
 
   // ---- Render rich content for each detail ----
-  // All flex containers use `justify-center lg:justify-start` so the
-  // selection details sit centered on tablet/mobile and left-align
-  // from `lg` up (where the panel is beside the icons, not below).
   const renderDetailContent = (key) => {
     switch (key) {
       case "tour":
@@ -452,12 +450,6 @@ const CheckoutSummary = ({
 
           {/* BOOKING DETAILS */}
           <div className="flex flex-col lg:flex-row gap-4 mb-6">
-            {/* Icon buttons row — centered on mobile/tablet, left on lg.
-                Outer div is the scrollable container (ref target);
-                inner w-max mx-auto wrapper centers the buttons when
-                they fit, and scrolls from the left when they don't
-                (avoids the "justify-center + overflow hidden-left"
-                trap on small screens). */}
             <div
               ref={iconButtonsContainerRef}
               className="overflow-x-auto pb-2 lg:overflow-visible lg:pb-0 scroll-smooth icon-scroll-container"
@@ -514,8 +506,6 @@ const CheckoutSummary = ({
               </div>
             </div>
 
-            {/* Value panel — centered content on mobile/tablet,
-                left-aligned on lg. */}
             <div className="flex-1 relative z-40">
               <div
                 className={`
@@ -555,7 +545,7 @@ const CheckoutSummary = ({
             {/* ───────── LEFT — PRICE BREAKDOWN ───────── */}
             <div className="lg:col-span-2 rounded-3xl border border-black/5 bg-gradient-to-b from-stone-50 to-stone-100/70 p-4 sm:p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
 
-              {/* <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
                 <div className="flex items-center gap-2.5">
                   <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-100 text-lg">
                     💰
@@ -571,7 +561,7 @@ const CheckoutSummary = ({
                     <span>Save {formatCurrency(Math.abs(groupAdjustmentAmount))}</span>
                   </span>
                 )}
-              </div> */}
+              </div>
 
               <div className="space-y-2.5">
                 {breakdownItems.map((item) => {
@@ -932,8 +922,44 @@ const CheckoutSummary = ({
                     )}
                   </div>
 
+                  {/* Pre-flight verification indicator — hidden for
+                      custom-quote tours (no fixed price to verify). */}
+                  {!isCustomQuote && verifyStatus !== "idle" && (
+                    <div
+                      className={`mt-4 flex items-start gap-2 rounded-xl border px-3 py-2.5 text-xs font-semibold ${
+                        verifyStatus === "verified"
+                          ? "border-green-300 bg-green-50 text-green-800"
+                          : verifyStatus === "failed"
+                          ? "border-red-300 bg-red-50 text-red-700"
+                          : "border-amber-200 bg-amber-50 text-amber-800"
+                      }`}
+                    >
+                      {verifyStatus === "pending" && (
+                        <>
+                          <span className="mt-[2px] inline-block h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-amber-300 border-t-amber-700" />
+                          <span>Verifying price…</span>
+                        </>
+                      )}
+                      {verifyStatus === "verified" && (
+                        <>
+                          <span className="shrink-0 text-sm leading-none">✓</span>
+                          <span>Price verified — ready for checkout.</span>
+                        </>
+                      )}
+                      {verifyStatus === "failed" && (
+                        <>
+                          <span className="shrink-0 text-sm leading-none">⚠</span>
+                          <span>
+                            {verifyError || "Price verification failed."} Click
+                            retry to try again.
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  )}
+
                   {submitError && (
-                    <p className="mt-4 rounded-xl border border-red-300 bg-red-50 p-3 text-xs font-bold text-red-700 sm:text-sm">
+                    <p className="mt-3 rounded-xl border border-red-300 bg-red-50 p-3 text-xs font-semibold text-red-700">
                       {submitError}
                     </p>
                   )}
@@ -941,16 +967,31 @@ const CheckoutSummary = ({
                   <button
                     type="submit"
                     form="booking-form"
-                    disabled={(hasOptions && !selectedTourOption) || submitting}
-                    className="mt-6 w-full rounded-2xl bg-white py-4 text-center text-sm font-black uppercase tracking-wider text-blue-700 shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_14px_30px_rgba(0,0,0,0.22)] disabled:opacity-50 disabled:hover:scale-100"
+                    disabled={
+                      submitting ||
+                      verifyStatus === "pending" ||
+                      (hasOptions && !selectedTourOption) ||
+                      // Custom-quote tours skip verification entirely.
+                      (!isCustomQuote &&
+                        verifyStatus !== "verified" &&
+                        verifyStatus !== "failed")
+                    }
+                    className={`mt-4 w-full rounded-2xl py-4 text-center text-sm font-black uppercase tracking-wider shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_14px_30px_rgba(0,0,0,0.22)] disabled:opacity-50 disabled:hover:scale-100 ${
+                      verifyStatus === "failed"
+                        ? "bg-red-600 text-white hover:bg-red-700"
+                        : "bg-white text-blue-700"
+                    }`}
                   >
-                    {submitting
-                      ? "Verifying price..."
-                      : isCustomQuote
-                      ? "Request custom quote"
-                      : hasOptions && !selectedTourOption
-                      ? "Select option"
-                      : "Continue to checkout"}
+                    {(() => {
+                      if (submitting || verifyStatus === "pending")
+                        return "Verifying price…";
+                      if (isCustomQuote) return "Request custom quote";
+                      if (hasOptions && !selectedTourOption)
+                        return "Select option";
+                      if (verifyStatus === "failed") return "Retry verification";
+                      if (verifyStatus === "idle") return "Complete your details";
+                      return "Continue to checkout";
+                    })()}
                   </button>
 
                   <div className="mt-4 flex justify-center gap-3 text-[10px] font-black uppercase tracking-[0.16em] text-white/60">

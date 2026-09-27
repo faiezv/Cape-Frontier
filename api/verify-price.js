@@ -1,12 +1,11 @@
 // api/verify-price.js
-import crypto from "crypto";
 import { computePricing } from "../src/utils/pricingEngine.js";
 import allTours from "../src/data/tours.js";
 import { KIDS_ACTIVITIES } from "../src/data/kidsActivities.js";
+import { signPricePayload, TOKEN_TTL_MS } from "./_lib/verifyPriceToken.js";
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "Method not allowed" });
   }
 
@@ -15,7 +14,7 @@ export default function handler(req, res) {
       tourId,
       adultCount,
       childAges,
-      currency,
+      currency = "ZAR",
       selectedOption,
       selectedExtras,
       isPrivate,
@@ -30,12 +29,17 @@ export default function handler(req, res) {
       return res.status(404).json({ error: "Tour not found" });
     }
 
+    const safeAdultCount = Math.max(0, Number(adultCount) || 0);
+    const safeChildAges = Array.isArray(childAges) ? childAges : [];
+    const safeCurrency = String(currency || "ZAR").toUpperCase();
+
+    // Recompute from scratch — client-supplied prices are ignored.
     const pricing = computePricing({
       tour,
-      childAges: Array.isArray(childAges) ? childAges : [],
-      adultCount: Math.max(0, Number(adultCount) || 0),
-      currency,
-      selectedOption,
+      childAges: safeChildAges,
+      adultCount: safeAdultCount,
+      currency: safeCurrency,
+      selectedOption: selectedOption || null,
       selectedExtras: selectedExtras || {},
       formData: {
         isPrivate: Boolean(isPrivate),
@@ -49,39 +53,32 @@ export default function handler(req, res) {
       return res.status(200).json({ isCustomQuote: true });
     }
 
-    const secret = process.env.PRICE_SIGNING_SECRET;
-    if (!secret) {
-      return res
-        .status(500)
-        .json({ error: "Server misconfigured: PRICE_SIGNING_SECRET not set" });
+    if (!Number.isFinite(pricing.finalTotal) || pricing.finalTotal <= 0) {
+      return res.status(500).json({
+        error: "Pricing engine returned an invalid total",
+      });
     }
 
-    const payload = {
-      tourId,
-      adultCount,
-      childAges,
-      currency,
+    const token = signPricePayload({
+      tourId: tour.id ?? tour.slug ?? tourId,
+      adultCount: safeAdultCount,
+      childAges: safeChildAges,
+      currency: safeCurrency,
       selectedOption: selectedOption || null,
       selectedExtras: selectedExtras || {},
       isPrivate: Boolean(isPrivate),
       isCustom: Boolean(isCustom),
       selectedKidsActivity: selectedKidsActivity || null,
       finalTotal: pricing.finalTotal,
-      exp: Date.now() + 15 * 60 * 1000,
-    };
-
-    const encoded = Buffer.from(JSON.stringify(payload)).toString("base64url");
-    const sig = crypto
-      .createHmac("sha256", secret)
-      .update(encoded)
-      .digest("base64url");
+      exp: Date.now() + TOKEN_TTL_MS,
+    });
 
     return res.status(200).json({
-      token: `${encoded}.${sig}`,
+      token,
       finalTotal: pricing.finalTotal,
+      currency: safeCurrency,
     });
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error("[verify-price] error:", err);
     return res
       .status(500)
