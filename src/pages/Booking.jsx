@@ -3,8 +3,6 @@
 import ClientOnly from "../components/ClientOnly";
 import { lazy, Suspense } from "react"; // ensure you have Suspense imported
 
-import { formatMoney } from '../components/Tours/Helpers.jsx';
-
 // Lazy-load the map – this import only runs on the client
 const Map = lazy(() => import("../components/Map"));
 const DEFAULT_CENTER = [-33.9249, 18.4241];
@@ -26,8 +24,13 @@ import gsap from "gsap";
 import allTours from "../data/tours.js";
 import { resolveImage } from "../utils/ImageLoader";
 
-const PRIVATE_TOUR_FEE_ZAR = 750;
-const CUSTOM_TRIP_FEE_ZAR = 500;
+// ─── Single source of truth for all pricing math ──────────────────
+import {
+  computePricing,
+  convertPrice,
+  formatMoney,
+  getFee,
+} from "../utils/pricingEngine.js";
 
 const slugify = (value = "") =>
   value
@@ -133,33 +136,6 @@ const getTourGallery = (tour) => {
   ];
 };
 
-// ─── Helpers (same as CheckoutSummary) ────────────────────────────
-const getFee = (tour, type) => {
-  const defaults = { private: 750, custom: 500 };
-  if (Array.isArray(tour?.additionalPricing)) {
-    const match = tour.additionalPricing.find((item) =>
-      item.category?.toLowerCase().includes(type),
-    );
-    if (match) {
-      const amount = match.pricePerPerson ?? match.price ?? match.amount ?? 0;
-      if (Number(amount) > 0) return Number(amount);
-    }
-  }
-  if (type === "private" && tour?.privateFee !== undefined)
-    return Number(tour.privateFee) || 0;
-  if (type === "custom" && tour?.customFee !== undefined)
-    return Number(tour.customFee) || 0;
-  return defaults[type] || 0;
-};
-
-// ─── FX_RATES ──────────────────────────────────────────────────────
-const FX_RATES = {
-  ZAR: 1,
-  USD: 0.054,
-  EUR: 0.05,
-  GBP: 0.043,
-};
-
 // ─── Helper components ────────────────────────────────────────────
 function BookingField({ label, hint, children }) {
   return (
@@ -227,6 +203,25 @@ function SaveIcon({ className = "h-4 w-4" }) {
       <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" />
       <path d="M17 21v-8H7v8" />
       <path d="M7 3v5h8" />
+    </svg>
+  );
+}
+
+function TrashIcon({ className = "h-3.5 w-3.5" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M3 6h18" />
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <path d="m19 6-.9 14a2 2 0 0 1-2 1.9H7.9a2 2 0 0 1-2-1.9L5 6" />
     </svg>
   );
 }
@@ -370,10 +365,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
   const initialCurrency = location.state?.selectedCurrency || "ZAR";
   const [currency, setCurrency] = useState(initialCurrency);
 
-  const convertPrice = (baseAmount = 0, targetCurrency = "ZAR") => {
-    return Number(baseAmount || 0) * (FX_RATES[targetCurrency] || 1);
-  };
-
   const supportedCurrencies =
     tour?.supportedCurrencies?.length > 0
       ? tour.supportedCurrencies
@@ -417,9 +408,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
   }, [tour]);
 
   // Reset child-related state whenever the selected tour changes.
-  // Prevents confirmed children from a previous (child-friendly) tour
-  // from carrying over — already confirmed — onto a tour where
-  // tour.childFriendly === false.
   const prevTourSlugRef = useRef(null);
   useEffect(() => {
     if (!tour) return;
@@ -428,12 +416,10 @@ const Booking = ({ embeddedTour, bookingData }) => {
       prevTourSlugRef.current !== null && prevTourSlugRef.current !== tourSlug;
 
     if (isTourSwitch) {
-      // Any confirmations belonged to the previous tour's children — always clear them.
       setConfirmedChildAges({});
       setChildAddedAnimation(false);
 
       if (tour.childFriendly === false) {
-        // New tour doesn't allow children — strip any carried-over children entirely.
         setFormData((prev) => {
           const nextAdults = Math.max(Number(prev.adults || 1), 1);
           const nextParticipantCount = Math.max(nextAdults, 1);
@@ -483,8 +469,10 @@ const Booking = ({ embeddedTour, bookingData }) => {
   const [groupSnapshot, setGroupSnapshot] = useState(null);
   const [confirmedChildAges, setConfirmedChildAges] = useState({});
   const [childAddedAnimation, setChildAddedAnimation] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
-  // ─── Derived counts ──────────────────────────────────────────────
+  // ─── Derived counts (category buckets for UI only) ────────────────
   const adultCount = Math.max(Number(formData.adults || 0), 1);
   const childAges = formData.childAges || [];
 
@@ -496,238 +484,49 @@ const Booking = ({ embeddedTour, bookingData }) => {
     (age) => Number(age) >= 12 && Number(age) <= 17,
   ).length;
 
-  // Total participants = adults + all children (including toddlers, children, teens)
   const participantCount = adultCount + childAges.length;
 
-  // For UI: max 8 total participants
   const maxParticipants = 8;
   const canAddChild =
     participantCount < maxParticipants && tour?.childFriendly !== false;
   const canAddAdult = participantCount < maxParticipants;
 
-  // ─── Pricing using CheckoutSummary logic ──────────────────────────
-  // Get category prices from tour.pricing with .startsWith matching
-  const getCategoryPrice = (category) => {
-    if (!tour?.pricing) return 0;
-    const entry = tour.pricing.find((p) =>
-      p.category?.toLowerCase().startsWith(category.toLowerCase()),
-    );
-    return entry ? Number(entry.pricePerPerson) || 0 : 0;
-  };
-
-  const adultPriceZar = getCategoryPrice("adult");
-  const teenPriceZar = getCategoryPrice("teen");
-  const childPriceZar = getCategoryPrice("child");
-  const toddlerPriceZar = getCategoryPrice("toddler");
-
-  // If no specific adult pricing, fallback to tour.priceBase
-  const fallbackAdultPrice = Number(tour?.priceBase) || 0;
-  const finalAdultPriceZar = adultPriceZar || fallbackAdultPrice;
-  const finalTeenPriceZar = teenPriceZar || finalAdultPriceZar;
-  const finalChildPriceZar = childPriceZar || 0; // assume 0 if not defined
-  const finalToddlerPriceZar = toddlerPriceZar || 0;
-
-  // Convert to selected currency
-  const adultPrice = convertPrice(finalAdultPriceZar, currency);
-  const teenPrice = convertPrice(finalTeenPriceZar, currency);
-  const childPrice = convertPrice(finalChildPriceZar, currency);
-  const toddlerPrice = convertPrice(finalToddlerPriceZar, currency);
-
-  // Original subtotals
-  const adultSubtotal = adultCount * adultPrice;
-  const teenSubtotal = teens * teenPrice;
-  const childSubtotal = children * childPrice;
-  const toddlerSubtotal = toddlers * toddlerPrice;
-  const originalSubtotal =
-    adultSubtotal + teenSubtotal + childSubtotal + toddlerSubtotal;
-
-  // ─── Group Discount (same as CheckoutSummary) ─────────────────────
-  let discountedSubtotal = originalSubtotal;
-  let groupDiscountAmount = 0;
-  let groupDiscountPercent = 0;
-  let adultDiscountAmount = 0;
-  let teenDiscountAmount = 0;
-  let hasDiscount = false;
-  let matchedGroupTier = null;
-  let groupPricingType = null;
-  let isCustomQuote = false;
-
-  if (
-    tour?.groupPricing?.enabled &&
-    Array.isArray(tour.groupPricing.tiers) &&
-    tour.groupPricing.tiers.length > 0
-  ) {
-    matchedGroupTier =
-      tour.groupPricing.tiers.find((tier) => {
-        const minPeople = Number(tier.minPeople) || 0;
-        const maxPeople =
-          tier.maxPeople == null ? Infinity : Number(tier.maxPeople);
-        return participantCount >= minPeople && participantCount <= maxPeople;
-      }) || null;
-  }
-
-  if (matchedGroupTier) {
-    const groupTotal =
-      matchedGroupTier.groupTotal != null
-        ? Number(matchedGroupTier.groupTotal)
-        : null;
-
-    if (groupTotal !== null && Number.isFinite(groupTotal) && groupTotal > 0) {
-      groupPricingType = "groupTotal";
-      discountedSubtotal = groupTotal;
-      groupDiscountAmount = Math.max(0, originalSubtotal - discountedSubtotal);
-      groupDiscountPercent =
-        originalSubtotal > 0
-          ? (groupDiscountAmount / originalSubtotal) * 100
-          : 0;
-      adultDiscountAmount = groupDiscountAmount;
-      teenDiscountAmount = 0;
-      hasDiscount = groupDiscountAmount > 0;
-    } else {
-      const hasPerPersonPrice =
-        matchedGroupTier.perPerson != null &&
-        Number.isFinite(Number(matchedGroupTier.perPerson));
-      const hasDiscountPercent =
-        matchedGroupTier.discountPercent != null &&
-        Number.isFinite(Number(matchedGroupTier.discountPercent));
-
-      if (hasPerPersonPrice) {
-        groupPricingType = "perPerson";
-        const groupPersonPriceZar = Math.max(
-          0,
-          Number(matchedGroupTier.perPerson),
-        );
-        const groupPersonPrice = convertPrice(groupPersonPriceZar, currency);
-
-        const discountedAdultSubtotal = adultCount * groupPersonPrice;
-        const discountedTeenSubtotal = teens * groupPersonPrice;
-        // Children and toddlers keep original price
-        const unchangedChildSubtotal = childSubtotal;
-        const unchangedToddlerSubtotal = toddlerSubtotal;
-
-        discountedSubtotal =
-          discountedAdultSubtotal +
-          discountedTeenSubtotal +
-          unchangedChildSubtotal +
-          unchangedToddlerSubtotal;
-
-        adultDiscountAmount = Math.max(
-          0,
-          adultSubtotal - discountedAdultSubtotal,
-        );
-        teenDiscountAmount = Math.max(0, teenSubtotal - discountedTeenSubtotal);
-        groupDiscountAmount = adultDiscountAmount + teenDiscountAmount;
-
-        const adultAndTeenOriginal = adultSubtotal + teenSubtotal;
-        groupDiscountPercent =
-          adultAndTeenOriginal > 0
-            ? (groupDiscountAmount / adultAndTeenOriginal) * 100
-            : 0;
-        hasDiscount = groupDiscountAmount > 0;
-      } else if (hasDiscountPercent) {
-        groupPricingType = "discountPercent";
-        const requested = Number(matchedGroupTier.discountPercent);
-        const safe = Math.min(Math.max(requested, 0), 100);
-
-        const adultDiscount = adultSubtotal * (safe / 100);
-        const discountedAdultSubtotal = adultSubtotal - adultDiscount;
-        const teenDiscount = teenSubtotal * (safe / 100);
-        const discountedTeenSubtotal = teenSubtotal - teenDiscount;
-
-        discountedSubtotal =
-          discountedAdultSubtotal +
-          discountedTeenSubtotal +
-          childSubtotal +
-          toddlerSubtotal;
-
-        adultDiscountAmount = Math.max(0, adultDiscount);
-        teenDiscountAmount = Math.max(0, teenDiscount);
-        groupDiscountAmount = adultDiscountAmount + teenDiscountAmount;
-        groupDiscountPercent = safe;
-        hasDiscount = groupDiscountAmount > 0;
-      } else {
-        groupPricingType = "custom";
-        isCustomQuote = true;
-        discountedSubtotal = originalSubtotal;
-        groupDiscountAmount = 0;
-        groupDiscountPercent = 0;
-        adultDiscountAmount = 0;
-        teenDiscountAmount = 0;
-        hasDiscount = false;
-      }
-    }
-  }
-
-  // ─── Fees ─────────────────────────────────────────────────────────
-  const isPrivate = formData.isPrivate;
-  const isCustom = formData.isCustom;
-
-  const privateFeeZar = isPrivate ? getFee(tour, "private") : 0;
-  const privateFee = convertPrice(privateFeeZar, currency);
-
-  const customFeeZar = isCustom ? getFee(tour, "custom") : 0;
-  const customFee = convertPrice(customFeeZar, currency);
-
-  // ─── Extras ──────────────────────────────────────────────────────
-  const extrasTotalZar = useMemo(() => {
-    const selectedExtras = formData.selectedExtras || {};
-    const additionalPricing = tour?.additionalPricing || [];
-    if (!Array.isArray(additionalPricing) || additionalPricing.length === 0)
-      return 0;
-    let total = 0;
-    additionalPricing.forEach((extra) => {
-      const { type, category, price } = extra;
-      const value = selectedExtras[category];
-      if (value === undefined || value === null || value === false) return;
-      if (type === "quantity") {
-        const qty = Number(value) || 0;
-        if (qty <= 0) return;
-        total += (Number(price) || 0) * qty;
-      } else if (type === "fixed") {
-        total += Number(price) || 0;
-      }
-    });
-    return total;
-  }, [formData.selectedExtras, tour]);
-
-  const extrasTotal = convertPrice(extrasTotalZar, currency);
-
-  // ─── Kids Activity ──────────────────────────────────────────────
-  const selectedKidsActivityData = KIDS_ACTIVITIES.find(
-    (act) => act.id === formData.selectedKidsActivity,
+  // ─── Pricing ─────────────────────────────────────────────────────
+  const pricing = useMemo(
+    () =>
+      computePricing({
+        tour,
+        childAges,
+        adultCount,
+        currency,
+        selectedOption: formData.selectedOption,
+        selectedExtras: formData.selectedExtras || {},
+        formData,
+        kidsActivities: KIDS_ACTIVITIES,
+      }),
+    [
+      tour,
+      childAges,
+      adultCount,
+      currency,
+      formData.selectedOption,
+      formData.selectedExtras,
+      formData.isPrivate,
+      formData.isCustom,
+      formData.selectedKidsActivity,
+    ],
   );
 
-  const kidsActivityAdultTotalZar = selectedKidsActivityData
-    ? (Number(selectedKidsActivityData.adultPrice) || 0) * adultCount
-    : 0;
-  const kidsActivityChildTotalZar = selectedKidsActivityData
-    ? (Number(selectedKidsActivityData.childPrice) || 0) * children
-    : 0;
-  const kidsActivityToddlerTotalZar = selectedKidsActivityData
-    ? (Number(selectedKidsActivityData.toddlerPrice) || 0) * toddlers
-    : 0;
-  const kidsActivityTotalZar =
-    kidsActivityAdultTotalZar +
-    kidsActivityChildTotalZar +
-    kidsActivityToddlerTotalZar;
-  const kidsActivityFee = convertPrice(kidsActivityTotalZar, currency);
-
-  // ─── Totals ──────────────────────────────────────────────────────
-  const totalPrice =
-    discountedSubtotal + privateFee + customFee + extrasTotal + kidsActivityFee;
-  const displayTotal = formatMoney(totalPrice, currency);
-  const displayBaseSubtotal = formatMoney(originalSubtotal, currency);
-  const displayGroupDiscountAmount = formatMoney(groupDiscountAmount, currency);
-  const displayDiscountedTourSubtotal = formatMoney(
-    discountedSubtotal,
-    currency,
+  const privateFeeAmount = useMemo(
+    () => convertPrice(getFee(tour, "private"), currency),
+    [tour, currency],
   );
-  const displayPrivateFee = formatMoney(privateFee, currency);
-  const displayCustomFee = formatMoney(customFee, currency);
-  const displayExtrasTotal =
-    extrasTotal > 0 ? formatMoney(extrasTotal, currency) : "None";
-  const displayKidsActivityTotal =
-    kidsActivityFee > 0 ? formatMoney(kidsActivityFee, currency) : "—";
+  const customFeeAmount = useMemo(
+    () => convertPrice(getFee(tour, "custom"), currency),
+    [tour, currency],
+  );
+  const displayPrivateFeeAmount = formatMoney(privateFeeAmount, currency);
+  const displayCustomFeeAmount = formatMoney(customFeeAmount, currency);
 
   // ─── UI helpers ──────────────────────────────────────────────────
   const formatTourMeta = (value = "") => {
@@ -833,9 +632,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
 
     if (bd.adults !== undefined) updates.adults = String(bd.adults);
 
-    // Prefer the detailed per-child ages array (from TourSelect's guest picker)
-    // over the plain `children` count — it carries toddler/child/teen info
-    // that the count alone loses.
     const incomingChildAges = Array.isArray(bd.childAges)
       ? bd.childAges
           .map((age) => Number(age))
@@ -864,7 +660,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
     if (Array.isArray(bd.participantEmails))
       updates.participantEmails = bd.participantEmails;
 
-    // Adjust participants & enforce max 8 total
     const rawAdults =
       updates.adults !== undefined ? Number(updates.adults) : adultCount;
     const rawChildren =
@@ -1110,25 +905,19 @@ const Booking = ({ embeddedTour, bookingData }) => {
     setFormData((prev) => ({ ...prev, [name]: !prev[name] }));
   };
 
-  const handleAddChildren = () => {
-    setShowChildrenSelector(true);
-    setShowGroupEditor(true);
-    setFormData((prev) => {
-      const currentAdults = Math.max(Number(prev.adults || 1), 1);
-      const nextChildren = Math.min(
-        Math.max(Number(prev.children || 0), 1),
-        Math.max(0, 8 - currentAdults),
-      );
-      const nextParticipantCount = Math.max(currentAdults + nextChildren, 1);
-      const maxEmails = Math.max(nextParticipantCount - 1, 0);
-      return {
-        ...prev,
-        children: String(nextChildren),
-        participants: String(nextParticipantCount),
-        participantEmails: (prev.participantEmails || []).slice(0, maxEmails),
-        ccParticipants: maxEmails === 0 ? false : prev.ccParticipants,
-      };
-    });
+  // Adds a child with a sensible default age for the chosen category.
+  // The age stepper is gone — the guest just picks a category and
+  // confirms. Pricing still sees a real age via this default.
+  const addChildByCategory = (category) => {
+    if (tour?.childFriendly === false || !canAddChild) return;
+    const defaultAge =
+      category === "toddler" ? 3 : category === "child" ? 8 : 14;
+    setFormData((prev) => ({
+      ...prev,
+      childAges: [...(prev.childAges || []), defaultAge],
+    }));
+    setChildAddedAnimation(true);
+    setTimeout(() => setChildAddedAnimation(false), 900);
   };
 
   const adjustGuestCount = (type, delta) => {
@@ -1285,8 +1074,18 @@ const Booking = ({ embeddedTour, bookingData }) => {
   };
 
   // ─── Submit ──────────────────────────────────────────────────────
-  const handleSubmit = (e) => {
+  // The client's `pricing` value is already computed from
+  // `computePricing` — the exact same function /api/verify-price calls
+  // server-side. We still ask the server to re-derive and sign a
+  // short-lived token, because that token (not the local number) is
+  // what Paystack is initialized with at /checkout. But if the
+  // endpoint isn't deployed yet (dev, static preview), we fall
+  // through gracefully using the local number instead of failing the
+  // whole booking. A console warning fires so it's not silent.
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError("");
+
     const requiredFields = [
       "fullName",
       "mobile",
@@ -1313,48 +1112,153 @@ const Booking = ({ embeddedTour, bookingData }) => {
       return;
     }
 
-    // Prepare kids activity fee (already computed)
-    const kidsActivityFeeConverted = kidsActivityFee;
-
-    // Compute final total with all components
-    const finalTotal = totalPrice;
-
-    nav("/checkout", {
-      state: {
-        tour,
-        bookingDetails: {
-          ...formData,
-          adults: adultCount,
-          children: children,
-          toddlers: toddlers,
-          teens: teens,
-          childAges: childAges,
-          participants: String(participantCount),
-          participantEmails: normalizedParticipantEmails,
-          ccParticipantEmails: formData.ccParticipants
-            ? normalizedParticipantEmails
-            : [],
-          selectedExtras: formData.selectedExtras || {},
-          selectedKidsActivity: formData.selectedKidsActivity,
-          kidsActivityFee: kidsActivityFeeConverted,
-          pricingOptions: {
-            isPrivate,
-            isCustom,
-            privateFee,
-            customFee,
-            groupDiscountPercent,
-            groupDiscountAmount,
-            subtotalBeforeGroupDiscount: originalSubtotal,
-            discountedTourSubtotal: discountedSubtotal,
-            extrasTotal,
-            kidsActivityFee: kidsActivityFeeConverted,
-            estimatedTotal: finalTotal,
-            currency,
-          },
-        },
-        selectedCurrency: currency,
+    const bookingDetails = {
+      ...formData,
+      adults: adultCount,
+      children,
+      toddlers,
+      teens,
+      childAges,
+      participants: String(participantCount),
+      participantEmails: normalizedParticipantEmails,
+      ccParticipantEmails: formData.ccParticipants
+        ? normalizedParticipantEmails
+        : [],
+      selectedExtras: formData.selectedExtras || {},
+      selectedKidsActivity: formData.selectedKidsActivity,
+      kidsActivityFee: pricing.kidsActivityTotal,
+      pricingOptions: {
+        isPrivate: formData.isPrivate,
+        isCustom: formData.isCustom,
+        privateFee: pricing.privateFee,
+        customFee: pricing.customFee,
+        groupDiscountPercent: pricing.groupDiscountPercent,
+        groupDiscountAmount: pricing.groupDiscountAmount,
+        subtotalBeforeGroupDiscount: pricing.originalSubtotal,
+        discountedTourSubtotal: pricing.discountedSubtotal,
+        extrasTotal: pricing.extrasTotal,
+        kidsActivityFee: pricing.kidsActivityTotal,
+        estimatedTotal: pricing.finalTotal,
+        currency,
       },
-    });
+    };
+
+    // Custom-quote tours have no fixed total to verify — send the
+    // guest straight through to the quote-request flow.
+    if (pricing.isCustomQuote) {
+      nav("/checkout", {
+        state: {
+          tour,
+          bookingDetails,
+          selectedCurrency: currency,
+          isCustomQuote: true,
+        },
+      });
+      return;
+    }
+
+    setSubmitting(true);
+
+    // Helper: no-token navigation used by both the fallback path and
+    // the "server said custom quote" path.
+    const goToCheckoutWithoutToken = (extraState = {}) =>
+      nav("/checkout", {
+        state: {
+          tour,
+          bookingDetails,
+          selectedCurrency: currency,
+          ...extraState,
+        },
+      });
+
+    try {
+      const res = await fetch("/api/verify-price", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tourId: tour.id ?? getTourSlug(tour),
+          adultCount,
+          childAges,
+          currency,
+          selectedOption: formData.selectedOption,
+          selectedExtras: formData.selectedExtras || {},
+          isPrivate: formData.isPrivate,
+          isCustom: formData.isCustom,
+          selectedKidsActivity: formData.selectedKidsActivity,
+        }),
+      });
+
+      const contentType = res.headers.get("content-type") || "";
+      const looksLikeHtml = contentType.includes("text/html");
+
+      // 404/405 (route missing) or 200+text/html (Vite SPA fallback
+      // served index.html for /api/*) both mean "no API here".
+      if (res.status === 404 || res.status === 405 || looksLikeHtml) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          "[Booking] /api/verify-price unavailable; using client-side price.",
+        );
+        goToCheckoutWithoutToken();
+        return;
+      }
+
+      if (!res.ok) {
+        let detail = "";
+        try {
+          const errBody = await res.json();
+          detail = errBody?.error || errBody?.message || "";
+        } catch {
+          /* body wasn't JSON — ignore */
+        }
+        throw new Error(detail || `HTTP ${res.status}`);
+      }
+
+      const verified = await res.json();
+
+      if (verified?.isCustomQuote) {
+        goToCheckoutWithoutToken({ isCustomQuote: true });
+        return;
+      }
+
+      nav("/checkout", {
+        state: {
+          tour,
+          bookingDetails,
+          selectedCurrency: currency,
+          priceToken: verified?.token,
+        },
+      });
+    } catch (err) {
+      // In dev (plain `npm run dev`), Vite has no POST handler for
+      // /api/*, so fetch() throws a TypeError before we ever see a
+      // response. Treat that the same as "endpoint not deployed" and
+      // fall back to the locally-computed price instead of failing
+      // the whole booking. Real 5xx errors from a deployed API still
+      // surface below.
+      const isNetworkError =
+        err instanceof TypeError ||
+        /failed to fetch|networkerror|load failed/i.test(err?.message || "");
+
+      if (isNetworkError) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          "[Booking] /api/verify-price unreachable; using client-side price.",
+        );
+        goToCheckoutWithoutToken();
+        return;
+      }
+
+      // eslint-disable-next-line no-console
+      console.error("[Booking] Price verification failed:", err);
+
+      setSubmitError(
+        err?.message
+          ? `Couldn't verify price — ${err.message}`
+          : "We couldn't verify the current price. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // ─── Render ──────────────────────────────────────────────────────
@@ -1938,15 +1842,14 @@ const Booking = ({ embeddedTour, bookingData }) => {
                         Group size
                       </h3>
                       <p className="mt-1 text-xs text-neutral-500">
-                        Select the number of guests in your own party.
+                        Who&apos;s travelling on this booking?
                       </p>
                     </div>
                   </div>
 
                   <div className="rounded-2xl border border-green-200 bg-green-50/65 p-4 transition-all duration-300">
-                    {/* Wrapper: both states are always rendered – we toggle classes for smooth transitions */}
                     <div className="overflow-hidden transition-all duration-500 ease-out">
-                      {/* ---------- Closed summary (visible when !showGroupEditor) ---------- */}
+                      {/* ---------- Closed summary ---------- */}
                       <div
                         className={`transition-all duration-500 ease-out ${
                           showGroupEditor
@@ -1991,7 +1894,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
                         </div>
                       </div>
 
-                      {/* ---------- Open editor (visible when showGroupEditor) ---------- */}
+                      {/* ---------- Open editor ---------- */}
                       <div
                         className={`transition-all duration-500 ease-out ${
                           showGroupEditor
@@ -2000,14 +1903,12 @@ const Booking = ({ embeddedTour, bookingData }) => {
                         }`}
                       >
                         <div className="mt-4">
-                          {" "}
-                          {/* keep some spacing when expanded */}
                           <div className="grid gap-3 sm:grid-cols-2">
                             {/* Adults */}
                             <GuestStepper
                               label="Adults"
                               value={adultCount}
-                              hint="Adults aged 18+ in your booking group."
+                              hint="Aged 18+."
                               onDecrease={() => adjustGuestCount("adults", -1)}
                               onIncrease={() => adjustGuestCount("adults", 1)}
                               decreaseDisabled={
@@ -2030,76 +1931,70 @@ const Booking = ({ embeddedTour, bookingData }) => {
                                   >
                                     ⚠️
                                   </span>
-                                  <span>
-                                    This tour is not child-friendly. Children
-                                    cannot be added.
-                                  </span>
+                                  <span>This tour is not child-friendly.</span>
                                 </div>
                               )}
 
-                              <div className="rounded-2xl border border-black/5 bg-white p-4">
+                              <div className="rounded-2xl border border-black/5 bg-white p-3 sm:p-4">
                                 <div className="flex items-center justify-between gap-3">
-                                  <div>
-                                    <p className="text-sm font-bold text-neutral-950">
-                                      Children
-                                    </p>
-                                    <p className="mt-1 text-xs leading-5 text-neutral-500">
-                                      Add each child's age.
-                                    </p>
-                                  </div>
+                                  <p className="text-sm font-bold text-neutral-950">
+                                    Children
+                                  </p>
                                   <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-bold text-blue-700">
                                     {childAges.length}
                                   </span>
                                 </div>
 
-                                {/* Age legend */}
-                                <div className="mt-3 grid grid-cols-3 gap-1.5">
-                                  <div className="rounded-lg border border-blue-100 bg-blue-50/70 px-2 py-1.5 text-center">
-                                    <p className="text-[9px] font-black text-blue-700">
-                                      Toddler
-                                    </p>
-                                    <p className="text-[8px] text-blue-500">
-                                      0–5
-                                    </p>
-                                  </div>
-                                  <div className="rounded-lg border border-blue-100 bg-blue-50/70 px-2 py-1.5 text-center">
-                                    <p className="text-[9px] font-black text-blue-700">
-                                      Child
-                                    </p>
-                                    <p className="text-[8px] text-blue-500">
-                                      6–11
-                                    </p>
-                                  </div>
-                                  <div className="rounded-lg border border-blue-100 bg-blue-50/70 px-2 py-1.5 text-center">
-                                    <p className="text-[9px] font-black text-blue-700">
-                                      Teen
-                                    </p>
-                                    <p className="text-[8px] text-blue-500">
-                                      12–17
-                                    </p>
-                                  </div>
-                                </div>
-
-                                <button
-                                  type="button"
-                                  disabled={
-                                    tour.childFriendly === false || !canAddChild
-                                  }
-                                  onClick={() => {
-                                    setFormData((prev) => ({
-                                      ...prev,
-                                      childAges: [...(prev.childAges || []), 6],
-                                    }));
-                                    setChildAddedAnimation(true);
-                                    setTimeout(
-                                      () => setChildAddedAnimation(false),
-                                      900,
+                                {/* Category buttons — click to add a
+                                    child in that age band. */}
+                                <div className="mt-3 grid grid-cols-3 gap-2">
+                                  {[
+                                    {
+                                      key: "toddler",
+                                      icon: "🧒",
+                                      label: "Toddler",
+                                      range: "0–5",
+                                    },
+                                    {
+                                      key: "child",
+                                      icon: "👦",
+                                      label: "Child",
+                                      range: "6–11",
+                                    },
+                                    {
+                                      key: "teen",
+                                      icon: "🧑",
+                                      label: "Teen",
+                                      range: "12–17",
+                                    },
+                                  ].map((cat) => {
+                                    const disabled =
+                                      tour.childFriendly === false ||
+                                      !canAddChild;
+                                    return (
+                                      <button
+                                        key={cat.key}
+                                        type="button"
+                                        disabled={disabled}
+                                        onClick={() =>
+                                          addChildByCategory(cat.key)
+                                        }
+                                        aria-label={`Add ${cat.label} (${cat.range} years)`}
+                                        className="group/cat flex flex-col items-center gap-0.5 rounded-xl border border-blue-100 bg-blue-50/70 px-1.5 py-2.5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-100 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:bg-blue-50/70"
+                                      >
+                                        <span className="text-lg leading-none transition-transform duration-200 group-hover/cat:scale-110">
+                                          {cat.icon}
+                                        </span>
+                                        <span className="mt-1 text-[10px] font-black uppercase tracking-wide text-blue-700">
+                                          {cat.label}
+                                        </span>
+                                        <span className="text-[9px] font-bold text-blue-500">
+                                          {cat.range}
+                                        </span>
+                                      </button>
                                     );
-                                  }}
-                                  className="relative mt-4 flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-xs font-black text-blue-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-100 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40"
-                                >
-                                  <span className="text-base">+</span> Add child
-                                </button>
+                                  })}
+                                </div>
 
                                 {childAddedAnimation && (
                                   <div className="pointer-events-none flex justify-center overflow-hidden">
@@ -2112,7 +2007,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
                                 {childAges.length > 0 && (
                                   <div className="mt-3 space-y-2">
                                     {(() => {
-                                      // Build labels with category and per‑category numbering
                                       const childLabels = childAges.map(
                                         (age, idx) => {
                                           let category;
@@ -2138,67 +2032,20 @@ const Booking = ({ embeddedTour, bookingData }) => {
                                       });
 
                                       return childLabels.map(
-                                        ({
-                                          age: numericAge,
-                                          category,
-                                          index,
-                                          displayIndex,
-                                        }) => {
+                                        ({ category, index, displayIndex }) => {
                                           const isAgeConfirmed =
                                             !!confirmedChildAges[index];
                                           let ageRange, icon;
-                                          if (numericAge <= 5) {
-                                            ageRange = "0–5 years";
+                                          if (category === "Toddler") {
+                                            ageRange = "0–5 yrs";
                                             icon = "🧒";
-                                          } else if (numericAge <= 11) {
-                                            ageRange = "6–11 years";
+                                          } else if (category === "Child") {
+                                            ageRange = "6–11 yrs";
                                             icon = "👦";
                                           } else {
-                                            ageRange = "12–17 years";
+                                            ageRange = "12–17 yrs";
                                             icon = "🧑";
                                           }
-
-                                          const increaseAge = () => {
-                                            if (isAgeConfirmed) return;
-                                            setFormData((prev) => {
-                                              const ages = [
-                                                ...(prev.childAges || []),
-                                              ];
-                                              ages[index] = Math.min(
-                                                17,
-                                                Number(ages[index] || 0) + 1,
-                                              );
-                                              return {
-                                                ...prev,
-                                                childAges: ages,
-                                              };
-                                            });
-                                            setConfirmedChildAges((prev) => ({
-                                              ...prev,
-                                              [index]: false,
-                                            }));
-                                          };
-
-                                          const decreaseAge = () => {
-                                            if (isAgeConfirmed) return;
-                                            setFormData((prev) => {
-                                              const ages = [
-                                                ...(prev.childAges || []),
-                                              ];
-                                              ages[index] = Math.max(
-                                                0,
-                                                Number(ages[index] || 0) - 1,
-                                              );
-                                              return {
-                                                ...prev,
-                                                childAges: ages,
-                                              };
-                                            });
-                                            setConfirmedChildAges((prev) => ({
-                                              ...prev,
-                                              [index]: false,
-                                            }));
-                                          };
 
                                           const confirmChildAge = () => {
                                             setConfirmedChildAges((prev) => ({
@@ -2236,125 +2083,77 @@ const Booking = ({ embeddedTour, bookingData }) => {
                                           return (
                                             <div
                                               key={`child-${index}`}
-                                              className={`flex flex-col sm:flex-row sm:items-center items-start gap-2 sm:gap-3 rounded-xl border px-3 py-2.5 transition-all duration-300 ${
+                                              className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-all duration-300 ${
                                                 isAgeConfirmed
                                                   ? "border-green-200 bg-green-50/50"
                                                   : "border-black/5 bg-neutral-50 hover:border-blue-100 hover:bg-blue-50/40"
                                               }`}
                                             >
-                                              {/* Icon + info */}
-                                              <div className="flex w-full items-center gap-3 sm:w-auto">
-                                                <div
-                                                  className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-white text-base sm:text-lg shadow-sm transition-all duration-300 ${
-                                                    isAgeConfirmed
-                                                      ? "ring-2 ring-green-200"
-                                                      : "group-hover:scale-105"
-                                                  }`}
-                                                >
-                                                  {icon}
-                                                </div>
-                                                <div className="min-w-0 flex-1">
-                                                  <div className="flex items-center gap-2 flex-wrap">
-                                                    <p className="text-xs font-black text-neutral-900">
-                                                      {category} {displayIndex}
-                                                    </p>
-                                                    {isAgeConfirmed && (
-                                                      <span className="rounded-full bg-green-100 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wide text-green-700">
-                                                        Confirmed
-                                                      </span>
-                                                    )}
-                                                  </div>
-                                                  <p
-                                                    className={`mt-0.5 text-[10px] transition-colors duration-300 ${
-                                                      isAgeConfirmed
-                                                        ? "text-green-600"
-                                                        : "text-neutral-400"
-                                                    }`}
-                                                  >
-                                                    {ageRange}
-                                                  </p>
-                                                </div>
+                                              <div
+                                                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-lg shadow-sm transition-all duration-300 ${
+                                                  isAgeConfirmed
+                                                    ? "ring-2 ring-green-200"
+                                                    : ""
+                                                }`}
+                                              >
+                                                {icon}
                                               </div>
 
-                                              {/* Age controls + action buttons */}
-                                              <div className="flex w-full flex-wrap items-center justify-between gap-1.5 sm:w-auto sm:flex-nowrap sm:justify-end">
-                                                <div
-                                                  className={`flex shrink-0 items-center rounded-xl border bg-white shadow-sm transition-opacity duration-300 ${
+                                              <div className="min-w-0 flex-1">
+                                                <p className="text-xs font-black text-neutral-900">
+                                                  {category} {displayIndex}
+                                                </p>
+                                                <p
+                                                  className={`mt-0.5 text-[10px] font-medium transition-colors duration-300 ${
                                                     isAgeConfirmed
-                                                      ? "border-green-200 opacity-60"
-                                                      : "border-black/10"
+                                                      ? "text-green-600"
+                                                      : "text-neutral-400"
                                                   }`}
                                                 >
-                                                  <button
-                                                    type="button"
-                                                    onClick={decreaseAge}
-                                                    disabled={
-                                                      numericAge <= 0 ||
-                                                      isAgeConfirmed
-                                                    }
-                                                    className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-l-xl text-sm font-black text-neutral-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30"
-                                                    aria-label={`Decrease ${category} ${displayIndex} age`}
-                                                  >
-                                                    −
-                                                  </button>
-                                                  <div className="flex h-7 min-w-[44px] sm:h-8 sm:min-w-[52px] items-center justify-center border-x border-black/5 px-1.5 sm:px-2">
-                                                    <span className="text-xs sm:text-sm font-black text-neutral-950">
-                                                      {numericAge}
-                                                    </span>
-                                                    <span className="ml-0.5 sm:ml-1 text-[8px] sm:text-[9px] font-bold text-neutral-400">
-                                                      yrs
-                                                    </span>
-                                                  </div>
-                                                  <button
-                                                    type="button"
-                                                    onClick={increaseAge}
-                                                    disabled={
-                                                      numericAge >= 17 ||
-                                                      isAgeConfirmed
-                                                    }
-                                                    className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-r-xl text-sm font-black text-neutral-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30"
-                                                    aria-label={`Increase ${category} ${displayIndex} age`}
-                                                  >
-                                                    +
-                                                  </button>
-                                                </div>
-
-                                                <div className="flex shrink-0 items-center gap-1.5">
-                                                  <button
-                                                    type="button"
-                                                    onClick={confirmChildAge}
-                                                    disabled={isAgeConfirmed}
-                                                    className={`flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border transition-all duration-300 ${
-                                                      isAgeConfirmed
-                                                        ? "scale-105 border-green-500 bg-green-500 text-white shadow-[0_4px_14px_rgba(34,197,94,0.25)]"
-                                                        : "border-green-200 bg-green-50 text-green-600 hover:scale-110 hover:bg-green-100"
-                                                    }`}
-                                                    aria-label={
-                                                      isAgeConfirmed
-                                                        ? `${category} ${displayIndex} age confirmed`
-                                                        : `Confirm ${category} ${displayIndex} age`
-                                                    }
-                                                  >
-                                                    <span
-                                                      className={`text-xs sm:text-sm font-black transition-transform duration-300 ${
-                                                        isAgeConfirmed
-                                                          ? "scale-110"
-                                                          : "scale-100"
-                                                      }`}
-                                                    >
-                                                      ✓
-                                                    </span>
-                                                  </button>
-                                                  <button
-                                                    type="button"
-                                                    onClick={removeChild}
-                                                    className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-neutral-300 transition-all duration-200 hover:bg-red-50 hover:text-red-500"
-                                                    aria-label={`Remove ${category} ${displayIndex}`}
-                                                  >
-                                                    ×
-                                                  </button>
-                                                </div>
+                                                  {isAgeConfirmed
+                                                    ? "Confirmed"
+                                                    : ageRange}
+                                                </p>
                                               </div>
+
+                                              {!isAgeConfirmed && (
+                                                <button
+                                                  type="button"
+                                                  onClick={confirmChildAge}
+                                                  className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-green-300 bg-green-50 px-2.5 text-[11px] font-bold text-green-700 transition-all duration-200 hover:border-green-500 hover:bg-green-500 hover:text-white"
+                                                  aria-label={`Confirm ${category} ${displayIndex}`}
+                                                >
+                                                  <span className="text-sm font-black">
+                                                    ✓
+                                                  </span>
+                                                  <span className="hidden sm:inline">
+                                                    Confirm
+                                                  </span>
+                                                </button>
+                                              )}
+
+                                              {isAgeConfirmed && (
+                                                <span className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-green-500 bg-green-500 px-2.5 text-[11px] font-bold text-white">
+                                                  <span className="text-sm font-black">
+                                                    ✓
+                                                  </span>
+                                                  <span className="hidden sm:inline">
+                                                    Confirmed
+                                                  </span>
+                                                </span>
+                                              )}
+
+                                              <button
+                                                type="button"
+                                                onClick={removeChild}
+                                                className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-2.5 text-[11px] font-bold text-red-600 transition-all duration-200 hover:border-red-500 hover:bg-red-500 hover:text-white"
+                                                aria-label={`Remove ${category} ${displayIndex}`}
+                                              >
+                                                <TrashIcon />
+                                                <span className="hidden sm:inline">
+                                                  Remove
+                                                </span>
+                                              </button>
                                             </div>
                                           );
                                         },
@@ -2364,24 +2163,18 @@ const Booking = ({ embeddedTour, bookingData }) => {
                                 )}
 
                                 {childAges.length === 0 && (
-                                  <div className="mt-3 rounded-xl border border-dashed border-black/10 bg-neutral-50 px-4 py-5 text-center">
-                                    <div className="text-2xl opacity-40">
-                                      🧒
-                                    </div>
-                                    <p className="mt-2 text-xs font-bold text-neutral-500">
-                                      No children added
-                                    </p>
-                                    <p className="mt-0.5 text-[10px] text-neutral-400">
-                                      Add a child to enter their age.
+                                  <div className="mt-3 rounded-xl border border-dashed border-black/10 bg-neutral-50 px-4 py-4 text-center">
+                                    <p className="text-[11px] font-bold text-neutral-500">
+                                      Tap a category above to add a child.
                                     </p>
                                   </div>
                                 )}
                               </div>
                             </div>
                           </div>
-                          {/* Group policy + action buttons – stacked on mobile, row on desktop */}
+
+                          {/* Group policy + action buttons */}
                           <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
-                            {/* "Save more" banner */}
                             <div
                               ref={groupSaveRef}
                               className="w-full rounded-2xl border border-green-200 bg-white transition-all duration-300 sm:w-auto"
@@ -2413,12 +2206,10 @@ const Booking = ({ embeddedTour, bookingData }) => {
                               </div>
                             </div>
 
-                            {/* Confirm & Cancel buttons */}
                             <div className="flex w-full flex-col items-center gap-2 sm:w-auto sm:flex-row sm:gap-3">
                               <button
                                 type="button"
                                 onClick={() => {
-                                  // Auto‑confirm all child ages
                                   const currentChildAges =
                                     formData.childAges || [];
                                   const newConfirmed = {};
@@ -2427,7 +2218,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
                                   });
                                   setConfirmedChildAges(newConfirmed);
 
-                                  // Delay close to allow confirmation animations to play
                                   setTimeout(() => {
                                     setGroupSnapshot(null);
                                     setShowGroupEditor(false);
@@ -2630,7 +2420,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
                     active={formData.isPrivate}
                     title="Private tour"
                     text="Book this as a private vehicle-based experience."
-                    price={`+ ${displayPrivateFee}`}
+                    price={`+ ${displayPrivateFeeAmount}`}
                     icon="P"
                     onClick={() => handleToggleOption("isPrivate")}
                   />
@@ -2638,7 +2428,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
                     active={formData.isCustom}
                     title="Custom trip"
                     text="Request custom planning, route timing, or special adjustments."
-                    price={`+ ${displayCustomFee}`}
+                    price={`+ ${displayCustomFeeAmount}`}
                     icon="C"
                     onClick={() => handleToggleOption("isCustom")}
                   />
@@ -2673,16 +2463,18 @@ const Booking = ({ embeddedTour, bookingData }) => {
                 />
               </div>
 
-              {/* CHECKOUT SUMMARY */}
+              {/* CHECKOUT SUMMARY — the price-verification error is now
+                  rendered inside CheckoutSummary, directly above the
+                  "Continue to checkout" button. */}
               <div ref={checkoutRef} className="mt-6">
                 <CheckoutSummary
                   tour={tour}
                   adultCount={adultCount}
                   childCount={children} // 6-11
                   toddlerCount={toddlers}
+                  currency={currency}
                   selectedOption={formData?.selectedOption}
                   selectedExtras={formData.selectedExtras}
-                  additionalPricing={tour.additionalPricing}
                   formData={formData}
                   contactDetailsComplete={contactDetailsComplete}
                   dateDetailsComplete={dateDetailsComplete}
@@ -2690,6 +2482,8 @@ const Booking = ({ embeddedTour, bookingData }) => {
                   isEmbedded={isEmbedded}
                   CheckoutCartIcon={CheckoutCartIcon}
                   checkoutRef={checkoutRef}
+                  submitting={submitting}
+                  submitError={submitError}
                 />
               </div>
             </div>

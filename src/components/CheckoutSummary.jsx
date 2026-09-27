@@ -3,46 +3,13 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import gsap from "gsap";
 import { KIDS_ACTIVITIES } from "../data/kidsActivities";
-import { resolveImage } from '../utils/ImageLoader.js'
+import { resolveImage } from "../utils/ImageLoader.js";
 
 // ============================================================
-// HELPER — PRIVATE / CUSTOM FEES
+// Single source of truth for pricing math — the exact same
+// function /api/verify-price uses server-side.
 // ============================================================
-
-const getFee = (tour, type) => {
-  const defaults = {
-    private: 750,
-    custom: 500,
-  };
-
-  if (Array.isArray(tour?.additionalPricing)) {
-    const match = tour.additionalPricing.find((item) =>
-      item.category?.toLowerCase().includes(type)
-    );
-
-    if (match) {
-      const amount =
-        match.pricePerPerson ??
-        match.price ??
-        match.amount ??
-        0;
-
-      if (Number(amount) > 0) {
-        return Number(amount);
-      }
-    }
-  }
-
-  if (type === "private" && tour?.privateFee !== undefined) {
-    return Number(tour.privateFee) || 0;
-  }
-
-  if (type === "custom" && tour?.customFee !== undefined) {
-    return Number(tour.customFee) || 0;
-  }
-
-  return defaults[type] || 0;
-};
+import { computePricing } from "../utils/pricingEngine.js";
 
 // ============================================================
 // COMPONENT
@@ -55,9 +22,10 @@ const CheckoutSummary = ({
   childCount,
   toddlerCount = 0,
 
+  currency = "ZAR",
+
   selectedOption,
   selectedExtras = {},
-  additionalPricing = [],
 
   formData,
 
@@ -69,7 +37,8 @@ const CheckoutSummary = ({
   CheckoutCartIcon = null,
   checkoutRef = null,
 
-  applyGroupDiscountToChildren = false,
+  submitting = false,
+  submitError = "",
 }) => {
   const [activeDetail, setActiveDetail] = useState("tour");
 
@@ -79,397 +48,54 @@ const CheckoutSummary = ({
   const iconButtonRefs = useRef({});
 
   // ============================================================
-  // PRICING CALCULATION
+  // PRICING CALCULATION — delegated entirely to pricingEngine
   // ============================================================
 
-  const pricing = useMemo(() => {
-    const hasOptions =
-      Array.isArray(tour?.options) &&
-      tour.options.length > 0;
+  const childAges = Array.isArray(formData?.childAges)
+    ? formData.childAges
+        .map((age) => Number(age))
+        .filter((age) => Number.isFinite(age) && age >= 0 && age <= 17)
+    : [];
 
-    const adults = Math.max(0, Number(adultCount) || 0);
-
-    const childAges = Array.isArray(formData?.childAges)
-      ? formData.childAges
-          .map((age) => Number(age))
-          .filter((age) => Number.isFinite(age) && age >= 0 && age <= 17)
-      : [];
-
-    const toddlers = childAges.filter((age) => age <= 5).length;
-    const children = childAges.filter((age) => age >= 6 && age <= 11).length;
-    const teens = childAges.filter((age) => age >= 12 && age <= 17).length;
-
-    const participantCount = adults + childAges.length;
-
-    const selectedKidsActivity =
-      tour?.childFriendly === true
-        ? KIDS_ACTIVITIES.find(
-            (activity) => activity.id === formData?.selectedKidsActivity
-          ) || null
-        : null;
-
-    const kidsActivityAdultPrice = selectedKidsActivity
-      ? Number(selectedKidsActivity.adultPrice) || 0
-      : 0;
-    const kidsActivityChildPrice = selectedKidsActivity
-      ? Number(selectedKidsActivity.childPrice) || 0
-      : 0;
-    const kidsActivityToddlerPrice = selectedKidsActivity
-      ? Number(selectedKidsActivity.toddlerPrice) || 0
-      : 0;
-
-    const kidsActivityAdultTotal = kidsActivityAdultPrice * adults;
-    const kidsActivityChildTotal = kidsActivityChildPrice * children;
-    const kidsActivityToddlerTotal = kidsActivityToddlerPrice * toddlers;
-    const kidsActivityTotal =
-      kidsActivityAdultTotal +
-      kidsActivityChildTotal +
-      kidsActivityToddlerTotal;
-
-    if (
-      !tour ||
-      !Array.isArray(tour.pricing) ||
-      tour.pricing.length === 0
-    ) {
-      return {
-        displayPrice: "—",
-        participantCount,
-        adults,
-        children,
-        toddlers,
-        teens,
-        hasOptions,
-        displayBaseSubtotal: "—",
-        groupDiscountPercent: 0,
-        displayGroupDiscountAmount: "—",
-        displayDiscountedTourSubtotal: "—",
-        displayActivePrivateFee: "—",
-        displayActiveCustomFee: "—",
-        displayExtrasTotal: "—",
-        extrasBreakdown: [],
-        displayKidsActivityTotal: "—",
-        kidsActivityTotal: 0,
-        kidsActivityAdultPrice: 0,
-        kidsActivityChildPrice: 0,
-        kidsActivityToddlerPrice: 0,
-        kidsActivityAdultTotal: 0,
-        kidsActivityChildTotal: 0,
-        kidsActivityToddlerTotal: 0,
-        selectedKidsActivity,
-        displayTotal: "—",
-        currency: "ZAR",
-        isCustomQuote: false,
-        hasDiscount: false,
-        matchedGroupTier: null,
-        groupPricingType: null,
-        selectedTourOption: null,
-        originalTotal: 0,
-        adultOriginalSubtotal: 0,
-        teenOriginalSubtotal: 0,
-        childOriginalSubtotal: 0,
-        toddlerOriginalSubtotal: 0,
-        adultDiscountAmount: 0,
-        teenDiscountAmount: 0,
-        discountAmount: 0,
-        discountedTourTotal: 0,
-        privateFee: 0,
-        customFee: 0,
-        extrasTotal: 0,
-        finalTotal: 0,
-        adultPrice: 0,
-        teenBasePrice: 0,
-        childBasePrice: 0,
-        toddlerBasePrice: 0,
-      };
-    }
-
-    const selectedTourOption = hasOptions
-      ? tour.options.find((option) => option.id === selectedOption) || null
-      : null;
-
-    // ---- CATEGORY PRICING ----
-    const adultPricing =
-      tour.pricing.find((p) =>
-        p.category?.toLowerCase().startsWith("adult")
-      ) || tour.pricing[0];
-    const adultBasePrice = Number(adultPricing?.pricePerPerson) || 0;
-    let adultPrice = adultBasePrice;
-    if (hasOptions) {
-      adultPrice = selectedTourOption
-        ? Number(selectedTourOption.pricePerPerson) || 0
-        : 0;
-    }
-
-    const teenPricing = tour.pricing.find((p) =>
-      p.category?.toLowerCase().startsWith("teen")
-    );
-    const teenBasePrice = Number(teenPricing?.pricePerPerson) || 0;
-
-    const childPricing = tour.pricing.find((p) =>
-      p.category?.toLowerCase().startsWith("child")
-    );
-    const childBasePrice = Number(childPricing?.pricePerPerson) || 0;
-
-    const toddlerPricing = tour.pricing.find((p) =>
-      p.category?.toLowerCase().startsWith("toddler")
-    );
-    const toddlerBasePrice = Number(toddlerPricing?.pricePerPerson) || 0;
-
-    // ---- ORIGINAL SUBTOTALS ----
-    const adultBaseSubtotal = adults * adultPrice;
-    const teenBaseSubtotal = teens * teenBasePrice;
-    const childBaseSubtotal = children * childBasePrice;
-    const toddlerBaseSubtotal = toddlers * toddlerBasePrice;
-
-    const originalSubtotal =
-      adultBaseSubtotal +
-      teenBaseSubtotal +
-      childBaseSubtotal +
-      toddlerBaseSubtotal;
-
-    // ---- GROUP DISCOUNT ----
-    let discountedSubtotal = originalSubtotal;
-    let groupDiscountAmount = 0;
-    let groupDiscountPercent = 0;
-    let adultDiscountAmount = 0;
-    let teenDiscountAmount = 0;
-    let isCustomQuote = false;
-    let hasDiscount = false;
-    let matchedGroupTier = null;
-    let groupPricingType = null;
-
-    if (
-      tour.groupPricing?.enabled &&
-      Array.isArray(tour.groupPricing.tiers) &&
-      tour.groupPricing.tiers.length > 0
-    ) {
-      matchedGroupTier = tour.groupPricing.tiers.find((tier) => {
-        const minPeople = Number(tier.minPeople) || 0;
-        const maxPeople = tier.maxPeople == null ? Infinity : Number(tier.maxPeople);
-        return participantCount >= minPeople && participantCount <= maxPeople;
-      }) || null;
-    }
-
-    if (matchedGroupTier) {
-      const groupTotal =
-        matchedGroupTier.groupTotal != null ? Number(matchedGroupTier.groupTotal) : null;
-
-      if (groupTotal !== null && Number.isFinite(groupTotal) && groupTotal > 0) {
-        groupPricingType = "groupTotal";
-        discountedSubtotal = groupTotal;
-        groupDiscountAmount = Math.max(0, originalSubtotal - discountedSubtotal);
-        groupDiscountPercent =
-          originalSubtotal > 0 ? (groupDiscountAmount / originalSubtotal) * 100 : 0;
-        adultDiscountAmount = groupDiscountAmount;
-        teenDiscountAmount = 0;
-        hasDiscount = groupDiscountAmount > 0;
-        isCustomQuote = false;
-      } else {
-        const hasPerPersonPrice =
-          matchedGroupTier.perPerson != null &&
-          Number.isFinite(Number(matchedGroupTier.perPerson));
-        const hasDiscountPercent =
-          matchedGroupTier.discountPercent != null &&
-          Number.isFinite(Number(matchedGroupTier.discountPercent));
-
-        if (hasPerPersonPrice) {
-          groupPricingType = "perPerson";
-          const groupPersonPrice = Math.max(0, Number(matchedGroupTier.perPerson));
-
-          const discountedAdultSubtotal = adults * groupPersonPrice;
-          const discountedTeenSubtotal = teens * groupPersonPrice;
-          const unchangedChildSubtotal = childBaseSubtotal;
-          const unchangedToddlerSubtotal = toddlerBaseSubtotal;
-
-          discountedSubtotal =
-            discountedAdultSubtotal +
-            discountedTeenSubtotal +
-            unchangedChildSubtotal +
-            unchangedToddlerSubtotal;
-
-          adultDiscountAmount = Math.max(0, adultBaseSubtotal - discountedAdultSubtotal);
-          teenDiscountAmount = Math.max(0, teenBaseSubtotal - discountedTeenSubtotal);
-          groupDiscountAmount = adultDiscountAmount + teenDiscountAmount;
-
-          const adultAndTeenOriginal = adultBaseSubtotal + teenBaseSubtotal;
-          groupDiscountPercent =
-            adultAndTeenOriginal > 0 ? (groupDiscountAmount / adultAndTeenOriginal) * 100 : 0;
-          hasDiscount = groupDiscountAmount > 0;
-          isCustomQuote = false;
-        } else if (hasDiscountPercent) {
-          groupPricingType = "discountPercent";
-          const requestedDiscountPercent = Number(matchedGroupTier.discountPercent);
-          const safeDiscountPercent = Math.min(Math.max(requestedDiscountPercent, 0), 100);
-
-          const adultDiscount = adultBaseSubtotal * (safeDiscountPercent / 100);
-          const discountedAdultSubtotal = adultBaseSubtotal - adultDiscount;
-          const teenDiscount = teenBaseSubtotal * (safeDiscountPercent / 100);
-          const discountedTeenSubtotal = teenBaseSubtotal - teenDiscount;
-
-          discountedSubtotal =
-            discountedAdultSubtotal +
-            discountedTeenSubtotal +
-            childBaseSubtotal +
-            toddlerBaseSubtotal;
-
-          adultDiscountAmount = Math.max(0, adultDiscount);
-          teenDiscountAmount = Math.max(0, teenDiscount);
-          groupDiscountAmount = adultDiscountAmount + teenDiscountAmount;
-          groupDiscountPercent = safeDiscountPercent;
-          hasDiscount = groupDiscountAmount > 0;
-        } else {
-          groupPricingType = "custom";
-          isCustomQuote = true;
-          discountedSubtotal = originalSubtotal;
-          groupDiscountAmount = 0;
-          groupDiscountPercent = 0;
-          adultDiscountAmount = 0;
-          teenDiscountAmount = 0;
-          hasDiscount = false;
-        }
-      }
-    }
-
-    // ---- FEES ----
-    const privateFee = formData?.isPrivate ? getFee(tour, "private") : 0;
-    const customFee = formData?.isCustom ? getFee(tour, "custom") : 0;
-
-    // ---- EXTRAS ----
-    const currency = tour.currency || "ZAR";
-    const formatPrice = (amount) =>
-      `${currency} ${Number(amount || 0).toFixed(2)}`;
-
-    const pricingExtras =
-      additionalPricing.length > 0 ? additionalPricing : tour?.additionalPricing || [];
-    let extrasTotal = 0;
-    const extrasBreakdown = [];
-
-    if (Array.isArray(pricingExtras)) {
-      pricingExtras.forEach((extra) => {
-        const { type, category, price, unit } = extra;
-        const value = selectedExtras[category];
-        if (value === undefined || value === null || value === false) return;
-
-        let cost = 0;
-        let label = category;
-
-        if (type === "quantity") {
-          const qty = Number(value) || 0;
-          if (qty <= 0) return;
-          cost = (Number(price) || 0) * qty;
-          label = `${category} × ${qty}`;
-        } else if (type === "fixed") {
-          cost = Number(price) || 0;
-        } else {
-          return;
-        }
-
-        if (cost > 0) {
-          extrasTotal += cost;
-          extrasBreakdown.push({ label, cost, formattedCost: formatPrice(cost), unit });
-        }
-      });
-    }
-
-    // ---- FINAL TOTAL ----
-    const total = isCustomQuote
-      ? null
-      : discountedSubtotal + privateFee + customFee + extrasTotal + kidsActivityTotal;
-
-    // ---- RETURN ----
-    return {
-      adults,
-      children,
-      toddlers,
-      teens,
-      participantCount,
-      adultPrice: Number(adultPrice),
-      teenBasePrice: Number(teenBasePrice),
-      childBasePrice: Number(childBasePrice),
-      toddlerBasePrice: Number(toddlerBasePrice),
-      adultOriginalSubtotal: Number(adultBaseSubtotal),
-      teenOriginalSubtotal: Number(teenBaseSubtotal),
-      childOriginalSubtotal: Number(childBaseSubtotal),
-      toddlerOriginalSubtotal: Number(toddlerBaseSubtotal),
-      originalTotal: Number(originalSubtotal),
-      adultDiscountAmount: Number(adultDiscountAmount),
-      teenDiscountAmount: Number(teenDiscountAmount),
-      discountAmount: Number(groupDiscountAmount),
-      groupDiscountPercent: Number(groupDiscountPercent),
-      discountedTourTotal: Number(discountedSubtotal),
-      privateFee: Number(privateFee),
-      customFee: Number(customFee),
-      extrasTotal: Number(extrasTotal),
-      selectedKidsActivity,
-      kidsActivityAdultPrice: Number(kidsActivityAdultPrice),
-      kidsActivityChildPrice: Number(kidsActivityChildPrice),
-      kidsActivityToddlerPrice: Number(kidsActivityToddlerPrice),
-      kidsActivityAdultTotal: Number(kidsActivityAdultTotal),
-      kidsActivityChildTotal: Number(kidsActivityChildTotal),
-      kidsActivityToddlerTotal: Number(kidsActivityToddlerTotal),
-      kidsActivityTotal: Number(kidsActivityTotal),
-      finalTotal: isCustomQuote ? null : Number(total),
-      displayPrice: formatPrice(adultPrice),
-      hasOptions,
-      selectedTourOption,
-      displayBaseSubtotal: formatPrice(originalSubtotal),
-      displayGroupDiscountAmount: formatPrice(groupDiscountAmount),
-      displayDiscountedTourSubtotal: isCustomQuote
-        ? "Custom quote"
-        : formatPrice(discountedSubtotal),
-      displayActivePrivateFee:
-        privateFee > 0 ? `+${formatPrice(privateFee)}` : "—",
-      displayActiveCustomFee:
-        customFee > 0 ? `+${formatPrice(customFee)}` : "—",
-      displayExtrasTotal: extrasTotal > 0 ? formatPrice(extrasTotal) : "—",
-      displayKidsActivityTotal: selectedKidsActivity
-        ? formatPrice(kidsActivityTotal)
-        : "—",
-      extrasBreakdown,
-      displayTotal: isCustomQuote ? "Custom quote" : formatPrice(total),
+  const engineResult = useMemo(
+    () =>
+      computePricing({
+        tour,
+        childAges,
+        adultCount: Math.max(0, Number(adultCount) || 0),
+        currency,
+        selectedOption,
+        selectedExtras,
+        formData,
+        kidsActivities: KIDS_ACTIVITIES,
+      }),
+    [
+      tour,
+      JSON.stringify(childAges),
+      adultCount,
       currency,
-      isCustomQuote,
-      hasDiscount,
-      matchedGroupTier,
-      groupPricingType,
-    };
-  }, [
-    tour,
-    adultCount,
-    childCount,
-    toddlerCount,
-    selectedOption,
-    formData?.childAges,
-    formData?.isPrivate,
-    formData?.isCustom,
-    formData?.selectedKidsActivity,
-    selectedExtras,
-    additionalPricing,
-    applyGroupDiscountToChildren,
-  ]);
-
-  // ============================================================
-  // DESTRUCTURE
-  // ============================================================
+      selectedOption,
+      selectedExtras,
+      formData?.isPrivate,
+      formData?.isCustom,
+      formData?.selectedKidsActivity,
+    ],
+  );
 
   const {
-    displayPrice,
-    participantCount,
     adults,
     children,
     toddlers,
     teens,
+    participantCount,
+    qualifyingHeadcount,
     hasOptions,
     selectedTourOption,
-    displayBaseSubtotal,
+    isCustomQuote,
+    matchedGroupTier,
+    groupPricingType,
     groupDiscountPercent,
-    displayGroupDiscountAmount,
-    displayDiscountedTourSubtotal,
-    displayActivePrivateFee,
-    displayActiveCustomFee,
-    displayExtrasTotal,
     extrasBreakdown,
-    displayKidsActivityTotal,
     selectedKidsActivity,
     kidsActivityAdultPrice,
     kidsActivityChildPrice,
@@ -477,29 +103,92 @@ const CheckoutSummary = ({
     kidsActivityAdultTotal,
     kidsActivityChildTotal,
     kidsActivityToddlerTotal,
-    displayTotal,
-    currency,
-    isCustomQuote,
-    hasDiscount,
-    matchedGroupTier,
-    groupPricingType,
-    adultPrice,
-    teenBasePrice,
-    childBasePrice,
-    toddlerBasePrice,
-    adultOriginalSubtotal,
-    teenOriginalSubtotal,
-    childOriginalSubtotal,
-    toddlerOriginalSubtotal,
-    adultDiscountAmount,
-    teenDiscountAmount,
-    discountedTourTotal,
+    kidsActivityTotal,
     privateFee,
     customFee,
     extrasTotal,
-    kidsActivityTotal,
     finalTotal,
-  } = pricing;
+    currency: resolvedCurrency,
+
+    adultPrice,
+    teenPrice: teenBasePrice,
+    childPrice: childBasePrice,
+    toddlerPrice: toddlerBasePrice,
+
+    effectiveAdultPrice,
+    effectiveTeenPrice,
+    effectiveChildPrice,
+    effectiveToddlerPrice,
+
+    adultSubtotal,
+    teenSubtotal,
+    childSubtotal,
+    toddlerSubtotal,
+    originalSubtotal,
+
+    groupDiscountAmount,
+    discountedSubtotal: discountedTourTotal,
+
+    displayExtrasTotal,
+    displayKidsActivityTotal,
+    displayTotal,
+  } = engineResult;
+
+  const formatCurrency = (amount) => {
+    const n = Number(amount);
+    return `${resolvedCurrency} ${(Number.isFinite(n) ? n : 0).toFixed(2)}`;
+  };
+
+  const displayActivePrivateFee =
+    privateFee > 0 ? `+${formatCurrency(privateFee)}` : "—";
+  const displayActiveCustomFee =
+    customFee > 0 ? `+${formatCurrency(customFee)}` : "—";
+
+  // ============================================================
+  // NORMALIZATION
+  // ============================================================
+
+  const toNum = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  const _adultPrice = toNum(adultPrice) ?? 0;
+
+  const childRateIsExplicit = toNum(childBasePrice) != null;
+  const toddlerRateIsExplicit = toNum(toddlerBasePrice) != null;
+
+  const effectiveChildren = childRateIsExplicit ? children : 0;
+  const effectiveToddlers = toddlerRateIsExplicit ? toddlers : 0;
+
+  const _effectiveAdultPrice = toNum(effectiveAdultPrice) ?? _adultPrice;
+  const _effectiveTeenPrice =
+    toNum(effectiveTeenPrice) ??
+    toNum(teenBasePrice) ??
+    _effectiveAdultPrice;
+  const _effectiveChildPrice = toNum(effectiveChildPrice) ?? 0;
+  const _effectiveToddlerPrice = toNum(effectiveToddlerPrice) ?? 0;
+
+  const adultRowSubtotal   = toNum(adultSubtotal)   ?? adults   * _effectiveAdultPrice;
+  const teenRowSubtotal    = toNum(teenSubtotal)    ?? teens    * _effectiveTeenPrice;
+  const childRowSubtotal   = toNum(childSubtotal)   ?? effectiveChildren * _effectiveChildPrice;
+  const toddlerRowSubtotal = toNum(toddlerSubtotal) ?? effectiveToddlers * _effectiveToddlerPrice;
+
+  const engineTourSubtotal =
+    toNum(discountedTourTotal) ??
+    adultRowSubtotal + teenRowSubtotal + childRowSubtotal + toddlerRowSubtotal;
+
+  const baseTourSubtotal = toNum(originalSubtotal) ?? engineTourSubtotal;
+  const groupAdjustmentAmount = engineTourSubtotal - baseTourSubtotal;
+  const hasGroupAdjustment = Math.abs(groupAdjustmentAmount) > 0.005;
+  const groupAdjustmentIsSaving = groupAdjustmentAmount < 0;
+
+  const groupRateLabel =
+    groupPricingType === "perPerson"
+      ? `${formatCurrency(_effectiveAdultPrice)} per person`
+      : groupPricingType === "groupTotal"
+      ? "fixed group total"
+      : `${(toNum(groupDiscountPercent) ?? 0).toFixed(0)}% off`;
 
   // ============================================================
   // GSAP ANIMATION
@@ -522,7 +211,7 @@ const CheckoutSummary = ({
         }
       );
     }
-  }, [activeDetail, adults, teens, children, toddlers]);
+  }, [activeDetail, adults, teens, effectiveChildren, effectiveToddlers]);
 
   // ============================================================
   // SCROLL TO CENTER SELECTED ICON BUTTON ON MOBILE
@@ -534,12 +223,10 @@ const CheckoutSummary = ({
 
     if (!container || !button) return;
 
-    // Use requestAnimationFrame to ensure DOM is updated
     requestAnimationFrame(() => {
       const containerRect = container.getBoundingClientRect();
       const buttonRect = button.getBoundingClientRect();
 
-      // Calculate the scroll position to center the button
       const scrollLeft =
         container.scrollLeft +
         buttonRect.left -
@@ -555,90 +242,67 @@ const CheckoutSummary = ({
   };
 
   // ============================================================
-  // BUILD BREAKDOWN ITEMS — FIXED LABELS
+  // BREAKDOWN ROWS
   // ============================================================
 
   const breakdownItems = [
     {
       label: "Adults",
       count: adults,
-      perPerson: adultPrice,
-      originalSubtotal: adultOriginalSubtotal,
-      discountAmount: adultDiscountAmount,
-      discountedSubtotal: adultOriginalSubtotal - adultDiscountAmount,
+      perPerson: _effectiveAdultPrice,
+      subtotal: adultRowSubtotal,
+      basePerPerson:
+        Math.abs(_effectiveAdultPrice - _adultPrice) > 0.005
+          ? _adultPrice
+          : null,
     },
     {
       label: "Teens",
       count: teens,
-      perPerson: teenBasePrice,
-      originalSubtotal: teenOriginalSubtotal,
-      discountAmount: teenDiscountAmount,
-      discountedSubtotal: teenOriginalSubtotal - teenDiscountAmount,
+      perPerson: _effectiveTeenPrice,
+      subtotal: teenRowSubtotal,
+      basePerPerson:
+        Math.abs(_effectiveTeenPrice - (toNum(teenBasePrice) ?? _effectiveTeenPrice)) > 0.005
+          ? toNum(teenBasePrice)
+          : null,
     },
     {
       label: "Children",
-      count: children,
-      perPerson: childBasePrice,
-      originalSubtotal: childOriginalSubtotal,
-      discountAmount: 0,
-      discountedSubtotal: childOriginalSubtotal,
+      count: effectiveChildren,
+      perPerson: _effectiveChildPrice,
+      subtotal: childRowSubtotal,
+      basePerPerson: null,
     },
     {
       label: "Toddlers",
-      count: toddlers,
-      perPerson: toddlerBasePrice,
-      originalSubtotal: toddlerOriginalSubtotal,
-      discountAmount: 0,
-      discountedSubtotal: toddlerOriginalSubtotal,
+      count: effectiveToddlers,
+      perPerson: _effectiveToddlerPrice,
+      subtotal: toddlerRowSubtotal,
+      basePerPerson: null,
     },
   ].filter((item) => item.count > 0);
-
-  const formatCurrency = (amount) =>
-    `${currency} ${Number(amount || 0).toFixed(2)}`;
 
   // ============================================================
   // DETAILS DATA
   // ============================================================
 
   const detailItems = [
-    {
-      key: "tour",
-      icon: "🏝️",
-      label: "Tour",
-      complete: true,
-    },
-    {
-      key: "traveller",
-      icon: "👤",
-      label: "Traveller",
-      complete: contactDetailsComplete,
-    },
-    {
-      key: "date",
-      icon: "📅",
-      label: "Date",
-      complete: dateDetailsComplete,
-    },
-    {
-      key: "guests",
-      icon: "👥",
-      label: "Guests",
-      complete: true,
-    },
-    {
-      key: "pickup",
-      icon: "🚐",
-      label: "Pickup",
-      complete: pickupDetailsComplete,
-    },
+    { key: "tour",      icon: "🏝️", label: "Tour",      complete: true },
+    { key: "traveller", icon: "👤", label: "Traveller", complete: contactDetailsComplete },
+    { key: "date",      icon: "📅", label: "Date",      complete: dateDetailsComplete },
+    { key: "guests",    icon: "👥", label: "Guests",    complete: true },
+    { key: "pickup",    icon: "🚐", label: "Pickup",    complete: pickupDetailsComplete },
   ];
 
   // ---- Render rich content for each detail ----
+  // All flex containers use `justify-center lg:justify-start` so the
+  // selection details sit centered on tablet/mobile and left-align
+  // from `lg` up (where the panel is beside the icons, not below).
   const renderDetailContent = (key) => {
     switch (key) {
       case "tour":
         return (
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col items-center justify-center gap-3 text-center sm:flex-row lg:justify-start lg:text-left">
             {tour?.images?.[0] ? (
               <img
                 src={resolveImage(tour.images[0])}
@@ -659,21 +323,21 @@ const CheckoutSummary = ({
         );
       case "traveller":
         return (
-          <div>
+          <div className="text-center lg:text-left">
             <p className="text-sm font-bold text-neutral-900">
               {contactDetailsComplete ? formData?.fullName : "Details not completed"}
             </p>
             {contactDetailsComplete && (
               <>
                 <p className="text-xs text-neutral-600">{formData?.email}</p>
-                <p className="text-xs text-neutral-600">{formData?.phone}</p>
+                <p className="text-xs text-neutral-600">{formData?.mobile}</p>
               </>
             )}
           </div>
         );
       case "date":
         return (
-          <div>
+          <div className="text-center lg:text-left">
             <p className="text-sm font-bold text-neutral-900">
               {formData?.date || "Select date"}
             </p>
@@ -684,7 +348,10 @@ const CheckoutSummary = ({
         );
       case "guests":
         return (
-          <div ref={guestContainerRef} className="flex items-center gap-4 flex-wrap">
+          <div
+            ref={guestContainerRef}
+            className="flex flex-wrap items-center justify-center gap-4 lg:justify-start"
+          >
             {adults > 0 && (
               <div className="flex items-center gap-1">
                 <span
@@ -709,7 +376,7 @@ const CheckoutSummary = ({
                 <span className="text-sm font-bold">×{teens}</span>
               </div>
             )}
-            {children > 0 && (
+            {effectiveChildren > 0 && (
               <div className="flex items-center gap-1">
                 <span
                   ref={(el) => (guestEmojisRef.current[2] = el)}
@@ -718,10 +385,10 @@ const CheckoutSummary = ({
                 >
                   👧
                 </span>
-                <span className="text-sm font-bold">×{children}</span>
+                <span className="text-sm font-bold">×{effectiveChildren}</span>
               </div>
             )}
-            {toddlers > 0 && (
+            {effectiveToddlers > 0 && (
               <div className="flex items-center gap-1">
                 <span
                   ref={(el) => (guestEmojisRef.current[3] = el)}
@@ -730,17 +397,20 @@ const CheckoutSummary = ({
                 >
                   👶
                 </span>
-                <span className="text-sm font-bold">×{toddlers}</span>
+                <span className="text-sm font-bold">×{effectiveToddlers}</span>
               </div>
             )}
-            {adults === 0 && teens === 0 && children === 0 && toddlers === 0 && (
-              <span className="text-sm text-neutral-500">No guests</span>
-            )}
+            {adults === 0 &&
+              teens === 0 &&
+              effectiveChildren === 0 &&
+              effectiveToddlers === 0 && (
+                <span className="text-sm text-neutral-500">No guests</span>
+              )}
           </div>
         );
       case "pickup":
         return (
-          <div>
+          <div className="text-center lg:text-left">
             <p className="text-sm font-bold text-neutral-900">
               {formData?.pickupLocation || "Choose pickup location"}
             </p>
@@ -751,7 +421,8 @@ const CheckoutSummary = ({
     }
   };
 
-  const activeDetailData = detailItems.find((d) => d.key === activeDetail) || detailItems[0];
+  const activeDetailData =
+    detailItems.find((d) => d.key === activeDetail) || detailItems[0];
 
   // ============================================================
   // RENDER
@@ -763,29 +434,28 @@ const CheckoutSummary = ({
       className="border-t border-black/5 bg-white/92"
     >
       <div className="grid gap-3 grid-cols-1">
-        {/* ======================================================
-            SUMMARY CARD
-        ====================================================== */}
-
         <div className="rounded-2xl border border-black/10 bg-white p-4 text-neutral-950 shadow-[0_12px_30px_rgba(0,0,0,0.05)]">
-          {/* HEADER */}
-          <div className="flex items-center gap-2 mb-4">
+          {/* HEADER — centered on mobile/tablet, left on lg */}
+          <div className="flex items-center justify-center gap-2 mb-4 lg:justify-start">
             {CheckoutCartIcon && (
               <CheckoutCartIcon className="h-7 w-7 text-blue-600" />
             )}
-            <p className="text-2xl font-frank font-   text-neutral-800">
+            <p className="text-2xl font-frank font-bold text-neutral-800">
               Checkout summary
             </p>
           </div>
 
-          {/* ====================================================
-              BOOKING DETAILS — ICON BUTTONS + VALUE PANEL
-          ==================================================== */}
+          {/* BOOKING DETAILS */}
           <div className="flex flex-col lg:flex-row gap-4 mb-6">
-            {/* Icon buttons container — with scroll-to-center on selection */}
+            {/* Icon buttons row — centered on mobile/tablet, left on lg.
+                Outer div is the scrollable container (ref target);
+                inner w-max mx-auto wrapper centers the buttons when
+                they fit, and scrolls from the left when they don't
+                (avoids the "justify-center + overflow hidden-left"
+                trap on small screens). */}
             <div
               ref={iconButtonsContainerRef}
-              className="flex flex-nowrap gap-2 overflow-x-auto pb-2 lg:flex-wrap lg:overflow-visible lg:pb-0 lg:gap-3 scroll-smooth"
+              className="overflow-x-auto pb-2 lg:overflow-visible lg:pb-0 scroll-smooth icon-scroll-container"
               style={{
                 scrollbarWidth: "none",
                 msOverflowStyle: "none",
@@ -796,55 +466,60 @@ const CheckoutSummary = ({
                   display: none;
                 }
               `}</style>
-              {detailItems.map((item) => {
-                const isActive = activeDetail === item.key;
-                const isComplete = item.complete;
-                return (
-                  <button
-                    key={item.key}
-                    ref={(el) => {
-                      if (el) {
-                        iconButtonRefs.current[item.key] = el;
-                      }
-                    }}
-                    onClick={() => {
-                      setActiveDetail(item.key);
-                      scrollToCenterButton(item.key);
-                    }}
-                    className={`
-                      flex flex-col items-center justify-center
-                      px-3 py-2 rounded-xl
-                      min-w-[70px] flex-shrink-0
-                      transition-all duration-200
-                      ${isActive
-                        ? "bg-blue-600 text-white shadow-md scale-105"
-                        : isComplete
-                        ? "bg-neutral-50 text-neutral-600 hover:bg-neutral-100 hover:scale-105"
-                        : "bg-neutral-100 text-neutral-400 opacity-60 hover:bg-neutral-200"
-                      }
-                    `}
-                  >
-                    <span className="text-xl">{item.icon}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-wide mt-0.5">
-                      {item.label}
-                    </span>
-                    {!isComplete && (
-                      <span className="text-[10px] mt-0.5 text-amber-500">⚠️</span>
-                    )}
-                  </button>
-                );
-              })}
+              <div className="flex w-max mx-auto flex-nowrap gap-2 lg:w-full lg:flex-wrap lg:gap-3">
+                {detailItems.map((item) => {
+                  const isActive = activeDetail === item.key;
+                  const isComplete = item.complete;
+                  return (
+                    <button
+                      key={item.key}
+                      ref={(el) => {
+                        if (el) {
+                          iconButtonRefs.current[item.key] = el;
+                        }
+                      }}
+                      onClick={() => {
+                        setActiveDetail(item.key);
+                        scrollToCenterButton(item.key);
+                      }}
+                      className={`
+                        flex flex-col items-center justify-center
+                        px-3 py-2 rounded-xl
+                        min-w-[70px] flex-shrink-0
+                        transition-all duration-200
+                        ${
+                          isActive
+                            ? "bg-blue-600 text-white shadow-md scale-105"
+                            : isComplete
+                            ? "bg-neutral-50 text-neutral-600 hover:bg-neutral-100 hover:scale-105"
+                            : "bg-neutral-100 text-neutral-400 opacity-60 hover:bg-neutral-200"
+                        }
+                      `}
+                    >
+                      <span className="text-xl">{item.icon}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wide mt-0.5">
+                        {item.label}
+                      </span>
+                      {!isComplete && (
+                        <span className="text-[10px] mt-0.5 text-amber-500">⚠️</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Value panel */}
+            {/* Value panel — centered content on mobile/tablet,
+                left-aligned on lg. */}
             <div className="flex-1 relative z-40">
               <div
                 className={`
-                  rounded-xl p-4 z-30
+                  rounded-xl p-4 z-30 text-center lg:text-left
                   transition-all duration-300 ease-out
-                  ${activeDetailData.complete
-                    ? "bg-neutral-50 border-l-4 border-blue-500"
-                    : "bg-neutral-100 border-l-4 border-amber-400"
+                  ${
+                    activeDetailData.complete
+                      ? "bg-neutral-50 border-l-4 border-blue-500"
+                      : "bg-neutral-100 border-l-4 border-amber-400"
                   }
                 `}
               >
@@ -855,12 +530,11 @@ const CheckoutSummary = ({
                   {renderDetailContent(activeDetailData.key)}
                 </div>
                 {!activeDetailData.complete && (
-                  <p className="text-xs text-amber-600 font-medium mt-2 flex items-center gap-1">
+                  <p className="mt-2 flex items-center justify-center gap-1 text-xs font-medium text-amber-600 lg:justify-start">
                     ⚠️ Incomplete – please fill in this field
                   </p>
                 )}
               </div>
-              {/* 3D shadow */}
               <div
                 className="z-[-1] absolute -bottom-2 left-1/2 -translate-x-1/2 w-3/4 h-4 rounded-full bg-black/20 blur-lg pointer-events-none"
                 style={{ filter: "blur(6px)" }}
@@ -871,272 +545,416 @@ const CheckoutSummary = ({
           {/* ====================================================
               PRICE BREAKDOWN + TOTAL
           ==================================================== */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-            {/* LEFT — PRICE BREAKDOWN */}
-            <div className="lg:col-span-2 space-y-4 rounded-2xl border border-black/5 bg-stone-50 p-4">
-              <h4 className="text-xs font-bold uppercase tracking-[0.16em] text-neutral-400">
-                Price breakdown
-              </h4>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-6 mt-6">
 
-              {/* PER‑CATEGORY LIST */}
-              <div className="space-y-2">
+            {/* ───────── LEFT — PRICE BREAKDOWN ───────── */}
+            <div className="lg:col-span-2 rounded-3xl border border-black/5 bg-gradient-to-b from-stone-50 to-stone-100/70 p-4 sm:p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+
+              {/* <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-100 text-lg">
+                    💰
+                  </span>
+                  <h4 className="text-base sm:text-lg font-black uppercase tracking-[0.16em] text-neutral-800">
+                    Price breakdown
+                  </h4>
+                </div>
+
+                {hasGroupAdjustment && groupAdjustmentIsSaving && (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-3.5 py-1.5 text-xs sm:text-sm font-black uppercase tracking-wider text-white shadow-[0_4px_14px_rgba(34,197,94,0.35)]">
+                    <span>🎉</span>
+                    <span>Save {formatCurrency(Math.abs(groupAdjustmentAmount))}</span>
+                  </span>
+                )}
+              </div> */}
+
+              <div className="space-y-2.5">
                 {breakdownItems.map((item) => {
-                  const hasItemDiscount = item.discountAmount > 0;
-                  const displayOriginal = formatCurrency(item.originalSubtotal);
-                  const displayDiscounted = formatCurrency(item.discountedSubtotal);
+                  const hasItemDiscount = item.basePerPerson != null;
+                  const baseTotal = hasItemDiscount
+                    ? item.basePerPerson * item.count
+                    : null;
 
                   return (
                     <div
                       key={item.label}
-                      className="flex flex-wrap items-baseline justify-between gap-1 rounded-lg bg-white px-3 py-2 text-sm"
+                      className={`relative overflow-hidden rounded-2xl border px-4 py-3.5 transition-all duration-200 sm:px-5 sm:py-4 ${
+                        hasItemDiscount
+                          ? "border-green-200 bg-gradient-to-r from-green-50 via-emerald-50/70 to-white shadow-[0_4px_16px_rgba(34,197,94,0.08)]"
+                          : "border-black/5 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]"
+                      }`}
                     >
-                      <span className="font-medium text-neutral-700">
-                        {item.label}{" "}
-                        <span className="text-neutral-400">
-                          ({item.count} × {formatCurrency(item.perPerson)})
-                        </span>
-                      </span>
-                      <span className="font-semibold text-neutral-900">
-                        {hasItemDiscount ? (
-                          <>
-                            <span className="text-red-500 line-through mr-2">
-                              {displayOriginal}
+                      {hasItemDiscount && (
+                        <span className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-green-400 to-emerald-500" />
+                      )}
+
+                      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                        <div className="min-w-0 flex-1">
+                          <p
+                            className={`text-base font-black leading-tight sm:text-lg ${
+                              hasItemDiscount
+                                ? "text-green-900"
+                                : "text-neutral-900"
+                            }`}
+                          >
+                            {item.label}
+                          </p>
+
+                          <p className="mt-1 text-xs font-semibold text-neutral-500 sm:text-sm">
+                            <span className="tabular-nums">
+                              {item.count} ×{" "}
                             </span>
-                            <span className="text-green-700">{displayDiscounted}</span>
-                          </>
-                        ) : (
-                          displayOriginal
-                        )}
-                      </span>
+                            {hasItemDiscount ? (
+                              <>
+                                <span className="line-through text-neutral-400">
+                                  {formatCurrency(item.basePerPerson)}
+                                </span>{" "}
+                                <span className="font-black text-green-700">
+                                  {formatCurrency(item.perPerson)}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="font-bold text-neutral-700">
+                                {formatCurrency(item.perPerson)}
+                              </span>
+                            )}
+                          </p>
+                        </div>
+
+                        <div className="shrink-0 text-right">
+                          {hasItemDiscount && baseTotal != null ? (
+                            <>
+                              <p className="text-xs font-semibold text-neutral-400 line-through tabular-nums sm:text-sm">
+                                {formatCurrency(baseTotal)}
+                              </p>
+                              <p className="text-xl font-black leading-tight text-green-700 tabular-nums sm:text-2xl">
+                                {formatCurrency(item.subtotal)}
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-xl font-black leading-tight text-neutral-900 tabular-nums sm:text-2xl">
+                              {formatCurrency(item.subtotal)}
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
               </div>
 
-              {/* SUBTOTAL */}
-              <div className="flex flex-wrap items-baseline justify-between rounded-lg bg-white px-3 py-2 text-sm">
-                <span className="font-medium text-neutral-700">Tour subtotal</span>
-                <span className="font-semibold text-neutral-900">
-                  {hasDiscount ? (
-                    <>
-                      <span className="text-red-500 line-through mr-2">
-                        {displayBaseSubtotal}
-                      </span>
-                      <span className="text-green-700">
-                        {displayDiscountedTourSubtotal}
-                      </span>
-                    </>
-                  ) : (
-                    displayBaseSubtotal
-                  )}
-                </span>
+              <div
+                className={`mt-4 rounded-2xl border px-4 py-4 sm:px-5 sm:py-5 ${
+                  hasGroupAdjustment
+                    ? "border-green-300 bg-gradient-to-r from-green-100 via-emerald-50 to-white shadow-[0_6px_22px_rgba(34,197,94,0.12)]"
+                    : "border-black/5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.03)]"
+                }`}
+              >
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                  <div>
+                    <p
+                      className={`text-base font-black uppercase tracking-wider sm:text-lg ${
+                        hasGroupAdjustment
+                          ? "text-green-900"
+                          : "text-neutral-900"
+                      }`}
+                    >
+                      Tour subtotal
+                    </p>
+                    {hasGroupAdjustment && (
+                      <p className="mt-0.5 text-xs font-bold text-green-700 sm:text-sm">
+                        After group rate
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="text-right">
+                    {hasGroupAdjustment ? (
+                      <>
+                        <p className="text-sm font-semibold text-neutral-400 line-through tabular-nums">
+                          {formatCurrency(baseTourSubtotal)}
+                        </p>
+                        <p className="text-2xl font-black leading-tight text-green-700 tabular-nums sm:text-3xl">
+                          {formatCurrency(engineTourSubtotal)}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-2xl font-black leading-tight text-neutral-900 tabular-nums sm:text-3xl">
+                        {formatCurrency(engineTourSubtotal)}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              {/* GROUP DISCOUNT LINE */}
-              {hasDiscount && (
-                <div className="flex flex-wrap items-baseline justify-between rounded-lg bg-green-50 px-3 py-2 text-sm">
-                  <span className="font-medium text-green-800">
-                    Group discount ({groupPricingType === "perPerson" ? "per‑person rate" : `${groupDiscountPercent.toFixed(0)}% off`})
+              {hasGroupAdjustment && groupAdjustmentIsSaving && (
+                <div className="mt-3 flex items-center gap-3 rounded-2xl border border-green-300 bg-gradient-to-r from-green-100 to-emerald-50 px-4 py-3.5">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 text-lg text-white shadow-[0_4px_12px_rgba(34,197,94,0.35)]">
+                    🎉
                   </span>
-                  <span className="font-semibold text-green-700">
-                    -{displayGroupDiscountAmount}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-black text-green-900 sm:text-base">
+                      Group rate applied
+                    </p>
+                    <p className="mt-0.5 text-xs font-semibold text-green-800 sm:text-sm">
+                      {groupRateLabel}
+                      {qualifyingHeadcount != null &&
+                        ` · ${qualifyingHeadcount} qualifying guests`}
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-white/80 px-3 py-1.5 text-sm font-black text-green-700 tabular-nums sm:text-base">
+                    −{formatCurrency(Math.abs(groupAdjustmentAmount))}
                   </span>
                 </div>
               )}
 
-              {/* PRIVATE / CUSTOM FEES */}
+              {hasGroupAdjustment && !groupAdjustmentIsSaving && (
+                <div className="mt-3 flex items-start gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3.5">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-200 text-lg text-amber-900">
+                    ℹ️
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-black text-amber-900 sm:text-base">
+                      Group rate applied
+                    </p>
+                    <p className="mt-0.5 text-xs font-semibold text-amber-800 sm:text-sm">
+                      {groupRateLabel}
+                      {qualifyingHeadcount != null &&
+                        ` · ${qualifyingHeadcount} qualifying guests`}
+                      . Rates shown above already reflect this adjustment.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {privateFee > 0 && (
-                <div className="flex flex-wrap items-baseline justify-between rounded-lg bg-white px-3 py-2 text-sm">
-                  <span className="font-medium text-neutral-700">Private tour fee</span>
-                  <span className="font-semibold text-neutral-900">
+                <div className="mt-3 flex items-center justify-between rounded-2xl border border-black/5 bg-white px-4 py-3 sm:px-5">
+                  <span className="text-sm font-bold text-neutral-700 sm:text-base">
+                    Private tour fee
+                  </span>
+                  <span className="text-base font-black text-neutral-900 tabular-nums sm:text-lg">
                     {displayActivePrivateFee.replace("+", "")}
                   </span>
                 </div>
               )}
               {customFee > 0 && (
-                <div className="flex flex-wrap items-baseline justify-between rounded-lg bg-white px-3 py-2 text-sm">
-                  <span className="font-medium text-neutral-700">Custom trip fee</span>
-                  <span className="font-semibold text-neutral-900">
+                <div className="mt-3 flex items-center justify-between rounded-2xl border border-black/5 bg-white px-4 py-3 sm:px-5">
+                  <span className="text-sm font-bold text-neutral-700 sm:text-base">
+                    Custom trip fee
+                  </span>
+                  <span className="text-base font-black text-neutral-900 tabular-nums sm:text-lg">
                     {displayActiveCustomFee.replace("+", "")}
                   </span>
                 </div>
               )}
 
-              {/* EXTRAS */}
               {extrasBreakdown.length > 0 && (
-                <div className="rounded-lg border border-black/5 bg-white p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">
+                <div className="mt-3 rounded-2xl border border-black/5 bg-white p-4 sm:p-5">
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-neutral-500">
                     Optional Extras
                   </p>
-                  <div className="mt-2 space-y-1">
+                  <div className="mt-3 space-y-2">
                     {extrasBreakdown.map((item, idx) => (
-                      <div key={idx} className="flex justify-between text-sm">
-                        <span className="text-neutral-700">{item.label}</span>
-                        <span className="font-medium text-neutral-900">
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between gap-3 text-sm sm:text-base"
+                      >
+                        <span className="font-semibold text-neutral-700">
+                          {item.label}
+                        </span>
+                        <span className="font-bold text-neutral-900 tabular-nums">
                           {item.formattedCost}
                         </span>
                       </div>
                     ))}
-                    <div className="mt-2 flex justify-between border-t border-black/5 pt-2 text-sm font-bold">
-                      <span>Extras total</span>
-                      <span>{displayExtrasTotal}</span>
+                    <div className="mt-3 flex items-center justify-between border-t border-black/5 pt-3 text-sm sm:text-base">
+                      <span className="font-black uppercase tracking-wider text-neutral-900">
+                        Extras total
+                      </span>
+                      <span className="font-black text-neutral-900 tabular-nums">
+                        {displayExtrasTotal}
+                      </span>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* KIDS ACTIVITY */}
               {selectedKidsActivity && (
-                <div className="rounded-xl border border-blue-100 bg-blue-50 p-3">
+                <div className="mt-3 rounded-2xl border border-blue-100 bg-blue-50 p-4 sm:p-5">
                   <div className="flex items-center justify-between gap-4">
                     <div className="min-w-0">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-blue-500">
+                      <p className="text-xs font-black uppercase tracking-[0.14em] text-blue-500">
                         Kids activity
                       </p>
-                      <p className="mt-1 truncate text-sm font-bold text-blue-950">
+                      <p className="mt-1 truncate text-base font-black text-blue-950 sm:text-lg">
                         {selectedKidsActivity.name}
                       </p>
-                      <p className="mt-0.5 text-xs text-blue-700">
+                      <p className="mt-0.5 text-xs font-semibold text-blue-700 sm:text-sm">
                         {selectedKidsActivity.category}
                         {selectedKidsActivity.location
                           ? ` · ${selectedKidsActivity.location}`
                           : ""}
                       </p>
                     </div>
-                    <span className="shrink-0 text-sm font-black text-blue-700">
+                    <span className="shrink-0 text-base font-black text-blue-700 tabular-nums sm:text-lg">
                       + {displayKidsActivityTotal}
                     </span>
                   </div>
-                  <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                    <div className="rounded-lg bg-white/70 p-2">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-blue-500">
+                  <div className="mt-4 grid gap-2.5 sm:grid-cols-3">
+                    <div className="rounded-xl bg-white/80 p-3">
+                      <p className="text-[10px] font-black uppercase tracking-[0.14em] text-blue-500">
                         Adults
                       </p>
-                      <p className="mt-1 text-xs text-blue-700">
-                        {adults} × {currency} {kidsActivityAdultPrice.toFixed(2)}
+                      <p className="mt-1 text-xs font-semibold text-blue-700">
+                        {adults} × {formatCurrency(kidsActivityAdultPrice)}
                       </p>
-                      <p className="mt-1 text-sm font-bold text-blue-950">
-                        {currency} {kidsActivityAdultTotal.toFixed(2)}
+                      <p className="mt-1 text-base font-black text-blue-950 tabular-nums">
+                        {formatCurrency(kidsActivityAdultTotal)}
                       </p>
                     </div>
-                    <div className="rounded-lg bg-white/70 p-2">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-blue-500">
+                    <div className="rounded-xl bg-white/80 p-3">
+                      <p className="text-[10px] font-black uppercase tracking-[0.14em] text-blue-500">
                         Children
                       </p>
-                      <p className="mt-1 text-xs text-blue-700">
-                        {children} × {currency} {kidsActivityChildPrice.toFixed(2)}
+                      <p className="mt-1 text-xs font-semibold text-blue-700">
+                        {effectiveChildren} × {formatCurrency(kidsActivityChildPrice)}
                       </p>
-                      <p className="mt-1 text-sm font-bold text-blue-950">
-                        {currency} {kidsActivityChildTotal.toFixed(2)}
+                      <p className="mt-1 text-base font-black text-blue-950 tabular-nums">
+                        {formatCurrency(kidsActivityChildTotal)}
                       </p>
                     </div>
-                    <div className="rounded-lg bg-white/70 p-2">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-blue-500">
+                    <div className="rounded-xl bg-white/80 p-3">
+                      <p className="text-[10px] font-black uppercase tracking-[0.14em] text-blue-500">
                         Toddlers
                       </p>
-                      <p className="mt-1 text-xs text-blue-700">
-                        {toddlers} × {currency} {kidsActivityToddlerPrice.toFixed(2)}
+                      <p className="mt-1 text-xs font-semibold text-blue-700">
+                        {effectiveToddlers} × {formatCurrency(kidsActivityToddlerPrice)}
                       </p>
-                      <p className="mt-1 text-sm font-bold text-blue-950">
-                        {currency} {kidsActivityToddlerTotal.toFixed(2)}
+                      <p className="mt-1 text-base font-black text-blue-950 tabular-nums">
+                        {formatCurrency(kidsActivityToddlerTotal)}
                       </p>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* CUSTOM QUOTE NOTICE */}
               {isCustomQuote && (
-                <div className="rounded-xl border border-blue-100 bg-blue-50 p-3">
-                  <p className="text-sm font-bold text-blue-900">
+                <div className="mt-3 rounded-2xl border border-blue-200 bg-blue-50 p-4">
+                  <p className="text-base font-black text-blue-900">
                     Custom quote required
                   </p>
-                  <p className="mt-1 text-xs leading-5 text-blue-700">
+                  <p className="mt-1 text-sm leading-6 font-medium text-blue-700">
                     {matchedGroupTier?.note ||
                       "This group size requires a custom quote. The final price will be confirmed with you before payment."}
                   </p>
                 </div>
               )}
 
-              {/* OPTION REQUIRED */}
               {hasOptions && !selectedTourOption && (
-                <div className="rounded-xl border border-blue-100 bg-blue-50 p-3">
-                  <p className="text-sm font-bold text-blue-900">
+                <div className="mt-3 rounded-2xl border border-blue-200 bg-blue-50 p-4">
+                  <p className="text-base font-black text-blue-900">
                     Select an option
                   </p>
-                  <p className="mt-1 text-xs leading-5 text-blue-700">
-                    Choose your preferred experience above before continuing to checkout.
+                  <p className="mt-1 text-sm leading-6 font-medium text-blue-700">
+                    Choose your preferred experience above before continuing to
+                    checkout.
                   </p>
                 </div>
               )}
             </div>
 
-            {/* RIGHT — TOTAL + CHECKOUT BUTTON */}
+            {/* ───────── RIGHT — TOTAL + CHECKOUT ───────── */}
             <div className="lg:col-span-1">
-              <div className="sticky top-4 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 p-6 text-white shadow-lg">
-                <p className="text-sm font-medium uppercase tracking-wider opacity-80">
-                  Total Due
-                </p>
-                <p className="mt-1 font-frank text-4xl font-bold leading-none">
-                  {displayTotal}
-                </p>
+              <div className="sticky top-4 overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-blue-650 to-indigo-700 p-5 text-white shadow-[0_20px_50px_rgba(37,99,235,0.35)] sm:p-6">
+                <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/10 blur-3xl" />
 
-                <div className="mt-4 space-y-1 border-t border-white/20 pt-4 text-sm">
-                  <div className="flex justify-between">
-                    <span className="opacity-80">Subtotal</span>
-                    <span>{displayBaseSubtotal}</span>
+                <div className="relative">
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-white/70 sm:text-sm">
+                    Total Due
+                  </p>
+                  <p className="mt-1.5 font-frank text-4xl font-black leading-none tabular-nums sm:text-5xl">
+                    {displayTotal}
+                  </p>
+
+                  {hasGroupAdjustment && groupAdjustmentIsSaving && (
+                    <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-green-100 backdrop-blur-sm">
+                      🎉 You save {formatCurrency(Math.abs(groupAdjustmentAmount))}
+                    </p>
+                  )}
+
+                  <div className="mt-5 space-y-2 border-t border-white/20 pt-4 text-sm sm:text-base">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="font-medium text-white/80">Tour subtotal</span>
+                      <span className="font-black tabular-nums">
+                        {formatCurrency(engineTourSubtotal)}
+                      </span>
+                    </div>
+
+                    {privateFee > 0 && (
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="font-medium text-white/80">Private fee</span>
+                        <span className="font-black tabular-nums">
+                          {displayActivePrivateFee.replace("+", "")}
+                        </span>
+                      </div>
+                    )}
+
+                    {customFee > 0 && (
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="font-medium text-white/80">Custom fee</span>
+                        <span className="font-black tabular-nums">
+                          {displayActiveCustomFee.replace("+", "")}
+                        </span>
+                      </div>
+                    )}
+
+                    {extrasTotal > 0 && (
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="font-medium text-white/80">Extras</span>
+                        <span className="font-black tabular-nums">
+                          {displayExtrasTotal}
+                        </span>
+                      </div>
+                    )}
+
+                    {selectedKidsActivity && (
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="font-medium text-white/80">Activity</span>
+                        <span className="font-black tabular-nums">
+                          {displayKidsActivityTotal}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  {hasDiscount && (
-                    <div className="flex justify-between text-green-300">
-                      <span>Discount</span>
-                      <span>-{displayGroupDiscountAmount}</span>
-                    </div>
-                  )}
-                  {privateFee > 0 && (
-                    <div className="flex justify-between">
-                      <span className="opacity-80">Private fee</span>
-                      <span>{displayActivePrivateFee.replace("+", "")}</span>
-                    </div>
-                  )}
-                  {customFee > 0 && (
-                    <div className="flex justify-between">
-                      <span className="opacity-80">Custom fee</span>
-                      <span>{displayActiveCustomFee.replace("+", "")}</span>
-                    </div>
-                  )}
-                  {extrasTotal > 0 && (
-                    <div className="flex justify-between">
-                      <span className="opacity-80">Extras</span>
-                      <span>{displayExtrasTotal}</span>
-                    </div>
-                  )}
-                  {selectedKidsActivity && (
-                    <div className="flex justify-between">
-                      <span className="opacity-80">Activity</span>
-                      <span>{displayKidsActivityTotal}</span>
-                    </div>
-                  )}
-                </div>
 
-                <button
-                  type="submit"
-                  form="booking-form"
-                  disabled={hasOptions && !selectedTourOption}
-                  className="mt-6 w-full rounded-xl bg-white py-4 text-center text-sm font-bold uppercase tracking-wider text-blue-700 shadow-lg transition hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
-                >
-                  {isCustomQuote
-                    ? "Request custom quote"
-                    : hasOptions && !selectedTourOption
-                    ? "Select option"
-                    : "Continue to checkout"}
-                </button>
+                  {submitError && (
+                    <p className="mt-4 rounded-xl border border-red-300 bg-red-50 p-3 text-xs font-bold text-red-700 sm:text-sm">
+                      {submitError}
+                    </p>
+                  )}
 
-                <div className="mt-4 flex justify-center gap-3 text-[10px] font-bold uppercase tracking-[0.14em] text-white/60">
-                  <span>Terms</span>
-                  <span>Privacy</span>
-                  <span className="rounded-full bg-white/20 px-2 py-0.5 text-white">
-                    Paystack
-                  </span>
+                  <button
+                    type="submit"
+                    form="booking-form"
+                    disabled={(hasOptions && !selectedTourOption) || submitting}
+                    className="mt-6 w-full rounded-2xl bg-white py-4 text-center text-sm font-black uppercase tracking-wider text-blue-700 shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_14px_30px_rgba(0,0,0,0.22)] disabled:opacity-50 disabled:hover:scale-100"
+                  >
+                    {submitting
+                      ? "Verifying price..."
+                      : isCustomQuote
+                      ? "Request custom quote"
+                      : hasOptions && !selectedTourOption
+                      ? "Select option"
+                      : "Continue to checkout"}
+                  </button>
+
+                  <div className="mt-4 flex justify-center gap-3 text-[10px] font-black uppercase tracking-[0.16em] text-white/60">
+                    <span>Terms</span>
+                    <span>Privacy</span>
+                    <span className="rounded-full bg-white/20 px-2.5 py-1 text-white">
+                      Paystack
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
