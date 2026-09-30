@@ -14,6 +14,7 @@ ScrollTrigger.config({
 import Navbar from './components/Navbar.jsx'
 import LoadingBar from '../src/components/LoadingBar.jsx'
 import AnimatedRoutes from './components/AnimatedRoutes.jsx'
+import Analytics from './components/Analytics.jsx'  
 
 const App = () => {
   useEffect(() => {
@@ -119,6 +120,7 @@ const App = () => {
           {JSON.stringify(buildOrganizationSchema())}
         </script>
       </Helmet>
+       <Analytics />
       <div className="relative min-w-full bg-white"> 
         <LoadingBar>
            <Navbar /> 
