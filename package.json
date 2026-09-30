@@ -7,15 +7,19 @@
     "dev": "vite-react-ssg dev",
     "build": "vite-react-ssg build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "graph:scan": "node scripts/scan-project.mjs"
   },
   "dependencies": {
+    "@babel/parser": "^7.29.9",
     "@react-three/drei": "^10.7.8",
     "@react-three/fiber": "^9.7.0",
     "@stripe/react-stripe-js": "^5.6.0",
     "@stripe/stripe-js": "^8.7.0",
     "@studio-freight/lenis": "^1.0.42",
+    "@xyflow/react": "^12.12.0",
     "axios": "^1.13.5",
+    "elkjs": "^0.12.0",
     "framer-motion": "^12.34.0",
     "gsap": "^3.14.2",
     "leaflet": "^1.9.4",

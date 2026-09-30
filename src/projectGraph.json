@@ -1,0 +1,1890 @@
+{
+  "nodes": [
+    {
+      "id": "api/_lib/verifyPriceToken.js",
+      "type": "default",
+      "data": {
+        "label": "verifyPriceToken.js",
+        "path": "api/_lib/verifyPriceToken.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "api/check-booking-status.js",
+      "type": "default",
+      "data": {
+        "label": "check-booking-status.js",
+        "path": "api/check-booking-status.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "api/paystack-initialize.js",
+      "type": "default",
+      "data": {
+        "label": "paystack-initialize.js",
+        "path": "api/paystack-initialize.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "api/paystack-verify.js",
+      "type": "default",
+      "data": {
+        "label": "paystack-verify.js",
+        "path": "api/paystack-verify.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "api/reviews/notify.js",
+      "type": "default",
+      "data": {
+        "label": "notify.js",
+        "path": "api/reviews/notify.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "api/send-booking-email.js",
+      "type": "default",
+      "data": {
+        "label": "send-booking-email.js",
+        "path": "api/send-booking-email.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "api/verify-price.js",
+      "type": "default",
+      "data": {
+        "label": "verify-price.js",
+        "path": "api/verify-price.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "config/stripe.js",
+      "type": "default",
+      "data": {
+        "label": "stripe.js",
+        "path": "config/stripe.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "eslint.config.js",
+      "type": "default",
+      "data": {
+        "label": "eslint.config.js",
+        "path": "eslint.config.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/App.jsx",
+      "type": "default",
+      "data": {
+        "label": "App.jsx",
+        "path": "src/App.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/About/About.jsx",
+      "type": "default",
+      "data": {
+        "label": "About.jsx",
+        "path": "src/components/About/About.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/About/CurrentPopularTour.jsx",
+      "type": "default",
+      "data": {
+        "label": "CurrentPopularTour.jsx",
+        "path": "src/components/About/CurrentPopularTour.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/About/JourneyToursBlock.jsx",
+      "type": "default",
+      "data": {
+        "label": "JourneyToursBlock.jsx",
+        "path": "src/components/About/JourneyToursBlock.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/About/PopularTours.jsx",
+      "type": "default",
+      "data": {
+        "label": "PopularTours.jsx",
+        "path": "src/components/About/PopularTours.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/About/ReviewsShowcase.jsx",
+      "type": "default",
+      "data": {
+        "label": "ReviewsShowcase.jsx",
+        "path": "src/components/About/ReviewsShowcase.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/About/StripeSponsored.jsx",
+      "type": "default",
+      "data": {
+        "label": "StripeSponsored.jsx",
+        "path": "src/components/About/StripeSponsored.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/About/SuggestedTours.jsx",
+      "type": "default",
+      "data": {
+        "label": "SuggestedTours.jsx",
+        "path": "src/components/About/SuggestedTours.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/About/WhatMakesUsDifferent.jsx",
+      "type": "default",
+      "data": {
+        "label": "WhatMakesUsDifferent.jsx",
+        "path": "src/components/About/WhatMakesUsDifferent.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/About/linkStrip.jsx",
+      "type": "default",
+      "data": {
+        "label": "linkStrip.jsx",
+        "path": "src/components/About/linkStrip.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/AnimatedRoutes.jsx",
+      "type": "default",
+      "data": {
+        "label": "AnimatedRoutes.jsx",
+        "path": "src/components/AnimatedRoutes.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/CheckoutSummary.jsx",
+      "type": "default",
+      "data": {
+        "label": "CheckoutSummary.jsx",
+        "path": "src/components/CheckoutSummary.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/ClientOnly.jsx",
+      "type": "default",
+      "data": {
+        "label": "ClientOnly.jsx",
+        "path": "src/components/ClientOnly.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Contact.jsx",
+      "type": "default",
+      "data": {
+        "label": "Contact.jsx",
+        "path": "src/components/Contact.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/ContactPlatforms.jsx",
+      "type": "default",
+      "data": {
+        "label": "ContactPlatforms.jsx",
+        "path": "src/components/ContactPlatforms.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/FloatingTooltip.jsx",
+      "type": "default",
+      "data": {
+        "label": "FloatingTooltip.jsx",
+        "path": "src/components/FloatingTooltip.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Hero.jsx",
+      "type": "default",
+      "data": {
+        "label": "Hero.jsx",
+        "path": "src/components/Hero.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/KidsActivitiesNavbar.jsx",
+      "type": "default",
+      "data": {
+        "label": "KidsActivitiesNavbar.jsx",
+        "path": "src/components/KidsActivitiesNavbar.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/LoadingBar.jsx",
+      "type": "default",
+      "data": {
+        "label": "LoadingBar.jsx",
+        "path": "src/components/LoadingBar.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/LoadingLink.jsx",
+      "type": "default",
+      "data": {
+        "label": "LoadingLink.jsx",
+        "path": "src/components/LoadingLink.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Map.jsx",
+      "type": "default",
+      "data": {
+        "label": "Map.jsx",
+        "path": "src/components/Map.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Modal.jsx",
+      "type": "default",
+      "data": {
+        "label": "Modal.jsx",
+        "path": "src/components/Modal.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Navbar.jsx",
+      "type": "default",
+      "data": {
+        "label": "Navbar.jsx",
+        "path": "src/components/Navbar.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/ProjectGraph.jsx",
+      "type": "default",
+      "data": {
+        "label": "ProjectGraph.jsx",
+        "path": "src/components/ProjectGraph.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/ScrollToTop.jsx",
+      "type": "default",
+      "data": {
+        "label": "ScrollToTop.jsx",
+        "path": "src/components/ScrollToTop.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Seo.jsx",
+      "type": "default",
+      "data": {
+        "label": "Seo.jsx",
+        "path": "src/components/Seo.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Stories/GoalsGallery.jsx",
+      "type": "default",
+      "data": {
+        "label": "GoalsGallery.jsx",
+        "path": "src/components/Stories/GoalsGallery.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Stories/Stories.jsx",
+      "type": "default",
+      "data": {
+        "label": "Stories.jsx",
+        "path": "src/components/Stories/Stories.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Stories/TestimonialsSection.jsx",
+      "type": "default",
+      "data": {
+        "label": "TestimonialsSection.jsx",
+        "path": "src/components/Stories/TestimonialsSection.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/AdditionalPricing.jsx",
+      "type": "default",
+      "data": {
+        "label": "AdditionalPricing.jsx",
+        "path": "src/components/TourDetails/AdditionalPricing.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/Arrangements.jsx",
+      "type": "default",
+      "data": {
+        "label": "Arrangements.jsx",
+        "path": "src/components/TourDetails/Arrangements.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/KidsActivities.jsx",
+      "type": "default",
+      "data": {
+        "label": "KidsActivities.jsx",
+        "path": "src/components/TourDetails/KidsActivities.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/RouteInformation.jsx",
+      "type": "default",
+      "data": {
+        "label": "RouteInformation.jsx",
+        "path": "src/components/TourDetails/RouteInformation.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/SecurityAndLiability.jsx",
+      "type": "default",
+      "data": {
+        "label": "SecurityAndLiability.jsx",
+        "path": "src/components/TourDetails/SecurityAndLiability.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourAdditionalPricing.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourAdditionalPricing.jsx",
+        "path": "src/components/TourDetails/TourAdditionalPricing.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourCancellationPolicy.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourCancellationPolicy.jsx",
+        "path": "src/components/TourDetails/TourCancellationPolicy.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourFAQ.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourFAQ.jsx",
+        "path": "src/components/TourDetails/TourFAQ.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourGallery.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourGallery.jsx",
+        "path": "src/components/TourDetails/TourGallery.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourGroupPricing.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourGroupPricing.jsx",
+        "path": "src/components/TourDetails/TourGroupPricing.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourHero.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourHero.jsx",
+        "path": "src/components/TourDetails/TourHero.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourHighlights.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourHighlights.jsx",
+        "path": "src/components/TourDetails/TourHighlights.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourIncludedExcluded.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourIncludedExcluded.jsx",
+        "path": "src/components/TourDetails/TourIncludedExcluded.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourItinerary.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourItinerary.jsx",
+        "path": "src/components/TourDetails/TourItinerary.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourOptions.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourOptions.jsx",
+        "path": "src/components/TourDetails/TourOptions.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourPricing.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourPricing.jsx",
+        "path": "src/components/TourDetails/TourPricing.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourQuickInfo.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourQuickInfo.jsx",
+        "path": "src/components/TourDetails/TourQuickInfo.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourRates.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourRates.jsx",
+        "path": "src/components/TourDetails/TourRates.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourRequirements.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourRequirements.jsx",
+        "path": "src/components/TourDetails/TourRequirements.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourSafetyPolicy.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourSafetyPolicy.jsx",
+        "path": "src/components/TourDetails/TourSafetyPolicy.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourVideoStrip.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourVideoStrip.jsx",
+        "path": "src/components/TourDetails/TourVideoStrip.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/TourWeatherPolicy.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourWeatherPolicy.jsx",
+        "path": "src/components/TourDetails/TourWeatherPolicy.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/TourDetails/VehicleDetails.jsx",
+      "type": "default",
+      "data": {
+        "label": "VehicleDetails.jsx",
+        "path": "src/components/TourDetails/VehicleDetails.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Tours/FixedCategoryNav.jsx",
+      "type": "default",
+      "data": {
+        "label": "FixedCategoryNav.jsx",
+        "path": "src/components/Tours/FixedCategoryNav.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Tours/Helpers.jsx",
+      "type": "default",
+      "data": {
+        "label": "Helpers.jsx",
+        "path": "src/components/Tours/Helpers.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Tours/TourCard.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourCard.jsx",
+        "path": "src/components/Tours/TourCard.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Tours/TourSelect.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourSelect.jsx",
+        "path": "src/components/Tours/TourSelect.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Tours/Tours.jsx",
+      "type": "default",
+      "data": {
+        "label": "Tours.jsx",
+        "path": "src/components/Tours/Tours.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Tours/ToursBanner.jsx",
+      "type": "default",
+      "data": {
+        "label": "ToursBanner.jsx",
+        "path": "src/components/Tours/ToursBanner.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Tours/ToursBrowser.jsx",
+      "type": "default",
+      "data": {
+        "label": "ToursBrowser.jsx",
+        "path": "src/components/Tours/ToursBrowser.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Tours/soclose.jsx",
+      "type": "default",
+      "data": {
+        "label": "soclose.jsx",
+        "path": "src/components/Tours/soclose.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/Tours/useScrollLock.jsx",
+      "type": "default",
+      "data": {
+        "label": "useScrollLock.jsx",
+        "path": "src/components/Tours/useScrollLock.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/components/useLoadingNavigate.jsx",
+      "type": "default",
+      "data": {
+        "label": "useLoadingNavigate.jsx",
+        "path": "src/components/useLoadingNavigate.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/data/emptyToursTemplate.js",
+      "type": "default",
+      "data": {
+        "label": "emptyToursTemplate.js",
+        "path": "src/data/emptyToursTemplate.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/data/kidsActivities.js",
+      "type": "default",
+      "data": {
+        "label": "kidsActivities.js",
+        "path": "src/data/kidsActivities.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/data/reviews.js",
+      "type": "default",
+      "data": {
+        "label": "reviews.js",
+        "path": "src/data/reviews.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/data/tours-v2.js",
+      "type": "default",
+      "data": {
+        "label": "tours-v2.js",
+        "path": "src/data/tours-v2.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/data/tours.js",
+      "type": "default",
+      "data": {
+        "label": "tours.js",
+        "path": "src/data/tours.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/data/vehicles.js",
+      "type": "default",
+      "data": {
+        "label": "vehicles.js",
+        "path": "src/data/vehicles.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/main.jsx",
+      "type": "default",
+      "data": {
+        "label": "main.jsx",
+        "path": "src/main.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/pages/Booking.jsx",
+      "type": "default",
+      "data": {
+        "label": "Booking.jsx",
+        "path": "src/pages/Booking.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/pages/CheckoutCancel.jsx",
+      "type": "default",
+      "data": {
+        "label": "CheckoutCancel.jsx",
+        "path": "src/pages/CheckoutCancel.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/pages/CheckoutPaystack.jsx",
+      "type": "default",
+      "data": {
+        "label": "CheckoutPaystack.jsx",
+        "path": "src/pages/CheckoutPaystack.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/pages/CheckoutSuccessPaystack.jsx",
+      "type": "default",
+      "data": {
+        "label": "CheckoutSuccessPaystack.jsx",
+        "path": "src/pages/CheckoutSuccessPaystack.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/pages/Home.jsx",
+      "type": "default",
+      "data": {
+        "label": "Home.jsx",
+        "path": "src/pages/Home.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/pages/PageNotFound.jsx",
+      "type": "default",
+      "data": {
+        "label": "PageNotFound.jsx",
+        "path": "src/pages/PageNotFound.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/pages/Policies.jsx",
+      "type": "default",
+      "data": {
+        "label": "Policies.jsx",
+        "path": "src/pages/Policies.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/pages/TourDetails.jsx",
+      "type": "default",
+      "data": {
+        "label": "TourDetails.jsx",
+        "path": "src/pages/TourDetails.jsx"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/utils/ImageLoader.js",
+      "type": "default",
+      "data": {
+        "label": "ImageLoader.js",
+        "path": "src/utils/ImageLoader.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/utils/TourImages.js",
+      "type": "default",
+      "data": {
+        "label": "TourImages.js",
+        "path": "src/utils/TourImages.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/utils/VideoLoader.js",
+      "type": "default",
+      "data": {
+        "label": "VideoLoader.js",
+        "path": "src/utils/VideoLoader.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/utils/bookingPricing.js",
+      "type": "default",
+      "data": {
+        "label": "bookingPricing.js",
+        "path": "src/utils/bookingPricing.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/utils/pricingEngine.js",
+      "type": "default",
+      "data": {
+        "label": "pricingEngine.js",
+        "path": "src/utils/pricingEngine.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "src/utils/tourSchema.js",
+      "type": "default",
+      "data": {
+        "label": "tourSchema.js",
+        "path": "src/utils/tourSchema.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "vite.config.js",
+      "type": "default",
+      "data": {
+        "label": "vite.config.js",
+        "path": "vite.config.js"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "api/paystack-initialize.js->api/_lib/verifyPriceToken.js",
+      "source": "api/paystack-initialize.js",
+      "target": "api/_lib/verifyPriceToken.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "api/verify-price.js->src/utils/pricingEngine.js",
+      "source": "api/verify-price.js",
+      "target": "src/utils/pricingEngine.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "api/verify-price.js->src/data/tours.js",
+      "source": "api/verify-price.js",
+      "target": "src/data/tours.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "api/verify-price.js->src/data/kidsActivities.js",
+      "source": "api/verify-price.js",
+      "target": "src/data/kidsActivities.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "api/verify-price.js->api/_lib/verifyPriceToken.js",
+      "source": "api/verify-price.js",
+      "target": "api/_lib/verifyPriceToken.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/App.jsx->src/utils/tourSchema.js",
+      "source": "src/App.jsx",
+      "target": "src/utils/tourSchema.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/App.jsx->src/components/ProjectGraph.jsx",
+      "source": "src/App.jsx",
+      "target": "src/components/ProjectGraph.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/App.jsx->src/components/Navbar.jsx",
+      "source": "src/App.jsx",
+      "target": "src/components/Navbar.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/App.jsx->src/components/LoadingBar.jsx",
+      "source": "src/App.jsx",
+      "target": "src/components/LoadingBar.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/App.jsx->src/components/AnimatedRoutes.jsx",
+      "source": "src/App.jsx",
+      "target": "src/components/AnimatedRoutes.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/About.jsx->src/components/About/PopularTours.jsx",
+      "source": "src/components/About/About.jsx",
+      "target": "src/components/About/PopularTours.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/About.jsx->src/components/About/StripeSponsored.jsx",
+      "source": "src/components/About/About.jsx",
+      "target": "src/components/About/StripeSponsored.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/About.jsx->src/components/About/CurrentPopularTour.jsx",
+      "source": "src/components/About/About.jsx",
+      "target": "src/components/About/CurrentPopularTour.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/About.jsx->src/components/About/ReviewsShowcase.jsx",
+      "source": "src/components/About/About.jsx",
+      "target": "src/components/About/ReviewsShowcase.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/About.jsx->src/components/About/WhatMakesUsDifferent.jsx",
+      "source": "src/components/About/About.jsx",
+      "target": "src/components/About/WhatMakesUsDifferent.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/About.jsx->src/components/About/JourneyToursBlock.jsx",
+      "source": "src/components/About/About.jsx",
+      "target": "src/components/About/JourneyToursBlock.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/About.jsx->src/data/reviews.js",
+      "source": "src/components/About/About.jsx",
+      "target": "src/data/reviews.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/JourneyToursBlock.jsx->src/components/Tours/TourSelect.jsx",
+      "source": "src/components/About/JourneyToursBlock.jsx",
+      "target": "src/components/Tours/TourSelect.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/JourneyToursBlock.jsx->src/components/About/SuggestedTours.jsx",
+      "source": "src/components/About/JourneyToursBlock.jsx",
+      "target": "src/components/About/SuggestedTours.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/PopularTours.jsx->src/data/tours.js",
+      "source": "src/components/About/PopularTours.jsx",
+      "target": "src/data/tours.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/PopularTours.jsx->src/utils/ImageLoader.js",
+      "source": "src/components/About/PopularTours.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/ReviewsShowcase.jsx->src/data/tours.js",
+      "source": "src/components/About/ReviewsShowcase.jsx",
+      "target": "src/data/tours.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/ReviewsShowcase.jsx->src/data/reviews.js",
+      "source": "src/components/About/ReviewsShowcase.jsx",
+      "target": "src/data/reviews.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/ReviewsShowcase.jsx->src/utils/ImageLoader.js",
+      "source": "src/components/About/ReviewsShowcase.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/SuggestedTours.jsx->src/data/tours.js",
+      "source": "src/components/About/SuggestedTours.jsx",
+      "target": "src/data/tours.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/SuggestedTours.jsx->src/utils/ImageLoader.js",
+      "source": "src/components/About/SuggestedTours.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/SuggestedTours.jsx->src/components/Tours/Helpers.jsx",
+      "source": "src/components/About/SuggestedTours.jsx",
+      "target": "src/components/Tours/Helpers.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/WhatMakesUsDifferent.jsx->src/utils/ImageLoader.js",
+      "source": "src/components/About/WhatMakesUsDifferent.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/About/WhatMakesUsDifferent.jsx->src/data/vehicles.js",
+      "source": "src/components/About/WhatMakesUsDifferent.jsx",
+      "target": "src/data/vehicles.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/CheckoutSummary.jsx->src/data/kidsActivities.js",
+      "source": "src/components/CheckoutSummary.jsx",
+      "target": "src/data/kidsActivities.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/CheckoutSummary.jsx->src/utils/ImageLoader.js",
+      "source": "src/components/CheckoutSummary.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/CheckoutSummary.jsx->src/utils/pricingEngine.js",
+      "source": "src/components/CheckoutSummary.jsx",
+      "target": "src/utils/pricingEngine.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Hero.jsx->src/components/Tours/TourSelect.jsx",
+      "source": "src/components/Hero.jsx",
+      "target": "src/components/Tours/TourSelect.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/KidsActivitiesNavbar.jsx->src/data/kidsActivities.js",
+      "source": "src/components/KidsActivitiesNavbar.jsx",
+      "target": "src/data/kidsActivities.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/LoadingLink.jsx->src/components/useLoadingNavigate.jsx",
+      "source": "src/components/LoadingLink.jsx",
+      "target": "src/components/useLoadingNavigate.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Navbar.jsx->src/components/KidsActivitiesNavbar.jsx",
+      "source": "src/components/Navbar.jsx",
+      "target": "src/components/KidsActivitiesNavbar.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Navbar.jsx->src/components/useLoadingNavigate.jsx",
+      "source": "src/components/Navbar.jsx",
+      "target": "src/components/useLoadingNavigate.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Navbar.jsx->src/utils/ImageLoader.js",
+      "source": "src/components/Navbar.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Stories/GoalsGallery.jsx->src/data/vehicles.js",
+      "source": "src/components/Stories/GoalsGallery.jsx",
+      "target": "src/data/vehicles.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Stories/GoalsGallery.jsx->src/utils/ImageLoader.js",
+      "source": "src/components/Stories/GoalsGallery.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Stories/Stories.jsx->src/components/Stories/TestimonialsSection.jsx",
+      "source": "src/components/Stories/Stories.jsx",
+      "target": "src/components/Stories/TestimonialsSection.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Stories/Stories.jsx->src/components/Stories/GoalsGallery.jsx",
+      "source": "src/components/Stories/Stories.jsx",
+      "target": "src/components/Stories/GoalsGallery.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Stories/Stories.jsx->src/data/reviews.js",
+      "source": "src/components/Stories/Stories.jsx",
+      "target": "src/data/reviews.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Stories/Stories.jsx->src/components/ContactPlatforms.jsx",
+      "source": "src/components/Stories/Stories.jsx",
+      "target": "src/components/ContactPlatforms.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Stories/Stories.jsx->src/utils/ImageLoader.js",
+      "source": "src/components/Stories/Stories.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Stories/TestimonialsSection.jsx->src/data/reviews.js",
+      "source": "src/components/Stories/TestimonialsSection.jsx",
+      "target": "src/data/reviews.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Stories/TestimonialsSection.jsx->src/utils/ImageLoader.js",
+      "source": "src/components/Stories/TestimonialsSection.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/TourDetails/KidsActivities.jsx->src/data/kidsActivities.js",
+      "source": "src/components/TourDetails/KidsActivities.jsx",
+      "target": "src/data/kidsActivities.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/TourDetails/TourGallery.jsx->src/utils/ImageLoader.js",
+      "source": "src/components/TourDetails/TourGallery.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/TourDetails/TourHero.jsx->src/components/TourDetails/TourVideoStrip.jsx",
+      "source": "src/components/TourDetails/TourHero.jsx",
+      "target": "src/components/TourDetails/TourVideoStrip.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/TourDetails/TourItinerary.jsx->src/utils/ImageLoader.js",
+      "source": "src/components/TourDetails/TourItinerary.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/TourDetails/TourQuickInfo.jsx->src/data/reviews.js",
+      "source": "src/components/TourDetails/TourQuickInfo.jsx",
+      "target": "src/data/reviews.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/FixedCategoryNav.jsx->src/utils/ImageLoader.js",
+      "source": "src/components/Tours/FixedCategoryNav.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/TourCard.jsx->src/components/useLoadingNavigate.jsx",
+      "source": "src/components/Tours/TourCard.jsx",
+      "target": "src/components/useLoadingNavigate.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/TourCard.jsx->src/components/Tours/Helpers.jsx",
+      "source": "src/components/Tours/TourCard.jsx",
+      "target": "src/components/Tours/Helpers.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/TourSelect.jsx->src/utils/ImageLoader.js",
+      "source": "src/components/Tours/TourSelect.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/TourSelect.jsx->src/data/tours.js",
+      "source": "src/components/Tours/TourSelect.jsx",
+      "target": "src/data/tours.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/TourSelect.jsx->src/components/useLoadingNavigate.jsx",
+      "source": "src/components/Tours/TourSelect.jsx",
+      "target": "src/components/useLoadingNavigate.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/TourSelect.jsx->src/components/Tours/Helpers.jsx",
+      "source": "src/components/Tours/TourSelect.jsx",
+      "target": "src/components/Tours/Helpers.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/Tours.jsx->src/components/Tours/ToursBanner.jsx",
+      "source": "src/components/Tours/Tours.jsx",
+      "target": "src/components/Tours/ToursBanner.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/Tours.jsx->src/components/Tours/ToursBrowser.jsx",
+      "source": "src/components/Tours/Tours.jsx",
+      "target": "src/components/Tours/ToursBrowser.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/ToursBanner.jsx->src/components/Tours/TourSelect.jsx",
+      "source": "src/components/Tours/ToursBanner.jsx",
+      "target": "src/components/Tours/TourSelect.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/ToursBrowser.jsx->src/data/tours.js",
+      "source": "src/components/Tours/ToursBrowser.jsx",
+      "target": "src/data/tours.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/ToursBrowser.jsx->src/components/Tours/TourCard.jsx",
+      "source": "src/components/Tours/ToursBrowser.jsx",
+      "target": "src/components/Tours/TourCard.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/ToursBrowser.jsx->src/components/Tours/FixedCategoryNav.jsx",
+      "source": "src/components/Tours/ToursBrowser.jsx",
+      "target": "src/components/Tours/FixedCategoryNav.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/soclose.jsx->src/data/tours.js",
+      "source": "src/components/Tours/soclose.jsx",
+      "target": "src/data/tours.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/soclose.jsx->src/components/Tours/TourCard.jsx",
+      "source": "src/components/Tours/soclose.jsx",
+      "target": "src/components/Tours/TourCard.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/Tours/soclose.jsx->src/components/Tours/FixedCategoryNav.jsx",
+      "source": "src/components/Tours/soclose.jsx",
+      "target": "src/components/Tours/FixedCategoryNav.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/components/useLoadingNavigate.jsx->src/components/LoadingBar.jsx",
+      "source": "src/components/useLoadingNavigate.jsx",
+      "target": "src/components/LoadingBar.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/main.jsx->src/App.jsx",
+      "source": "src/main.jsx",
+      "target": "src/App.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/main.jsx->src/pages/Home.jsx",
+      "source": "src/main.jsx",
+      "target": "src/pages/Home.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/main.jsx->src/pages/TourDetails.jsx",
+      "source": "src/main.jsx",
+      "target": "src/pages/TourDetails.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/main.jsx->src/pages/Policies.jsx",
+      "source": "src/main.jsx",
+      "target": "src/pages/Policies.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/main.jsx->src/pages/PageNotFound.jsx",
+      "source": "src/main.jsx",
+      "target": "src/pages/PageNotFound.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/main.jsx->src/pages/CheckoutPaystack.jsx",
+      "source": "src/main.jsx",
+      "target": "src/pages/CheckoutPaystack.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/main.jsx->src/pages/CheckoutSuccessPaystack.jsx",
+      "source": "src/main.jsx",
+      "target": "src/pages/CheckoutSuccessPaystack.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Booking.jsx->src/components/ClientOnly.jsx",
+      "source": "src/pages/Booking.jsx",
+      "target": "src/components/ClientOnly.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Booking.jsx->src/components/CheckoutSummary.jsx",
+      "source": "src/pages/Booking.jsx",
+      "target": "src/components/CheckoutSummary.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Booking.jsx->src/components/TourDetails/TourOptions.jsx",
+      "source": "src/pages/Booking.jsx",
+      "target": "src/components/TourDetails/TourOptions.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Booking.jsx->src/components/TourDetails/AdditionalPricing.jsx",
+      "source": "src/pages/Booking.jsx",
+      "target": "src/components/TourDetails/AdditionalPricing.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Booking.jsx->src/components/TourDetails/KidsActivities.jsx",
+      "source": "src/pages/Booking.jsx",
+      "target": "src/components/TourDetails/KidsActivities.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Booking.jsx->src/data/kidsActivities.js",
+      "source": "src/pages/Booking.jsx",
+      "target": "src/data/kidsActivities.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Booking.jsx->src/data/tours.js",
+      "source": "src/pages/Booking.jsx",
+      "target": "src/data/tours.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Booking.jsx->src/utils/ImageLoader.js",
+      "source": "src/pages/Booking.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Booking.jsx->src/utils/pricingEngine.js",
+      "source": "src/pages/Booking.jsx",
+      "target": "src/utils/pricingEngine.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/CheckoutPaystack.jsx->src/data/tours.js",
+      "source": "src/pages/CheckoutPaystack.jsx",
+      "target": "src/data/tours.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/CheckoutPaystack.jsx->src/data/vehicles.js",
+      "source": "src/pages/CheckoutPaystack.jsx",
+      "target": "src/data/vehicles.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/CheckoutPaystack.jsx->src/data/kidsActivities.js",
+      "source": "src/pages/CheckoutPaystack.jsx",
+      "target": "src/data/kidsActivities.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/CheckoutPaystack.jsx->src/utils/ImageLoader.js",
+      "source": "src/pages/CheckoutPaystack.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/CheckoutPaystack.jsx->src/components/Tours/Helpers.jsx",
+      "source": "src/pages/CheckoutPaystack.jsx",
+      "target": "src/components/Tours/Helpers.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/CheckoutPaystack.jsx->src/components/Seo.jsx",
+      "source": "src/pages/CheckoutPaystack.jsx",
+      "target": "src/components/Seo.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/CheckoutSuccessPaystack.jsx->src/components/Seo.jsx",
+      "source": "src/pages/CheckoutSuccessPaystack.jsx",
+      "target": "src/components/Seo.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Home.jsx->src/components/Seo.jsx",
+      "source": "src/pages/Home.jsx",
+      "target": "src/components/Seo.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Home.jsx->src/components/Hero.jsx",
+      "source": "src/pages/Home.jsx",
+      "target": "src/components/Hero.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Home.jsx->src/components/About/About.jsx",
+      "source": "src/pages/Home.jsx",
+      "target": "src/components/About/About.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Home.jsx->src/components/Stories/Stories.jsx",
+      "source": "src/pages/Home.jsx",
+      "target": "src/components/Stories/Stories.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Home.jsx->src/components/Tours/Tours.jsx",
+      "source": "src/pages/Home.jsx",
+      "target": "src/components/Tours/Tours.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Home.jsx->src/components/Contact.jsx",
+      "source": "src/pages/Home.jsx",
+      "target": "src/components/Contact.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Home.jsx->src/components/Tours/TourSelect.jsx",
+      "source": "src/pages/Home.jsx",
+      "target": "src/components/Tours/TourSelect.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/Policies.jsx->src/components/Seo.jsx",
+      "source": "src/pages/Policies.jsx",
+      "target": "src/components/Seo.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/data/tours.js",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/data/tours.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/pages/Booking.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/pages/Booking.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/utils/ImageLoader.js",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/utils/ImageLoader.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/Tours/Helpers.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/Tours/Helpers.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/Seo.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/Seo.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/utils/tourSchema.js",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/utils/tourSchema.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/data/reviews.js",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/data/reviews.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/TourHero.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/TourHero.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/TourQuickInfo.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/TourQuickInfo.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/TourPricing.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/TourPricing.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/TourAdditionalPricing.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/TourAdditionalPricing.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/TourGroupPricing.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/TourGroupPricing.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/TourGallery.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/TourGallery.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/TourIncludedExcluded.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/TourIncludedExcluded.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/TourHighlights.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/TourHighlights.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/TourRequirements.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/TourRequirements.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/Arrangements.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/Arrangements.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/TourWeatherPolicy.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/TourWeatherPolicy.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/TourCancellationPolicy.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/TourCancellationPolicy.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/TourSafetyPolicy.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/TourSafetyPolicy.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/VehicleDetails.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/VehicleDetails.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/RouteInformation.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/RouteInformation.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/SecurityAndLiability.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/SecurityAndLiability.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/TourItinerary.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/TourItinerary.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/pages/TourDetails.jsx->src/components/TourDetails/TourFAQ.jsx",
+      "source": "src/pages/TourDetails.jsx",
+      "target": "src/components/TourDetails/TourFAQ.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/utils/bookingPricing.js->src/components/Tours/Helpers.jsx",
+      "source": "src/utils/bookingPricing.js",
+      "target": "src/components/Tours/Helpers.jsx",
+      "type": "smoothstep"
+    },
+    {
+      "id": "src/utils/pricingEngine.js->src/data/tours.js",
+      "source": "src/utils/pricingEngine.js",
+      "target": "src/data/tours.js",
+      "type": "smoothstep"
+    },
+    {
+      "id": "vite.config.js->src/data/tours.js",
+      "source": "vite.config.js",
+      "target": "src/data/tours.js",
+      "type": "smoothstep"
+    }
+  ]
+}

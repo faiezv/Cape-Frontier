@@ -4673,7 +4673,7 @@ export const tours = [
     location: "Cape Peninsula, Cape Town",
     duration: "Full Day",
 
-    priceBase: 3200,
+    priceBase: 2500,
     minPeople: 1,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
@@ -4681,7 +4681,7 @@ export const tours = [
     pricing: [
       {
         category: "Adults",
-        pricePerPerson: 3200,
+        pricePerPerson: 2500,
       },
       // {
       //   category: "Children (5–17 years)",

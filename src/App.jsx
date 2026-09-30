@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Helmet } from 'react-helmet-async'
 import Lenis from 'lenis'
 import { buildOrganizationSchema } from './utils/tourSchema.js'
+import ProjectGraph from "./components/ProjectGraph.jsx";
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({
@@ -119,12 +120,13 @@ const App = () => {
           {JSON.stringify(buildOrganizationSchema())}
         </script>
       </Helmet>
-      <div className="relative min-w-full bg-white">
-        <LoadingBar>
-          <Navbar />
-          <AnimatedRoutes />
-        </LoadingBar>
-      </div>
+      {/* <div className="relative min-w-full bg-white"> */}
+      {/*   <LoadingBar> */}
+      {/*     <Navbar /> */}
+      {/*     <AnimatedRoutes /> */}
+      {/*   </LoadingBar> */}
+      {/* </div> */}
+      <ProjectGraph />
     </>
   )
 }
