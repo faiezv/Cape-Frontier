@@ -110,6 +110,20 @@ const Hero = () => {
     const ctx = gsap.context(() => {
       const first = bgRefs.current[0]
 
+      // Slide 1 is the only <img> in the server HTML. React does not repair a
+      // mismatched `src` during hydration, so if the server build emitted a
+      // different asset URL than the client bundle, the browser keeps the
+      // broken one. Re-assert the client URL and retry if it failed to decode.
+      if (first) {
+        const want = toSrc(slides[0].image)
+        if (
+          first.getAttribute('src') !== want ||
+          (first.complete && first.naturalWidth === 0)
+        ) {
+          first.setAttribute('src', want)
+        }
+      }
+
       if (!reduceMotion && first) {
         gsap.fromTo(
           first,
@@ -235,6 +249,9 @@ const Hero = () => {
           fetchPriority={index === 0 ? 'high' : 'auto'}
           decoding={index === 0 ? 'sync' : 'async'}
           draggable={false}
+          onError={(e) =>
+            console.error('[Hero] image failed to load:', e.currentTarget.src)
+          }
           className={`absolute inset-0 h-full w-full object-cover will-change-transform ${
             index === 0 ? 'opacity-100' : 'opacity-0'
           }`}
