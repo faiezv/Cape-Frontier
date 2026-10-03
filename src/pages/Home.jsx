@@ -204,110 +204,129 @@ const Home = () => {
   }, []);
 
   // ---------- HERO & ABOUT ANIMATIONS (DELAYED PIN) ----------
-  // We'll keep the ScrollTrigger pin but delay its creation until layout
-  // (fonts + images + ResizeObserver) is confirmed stable by App.jsx.
-  // Hero stays invisible until then so no wrong-height frame is ever shown.
-  const [pinCreated, setPinCreated] = useState(false);
   const [heroReady, setHeroReady] = useState(false);
 
   useEffect(() => {
-    // Only run once after everything is stable
+    let created = false;
+    let cancelled = false;
+    let ctx = null;
+
     const createPin = () => {
-      if (!heroRef.current || !aboutRef.current || pinCreated) return;
+      if (created || cancelled) return;
+      created = true;
 
-      const touchDevice = isTouchDevice();
+      try {
+        const heroEl = heroRef.current;
+        const aboutEl = aboutRef.current;
+        if (!heroEl || !aboutEl) return; // finally still reveals the page
 
-      const resetHero = () => {
-        gsap.set(heroRef.current, {
-          clearProps: "filter",
-          scale: 1,
-          opacity: 1,
-          x: 0,
-          y: 0,
-          transformOrigin: "center top",
-          force3D: true,
-          backfaceVisibility: "hidden",
-          willChange: "transform, opacity",
-        });
-      };
+        const touchDevice = isTouchDevice();
 
-      const getHeroScrollDistance = () => {
-        const heroHeight = heroRef.current?.offsetHeight || 0;
-        const visualHeight = window.visualViewport?.height || 0;
-        const windowHeight = window.innerHeight || 0;
-        return Math.max(heroHeight, visualHeight, windowHeight, 1);
-      };
+        // gsap.context records everything created inside it so revert()
+        // can kill the ScrollTrigger, remove the pin-spacer and restore
+        // inline styles on unmount.
+        ctx = gsap.context(() => {
+          const resetHero = () => {
+            gsap.set(heroEl, {
+              clearProps: "filter",
+              scale: 1,
+              opacity: 1,
+              x: 0,
+              y: 0,
+              transformOrigin: "center top",
+              force3D: true,
+              backfaceVisibility: "hidden",
+              willChange: "transform, opacity",
+            });
+          };
 
-      resetHero();
+          const getHeroScrollDistance = () => {
+            const heroHeight = heroEl.offsetHeight || 0;
+            const visualHeight = window.visualViewport?.height || 0;
+            const windowHeight = window.innerHeight || 0;
+            return Math.max(heroHeight, visualHeight, windowHeight, 1);
+          };
 
-      gsap.set([heroRef.current, aboutRef.current], {
-        force3D: true,
-        backfaceVisibility: "hidden",
-        willChange: "transform, opacity",
-      });
+          resetHero();
 
-      gsap.set(aboutRef.current, { y: 40 });
+          gsap.set([heroEl, aboutEl], {
+            force3D: true,
+            backfaceVisibility: "hidden",
+            willChange: "transform, opacity",
+          });
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          id: "home-hero-pin-scale",
-          trigger: heroRef.current,
-          start: "top top",
-          end: () =>
-            `+=${Math.round(
-              getHeroScrollDistance() * (touchDevice ? 1.15 : 1),
-            )}`,
-          scrub: touchDevice ? 0.55 : 0.3,
-          pin: heroRef.current,
-          pinSpacing: false,
-          anticipatePin: touchDevice ? 0 : 1,
-          invalidateOnRefresh: true,
-          refreshPriority: 5,
-          onRefreshInit: () => {
-            if (window.scrollY <= 2) resetHero();
-          },
-          onRefresh: (self) => {
-            if (window.scrollY <= 2) {
-              self.animation?.progress(0);
-              resetHero();
-            }
-          },
-        },
-      });
+          gsap.set(aboutEl, { y: 40 });
 
-      tl.to(aboutRef.current, { y: 0, force3D: true, ease: "none" }, 0).to(
-        heroRef.current,
-        {
-          scale: touchDevice ? 0.72 : 0.6,
-          opacity: touchDevice ? 0.82 : 0.1,
-          force3D: true,
-          ease: "none",
-        },
-        0,
-      );
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              id: "home-hero-pin-scale",
+              trigger: heroEl,
+              start: "top top",
+              end: () =>
+                `+=${Math.round(
+                  getHeroScrollDistance() * (touchDevice ? 1.15 : 1),
+                )}`,
+              scrub: touchDevice ? 0.55 : 0.3,
+              pin: heroEl,
+              pinSpacing: false,
+              anticipatePin: touchDevice ? 0 : 1,
+              invalidateOnRefresh: true,
+              refreshPriority: 5,
+              onRefreshInit: () => {
+                if (window.scrollY <= 2) resetHero();
+              },
+              onRefresh: (self) => {
+                if (window.scrollY <= 2) {
+                  self.animation?.progress(0);
+                  resetHero();
+                }
+              },
+            },
+          });
 
-      setPinCreated(true);
-      setHeroReady(true);
-      // Force a final refresh after pin creation
-      ScrollTrigger.refresh(true);
+          tl.to(aboutEl, { y: 0, force3D: true, ease: "none" }, 0).to(
+            heroEl,
+            {
+              scale: touchDevice ? 0.72 : 0.6,
+              opacity: touchDevice ? 0.82 : 0.1,
+              force3D: true,
+              ease: "none",
+            },
+            0,
+          );
+        }, pageRef);
+
+        ScrollTrigger.refresh(true);
+      } catch (err) {
+        console.error("[Home] hero pin setup failed:", err);
+      } finally {
+        // Never leave the page hidden, whatever happened above.
+        if (!cancelled) setHeroReady(true);
+      }
     };
 
-    // Wait for App.jsx's single source of truth for "layout is stable"
-    // (fonts loaded, images loaded, ResizeObserver settled) instead of a
-    // fixed timeout after `load`, which fires before web fonts swap in and
-    // was the actual cause of the hero jumping/settling after a beat.
     const onLayoutStable = () => createPin();
-    window.addEventListener("app:layout-stable", onLayoutStable, { once: true });
 
-    // Safety net: if the event never fires for some reason (e.g. no
-    // ResizeObserver support), don't leave the hero hidden forever.
+    // The event may already have fired before Home mounted (dev mode,
+    // lazy routes). App.jsx records that in window.__layoutStable.
+    if (window.__layoutStable) {
+      createPin();
+    } else {
+      window.addEventListener("app:layout-stable", onLayoutStable, {
+        once: true,
+      });
+    }
+
+    // Safety net
     const fallback = setTimeout(createPin, 3000);
 
     return () => {
+      cancelled = true;
       window.removeEventListener("app:layout-stable", onLayoutStable);
       clearTimeout(fallback);
+      ctx?.revert(); // kills the pin and restores the DOM React expects
     };
-  }, [pinCreated]);
+  }, []);
 
   // ---------- RENDER ----------
   return (
@@ -330,8 +349,9 @@ const Home = () => {
         <section
           id="home"
           ref={heroRef}
-          className={`relative z-10 overflow-hidden transition-opacity duration-200 ${heroReady ? "opacity-100" : "opacity-0"
-            }`}
+          className={`relative z-10 overflow-hidden transition-opacity duration-200 ${
+            heroReady ? "opacity-100" : "opacity-0"
+          }`}
         >
           <Hero />
         </section>
@@ -339,8 +359,9 @@ const Home = () => {
         <section
           id="about"
           ref={aboutRef}
-          className={`relative z-20 -mt-6 rounded-t-[2rem] bg-white text-black sm:-mt-8 lg:-mt-10 transition-opacity duration-200 ${heroReady ? "opacity-100" : "opacity-0"
-            }`}
+          className={`relative z-20 -mt-6 rounded-t-[2rem] bg-white text-black sm:-mt-8 lg:-mt-10 transition-opacity duration-200 ${
+            heroReady ? "opacity-100" : "opacity-0"
+          }`}
         >
           <About />
         </section>
@@ -359,10 +380,11 @@ const Home = () => {
 
         {/* Fixed button */}
         <div
-          className={`fixed left-1/2 top-20 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${showButton
+          className={`fixed left-1/2 top-20 z-50 -translate-x-1/2 transition-all duration-500 ease-out ${
+            showButton
               ? "opacity-100 pointer-events-auto"
               : "opacity-0 pointer-events-none"
-            }`}
+          }`}
         >
           <button
             onClick={scrollToTourSelect}
@@ -384,8 +406,9 @@ const Home = () => {
               />
             </svg>
             <span
-              className={`ml-2 font-medium text-white transition-all duration-500 delay-150 ${showButton ? "opacity-100" : "opacity-0"
-                }`}
+              className={`ml-2 font-medium text-white transition-all duration-500 delay-150 ${
+                showButton ? "opacity-100" : "opacity-0"
+              }`}
             >
               Tour Select
             </span>
