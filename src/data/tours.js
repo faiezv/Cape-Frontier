@@ -3579,7 +3579,7 @@ export const tours = [
     duration: "7 hours (09:00 – 16:00)",
 
     priceBase: 2500, // Price not specified in the brief
-    minPeople: 1,
+    minPeople: 2,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
@@ -3590,50 +3590,59 @@ export const tours = [
         note: "Minimum 2 participants.",
       },
       {
+        category: "Teens (12-17)",
+        pricePerPerson: 2500,
+        note: "Same as adults.",
+      },
+      {
         category: "Children under 12",
         pricePerPerson: 0,
-        note: "Minimum 1 Adult participants.",
+        note: "Minimum 1 adult participants.",
       },
     ],
 
     additionalPricing: [],
-
     groupPricing: {
       enabled: true,
       icon: "/icons/savemore.png",
+      countsTowardTier: {
+        teens: true,      // default true, matches current behaviour
+        children: true,
+        toddlers: false,
+      },
       tiers: [
-        {
-          minPeople: 2,
-          maxPeople: 3,
-          perPerson: 2500,
-          discountPercent: null,
-          label: "2-3 Guests",
-          note: "• All-inclusive",
-        },
-        {
-          minPeople: 4,
-          maxPeople: 6,
-          perPerson: 2300,
-          discountPercent: null,
-          label: "4-6 Guests",
-          note: "• All-inclusive",
-        },
-        {
-          minPeople: 6,
-          maxPeople: 6,
-          perPerson: null,
-          groupTotal: 13500,
-          discountPercent: null,
-          label: "4-6 Guests",
-          note: "Group total • All-inclusive",
-        },
+        // {
+        //   minPeople: 2,
+        //   maxPeople: 3,
+        //   perPerson: 2500,
+        //   discountPercent: null,
+        //   label: "2-3 Guests",
+        //   note: "All-inclusive",
+        // },
+        // {
+        //   minPeople: 4,
+        //   maxPeople: 6,
+        //   perPerson: 2300,
+        //   discountPercent: null,
+        //   label: "4-6 Guests",
+        //   note: "All-inclusive",
+        // },
+        // {
+        //   minPeople: 6,
+        //   maxPeople: 6,
+        //   perPerson: null,
+        //   groupTotal: 13500,
+        //   discountPercent: null,
+        //   label: "4-6 Guests",
+        //   note: "Group total • All-inclusive",
+        // },
         {
           minPeople: 7,
           maxPeople: 12,
           perPerson: null,
-          groupTotal: 22000,
-          discountPercent: null,
-          label: "4-6 Guests",
+          groupTotal: null,
+          discountPercent: 20,
+          label: "7+ Guests",
           note: "Group total • All-inclusive",
         },
       ],
@@ -4632,7 +4641,7 @@ export const tours = [
       "Sightseeing",
     ],
   },
-  // PenTour 2 -Peninsula Tour
+  // Peninsula Tour
   {
     id: 14,
     type: TOUR_TYPES.PACKAGES,
@@ -4674,7 +4683,7 @@ export const tours = [
     duration: "Full Day",
 
     priceBase: 2500,
-    minPeople: 1,
+    minPeople: 2,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
@@ -4683,28 +4692,30 @@ export const tours = [
         category: "Adults",
         pricePerPerson: 2500,
       },
-      // {
-      //   category: "Children (5–17 years)",
-      //   pricePerPerson: 2295,
-      //   note: "Robben Island child fare + Langa Township tour",
-      // },
-      // {
-      //   category: "Children (0–4 years)",
-      //   pricePerPerson: 1300,
-      //   note: "Robben Island free • Langa Township applies",
-      // }, // no group/childrens pricing
+      {
+        category: "Children (12–17 years)",
+        pricePerPerson: 2500,
+        note: "Same price as adults. Includes all entry fees.",
+      },
+      {
+        category: "Children (5-11 years)",
+        pricePerPerson: 1900,
+      },
+      {
+        category: "Children (0-4 years)",
+        pricePerPerson: 0,
+      },
     ],
 
     groupPricing: {
-      enabled: false,
+      enabled: true,
       icon: "/icons/savemore.png",
       tiers: [
         {
-          // minPeople: 2,
-          // maxPeople: 4,
-          // totalPrice: 9560,
-          // label: "2–4 Guests",
-          // note: "Private vehicle • All-inclusive",
+          minPeople: 5,
+          maxPeople: 5,
+          discountPercent: 15,
+          note: "Private vehicle • All-inclusive",
         },
       ],
     },

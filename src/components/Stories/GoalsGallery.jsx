@@ -1,192 +1,179 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 
 import vehicles from "../../data/vehicles.js";
 import { resolveImage } from "../../utils/ImageLoader.js";
-import mapPinIcon from "/public/icons/mapPin.png";
-
-gsap.registerPlugin(ScrollTrigger);
 
 // ============================================================
-// 1. AUTO-LOADED MEDIA (videos + images from heroGallery folders)
+// CONFIG
+// ============================================================
+
+// Video order. List titles or filenames in the order you want them shown.
+// The FIRST entry is the clip that plays first. Anything not listed follows
+// afterwards in alphabetical order. Matching ignores case, extension, spaces,
+// dashes and underscores. Leave empty ([]) for plain alphabetical order.
+const VIDEO_ORDER = [
+  "Welcome to Cape Frontier",
+  "V&A Waterfront, Cape Town",
+  "Unforgettable View on Table Mountain",
+  "Unique experience with Cobra Sundowner",
+  "Welcome to Bo-Kaap!",
+  "Cobra Sundowner Experience",
+  "A Day to Remember",
+  "A Truly Special Experience",
+  "An Unforgettable Encounter",
+  "Beautiful views, thank you Cape Frontier",
+  "Incredible Scenery",
+  "Refreshing experience at Seapoint",
+  "Thats Ben",
+  "This is Sarah",
+];
+
+// 9 + the featured tile (2x2) fills whole rows at 2, 3 and 4 columns.
+// Each "See more" adds 12 (divisible by 2, 3 and 4) so rows stay full.
+const IMAGES_INITIAL_COUNT = 9;
+const IMAGES_STEP = 12;
+
+// Videos use the same idea: 6 per page (divisible by the 3 / 6 column layouts).
+const VIDEOS_INITIAL_COUNT = 6;
+const VIDEOS_STEP = 6;
+
+const DEFAULT_LOCATION = "Seapoint, Cape Town";
+
+// Optional per-file overrides, keyed by filename:
+// Videos auto-detect portrait/landscape once loaded. Set aspect here to get the
+// correct player shape immediately (no resize on first load), e.g.:
+// "welcome.mp4": { title: "Welcome to Cape Frontier", aspect: "landscape" }
+const mediaMetaOverrides = {};
+
+// ============================================================
+// 1. MEDIA (recursive glob: includes sub-folders of heroGallery)
 // ============================================================
 
 const videoModules = import.meta.glob(
   "/src/assets/videos/heroGallery/**/*.{mp4,webm,ogg,mov}",
   { eager: true }
 );
-
 const imageModules = import.meta.glob(
   "/src/assets/images/heroGallery/**/*.{jpg,jpeg,png,webp,avif}",
   { eager: true }
 );
 
-const mediaMetaOverrides = {
-  // "sunset-drive.mp4": { title: "Sunset Drive", location: "Camps Bay, Cape Town" },
-};
+const normalize = (s = "") =>
+  s
+    .toLowerCase()
+    .replace(/\.(mp4|webm|ogg|mov|jpe?g|png|webp|avif)$/i, "")
+    .replace(/[\s_-]+/g, " ")
+    .trim();
 
-const humanizeFilename = (filename) => {
-  const nameOnly = filename.replace(/\.[^/.]+$/, "");
-  return nameOnly
+const humanize = (filename) =>
+  filename
+    .replace(/\.[^/.]+$/, "")
     .replace(/[-_]+/g, " ")
     .replace(/\s+/g, " ")
     .trim()
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-};
+    .replace(/(^|\s)\S/g, (c) => c.toUpperCase());
 
-const buildVideoList = () => {
-  return Object.entries(videoModules)
+const buildList = (modules) =>
+  Object.entries(modules)
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([fullPath, mod], index) => {
-      const filename = fullPath.split("/").pop();
-      const override = mediaMetaOverrides[filename] || {};
+    .map(([path, mod]) => {
+      const filename = path.split("/").pop();
+      const o = mediaMetaOverrides[filename] || {};
       return {
-        id: filename,
-        title: override.title || humanizeFilename(filename),
-        location: override.location || "Seapoint, Cape Town",
+        id: path, // full path: unique even if two folders share a filename
+        filename,
+        title: o.title || humanize(filename),
+        location: o.location || DEFAULT_LOCATION,
         src: mod.default,
-        aspect: override.aspect || "portrait",
-        index,
+        aspect: o.aspect || null, // null = auto-detect from video metadata
       };
     });
-};
 
-const buildImageList = () => {
-  return Object.entries(imageModules)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([fullPath, mod], index) => {
-      const filename = fullPath.split("/").pop();
-      const override = mediaMetaOverrides[filename] || {};
-      return {
-        id: filename,
-        title: override.title || humanizeFilename(filename),
-        location: override.location || "Seapoint, Cape Town",
-        src: mod.default,
-        aspect: override.aspect || "landscape",
-        index,
-      };
-    });
-};
+const orderVideos = (list, order) => {
+  const rank = new Map(order.map((key, i) => [normalize(key), i]));
+  const rankOf = (v) => rank.get(normalize(v.title)) ?? rank.get(normalize(v.filename)) ?? Infinity;
 
-const videos = buildVideoList();
-const images = buildImageList();
-
-const IMAGES_INITIAL_COUNT = 10;
-
-// ============================================================
-// 2. VEHICLE HELPERS
-// ============================================================
-
-const fallbackFleetImages = [
-  "/images/content/vehicles/1.webp",
-  "/images/content/vehicles/2.webp",
-  "/images/content/vehicles/3.webp",
-  "/images/content/vehicles/4.webp",
-  "/images/content/vehicles/5.webp",
-];
-
-const getVehicleImage = (vehicle) => {
-  if (typeof vehicle === "string") return vehicle;
-  return (
-    vehicle?.image ||
-    vehicle?.img ||
-    vehicle?.src ||
-    vehicle?.photo ||
-    vehicle?.cover ||
-    vehicle?.images?.[0] ||
-    vehicle?.gallery?.[0] ||
-    null
-  );
-};
-
-const getVehicleTitle = (vehicle, index) => {
-  if (typeof vehicle === "string") return `Cape Frontier vehicle ${index + 1}`;
-  return (
-    vehicle?.title ||
-    vehicle?.name ||
-    vehicle?.model ||
-    vehicle?.label ||
-    `Cape Frontier vehicle ${index + 1}`
-  );
-};
-
-const getVehicleDescription = (vehicle) => {
-  if (typeof vehicle === "string") {
-    return "Comfortable Cape Frontier transport used for private and group tour operations.";
-  }
-  return (
-    vehicle?.description ||
-    vehicle?.desc ||
-    vehicle?.summary ||
-    vehicle?.note ||
-    "Comfortable Cape Frontier transport used for private and group tour operations."
-  );
-};
-
-const getVehicleCapacity = (vehicle) => {
-  if (typeof vehicle === "string") return "Tour vehicle";
-  return (
-    vehicle?.capacity ||
-    vehicle?.seats ||
-    vehicle?.passengers ||
-    vehicle?.type ||
-    "Tour vehicle"
-  );
-};
-
-const getFleetItems = () => {
-  if (!Array.isArray(vehicles) || vehicles.length === 0) {
-    return fallbackFleetImages.map((src, index) => ({
-      id: `fallback-${index}`,
-      image: resolveImage(src),
-      title: `Cape Frontier vehicle ${index + 1}`,
-      description:
-        "Comfortable Cape Frontier transport used for private and group tour operations.",
-      capacity: "Tour vehicle",
-    }));
+  if (import.meta.env?.DEV) {
+    const known = new Set(list.flatMap((v) => [normalize(v.title), normalize(v.filename)]));
+    const missing = order.filter((k) => !known.has(normalize(k)));
+    if (missing.length) {
+      console.warn("[GoalsGallery] VIDEO_ORDER entries with no matching video:", missing, "Available:", list.map((v) => v.title));
+    }
   }
 
-  const mappedVehicles = vehicles
-    .map((vehicle, index) => ({
-      id: vehicle?.id || vehicle?.slug || vehicle?.title || vehicle?.name || index,
-      image: resolveImage(getVehicleImage(vehicle)),
-      title: getVehicleTitle(vehicle, index),
-      description: getVehicleDescription(vehicle),
-      capacity: getVehicleCapacity(vehicle),
-    }))
-    .filter((vehicle) => vehicle.image);
-
-  return mappedVehicles.length
-    ? mappedVehicles
-    : fallbackFleetImages.map((src, index) => ({
-        id: `fallback-${index}`,
-        image: resolveImage(src),
-        title: `Cape Frontier vehicle ${index + 1}`,
-        description:
-          "Comfortable Cape Frontier transport used for private and group tour operations.",
-        capacity: "Tour vehicle",
-      }));
+  // Array.sort is stable, so unlisted videos keep their alphabetical order.
+  return [...list].sort((a, b) => {
+    const ra = rankOf(a);
+    const rb = rankOf(b);
+    if (ra === rb) return 0;
+    return ra < rb ? -1 : 1;
+  });
 };
 
+const videos = orderVideos(buildList(videoModules), VIDEO_ORDER);
+const images = buildList(imageModules);
+
+const hasVideos = videos.length > 0;
+const hasImages = images.length > 0;
+
 // ============================================================
-// 3. STAR RATING
+// 2. FLEET (computed once at module load)
 // ============================================================
+
+const fallbackFleetImages = [1, 2, 3, 4, 5].map((n) => `/images/content/vehicles/${n}.webp`);
+const DEFAULT_DESC =
+  "Comfortable Cape Frontier transport used for private and group tour operations.";
+
+const pick = (v, keys) => {
+  for (const k of keys) if (v?.[k]) return v[k];
+  return null;
+};
+
+const toFleetItem = (v, i) => {
+  const isStr = typeof v === "string";
+  const fallbackTitle = `Cape Frontier vehicle ${i + 1}`;
+  return {
+    id: (!isStr && pick(v, ["id", "slug", "title", "name"])) || `vehicle-${i}`,
+    image: resolveImage(
+      isStr
+        ? v
+        : pick(v, ["image", "img", "src", "photo", "cover"]) || v?.images?.[0] || v?.gallery?.[0]
+    ),
+    title: isStr ? fallbackTitle : pick(v, ["title", "name", "model", "label"]) || fallbackTitle,
+    description: isStr ? DEFAULT_DESC : pick(v, ["description", "desc", "summary", "note"]) || DEFAULT_DESC,
+    capacity: isStr ? "Tour vehicle" : pick(v, ["capacity", "seats", "passengers", "type"]) || "Tour vehicle",
+  };
+};
+
+const fleetSource = Array.isArray(vehicles) && vehicles.length ? vehicles : fallbackFleetImages;
+let fleetItems = fleetSource.map(toFleetItem).filter((v) => v.image);
+if (!fleetItems.length) fleetItems = fallbackFleetImages.map(toFleetItem);
+
+// ============================================================
+// 3. SMALL PIECES
+// ============================================================
+
+// Entrance + ambient motion live in CSS: no JS animation library needed,
+// and everything switches off under prefers-reduced-motion.
+const Styles = () => (
+  <style>{`
+    @media (prefers-reduced-motion: no-preference) {
+      @keyframes gf-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+      @keyframes gf-fade { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes gf-bob  { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+      .gf-rise { animation: gf-rise .4s cubic-bezier(.2,.7,.2,1) both; }
+      .gf-fade { animation: gf-fade .25s ease-out both; }
+      .gf-bob  { animation: gf-bob 4.5s ease-in-out infinite; }
+    }
+  `}</style>
+);
 
 const StarRating = ({ rating = 4.7 }) => {
   const rounded = Math.round(Number(rating) || 0);
   return (
-    <div className="flex items-center gap-0.5" aria-label={`${rating} out of 5 stars`}>
-      {Array.from({ length: 5 }).map((_, index) => (
-        <svg
-          key={index}
-          className="h-3.5 w-3.5"
-          viewBox="0 0 24 24"
-          fill={index < rounded ? "#22C55E" : "none"}
-          stroke="#22C55E"
-          strokeWidth="1.7"
-          aria-hidden="true"
-        >
+    <div className="flex items-center gap-0.5" role="img" aria-label={`${rating} out of 5 stars`}>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <svg key={i} className="h-3.5 w-3.5" viewBox="0 0 24 24" fill={i < rounded ? "#22C55E" : "none"} stroke="#22C55E" strokeWidth="1.7" aria-hidden="true">
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
         </svg>
       ))}
@@ -194,910 +181,564 @@ const StarRating = ({ rating = 4.7 }) => {
   );
 };
 
-// ============================================================
-// 4. MAIN COMPONENT
-// ============================================================
+const CloseIcon = () => (
+  <span className="relative block h-4 w-4" aria-hidden="true">
+    <span className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 rotate-45 rounded-full bg-current" />
+    <span className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 -rotate-45 rounded-full bg-current" />
+  </span>
+);
 
-const GoalsGallery = () => {
-  const [activeTab, setActiveTab] = useState("images");
+const Chevron = ({ dir }) => (
+  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d={dir === "left" ? "M15 18l-6-6 6-6" : "M9 18l6-6-6-6"} />
+  </svg>
+);
 
-  const [selectedVideo, setSelectedVideo] = useState(videos[0] || null);
-  const [isGalleryManuallyPaused, setIsGalleryManuallyPaused] = useState(false);
-  const [isGalleryInView, setIsGalleryInView] = useState(false);
-  const [selectedFleetImage, setSelectedFleetImage] = useState(null);
-
-  const [visibleImageCount, setVisibleImageCount] = useState(IMAGES_INITIAL_COUNT);
-  const [lightboxIndex, setLightboxIndex] = useState(null);
-
-  const fleetItems = useMemo(() => getFleetItems(), []);
-
-  const galleryRef = useRef(null);
-  const imagesSectionRef = useRef(null);
-  const playerRef = useRef(null);
-  const thumbVideoRefs = useRef([]);
-  const previousVideoRef = useRef(selectedVideo);
-  const lightboxThumbStripRef = useRef(null);
-  const lightboxImageRef = useRef(null);
-
-  // banner illustration refs
-  const compassRef = useRef(null);
-  const cameraRef = useRef(null);
-  const mountainRef = useRef(null);
-  const routeLineRef = useRef(null);
-
-  const isGalleryPaused = isGalleryManuallyPaused || !isGalleryInView;
-
-  const hasVideos = videos.length > 0;
-  const hasImages = images.length > 0;
-
-  const visibleImages = images.slice(0, visibleImageCount);
-  const hasMoreImages = visibleImageCount < images.length;
-  const isExpanded = visibleImageCount > IMAGES_INITIAL_COUNT;
-
-  const lightboxImage = lightboxIndex !== null ? images[lightboxIndex] : null;
-
-  // ============================================================
-  // RESET IMAGE COUNT WHEN SWITCHING TABS
-  // ============================================================
-
+// Locks page scroll and wires a key handler while a dialog is mounted.
+const useDialog = (onKeyDown) => {
+  const handlerRef = useRef(onKeyDown);
+  handlerRef.current = onKeyDown;
   useEffect(() => {
-    setVisibleImageCount(IMAGES_INITIAL_COUNT);
-  }, [activeTab]);
-
-  // ============================================================
-  // BANNER ILLUSTRATION ANIMATION (subtle float + draw)
-  // ============================================================
-
-  useLayoutEffect(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reducedMotion) return undefined;
-
-    const ctx = gsap.context(() => {
-      if (compassRef.current) {
-        gsap.to(compassRef.current, {
-          rotate: 12,
-          duration: 3.4,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-        });
-      }
-
-      if (cameraRef.current) {
-        gsap.to(cameraRef.current, {
-          y: -6,
-          duration: 2.6,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-          delay: 0.2,
-        });
-      }
-
-      if (mountainRef.current) {
-        gsap.to(mountainRef.current, {
-          y: -4,
-          duration: 3.1,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-          delay: 0.5,
-        });
-      }
-
-      if (routeLineRef.current) {
-        const length = routeLineRef.current.getTotalLength();
-        gsap.set(routeLineRef.current, {
-          strokeDasharray: length,
-          strokeDashoffset: length,
-        });
-        gsap.to(routeLineRef.current, {
-          strokeDashoffset: 0,
-          duration: 1.8,
-          ease: "power2.out",
-          delay: 0.15,
-        });
-      }
-    }, galleryRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  // ============================================================
-  // GALLERY INTRO
-  // ============================================================
-
-  useLayoutEffect(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    const ctx = gsap.context(() => {
-      const introItems = gsap.utils.toArray(".gallery-intro-item");
-      const galleryItems = gsap.utils.toArray(".gallery-item");
-      const fleetCards = gsap.utils.toArray(".fleet-card");
-      const all = [...introItems, ...galleryItems, ...fleetCards];
-
-      if (reducedMotion) {
-        gsap.set(all, { autoAlpha: 1, y: 0 });
-        return;
-      }
-
-      gsap.set(all, { autoAlpha: 0, y: 12, willChange: "transform, opacity" });
-
-      const introTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: galleryRef.current,
-          start: "top 86%",
-          once: true,
-          invalidateOnRefresh: true,
-        },
-        onComplete: () => gsap.set(all, { willChange: "auto" }),
-      });
-
-      introTl
-        .to(introItems, { autoAlpha: 1, y: 0, duration: 0.38, stagger: 0.04, ease: "power2.out" })
-        .to(
-          galleryItems,
-          { autoAlpha: 1, y: 0, duration: 0.38, stagger: 0.025, ease: "power2.out" },
-          "-=0.2"
-        )
-        .to(
-          fleetCards,
-          { autoAlpha: 1, y: 0, duration: 0.34, stagger: 0.03, ease: "power2.out" },
-          "-=0.12"
-        );
-    }, galleryRef);
-
-    return () => ctx.revert();
-  }, [activeTab]);
-
-  // ============================================================
-  // SEE MORE / SEE LESS
-  // ============================================================
-
-  const revealMoreImages = () => {
-    setVisibleImageCount((prev) => Math.min(prev + IMAGES_INITIAL_COUNT, images.length));
-  };
-
-  const collapseImages = () => {
-    setVisibleImageCount(IMAGES_INITIAL_COUNT);
-    imagesSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  useLayoutEffect(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reducedMotion) return;
-
-    const cards = gsap.utils.toArray(".gallery-image-card");
-    const newlyRevealed = cards.slice(Math.max(0, visibleImageCount - IMAGES_INITIAL_COUNT));
-
-    if (!newlyRevealed.length || visibleImageCount <= IMAGES_INITIAL_COUNT) return;
-
-    gsap.fromTo(
-      newlyRevealed,
-      { autoAlpha: 0, y: 14 },
-      { autoAlpha: 1, y: 0, duration: 0.36, stagger: 0.03, ease: "power2.out" }
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visibleImageCount]);
-
-  // ============================================================
-  // DETECT GALLERY VISIBILITY
-  // ============================================================
-
-  useLayoutEffect(() => {
-    let frame = null;
-
-    const updateVisibility = () => {
-      frame = null;
-      if (!galleryRef.current) return;
-
-      const rect = galleryRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-      const visiblePixels = Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0));
-      const ratio = visiblePixels / Math.min(rect.height, viewportHeight);
-
-      setIsGalleryInView(ratio >= 0.45);
-    };
-
-    const requestUpdate = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(updateVisibility);
-    };
-
-    updateVisibility();
-    window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", requestUpdate);
-    window.addEventListener("orientationchange", requestUpdate);
-
-    return () => {
-      if (frame) window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", requestUpdate);
-      window.removeEventListener("resize", requestUpdate);
-      window.removeEventListener("orientationchange", requestUpdate);
-    };
-  }, []);
-
-  // ============================================================
-  // PLAY / PAUSE MAIN VIDEO
-  // ============================================================
-
-  useLayoutEffect(() => {
-    if (activeTab !== "videos" || !playerRef.current) return;
-
-    if (isGalleryPaused) {
-      playerRef.current.pause();
-    } else {
-      const playPromise = playerRef.current.play();
-      if (playPromise?.catch) playPromise.catch(() => {});
-    }
-  }, [isGalleryPaused, selectedVideo, activeTab]);
-
-  // ============================================================
-  // SELECTED VIDEO TRANSITION
-  // ============================================================
-
-  useLayoutEffect(() => {
-    if (!selectedVideo || previousVideoRef.current?.id === selectedVideo.id) return;
-    previousVideoRef.current = selectedVideo;
-
-    if (playerRef.current) {
-      gsap.fromTo(
-        playerRef.current,
-        { opacity: 0, y: 8, scale: 0.99 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "power2.out" }
-      );
-    }
-
-    const activeThumbs = galleryRef.current?.querySelectorAll(".active-video-thumb");
-    if (activeThumbs?.length) {
-      gsap.fromTo(activeThumbs, { scale: 0.96 }, { scale: 1, duration: 0.26, ease: "power2.out" });
-    }
-  }, [selectedVideo]);
-
-  // ============================================================
-  // THUMBNAIL HOVER PLAYBACK
-  // ============================================================
-
-  const handleThumbEnter = (event) => {
-    if (isGalleryPaused) return;
-    const video = event.currentTarget;
-    video.currentTime = 0;
-    video.play().catch(() => {});
-  };
-
-  const handleThumbLeave = (event) => {
-    const video = event.currentTarget;
-    video.pause();
-    try {
-      video.currentTime = 0;
-    } catch {
-      // ignore
-    }
-  };
-
-  const selectVideo = (video) => {
-    if (video.id === selectedVideo?.id) return;
-    setSelectedVideo(video);
-  };
-
-  // ============================================================
-  // LIGHTBOX
-  // ============================================================
-
-  const openLightbox = (image) => {
-    const index = images.findIndex((item) => item.id === image.id);
-    setLightboxIndex(index === -1 ? 0 : index);
-  };
-
-  const closeLightbox = () => setLightboxIndex(null);
-
-  const showPrevImage = (e) => {
-    e?.stopPropagation();
-    setLightboxIndex((prev) => (prev === null ? prev : (prev - 1 + images.length) % images.length));
-  };
-
-  const showNextImage = (e) => {
-    e?.stopPropagation();
-    setLightboxIndex((prev) => (prev === null ? prev : (prev + 1) % images.length));
-  };
-
-  useEffect(() => {
-    if (lightboxIndex === null) return undefined;
-
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") closeLightbox();
-      if (e.key === "ArrowLeft") showPrevImage();
-      if (e.key === "ArrowRight") showNextImage();
-    };
-
-    const previousOverflow = document.body.style.overflow;
+    const handle = (e) => handlerRef.current(e);
+    const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", handleKeyDown);
-
+    window.addEventListener("keydown", handle);
     return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", handle);
     };
-  }, [lightboxIndex]);
+  }, []);
+};
 
-  useEffect(() => {
-    if (lightboxIndex === null || !lightboxThumbStripRef.current) return;
-    const activeThumb = lightboxThumbStripRef.current.querySelector(
-      `[data-thumb-index="${lightboxIndex}"]`
-    );
-    activeThumb?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-  }, [lightboxIndex]);
+const focusRing =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500";
 
-  useLayoutEffect(() => {
-    if (lightboxIndex === null || !lightboxImageRef.current) return;
-    gsap.fromTo(
-      lightboxImageRef.current,
-      { autoAlpha: 0, scale: 0.985 },
-      { autoAlpha: 1, scale: 1, duration: 0.28, ease: "power2.out" }
-    );
-  }, [lightboxIndex]);
+// ============================================================
+// 4. IMAGES
+// ============================================================
 
-  // ============================================================
-  // RENDER
-  // ============================================================
+const ImageCard = memo(({ image, index, onOpen }) => {
+  const [loaded, setLoaded] = useState(false);
+
+  // Cached images can finish loading before React attaches onLoad.
+  const imgRef = useCallback((el) => {
+    if (el?.complete && el.naturalWidth) setLoaded(true);
+  }, []);
 
   return (
-    <div ref={galleryRef} className="relative w-full">
-      {/* ========================================================
-          HEADER / BANNER — light theme with animated line-art
-      ======================================================== */}
-      <header className="gallery-intro-item relative mx-auto w-full max-w-6xl overflow-hidden rounded-t-[2rem] border border-b-0 border-black/[0.06] bg-white px-5 py-6 shadow-[0_10px_36px_rgba(15,23,42,0.05)] sm:px-8 sm:py-7">
-        {/* soft color wash */}
-        <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-green-100/70 blur-3xl" />
-        <div className="pointer-events-none absolute -left-20 bottom-0 h-48 w-48 rounded-full bg-blue-100/50 blur-3xl" />
+    <button
+      type="button"
+      onClick={() => onOpen(index)}
+      style={{ animationDelay: `${(index % IMAGES_STEP) * 30}ms` }}
+      className={`gf-rise group relative overflow-hidden rounded-2xl bg-neutral-100 ${focusRing} ${
+        index === 0 ? "col-span-2 row-span-2" : ""
+      }`}
+    >
+      {/* No decoding="async" and a GPU layer from the start: lazy + async
+          decode + a hover-only transform is what left tiles blank until hover.
+          The opacity fade is tied to the real load event, so a tile is either
+          a plain placeholder or the finished photo, never a half-painted box. */}
+      <img
+        ref={imgRef}
+        src={image.src}
+        alt={image.title}
+        loading={index < 6 ? "eager" : "lazy"}
+        onLoad={() => setLoaded(true)}
+        onError={() => setLoaded(true)}
+        className={`absolute inset-0 h-full w-full transform-gpu object-cover transition-[opacity,transform] duration-500 ease-out group-hover:scale-105 ${
+          loaded ? "opacity-100" : "opacity-0"
+        }`}
+      />
+      <span className="pointer-events-none absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/60 to-transparent px-3 pb-2.5 pt-8 text-left font-frank text-sm font-bold text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+        {image.title}
+      </span>
+    </button>
+  );
+});
 
-        {/* animated dotted route line */}
-        <svg
-          className="pointer-events-none absolute left-0 top-0 hidden h-full w-full opacity-[0.35] sm:block"
-          viewBox="0 0 800 160"
-          fill="none"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <path
-            ref={routeLineRef}
-            d="M20 130 C 160 40, 260 150, 400 70 S 620 20, 780 90"
-            stroke="#16A34A"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeDasharray="1 10"
-          />
-        </svg>
+const ImageGrid = ({ onOpen }) => {
+  const [visible, setVisible] = useState(IMAGES_INITIAL_COUNT);
+  const sectionRef = useRef(null);
 
-        {/* floating line-art icons */}
-        <svg
-          ref={compassRef}
-          className="pointer-events-none absolute right-8 top-6 h-10 w-10 text-green-500/60 sm:h-12 sm:w-12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.4"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="9" />
-          <path d="M14.5 9.5l-2 5-3 1.5 2-5 3-1.5z" strokeLinejoin="round" />
-        </svg>
+  const hasMore = visible < images.length;
+  const expanded = visible > IMAGES_INITIAL_COUNT;
 
-        <svg
-          ref={cameraRef}
-          className="pointer-events-none absolute left-10 top-10 h-8 w-8 text-blue-400/50 sm:h-10 sm:w-10"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.4"
-          aria-hidden="true"
-        >
-          <path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 011 1v9a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z" strokeLinejoin="round" />
-          <circle cx="12" cy="13" r="3.2" />
-        </svg>
+  const collapse = () => {
+    setVisible(IMAGES_INITIAL_COUNT);
+    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
-        <svg
-          ref={mountainRef}
-          className="pointer-events-none absolute bottom-4 right-16 h-9 w-9 text-green-400/50 sm:h-11 sm:w-11"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.4"
-          aria-hidden="true"
-        >
-          <path d="M3 18l6-9 4 6 2-3 6 6H3z" strokeLinejoin="round" strokeLinecap="round" />
-        </svg>
+  return (
+    <div ref={sectionRef} className="scroll-mt-4 p-4 sm:p-5">
+      <div className="mb-4 flex items-end justify-between gap-4">
+        <h3 className="font-frank text-2xl font-bold leading-none text-black lg:text-3xl">Photo highlights</h3>
+        <p className="hidden font-bitter text-xs text-black/40 lg:block">Tap a photo to view it full size.</p>
+      </div>
 
-        <div className="relative flex flex-col items-center text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1 font-bitter text-[10px] font-black uppercase tracking-[0.2em] text-green-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-            Cape Frontier moments
-          </span>
+      <div className="grid auto-rows-[8.5rem] grid-flow-dense grid-cols-2 gap-2.5 sm:auto-rows-[10rem] sm:grid-cols-3 lg:auto-rows-[11rem] lg:grid-cols-4">
+        {images.slice(0, visible).map((image, i) => (
+          <ImageCard key={image.id} image={image} index={i} onOpen={onOpen} />
+        ))}
+      </div>
 
-          <h2 className="mt-3 font-frank text-4xl font-bold leading-[0.92] tracking-tight text-black sm:text-5xl md:text-6xl">
-            Gallery & Fleet
-          </h2>
-
-          <p className="mt-2.5 max-w-xl font-bitter text-xs leading-relaxed text-black/45 sm:text-sm">
-            A glimpse into the places, experiences and vehicles behind Cape
-            Frontier — photos and video from real tours.
-          </p>
-
-          {hasVideos && hasImages && (
-            <div className="relative mt-5 inline-flex rounded-full border border-black/[0.07] bg-black/[0.03] p-1">
-              <button
-                type="button"
-                onClick={() => setActiveTab("images")}
-                className={`relative flex items-center gap-1.5 rounded-full px-5 py-2.5 font-bitter text-[10px] font-black uppercase tracking-[0.14em] transition-colors duration-300 ${
-                  activeTab === "images"
-                    ? "bg-black text-white shadow-sm"
-                    : "text-black/40 hover:text-black/70"
-                }`}
-              >
-                Images
-                <span
-                  className={`rounded-full px-1.5 py-0.5 text-[9px] ${
-                    activeTab === "images" ? "bg-white/20 text-white" : "bg-black/[0.06] text-black/40"
-                  }`}
-                >
-                  {images.length}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveTab("videos")}
-                className={`relative flex items-center gap-1.5 rounded-full px-5 py-2.5 font-bitter text-[10px] font-black uppercase tracking-[0.14em] transition-colors duration-300 ${
-                  activeTab === "videos"
-                    ? "bg-black text-white shadow-sm"
-                    : "text-black/40 hover:text-black/70"
-                }`}
-              >
-                Videos
-                <span
-                  className={`rounded-full px-1.5 py-0.5 text-[9px] ${
-                    activeTab === "videos" ? "bg-white/20 text-white" : "bg-black/[0.06] text-black/40"
-                  }`}
-                >
-                  {videos.length}
-                </span>
-              </button>
-            </div>
-          )}
-        </div>
-      </header>
-
-      {/* ========================================================
-          IMAGES SECTION
-      ======================================================== */}
-
-      {hasImages && activeTab === "images" && (
-        <section
-          ref={imagesSectionRef}
-          className="relative mx-auto w-full max-w-6xl overflow-hidden rounded-b-[2rem] border border-t-0 border-black/[0.06] bg-white p-4 shadow-[0_16px_46px_rgba(15,23,42,0.06)] sm:p-5"
-        >
-          <div className="pointer-events-none absolute -left-32 top-10 h-56 w-56 rounded-full bg-green-100/30 blur-3xl" />
-
-          <div className="relative z-10 mb-4 flex items-end justify-between gap-4">
-            <div>
-              <p className="font-bitter text-[10px] font-black uppercase tracking-[0.18em] text-green-600">
-                Explore the moments
-              </p>
-              <h3 className="mt-1 font-frank text-2xl font-bold leading-none text-black lg:text-3xl">
-                Photo highlights
-              </h3>
-            </div>
-            <p className="hidden max-w-[13rem] text-right font-bitter text-[10px] leading-relaxed text-black/35 lg:block">
-              Tap an image to view it in full, with next and previous.
-            </p>
-          </div>
-
-          <div className="relative z-10 columns-2 gap-2.5 sm:columns-3 lg:columns-4 [column-fill:_balance]">
-            {visibleImages.map((image) => (
-              <button
-                key={image.id}
-                type="button"
-                onClick={() => openLightbox(image)}
-                className="gallery-item gallery-image-card group relative mb-2.5 block w-full overflow-hidden rounded-[1rem] border border-black/[0.06] transition-transform duration-300 hover:-translate-y-0.5 hover:shadow-md"
-              >
-                <img
-                  src={image.src}
-                  alt={image.title}
-                  className="w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-                  loading="lazy"
-                  decoding="async"
-                />
-
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-                <div className="absolute bottom-2.5 left-2.5 right-2.5 translate-y-1 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                  <p className="truncate font-frank text-sm font-bold leading-none text-white">
-                    {image.title}
-                  </p>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {(hasMoreImages || isExpanded) && (
-            <div className="relative z-10 mt-4 flex justify-center gap-3">
-              {hasMoreImages && (
-                <button
-                  type="button"
-                  onClick={revealMoreImages}
-                  className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-6 py-2.5 font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-black/70 shadow-sm transition hover:-translate-y-0.5 hover:border-green-300 hover:text-green-700 hover:shadow-md"
-                >
-                  See more
-                  <span className="rounded-full bg-black/[0.06] px-1.5 py-0.5 text-[9px]">
-                    +{Math.min(IMAGES_INITIAL_COUNT, images.length - visibleImageCount)}
-                  </span>
-                </button>
-              )}
-
-              {isExpanded && (
-                <button
-                  type="button"
-                  onClick={collapseImages}
-                  className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/[0.02] px-6 py-2.5 font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-black/45 transition hover:-translate-y-0.5 hover:border-black/20 hover:text-black/70"
-                >
-                  See less
-                </button>
-              )}
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* ========================================================
-          IMAGE LIGHTBOX
-      ======================================================== */}
-
-      {lightboxImage && (
-        <div
-          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/70 p-3 backdrop-blur-md sm:p-6"
-          onClick={closeLightbox}
-        >
-          <div
-            className="relative w-full max-w-4xl rounded-[1.8rem] border border-white/20 bg-white/[0.03] p-2 shadow-[0_30px_80px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:p-3"
-            onClick={(event) => event.stopPropagation()}
-          >
+      {(hasMore || expanded) && (
+        <div className="mt-5 flex justify-center gap-3">
+          {hasMore && (
             <button
               type="button"
-              onClick={closeLightbox}
-              className="absolute -top-12 right-0 z-20 grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20 sm:right-1"
-              aria-label="Close image"
+              onClick={() => setVisible((v) => Math.min(v + IMAGES_STEP, images.length))}
+              className={`rounded-full border border-black/10 bg-white px-6 py-2.5 font-bitter text-sm font-bold text-black/70 shadow-sm transition hover:border-green-300 hover:text-green-700 ${focusRing}`}
             >
-              <span className="relative block h-4 w-4">
-                <span className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 rotate-45 rounded-full bg-current" />
-                <span className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 -rotate-45 rounded-full bg-current" />
-              </span>
+              See more ({images.length - visible} left)
             </button>
-
-            <div className="relative flex items-center justify-center overflow-hidden rounded-[1.4rem] bg-black/40">
-              {images.length > 1 && (
-                <button
-                  type="button"
-                  onClick={showPrevImage}
-                  className="absolute left-2 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20 sm:left-4 sm:h-12 sm:w-12"
-                  aria-label="Previous image"
-                >
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
-                  </svg>
-                </button>
-              )}
-
-              <img
-                ref={lightboxImageRef}
-                key={lightboxImage.id}
-                src={lightboxImage.src}
-                alt={lightboxImage.title}
-                className="max-h-[68dvh] w-full rounded-[1.2rem] object-contain"
-              />
-
-              {images.length > 1 && (
-                <button
-                  type="button"
-                  onClick={showNextImage}
-                  className="absolute right-2 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20 sm:right-4 sm:h-12 sm:w-12"
-                  aria-label="Next image"
-                >
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
-                  </svg>
-                </button>
-              )}
-            </div>
-
-            <div className="flex items-center justify-between px-2 pt-3">
-              <p className="truncate font-frank text-lg font-bold text-white sm:text-xl">
-                {lightboxImage.title}
-              </p>
-              <span className="shrink-0 font-bitter text-[10px] font-bold text-white/40">
-                {lightboxIndex + 1} / {images.length}
-              </span>
-            </div>
-
-            <div
-              ref={lightboxThumbStripRef}
-              className="mt-3 flex gap-2 overflow-x-auto px-2 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          )}
+          {expanded && (
+            <button
+              type="button"
+              onClick={collapse}
+              className={`rounded-full border border-black/10 px-6 py-2.5 font-bitter text-sm font-bold text-black/45 transition hover:text-black/70 ${focusRing}`}
             >
-              {images.map((image, index) => {
-                const isActive = index === lightboxIndex;
+              See less
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Lightbox = ({ index, onChange, onClose }) => {
+  const image = images[index];
+  const stripRef = useRef(null);
+  const touchX = useRef(null);
+  const count = images.length;
+
+  const prev = useCallback(() => onChange((index - 1 + count) % count), [index, count, onChange]);
+  const next = useCallback(() => onChange((index + 1) % count), [index, count, onChange]);
+
+  useDialog((e) => {
+    if (e.key === "Escape") onClose();
+    if (e.key === "ArrowLeft") prev();
+    if (e.key === "ArrowRight") next();
+  });
+
+  // Warm the cache for the neighbours so next/prev feels instant.
+  useEffect(() => {
+    [1, -1].forEach((d) => {
+      new Image().src = images[(index + d + count) % count].src;
+    });
+    stripRef.current
+      ?.querySelector(`[data-thumb-index="${index}"]`)
+      ?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [index, count]);
+
+  const onTouchEnd = (e) => {
+    if (touchX.current == null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (Math.abs(dx) > 50) (dx > 0 ? prev : next)();
+  };
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={image.title}
+      className="gf-fade fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 p-3 sm:p-6"
+      onClick={onClose}
+    >
+      <div className="relative w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          onClick={onClose}
+          autoFocus
+          aria-label="Close image"
+          className={`absolute -top-12 right-0 z-20 grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 ${focusRing}`}
+        >
+          <CloseIcon />
+        </button>
+
+        <div
+          className="relative flex items-center justify-center overflow-hidden rounded-2xl bg-black"
+          onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
+          onTouchEnd={onTouchEnd}
+        >
+          {count > 1 && (
+            <button type="button" onClick={prev} aria-label="Previous image" className={`absolute left-2 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/40 text-white transition hover:bg-black/60 sm:left-4 sm:h-12 sm:w-12 ${focusRing}`}>
+              <Chevron dir="left" />
+            </button>
+          )}
+          <img key={image.id} src={image.src} alt={image.title} className="gf-fade max-h-[70dvh] w-full object-contain" />
+          {count > 1 && (
+            <button type="button" onClick={next} aria-label="Next image" className={`absolute right-2 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/40 text-white transition hover:bg-black/60 sm:right-4 sm:h-12 sm:w-12 ${focusRing}`}>
+              <Chevron dir="right" />
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between gap-4 px-1 pt-3">
+          <p className="truncate font-frank text-lg font-bold text-white sm:text-xl">{image.title}</p>
+          <span className="shrink-0 font-bitter text-xs font-bold text-white/50">
+            {index + 1} / {count}
+          </span>
+        </div>
+
+        <div
+          ref={stripRef}
+          className="mt-3 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {images.map((img, i) => (
+            <button
+              key={img.id}
+              type="button"
+              data-thumb-index={i}
+              onClick={() => onChange(i)}
+              aria-label={`View ${img.title}`}
+              aria-current={i === index}
+              className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border transition ${focusRing} ${
+                i === index ? "border-green-300 ring-2 ring-green-300/60" : "border-white/15 opacity-50 hover:opacity-80"
+              }`}
+            >
+              <img src={img.src} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// 5. VIDEOS
+// ============================================================
+
+const VideoGallery = () => {
+  const [selected, setSelected] = useState(videos[0]); // first in VIDEO_ORDER
+  const [manualPause, setManualPause] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [visible, setVisible] = useState(VIDEOS_INITIAL_COUNT);
+  const [detected, setDetected] = useState({}); // id -> "portrait" | "landscape"
+
+  const stageRef = useRef(null);
+  const playerRef = useRef(null);
+  const paused = manualPause || !inView;
+  const aspect = selected.aspect || detected[selected.id] || "portrait";
+  const hasMore = visible < videos.length;
+  const expanded = visible > VIDEOS_INITIAL_COUNT;
+
+  const noteAspect = useCallback((id, el) => {
+    if (!el?.videoWidth) return;
+    const next = el.videoWidth >= el.videoHeight ? "landscape" : "portrait";
+    setDetected((d) => (d[id] === next ? d : { ...d, [id]: next }));
+  }, []);
+
+  // One IntersectionObserver instead of scroll/resize listeners.
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return undefined;
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.4 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const v = playerRef.current;
+    if (!v) return;
+    if (paused) v.pause();
+    else v.play().catch(() => {});
+  }, [paused, selected]);
+
+  const onThumbEnter = (e) => {
+    if (paused) return;
+    const v = e.currentTarget;
+    v.currentTime = 0;
+    v.play().catch(() => {});
+  };
+  const onThumbLeave = (e) => {
+    const v = e.currentTarget;
+    v.pause();
+    try { v.currentTime = 0; } catch { /* ignore */ }
+  };
+
+  return (
+    <div className="grid gap-5 p-4 sm:p-5 lg:grid-cols-[1fr_0.72fr] lg:items-start">
+      {/* Player */}
+      <div className="min-w-0">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="font-bitter text-xs font-bold text-green-600">Now playing</p>
+            <h3 className="mt-0.5 truncate font-frank text-xl font-bold leading-tight text-black sm:text-2xl">
+              {selected.title}
+            </h3>
+          </div>
+          <button
+            type="button"
+            onClick={() => setManualPause((p) => !p)}
+            aria-label={paused ? "Play gallery video" : "Pause gallery video"}
+            className={`grid h-9 w-9 shrink-0 place-items-center rounded-full border border-black/10 text-black/60 transition hover:border-green-300 hover:bg-green-400 hover:text-green-950 ${focusRing}`}
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d={paused ? "M8 5v14l11-7z" : "M7 5h4v14H7zM13 5h4v14h-4z"} />
+            </svg>
+          </button>
+        </div>
+
+        {/* Fixed-size stage: switching clips never shifts the layout. */}
+        <div
+          ref={stageRef}
+          className={`overflow-hidden rounded-2xl bg-neutral-950 ${
+            aspect === "landscape" ? "aspect-video" : "h-[min(72vh,38rem)]"
+          }`}
+        >
+          <video
+            ref={playerRef}
+            key={selected.id}
+            src={selected.src}
+            className="gf-fade h-full w-full object-contain"
+            controls
+            autoPlay={!paused}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            onLoadedMetadata={(e) => noteAspect(selected.id, e.currentTarget)}
+          />
+        </div>
+
+        {/*
+        <div className="mt-3 flex items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-1.5">
+            <img src="/icons/mapPin.png" alt="" aria-hidden="true" className="h-3.5 w-3.5 shrink-0 object-contain opacity-50" />
+            <p className="truncate font-bitter text-xs font-semibold italic text-black/50">{selected.location}</p>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="font-frank text-base font-bold text-black">4.7</span>
+            <StarRating rating={4.7} />
+          </div>
+        </div>
+        */}
+      </div>
+
+      {/* Filmstrip: paged grid, same See more / See less behaviour as photos */}
+      <div className="min-w-0">
+        <p className="mb-3 font-bitter text-xs font-bold text-green-600">All clips ({videos.length})</p>
+
+        <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-6 lg:grid-cols-3">
+          {videos.slice(0, visible).map((video, i) => {
+            const active = video.id === selected.id;
+            return (
+              <button
+                key={video.id}
+                type="button"
+                onClick={() => setSelected(video)}
+                aria-label={`Play ${video.title}`}
+                aria-current={active}
+                style={{ animationDelay: `${(i % VIDEOS_STEP) * 30}ms` }}
+                className={`gf-rise group relative aspect-[3/4] w-full overflow-hidden rounded-xl border text-left transition ${focusRing} ${
+                  active
+                    ? "border-green-400 ring-2 ring-green-400/30"
+                    : "border-black/[0.06] opacity-90 hover:opacity-100"
+                }`}
+              >
+                <video
+                  src={`${video.src}#t=0.1`}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  muted
+                  playsInline
+                  preload="metadata"
+                  onLoadedMetadata={(e) => noteAspect(video.id, e.currentTarget)}
+                  onMouseEnter={onThumbEnter}
+                  onMouseLeave={onThumbLeave}
+                />
+                <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-transparent" />
+                {active && <span className="absolute left-2 top-2 h-2 w-2 rounded-full bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.8)]" />}
+                <span className="absolute inset-x-2 bottom-2 line-clamp-2 font-frank text-xs font-bold leading-tight text-white">
+                  {video.title}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {(hasMore || expanded) && (
+          <div className="mt-4 flex flex-wrap justify-center gap-3">
+            {hasMore && (
+              <button
+                type="button"
+                onClick={() => setVisible((v) => Math.min(v + VIDEOS_STEP, videos.length))}
+                className={`rounded-full border border-black/10 bg-white px-5 py-2.5 font-bitter text-sm font-bold text-black/70 shadow-sm transition hover:border-green-300 hover:text-green-700 ${focusRing}`}
+              >
+                See more ({videos.length - visible} left)
+              </button>
+            )}
+            {expanded && (
+              <button
+                type="button"
+                onClick={() => setVisible(VIDEOS_INITIAL_COUNT)}
+                className={`rounded-full border border-black/10 px-5 py-2.5 font-bitter text-sm font-bold text-black/45 transition hover:text-black/70 ${focusRing}`}
+              >
+                See less
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// 6. FLEET
+// ============================================================
+
+const FleetCard = memo(({ vehicle, onOpen }) => (
+  <button
+    type="button"
+    onClick={() => onOpen(vehicle)}
+    className={`group w-[10.5rem] shrink-0 snap-start overflow-hidden rounded-2xl border border-black/[0.06] bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md lg:w-auto ${focusRing}`}
+  >
+    <div className="h-28 overflow-hidden lg:h-32">
+      <img
+        src={vehicle.image}
+        alt={vehicle.title}
+        loading="lazy"
+        decoding="async"
+        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+      />
+    </div>
+    <div className="p-3">
+      <p className="truncate font-frank text-base font-bold leading-tight text-black">{vehicle.title}</p>
+      <p className="mt-1 truncate font-bitter text-xs font-bold text-green-600">{vehicle.capacity}</p>
+    </div>
+  </button>
+));
+
+const FleetModal = ({ vehicle, onClose }) => {
+  useDialog((e) => e.key === "Escape" && onClose());
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={vehicle.title}
+      className="gf-fade fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 p-4"
+      onClick={onClose}
+    >
+      <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl bg-white p-2 shadow-2xl sm:p-3" onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          onClick={onClose}
+          autoFocus
+          aria-label="Close fleet image"
+          className={`absolute right-4 top-4 z-20 grid h-10 w-10 place-items-center rounded-full bg-black/70 text-white transition hover:bg-black ${focusRing}`}
+        >
+          <CloseIcon />
+        </button>
+        <img src={vehicle.image} alt={vehicle.title} className="max-h-[72dvh] w-full rounded-2xl object-contain" />
+        <div className="p-3 sm:p-4">
+          <h3 className="font-frank text-3xl font-bold leading-none text-black">{vehicle.title}</h3>
+          <p className="mt-1.5 font-bitter text-sm font-bold text-green-700">{vehicle.capacity}</p>
+          <p className="mt-3 max-w-2xl font-bitter text-base leading-relaxed text-black/80">{vehicle.description}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// 7. MAIN COMPONENT
+// ============================================================
+
+const SECTION_TEXT = {
+  images: "Photos from real Cape Frontier tours.",
+  videos: "Welcome clips and guest stories from real tours.",
+};
+
+const TABS = [
+  { key: "images", label: "Images", count: images.length, show: hasImages },
+  { key: "videos", label: "Videos", count: videos.length, show: hasVideos },
+].filter((t) => t.show);
+
+const GoalsGallery = () => {
+  const [tab, setTab] = useState(hasImages ? "images" : "videos");
+  const [lightboxIndex, setLightboxIndex] = useState(null);
+  const [fleetVehicle, setFleetVehicle] = useState(null);
+
+  const openLightbox = useCallback((i) => setLightboxIndex(i), []);
+  const closeLightbox = useCallback(() => setLightboxIndex(null), []);
+  const openFleet = useCallback((v) => setFleetVehicle(v), []);
+  const closeFleet = useCallback(() => setFleetVehicle(null), []);
+
+  return (
+    <div className="relative w-full">
+      <Styles />
+
+      {/* Media card */}
+      <section className="mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] border border-black/[0.06] bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
+        <header className="relative flex flex-col items-center gap-3 overflow-hidden border-b border-black/[0.05] px-5 py-5 text-center sm:py-6">
+          {/* cheap gradient wash instead of large blurred divs */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_90%_at_100%_0%,rgba(187,247,208,0.55),transparent),radial-gradient(40%_80%_at_0%_100%,rgba(191,219,254,0.45),transparent)]"
+          />
+          <svg aria-hidden="true" className="gf-bob pointer-events-none absolute right-6 top-5 hidden h-12 w-12 text-green-500/50 sm:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M14.5 9.5l-2 5-3 1.5 2-5 3-1.5z" strokeLinejoin="round" />
+          </svg>
+
+          {TABS.length > 1 && (
+            <div role="tablist" aria-label="Media type" className="relative inline-flex rounded-full border border-black/[0.07] bg-black/[0.03] p-1">
+              {TABS.map((t) => {
+                const active = tab === t.key;
                 return (
                   <button
-                    key={image.id}
+                    key={t.key}
+                    role="tab"
                     type="button"
-                    data-thumb-index={index}
-                    onClick={() => setLightboxIndex(index)}
-                    className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-[0.7rem] border transition ${
-                      isActive
-                        ? "border-green-300 opacity-100 ring-2 ring-green-300/60"
-                        : "border-white/15 opacity-50 hover:opacity-80"
+                    aria-selected={active}
+                    onClick={() => setTab(t.key)}
+                    className={`flex items-center gap-1.5 rounded-full px-5 py-2.5 font-bitter text-sm font-bold transition-colors ${focusRing} ${
+                      active ? "bg-black text-white shadow-sm" : "text-black/45 hover:text-black/75"
                     }`}
                   >
-                    <img src={image.src} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+                    {t.label}
+                    <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${active ? "bg-white/20" : "bg-black/[0.06]"}`}>
+                      {t.count}
+                    </span>
                   </button>
                 );
               })}
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
-      {/* ========================================================
-          VIDEOS SECTION — unified filmstrip layout (no mosaic)
-      ======================================================== */}
+          <p aria-live="polite" className="relative max-w-md font-bitter text-xs leading-relaxed text-black/55 sm:text-sm">
+            {SECTION_TEXT[tab]}
+          </p>
+        </header>
 
-      {hasVideos && activeTab === "videos" && (
-        <section className="relative mx-auto w-full max-w-6xl overflow-hidden rounded-b-[2rem] border border-t-0 border-black/[0.06] bg-white p-4 shadow-[0_16px_46px_rgba(15,23,42,0.06)] sm:p-5">
-          <div className="pointer-events-none absolute -right-32 top-10 h-56 w-56 rounded-full bg-blue-100/30 blur-3xl" />
+        {tab === "images" && hasImages && <ImageGrid onOpen={openLightbox} />}
+        {tab === "videos" && hasVideos && <VideoGallery />}
+      </section>
 
-          <div className="relative z-10 grid gap-5 lg:grid-cols-[1fr_0.72fr] lg:items-start">
-            {/* Player */}
-            <div className="gallery-item min-w-0">
-              <div className="mb-3 flex items-center justify-between gap-3 px-1">
-                <div>
-                  <p className="font-bitter text-[9px] font-black uppercase tracking-[0.18em] text-green-600">
-                    Now viewing
-                  </p>
-                  {selectedVideo && (
-                    <h3 className="mt-0.5 truncate font-frank text-xl font-bold leading-none text-black sm:text-2xl">
-                      {selectedVideo.title}
-                    </h3>
-                  )}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setIsGalleryManuallyPaused((prev) => !prev)}
-                  className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-black/10 bg-black/[0.03] text-black/60 transition hover:border-green-300 hover:bg-green-400 hover:text-green-950"
-                  aria-label={isGalleryPaused ? "Play gallery video" : "Pause gallery video"}
-                >
-                  {isGalleryPaused ? (
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  ) : (
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-
-              {selectedVideo && (
-                <div
-                  className={`relative flex items-center justify-center overflow-hidden rounded-[1.3rem] border border-black/[0.05] bg-gradient-to-b from-gray-900 to-black shadow-inner ${
-                    selectedVideo.aspect === "portrait" ? "min-h-[24rem] sm:min-h-[30rem]" : "min-h-[16rem] sm:min-h-[20rem]"
-                  }`}
-                >
-                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_60%)]" />
-                  <video
-                    ref={playerRef}
-                    key={selectedVideo.id}
-                    src={selectedVideo.src}
-                    className={`relative z-10 max-h-[58vh] rounded-[0.9rem] object-contain shadow-2xl ring-1 ring-white/10 ${
-                      selectedVideo.aspect === "portrait" ? "h-full w-auto max-w-full" : "h-auto w-full"
-                    }`}
-                    controls
-                    autoPlay={!isGalleryPaused}
-                    muted
-                    loop
-                    playsInline
-                  />
-                </div>
-              )}
-
-              {selectedVideo && (
-                <div className="mt-3 flex items-center justify-between gap-4 px-1">
-                  <div className="flex min-w-0 items-center gap-1.5">
-                    <img src={mapPinIcon} className="h-3.5 w-3.5 shrink-0 object-contain opacity-50" alt="" aria-hidden="true" />
-                    <p className="truncate font-bitter text-[11px] font-semibold italic text-black/45">
-                      {selectedVideo.location || "Seapoint, Cape Town"}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <span className="font-frank text-base font-bold text-black">4.7</span>
-                    <StarRating rating={4.7} />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Filmstrip */}
-            <div className="gallery-item min-w-0">
-              <p className="mb-3 px-1 font-bitter text-[10px] font-black uppercase tracking-[0.18em] text-green-600">
-                All clips
-              </p>
-
-              <div className="flex gap-2.5 overflow-x-auto pb-1 lg:grid lg:grid-cols-3 lg:gap-2.5 lg:overflow-visible [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {videos.map((video, index) => {
-                  const isSelected = selectedVideo?.id === video.id;
-                  return (
-                    <button
-                      key={video.id}
-                      type="button"
-                      onClick={() => selectVideo(video)}
-                      className={`gallery-item group relative aspect-[3/4] w-28 shrink-0 overflow-hidden rounded-[1rem] border text-left transition-all duration-300 sm:w-32 lg:w-full ${
-                        isSelected
-                          ? "active-video-thumb border-green-400 shadow-[0_0_0_2px_rgba(74,222,128,0.25),0_8px_18px_rgba(0,0,0,0.10)]"
-                          : "border-black/[0.06] opacity-90 hover:-translate-y-0.5 hover:opacity-100 hover:shadow-sm"
-                      }`}
-                    >
-                      <video
-                        ref={(el) => {
-                          thumbVideoRefs.current[index] = el;
-                        }}
-                        src={video.src}
-                        className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-                        muted
-                        preload="metadata"
-                        playsInline
-                        onMouseEnter={handleThumbEnter}
-                        onMouseLeave={handleThumbLeave}
-                      />
-
-                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-transparent" />
-
-                      {isSelected && (
-                        <span className="absolute left-2 top-2 h-1.5 w-1.5 rounded-full bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.8)]" />
-                      )}
-
-                      <div className="absolute bottom-2 left-2 right-2">
-                        <p className="truncate font-frank text-xs font-bold leading-none text-white">
-                          {video.title}
-                        </p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ========================================================
-          STATUS PILL
-      ======================================================== */}
-
-      <div className="mx-auto mt-2 flex w-full max-w-6xl px-1">
-        <span className="rounded-full border border-green-200 bg-green-50 px-3 py-1.5 font-bitter text-[9px] font-black uppercase tracking-[0.14em] text-green-700">
-          Fleet ready
-        </span>
-      </div>
-
-      {/* ========================================================
-          FLEET
-      ======================================================== */}
-
-      <section className="fleet-section relative z-10 mx-auto mt-2 w-full max-w-6xl overflow-hidden rounded-[2rem] border border-black/[0.06] bg-white p-4 shadow-[0_14px_38px_rgba(15,23,42,0.05)] sm:p-5">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -left-24 top-0 h-64 w-64 rounded-full bg-green-100/50 blur-3xl" />
-          <div className="absolute -bottom-24 right-0 h-64 w-64 rounded-full bg-blue-100/40 blur-3xl" />
-        </div>
-
-        <div className="relative z-10 mb-4 flex items-end justify-between gap-4">
-          <div>
-            <p className="font-bitter text-[9px] font-black uppercase tracking-[0.2em] text-green-600">
-              Vehicle visuals
-            </p>
-            <h3 className="mt-1 font-frank text-3xl font-bold leading-none text-black">
-              See our fleet
-            </h3>
-          </div>
-          <p className="hidden max-w-sm text-right font-bitter text-xs leading-relaxed text-black/95 lg:block">
-            Vehicles are matched to the route, group size, and operational
-            needs of each booking.
+      {/* Fleet */}
+      <section className="mx-auto mt-4 w-full max-w-6xl overflow-hidden rounded-[2rem] border border-black/[0.06] bg-white p-4 shadow-[0_10px_30px_rgba(15,23,42,0.05)] [contain-intrinsic-size:auto_22rem] [content-visibility:auto] sm:p-5">
+        <div className="mb-4 flex items-end justify-between gap-4">
+          <h3 className="font-frank text-3xl font-bold leading-none text-black">Our fleet</h3>
+          <p className="hidden max-w-sm text-right font-bitter text-xs leading-relaxed text-black/60 lg:block">
+            Vehicles are matched to the route, group size and needs of each booking.
           </p>
         </div>
 
-        <div className="relative z-10 flex gap-2.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-5 lg:overflow-visible [&::-webkit-scrollbar]:hidden">
-          {fleetItems.map((vehicle) => (
-            <button
-              key={vehicle.id}
-              type="button"
-              onClick={() => setSelectedFleetImage(vehicle)}
-              className="fleet-card group relative min-w-[10.5rem] place-items-center overflow-hidden rounded-[1.2rem] border border-black/[0.06] bg-white text-left transition duration-300 hover:-translate-y-1 hover:border-black/15 hover:shadow-md lg:min-w-0"
-            >
-              <div className="relative h-28 overflow-hidden lg:h-32">
-                <img
-                  src={vehicle.image}
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                  alt={vehicle.title}
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute bottom-2 left-2">
-                  <span className="rounded-full bg-white/90 px-2 py-1 font-bitter text-[7px] font-black uppercase tracking-[0.12em] text-black">
-                    View
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-3">
-                <p className="truncate font-frank text-base font-bold leading-none text-black">
-                  {vehicle.title}
-                </p>
-                <p className="mt-1 font-bitter text-[8px] font-black uppercase tracking-[0.12em] text-green-600">
-                  {vehicle.capacity}
-                </p>
-                <p className="mt-2 hidden line-clamp-2 font-bitter text-[10px] leading-relaxed text-black/90 lg:block">
-                  {/* {vehicle.description} */}
-                </p>
-              </div>
-            </button>
+        <div className="flex snap-x gap-2.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-5 lg:overflow-visible [&::-webkit-scrollbar]:hidden">
+          {fleetItems.map((v) => (
+            <FleetCard key={v.id} vehicle={v} onOpen={openFleet} />
           ))}
         </div>
       </section>
 
-      {/* ========================================================
-          FLEET IMAGE MODAL
-      ======================================================== */}
-
-      {selectedFleetImage && (
-        <div
-          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md"
-          onClick={() => setSelectedFleetImage(null)}
-        >
-          <div
-            className="relative w-full max-w-4xl overflow-hidden rounded-[2rem] bg-white p-2 shadow-2xl sm:p-3"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button
-              type="button"
-              onClick={() => setSelectedFleetImage(null)}
-              className="absolute right-4 top-4 z-20 grid h-10 w-10 place-items-center rounded-full bg-black/70 text-white backdrop-blur-md transition hover:bg-black"
-              aria-label="Close fleet image"
-            >
-              <span className="relative block h-4 w-4">
-                <span className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 rotate-45 rounded-full bg-current" />
-                <span className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 -rotate-45 rounded-full bg-current" />
-              </span>
-            </button>
-
-            <img
-              src={selectedFleetImage.image}
-              alt={selectedFleetImage.title}
-              className="max-h-[74dvh] w-full rounded-[1.5rem] object-contain"
-            />
-
-            <div className="p-3 sm:p-4">
-              <h3 className="font-frank text-3xl font-bold leading-none text-black">
-                {selectedFleetImage.title}
-              </h3>
-              <p className="mt-1 font-bitter text-[9px] font-black uppercase tracking-[0.14em] text-green-700">
-                {selectedFleetImage.capacity}
-              </p>
-              <p className="mt-3 max-w-2xl font-bitter text-md leading-relaxed text-black">
-                {selectedFleetImage.description}
-              </p>
-            </div>
-          </div>
-        </div>
+      {lightboxIndex !== null && (
+        <Lightbox index={lightboxIndex} onChange={setLightboxIndex} onClose={closeLightbox} />
       )}
+      {fleetVehicle && <FleetModal vehicle={fleetVehicle} onClose={closeFleet} />}
     </div>
   );
 };

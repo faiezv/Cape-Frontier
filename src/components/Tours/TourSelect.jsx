@@ -254,8 +254,6 @@ function TourSelect() {
   // Mobile: expanded row index
   const [expandedIndex, setExpandedIndex] = useState(null)
 
-  // ----- BANNER is always visible – removed scroll‑hide logic -----
-
   const mobileCardRef = useRef(null)
   const desktopTileRefs = useRef({})
   const errorBarRef = useRef(null)
@@ -272,10 +270,6 @@ function TourSelect() {
   // Refs for progress line animation
   const line1Ref = useRef(null)
   const line2Ref = useRef(null)
-
-  // Refs for the Travel & Tours title
-  const titleRef = useRef(null)
-  const titleShineRef = useRef(null)
 
   // Refs for destination modal row animations and title overflow checks
   const destinationModalRef = useRef(null)
@@ -1040,44 +1034,6 @@ function TourSelect() {
     const timer = setTimeout(() => ScrollTrigger.refresh(), 50);
     return () => clearTimeout(timer);
   }, [searchError, activeModal, hasDetails, canSearch]);
-
-  // --- Shine animation for the Travel & Tours title (moved from Hero) ---
-  useLayoutEffect(() => {
-    if (titleShineRef.current) {
-      gsap.fromTo(
-        titleShineRef.current,
-        { xPercent: -220 },
-        {
-          xPercent: 720,
-          duration: 1.15,
-          repeat: -1,
-          repeatDelay: 2.2,
-          ease: 'power2.inOut',
-        }
-      )
-    }
-  }, [])
-
-  // --- Entrance animation for the title (moved from Hero) ---
-  useLayoutEffect(() => {
-    if (titleRef.current) {
-      gsap.fromTo(
-        titleRef.current,
-        {
-          y: 10,
-          opacity: 0,
-          scale: 0.985,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.55,
-          ease: 'power2.out',
-        }
-      )
-    }
-  }, [])
 
   const renderDayContents = (day, dateObj) => {
     const isToday = dateObj && new Date().toDateString() === dateObj.toDateString()
@@ -1857,32 +1813,6 @@ function TourSelect() {
                 <img src={canSearch && mobileStep >= 2 ? './icons/go.png' : './icons/topRightArrow.png'} className="h-4 w-auto" alt="" aria-hidden="true" />
               </button>
             </div>
-
-            {/* ===== BANNER (always visible) ===== */}
-            <div className="mt-3 flex w-full max-w-5xl flex-wrap items-center justify-between gap-2 
-            rounded-2xl border border-white/16 px-3 py-2 hadow-[0_10px_30px_rgba(0,0,0,0.06)] backdrop-blur-sm sm:flex-nowrap sm:px-4 sm:py-2.5">
-              <div
-                ref={titleRef}
-                className="relative overflow-hidden rounded-2xl px-3 py-1 sm:px-4 sm:py-1.5 bg-blue-800 border"
-              >
-                <span
-                  ref={titleShineRef}
-                  className="pointer-events-none absolute inset-y-0 left-[-48%] w-[30%] skew-x-[-20deg] 
-                bg-white bg[linear-gradient(90deg,transparent,rgba(0,45,203,0.18),transparent)]"
-                  aria-hidden="true"
-                />
-                <span className="relative bg-blu z-10 font-lobster text-base font-extrabold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.04)] sm:text-lg md:text-xl">
-                  Travel &amp; Tours
-                </span>
-              </div>
-              <div className="flex w-fit lg:w-fit items-center gap-2 rounded-2xl border border-green-300/80 bg-green-100/95 px-3 py-1.5 sm:px-4 sm:py-2">
-                <img src="./icons/savemore.png" className="h-4 w-4 shrink-0 object-contain sm:h-5 sm:w-5" alt="" aria-hidden="true" />
-                <p className="whitespace-nowrap font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-green-900 sm:text-[11px] sm:tracking-[0.1em]">
-                  Save more when you book as a group
-                </p>
-              </div>
-            </div>
-            {/* ===== END BANNER ===== */}
           </div>
         ) : (
           <div className="grid max-w-full overflow-hidden rounded-[22px] 

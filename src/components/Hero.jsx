@@ -31,6 +31,137 @@ const slides = [
 ]
 
 const SLIDE_MS = 6500
+const PROMO_MS = 5000 // how long each promo ribbon stays visible
+
+// Promotional ribbons shown under the search / select destination block.
+// Text only (no images). Update the wording and hrefs below.
+// `short` is the one-line offer shown on mobile; `text` is the full desktop copy.
+const promos = [
+  {
+    key: 'peninsula',
+    badge: 'PROMOTION',
+    title: 'Cape Peninsula Tour',
+    short: 'Limited-time offer',
+    text: 'Limited-time offer. [add promo wording here]',
+    text: 'Limited-time special on our Cape Peninsula Tour. Discover Cape Town’s iconic coastline and unforgettable scenery at a special price.',
+    href: '#featured-tours', // TODO: change to the Cape Peninsula tour page
+    ribbon: 'bg-[linear-gradient(90deg,#facc15,#fde047,#facc15)] text-[#1a1300]',
+    badgeStyle: 'bg-[#1a1300] text-[#fde047]',
+  },
+  {
+    key: 'heritage',
+    badge: '🔥 MUST EXPERIENCE',
+    title: 'Heritage Cape Flats Community Tour',
+    short: 'Groups of 7–10 save 20%',
+    text: 'Groups of 7–10 guests save 20%. Go deeper into Cape Town and take a story home with you.',
+    href: '#featured-tours', // TODO: change to the Heritage tour page
+    ribbon: 'bg-[linear-gradient(90deg,#ea580c,#fb923c,#ea580c)] text-white',
+    badgeStyle: 'bg-white text-[#c2410c]',
+  },
+]
+
+// Ribbons share one grid cell. The active one slides in from the right while
+// the previous one slides out to the left, so visitors can see there is
+// another banner. Dots underneath show which one is showing (and are clickable).
+const PromoRibbons = ({ innerRef, active, prev, onSelect, setPaused }) => (
+  <div
+    ref={innerRef}
+    onMouseEnter={() => setPaused(true)}
+    onMouseLeave={() => setPaused(false)}
+    className="relative mt-3 w-full max-w-4xl self-center px-2 sm:mt-0 sm:px-0"
+  >
+    <style>{`
+      @keyframes promoIn {
+        from { opacity: 0; transform: translateX(80px); }
+        to   { opacity: 1; transform: translateX(0); }
+      }
+      @keyframes promoOut {
+        from { opacity: 1; transform: translateX(0); }
+        to   { opacity: 0; transform: translateX(-80px); }
+      }
+      @keyframes promoTwinkle {
+        0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+        50%      { opacity: 1; transform: scale(1) rotate(90deg); }
+      }
+      /* Notched ribbon ends; the notch is smaller on phones so it never clips the badge */
+      .promo-ribbon {
+        --n: 10px;
+        clip-path: polygon(0 0, 100% 0, calc(100% - var(--n)) 50%, 100% 100%, 0 100%, var(--n) 50%);
+      }
+      @media (min-width: 640px) {
+        .promo-ribbon { --n: 14px; }
+      }
+      .promo-in   { animation: promoIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+      .promo-out  { animation: promoOut 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; pointer-events: none; }
+      .promo-idle { opacity: 0; pointer-events: none; }
+      .promo-spark { animation: promoTwinkle 2.4s ease-in-out infinite; }
+      @media (prefers-reduced-motion: reduce) {
+        .promo-in, .promo-out { animation-duration: 0.01s; }
+        .promo-spark { animation: none; opacity: 0.8; }
+      }
+    `}</style>
+
+    {/* Sparkles on both sides (hidden on small screens) */}
+    {[
+      { side: '-left-7', top: 'top-[8%]', size: 'text-lg', delay: '0s' },
+      { side: '-left-4', top: 'top-[55%]', size: 'text-sm', delay: '0.8s' },
+      { side: '-left-9', top: 'top-[85%]', size: 'text-xs', delay: '1.5s' },
+      { side: '-right-7', top: 'top-[15%]', size: 'text-sm', delay: '0.4s' },
+      { side: '-right-4', top: 'top-[60%]', size: 'text-lg', delay: '1.1s' },
+      { side: '-right-9', top: 'top-[90%]', size: 'text-xs', delay: '1.9s' },
+    ].map((sp, i) => (
+      <span
+        key={i}
+        aria-hidden="true"
+        style={{ animationDelay: sp.delay }}
+        className={`promo-spark pointer-events-none absolute hidden text-yellow-200 drop-shadow-[0_0_6px_rgba(253,224,71,0.9)] sm:block ${sp.side} ${sp.top} ${sp.size}`}
+      >
+        ✦
+      </span>
+    ))}
+
+    <div className="grid">
+      {promos.map((p, i) => (
+        <a
+          key={p.key}
+          href={p.href}
+          aria-hidden={i !== active}
+          tabIndex={i === active ? 0 : -1}
+          className={`promo-ribbon col-start-1 row-start-1 flex flex-col items-start justify-center gap-1 py-2.5 pl-6 pr-7 shadow-lg hover:brightness-105 sm:flex-row sm:items-center sm:gap-3 sm:px-10 sm:py-3 ${p.ribbon} ${
+            i === active ? 'promo-in' : i === prev ? 'promo-out' : 'promo-idle'
+          }`}
+        >
+          <span
+            className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold leading-none tracking-wider sm:text-xs ${p.badgeStyle}`}
+          >
+            {p.badge}
+          </span>
+          <span className="min-w-0 text-[13px] leading-snug sm:text-sm md:text-base">
+            <strong className="font-bold">{p.title}</strong>
+            <span className="block sm:hidden">{p.short}</span>
+            <span className="hidden sm:inline"> – {p.text}</span>
+          </span>
+        </a>
+      ))}
+    </div>
+
+    {/* Dots: show how many banners there are and which is active */}
+    <div className="mt-2 flex justify-center gap-2">
+      {promos.map((p, i) => (
+        <button
+          key={p.key}
+          type="button"
+          aria-label={`Show ${p.title} banner`}
+          aria-current={i === active}
+          onClick={() => onSelect(i)}
+          className={`h-2 rounded-full transition-all duration-300 ${
+            i === active ? 'w-6 bg-white' : 'w-2 bg-white/50 hover:bg-white/80'
+          }`}
+        />
+      ))}
+    </div>
+  </div>
+)
 
 const ArrowDown = ({ className = 'h-4 w-4' }) => (
   <svg
@@ -50,10 +181,13 @@ const Hero = () => {
   // Only slide 1 is in the server HTML (it is the LCP image).
   // The rest mount after window load so they never compete with it.
   const [extrasReady, setExtrasReady] = useState(false)
+  const [promoState, setPromoState] = useState({ active: 0, prev: null })
+  const [promoPaused, setPromoPaused] = useState(false)
 
   const heroRef = useRef(null)
   const contentRef = useRef(null)
   const tourSelectRef = useRef(null)
+  const promoRef = useRef(null)
   const scrollRef = useRef(null)
   const shineRef = useRef(null)
   const arrowRef = useRef(null)
@@ -155,6 +289,9 @@ const Hero = () => {
         tl.from(tourSelectRef.current, { y: -10, opacity: 0, duration: 0.75 })
       }
 
+      // NOTE: promo ribbons are NOT animated with GSAP. They slide via CSS
+      // keyframes (see PromoRibbons) and GSAP would fight that opacity.
+
       if (scrollRef.current) {
         tl.from(
           scrollRef.current,
@@ -203,6 +340,26 @@ const Hero = () => {
 
     return () => clearInterval(interval)
   }, [extrasReady])
+
+  // Rotate promo ribbons (one visible at a time; pauses on hover / hidden tab)
+  const selectPromo = (next) =>
+    setPromoState((s) =>
+      s.active === next ? s : { active: next, prev: s.active }
+    )
+
+  useEffect(() => {
+    if (promoPaused || promos.length <= 1) return
+
+    const id = setInterval(() => {
+      if (document.hidden) return
+      setPromoState((s) => ({
+        active: (s.active + 1) % promos.length,
+        prev: s.active,
+      }))
+    }, PROMO_MS)
+
+    return () => clearInterval(id)
+  }, [promoPaused, promoState.active])
 
   // Slide cross-fade
   useEffect(() => {
@@ -271,8 +428,22 @@ const Hero = () => {
             Cape Frontier - Guided tours and experiences in Cape Town
           </h1>
 
-          {/* Placeholder used for the desktop TourSelect pinning */}
-          <div ref={tourSelectRef} className="w-full max-w-5xl" />
+          {/* Placeholder used for the desktop TourSelect pinning.
+              Adjust the min heights if the ribbons overlap the search box. */}
+          <div
+            ref={tourSelectRef}
+            className="w-full max-w-5xl min-h-[200px] sm:min-h-[200px] md:min-h-[100px] lg:min-h-[80px]"
+          />
+
+          {/* Promotional ribbons: Cape Peninsula (yellow) + Heritage (orange),
+              sliding side to side, one at a time */}
+          <PromoRibbons
+            innerRef={promoRef}
+            active={promoState.active}
+            prev={promoState.prev}
+            onSelect={selectPromo}
+            setPaused={setPromoPaused}
+          />
         </div>
 
         {/* Bottom scroll CTA - a real link, so it works without JS too */}

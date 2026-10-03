@@ -11,7 +11,7 @@ export const getFee = (tour, type) => {
   const defaults = { private: 750, custom: 500 };
   if (Array.isArray(tour?.additionalPricing)) {
     const match = tour.additionalPricing.find((item) =>
-      item.category?.toLowerCase().includes(type)
+      item.category?.toLowerCase().includes(type),
     );
     if (match) {
       const amount = match.pricePerPerson ?? match.price ?? match.amount ?? 0;
@@ -30,7 +30,8 @@ export const matchGroupTier = (tour, qualifyingHeadcount) => {
     !tour?.groupPricing?.enabled ||
     !Array.isArray(tour.groupPricing.tiers) ||
     tour.groupPricing.tiers.length === 0
-  ) return null;
+  )
+    return null;
 
   return (
     tour.groupPricing.tiers.find((tier) => {
@@ -59,7 +60,7 @@ export const computePricing = ({
 
   const toddlers = normalizedChildAges.filter((a) => a <= 5).length;
   const children = normalizedChildAges.filter((a) => a >= 6 && a <= 11).length;
-  const teens    = normalizedChildAges.filter((a) => a >= 12 && a <= 17).length;
+  const teens = normalizedChildAges.filter((a) => a >= 12 && a <= 17).length;
 
   // Total heads (used for display / limits).
   const participantCount = adults + normalizedChildAges.length;
@@ -68,18 +69,30 @@ export const computePricing = ({
   // Only adults and teens count toward the group-tier threshold.
   // Toddlers and children do NOT — a "group of 6" means 6 paying
   // adult-equivalent guests, not 3 adults plus 3 toddlers.
-  const qualifyingHeadcount = adults + teens;
+
+  const counts = {
+    teens: true,
+    children: false,
+    toddlers: false,
+    ...(tour?.groupPricing?.countsTowardTier || {}),
+  };
+
+  const qualifyingHeadcount =
+    adults +
+    (counts.teens ? teens : 0) +
+    (counts.children ? children : 0) +
+    (counts.toddlers ? toddlers : 0);
 
   const hasOptions = Array.isArray(tour?.options) && tour.options.length > 0;
   const selectedTourOption = hasOptions
-    ? (tour.options.find((o) => o.id === selectedOption) || null)
+    ? tour.options.find((o) => o.id === selectedOption) || null
     : null;
 
   // ── Base prices (ZAR) ──────────────────────────────────────────────
   const getBasePrice = (prefix) => {
     if (!Array.isArray(tour?.pricing)) return 0;
     const entry = tour.pricing.find((p) =>
-      p.category?.toLowerCase().startsWith(prefix.toLowerCase())
+      p.category?.toLowerCase().startsWith(prefix.toLowerCase()),
     );
     return Number(entry?.pricePerPerson) || 0;
   };
@@ -93,40 +106,40 @@ export const computePricing = ({
     adultPriceZar = Number(tour?.priceBase) || 0;
   }
 
-  const teenPriceZar    = getBasePrice("teen")    || adultPriceZar;
-  const childPriceZar   = getBasePrice("child");
+  const teenPriceZar = getBasePrice("teen") || adultPriceZar;
+  const childPriceZar = getBasePrice("child");
   const toddlerPriceZar = getBasePrice("toddler");
 
   // ── Convert to selected currency ───────────────────────────────────
-  const adultPrice   = convertPrice(adultPriceZar,   currency);
-  const teenPrice    = convertPrice(teenPriceZar,    currency);
-  const childPrice   = convertPrice(childPriceZar,   currency);
+  const adultPrice = convertPrice(adultPriceZar, currency);
+  const teenPrice = convertPrice(teenPriceZar, currency);
+  const childPrice = convertPrice(childPriceZar, currency);
   const toddlerPrice = convertPrice(toddlerPriceZar, currency);
 
   // ── Original subtotals ─────────────────────────────────────────────
-  const adultSubtotal   = adults   * adultPrice;
-  const teenSubtotal    = teens    * teenPrice;
-  const childSubtotal   = children * childPrice;
+  const adultSubtotal = adults * adultPrice;
+  const teenSubtotal = teens * teenPrice;
+  const childSubtotal = children * childPrice;
   const toddlerSubtotal = toddlers * toddlerPrice;
   const originalSubtotal =
     adultSubtotal + teenSubtotal + childSubtotal + toddlerSubtotal;
 
   // ── Group pricing ──────────────────────────────────────────────────
-  let discountedSubtotal   = originalSubtotal;
-  let groupDiscountAmount  = 0;
+  let discountedSubtotal = originalSubtotal;
+  let groupDiscountAmount = 0;
   let groupDiscountPercent = 0;
-  let adultDiscountAmount  = 0;
-  let teenDiscountAmount   = 0;
-  let hasDiscount          = false;
-  let isCustomQuote        = false;
-  let groupPricingType     = null;
+  let adultDiscountAmount = 0;
+  let teenDiscountAmount = 0;
+  let hasDiscount = false;
+  let isCustomQuote = false;
+  let groupPricingType = null;
 
   // Effective per-person rates — initialised to base rates and
   // overwritten below whenever a group tier changes them. These are
   // the numbers the UI should render as "× per person".
-  let effectiveAdultPrice   = adultPrice;
-  let effectiveTeenPrice    = teenPrice;
-  let effectiveChildPrice   = childPrice;
+  let effectiveAdultPrice = adultPrice;
+  let effectiveTeenPrice = teenPrice;
+  let effectiveChildPrice = childPrice;
   let effectiveToddlerPrice = toddlerPrice;
 
   const matchedGroupTier = matchGroupTier(tour, qualifyingHeadcount);
@@ -137,9 +150,13 @@ export const computePricing = ({
         ? Number(matchedGroupTier.groupTotal)
         : null;
 
-    if (rawGroupTotal !== null && Number.isFinite(rawGroupTotal) && rawGroupTotal > 0) {
+    if (
+      rawGroupTotal !== null &&
+      Number.isFinite(rawGroupTotal) &&
+      rawGroupTotal > 0
+    ) {
       // Fixed group total — convert from ZAR to selected currency
-      groupPricingType   = "groupTotal";
+      groupPricingType = "groupTotal";
       discountedSubtotal = convertPrice(rawGroupTotal, currency);
       groupDiscountAmount = Math.max(0, originalSubtotal - discountedSubtotal);
       groupDiscountPercent =
@@ -147,8 +164,8 @@ export const computePricing = ({
           ? (groupDiscountAmount / originalSubtotal) * 100
           : 0;
       adultDiscountAmount = groupDiscountAmount;
-      teenDiscountAmount  = 0;
-      hasDiscount         = groupDiscountAmount > 0;
+      teenDiscountAmount = 0;
+      hasDiscount = groupDiscountAmount > 0;
 
       // Spread the group-total (minus children/toddlers) across the
       // adult-equivalent guests so the UI can still show a per-person rate.
@@ -156,13 +173,12 @@ export const computePricing = ({
       if (adultTeenCount > 0) {
         const adultTeenPortion = Math.max(
           0,
-          discountedSubtotal - childSubtotal - toddlerSubtotal
+          discountedSubtotal - childSubtotal - toddlerSubtotal,
         );
         const perPerson = adultTeenPortion / adultTeenCount;
         effectiveAdultPrice = perPerson;
-        effectiveTeenPrice  = perPerson;
+        effectiveTeenPrice = perPerson;
       }
-
     } else {
       const hasPerPerson =
         matchedGroupTier.perPerson != null &&
@@ -175,16 +191,16 @@ export const computePricing = ({
         groupPricingType = "perPerson";
         const groupPersonPrice = convertPrice(
           Math.max(0, Number(matchedGroupTier.perPerson)),
-          currency
+          currency,
         );
         const discAdult = adults * groupPersonPrice;
-        const discTeen  = teens  * groupPersonPrice;
+        const discTeen = teens * groupPersonPrice;
 
         discountedSubtotal =
           discAdult + discTeen + childSubtotal + toddlerSubtotal;
 
         adultDiscountAmount = Math.max(0, adultSubtotal - discAdult);
-        teenDiscountAmount  = Math.max(0, teenSubtotal  - discTeen);
+        teenDiscountAmount = Math.max(0, teenSubtotal - discTeen);
         groupDiscountAmount = adultDiscountAmount + teenDiscountAmount;
 
         const adultTeenOriginal = adultSubtotal + teenSubtotal;
@@ -195,41 +211,40 @@ export const computePricing = ({
         hasDiscount = groupDiscountAmount > 0;
 
         effectiveAdultPrice = groupPersonPrice;
-        effectiveTeenPrice  = groupPersonPrice;
-
+        effectiveTeenPrice = groupPersonPrice;
       } else if (hasDiscountPct) {
         groupPricingType = "discountPercent";
         const pct = Math.min(
           Math.max(Number(matchedGroupTier.discountPercent), 0),
-          100
+          100,
         );
         const adultDisc = adultSubtotal * (pct / 100);
-        const teenDisc  = teenSubtotal  * (pct / 100);
+        const teenDisc = teenSubtotal * (pct / 100);
 
         discountedSubtotal =
-          (adultSubtotal - adultDisc) +
-          (teenSubtotal  - teenDisc)  +
+          adultSubtotal -
+          adultDisc +
+          (teenSubtotal - teenDisc) +
           childSubtotal +
           toddlerSubtotal;
 
-        adultDiscountAmount  = Math.max(0, adultDisc);
-        teenDiscountAmount   = Math.max(0, teenDisc);
-        groupDiscountAmount  = adultDiscountAmount + teenDiscountAmount;
+        adultDiscountAmount = Math.max(0, adultDisc);
+        teenDiscountAmount = Math.max(0, teenDisc);
+        groupDiscountAmount = adultDiscountAmount + teenDiscountAmount;
         groupDiscountPercent = pct;
-        hasDiscount          = groupDiscountAmount > 0;
+        hasDiscount = groupDiscountAmount > 0;
 
         effectiveAdultPrice = adultPrice * (1 - pct / 100);
-        effectiveTeenPrice  = teenPrice  * (1 - pct / 100);
-
+        effectiveTeenPrice = teenPrice * (1 - pct / 100);
       } else {
-        groupPricingType     = "custom";
-        isCustomQuote        = true;
-        discountedSubtotal   = originalSubtotal;
-        groupDiscountAmount  = 0;
+        groupPricingType = "custom";
+        isCustomQuote = true;
+        discountedSubtotal = originalSubtotal;
+        groupDiscountAmount = 0;
         groupDiscountPercent = 0;
-        adultDiscountAmount  = 0;
-        teenDiscountAmount   = 0;
-        hasDiscount          = false;
+        adultDiscountAmount = 0;
+        teenDiscountAmount = 0;
+        hasDiscount = false;
       }
     }
   }
@@ -256,13 +271,13 @@ export const computePricing = ({
     if (value === undefined || value === null || value === false) return;
 
     let costZar = 0;
-    let label   = category;
+    let label = category;
 
     if (type === "quantity") {
       const qty = Number(value) || 0;
       if (qty <= 0) return;
       costZar = (Number(price) || 0) * qty;
-      label   = `${category} × ${qty}`;
+      label = `${category} × ${qty}`;
     } else if (type === "fixed") {
       costZar = Number(price) || 0;
     } else {
@@ -283,34 +298,51 @@ export const computePricing = ({
   // ── Kids activity ──────────────────────────────────────────────────
   const selectedKidsActivity =
     tour?.childFriendly === true && formData?.selectedKidsActivity
-      ? (kidsActivities.find((a) => a.id === formData.selectedKidsActivity) || null)
+      ? kidsActivities.find((a) => a.id === formData.selectedKidsActivity) ||
+        null
       : null;
 
-  const kaAdultPrice   = Number(selectedKidsActivity?.adultPrice)   || 0;
-  const kaChildPrice   = Number(selectedKidsActivity?.childPrice)   || 0;
+  const kaAdultPrice = Number(selectedKidsActivity?.adultPrice) || 0;
+  const kaChildPrice = Number(selectedKidsActivity?.childPrice) || 0;
   const kaToddlerPrice = Number(selectedKidsActivity?.toddlerPrice) || 0;
 
-  const kidsActivityAdultTotal   = convertPrice(kaAdultPrice   * adults,   currency);
-  const kidsActivityChildTotal   = convertPrice(kaChildPrice   * children, currency);
-  const kidsActivityToddlerTotal = convertPrice(kaToddlerPrice * toddlers, currency);
+  const kidsActivityAdultTotal = convertPrice(kaAdultPrice * adults, currency);
+  const kidsActivityChildTotal = convertPrice(
+    kaChildPrice * children,
+    currency,
+  );
+  const kidsActivityToddlerTotal = convertPrice(
+    kaToddlerPrice * toddlers,
+    currency,
+  );
   const kidsActivityTotal =
     kidsActivityAdultTotal + kidsActivityChildTotal + kidsActivityToddlerTotal;
 
   // ── Final total ────────────────────────────────────────────────────
   const finalTotal = isCustomQuote
     ? null
-    : discountedSubtotal + privateFee + customFee + extrasTotal + kidsActivityTotal;
+    : discountedSubtotal +
+      privateFee +
+      customFee +
+      extrasTotal +
+      kidsActivityTotal;
 
   const fmt = (n) => formatMoney(n, currency);
 
   return {
     // Counts
-    adults, children, toddlers, teens,
-    participantCount,          // all heads (used for limits / display)
-    qualifyingHeadcount,       // adults + teens — the tier-matching count
+    adults,
+    children,
+    toddlers,
+    teens,
+    participantCount, // all heads (used for limits / display)
+    qualifyingHeadcount, // adults + teens — the tier-matching count
 
     // Per-person base prices (in selected currency)
-    adultPrice, teenPrice, childPrice, toddlerPrice,
+    adultPrice,
+    teenPrice,
+    childPrice,
+    toddlerPrice,
 
     // Per-person *effective* prices — reflect any group tier that was
     // applied. UI should use these for "N × rate" rows.
@@ -320,51 +352,67 @@ export const computePricing = ({
     effectiveToddlerPrice,
 
     // Subtotals
-    adultSubtotal, teenSubtotal, childSubtotal, toddlerSubtotal,
+    adultSubtotal,
+    teenSubtotal,
+    childSubtotal,
+    toddlerSubtotal,
     originalSubtotal,
 
     // Group discount
-    matchedGroupTier, groupPricingType,
-    hasDiscount, isCustomQuote,
-    groupDiscountPercent, groupDiscountAmount,
-    adultDiscountAmount, teenDiscountAmount,
+    matchedGroupTier,
+    groupPricingType,
+    hasDiscount,
+    isCustomQuote,
+    groupDiscountPercent,
+    groupDiscountAmount,
+    adultDiscountAmount,
+    teenDiscountAmount,
     discountedSubtotal,
 
     // Fees
-    privateFee, customFee,
+    privateFee,
+    customFee,
 
     // Extras
-    extrasTotal, extrasBreakdown,
+    extrasTotal,
+    extrasBreakdown,
 
     // Kids activity
     selectedKidsActivity,
-    kidsActivityAdultPrice:   kaAdultPrice,
-    kidsActivityChildPrice:   kaChildPrice,
+    kidsActivityAdultPrice: kaAdultPrice,
+    kidsActivityChildPrice: kaChildPrice,
     kidsActivityToddlerPrice: kaToddlerPrice,
-    kidsActivityAdultTotal, kidsActivityChildTotal, kidsActivityToddlerTotal,
+    kidsActivityAdultTotal,
+    kidsActivityChildTotal,
+    kidsActivityToddlerTotal,
     kidsActivityTotal,
 
     // Options
-    hasOptions, selectedTourOption,
+    hasOptions,
+    selectedTourOption,
 
     // Total
     finalTotal,
 
     // Display strings
-    displayAdultPrice:          fmt(effectiveAdultPrice),
-    displayTeenPrice:           fmt(effectiveTeenPrice),
-    displayOriginalSubtotal:    fmt(originalSubtotal),
+    displayAdultPrice: fmt(effectiveAdultPrice),
+    displayTeenPrice: fmt(effectiveTeenPrice),
+    displayOriginalSubtotal: fmt(originalSubtotal),
     displayGroupDiscountAmount: fmt(groupDiscountAmount),
-    displayDiscountedSubtotal:  isCustomQuote ? "Custom quote" : fmt(discountedSubtotal),
-    displayPrivateFee:          privateFee > 0 ? fmt(privateFee) : "—",
-    displayCustomFee:           customFee  > 0 ? fmt(customFee)  : "—",
-    displayExtrasTotal:         extrasTotal > 0 ? fmt(extrasTotal) : "—",
-    displayKidsActivityTotal:   selectedKidsActivity ? fmt(kidsActivityTotal) : "—",
-    displayTotal:               isCustomQuote
-                                  ? "Custom quote"
-                                  : finalTotal !== null
-                                    ? fmt(finalTotal)
-                                    : "—",
+    displayDiscountedSubtotal: isCustomQuote
+      ? "Custom quote"
+      : fmt(discountedSubtotal),
+    displayPrivateFee: privateFee > 0 ? fmt(privateFee) : "—",
+    displayCustomFee: customFee > 0 ? fmt(customFee) : "—",
+    displayExtrasTotal: extrasTotal > 0 ? fmt(extrasTotal) : "—",
+    displayKidsActivityTotal: selectedKidsActivity
+      ? fmt(kidsActivityTotal)
+      : "—",
+    displayTotal: isCustomQuote
+      ? "Custom quote"
+      : finalTotal !== null
+        ? fmt(finalTotal)
+        : "—",
     currency,
   };
 };
