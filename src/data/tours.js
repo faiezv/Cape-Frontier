@@ -2908,7 +2908,6 @@ export const tours = [
 
     tags: ["Hiking", "Table Mountain", "Scenic", "Active"],
   },
-
   // =========================================== HISTORICAL
   // Langa
   {
@@ -3277,7 +3276,6 @@ export const tours = [
       "Local Guide",
     ],
   },
-
   // Robben-Island
   {
     id: 11, // New tour ID to be assigned (e.g., 33)
@@ -3535,8 +3533,7 @@ export const tours = [
       "World Heritage Site",
     ],
   },
-
-  // Mannenburg
+  // Cape flats + Mannenburg
   {
     id: 12 || "heritage-tour", // New tour ID to be assigned (e.g., 34)
     type: TOUR_TYPES.HISTORICAL,
@@ -4691,6 +4688,7 @@ export const tours = [
       {
         category: "Adults",
         pricePerPerson: 2500,
+        note: "Includes all entry fees.",
       },
       {
         category: "Children (12–17 years)",
@@ -4700,10 +4698,12 @@ export const tours = [
       {
         category: "Children (5-11 years)",
         pricePerPerson: 1900,
+        note: "Includes all entry fees.",
       },
       {
         category: "Children (0-4 years)",
         pricePerPerson: 0,
+        note: "Free for children under 5.",
       },
     ],
 
