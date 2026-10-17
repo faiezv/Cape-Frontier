@@ -1,4 +1,6 @@
-const SITE_URL = 'https://www.cape-frontier.co.za'
+import { site } from './siteConfig.js'
+
+const SITE_URL = site.origin
 
 /**
  * Builds Product + AggregateRating + Review JSON-LD for a single tour,

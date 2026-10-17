@@ -1,5 +1,6 @@
 // api/paystack-initialize.js
 import { verifyPriceToken } from "./_lib/verifyPriceToken.js";
+import { getSite } from "./_lib/site.js";
 
 const PAYSTACK_BASE_URL = "https://api.paystack.co";
 
@@ -16,6 +17,17 @@ const toMinorUnit = (amount, currency) => {
   return ZERO_DECIMAL.has(String(currency).toUpperCase())
     ? Math.round(n)
     : Math.round(n * 100);
+};
+
+const buildCallbackUrl = (raw, origin) => {
+  const value = toSafeString(raw);
+  if (!value) return null;
+  try {
+    const u = new URL(value, origin);
+    return `${origin}${u.pathname}${u.search}`;
+  } catch {
+    return null;
+  }
 };
 
 export default async function handler(req, res) {
@@ -131,9 +143,9 @@ export default async function handler(req, res) {
       },
     };
 
-    if (toSafeString(callbackUrl)) {
-      payload.callback_url = toSafeString(callbackUrl);
-    }
+
+    const callback = buildCallbackUrl(callbackUrl, getSite(req).origin);
+    if (callback) payload.callback_url = callback;
 
     const paystackRes = await fetch(
       `${PAYSTACK_BASE_URL}/transaction/initialize`,

@@ -4,12 +4,26 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "routes": [
+    { "handle": "filesystem" },
     {
-      "handle": "filesystem"
+      "src": "/(.*)",
+      "has": [{ "type": "host", "value": "(www\\.)?cape-frontier\\.com" }],
+      "dest": "/com/$1",
+      "check": true
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "has": [{ "type": "host", "value": "(www\\.)?cape-frontier\\.com" }],
+      "dest": "/com/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/coza/$1",
+      "check": true
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/coza/index.html"
     }
   ]
 }

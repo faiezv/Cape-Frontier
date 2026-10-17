@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite-react-ssg dev",
-    "build": "vite-react-ssg build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "graph:scan": "node scripts/scan-project.mjs"
+      "build": "rm -rf dist && npm run build:coza && npm run build:com",
+      "build:coza": "cross-env VITE_SITE=coza vite-react-ssg build && node scripts/postbuild.mjs coza",
+      "build:com": "cross-env VITE_SITE=com vite-react-ssg build && node scripts/postbuild.mjs com",
+      "preview": "vite preview --outDir dist/coza",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@babel/parser": "^7.29.9",
@@ -43,6 +44,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.24",
+    "cross-env": "^10.1.0",
     "eslint": "^8.57.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",

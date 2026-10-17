@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async'
+import { site, ORIGINS } from '../utils/siteConfig.js'
 
-const SITE_URL = 'https://www.cape-frontier.co.za'
+const SITE_URL = site.origin // www.cape-frontier.co.za or www.cape-frontier.com, per build
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg` // swap for your real default share image
 
 export default function Seo({
@@ -23,15 +24,18 @@ export default function Seo({
       <title>{title}</title>
       {description && <meta name="description" content={description} />}
 
-      {noindex ? (
-        <meta name="robots" content="noindex, nofollow" />
-      ) : (
-        <link rel="canonical" href={canonical} />
-      )}
+      {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+      {/* Canonical + hreflang pair (only for indexable pages) */}
+      {!noindex && <link rel="canonical" href={canonical} />}
+      {!noindex && <link rel="alternate" hrefLang="en-za" href={`${ORIGINS.coza}${path}`} />}
+      {!noindex && <link rel="alternate" hrefLang="en" href={`${ORIGINS.com}${path}`} />}
+      {!noindex && <link rel="alternate" hrefLang="x-default" href={`${ORIGINS.com}${path}`} />}
 
       {/* Open Graph */}
       <meta property="og:type" content={path === '/' ? 'website' : 'article'} />
       <meta property="og:site_name" content="Cape Frontier" />
+      <meta property="og:locale" content={site.locale} />
       <meta property="og:title" content={title} />
       {description && <meta property="og:description" content={description} />}
       <meta property="og:url" content={canonical} />

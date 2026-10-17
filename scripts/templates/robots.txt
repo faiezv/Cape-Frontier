@@ -3,5 +3,6 @@ Allow: /
 Disallow: /checkout
 Disallow: /success
  
-Sitemap: https://www.cape-frontier.co.za/sitemap.xml
+Sitemap: {{ORIGIN}}/sitemap.xml
  
+Sitemap: {{ORIGIN}}/sitemap.xml
