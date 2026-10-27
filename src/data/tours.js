@@ -879,7 +879,7 @@ export const tours = [
       ],
     },
 
-  
+
 
     description:
       "Experience one of Cape Town's most iconic adventures — a scenic tandem paragliding flight over the Atlantic coastline. Guests enjoy breathtaking views of Sea Point, the Twelve Apostles, and the city bowl while flying with a licensed and accredited tandem paragliding operator.",
@@ -2647,7 +2647,7 @@ export const tours = [
       ],
     },
 
-     description:
+    description:
       "A guided hike up one of Cape Town’s most iconic mountains. Lion’s Head offers panoramic views of the city, Table Mountain, Camps Bay, and the Atlantic Ocean.",
 
     highlights: [
@@ -8697,7 +8697,7 @@ export const tours = [
         image: "",
       },
     ],
-    
+
     securityAndLiability: null,
 
     accommodation: {
@@ -8874,42 +8874,42 @@ export const tours = [
       enabled: true,
       icon: "",
       tiers: [
-      {
-        minPeople: 2,
-        maxPeople: 2,
-        perPerson: 3200,
-        discountPercent: null,
-        label: "2-3 Guests",
-        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
-      },
-      {
-        minPeople: 3,
-        maxPeople: 3,
-        perPerson: 2650,
-        label: "3 Guests",
-        discountPercent: null,
-        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
-      },
-      {
-        minPeople: 4,
-        maxPeople: 4,
-        perPerson: 2450,
-        label: "5–7 Guests",
-        discountPercent: null,
-        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
-      },
-      {
-        minPeople: 5,
-        maxPeople: 7,
-        perPerson: 2150,
-        label: "5–7 Guests",
-        discountPercent: null,
-        note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
-      },
+        {
+          minPeople: 2,
+          maxPeople: 2,
+          perPerson: 3200,
+          discountPercent: null,
+          label: "2-3 Guests",
+          note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
+        },
+        {
+          minPeople: 3,
+          maxPeople: 3,
+          perPerson: 2650,
+          label: "3 Guests",
+          discountPercent: null,
+          note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
+        },
+        {
+          minPeople: 4,
+          maxPeople: 4,
+          perPerson: 2450,
+          label: "5–7 Guests",
+          discountPercent: null,
+          note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
+        },
+        {
+          minPeople: 5,
+          maxPeople: 7,
+          perPerson: 2150,
+          label: "5–7 Guests",
+          discountPercent: null,
+          note: "Includes standard wine tastings with cheese OR chocolate pairing, Franschhoek Wine Tram ticket and private vehicle.",
+        },
       ],
     },
 
-   
+
 
     description:
       "A luxurious full-day journey through the Stellenbosch and Franschhoek Winelands, featuring three premium wine estates, breathtaking scenery, included cheese OR chocolate pairings, and the iconic Franschhoek Wine Tram. Perfect for couples, families and wine lovers seeking a relaxed, scenic and unforgettable Cape Winelands experience. The tour is family-friendly, with spacious wine-estate lawns, mountain scenery, outdoor areas and an open-air Wine Tram experience that children can enjoy.",
@@ -9823,39 +9823,39 @@ export const tours = [
     ],
 
     groupPricing: {
-    enabled: true,
-    icon: "",
-    tiers: [
-      {
-        minPeople: 2,
-        maxPeople: 3,
-        perPerson: 3200,
-        label: "2–3 guests",
-        note: "Adult rate. Minimum tour total of R6,400 covers 2 guests.",
-      },
-      {
-        minPeople: 4,
-        maxPeople: 6,
-        perPerson: 3100,
-        label: "4–6 guests",
-        note: "Adult rate for groups of 4–6 guests.",
-      },
-      {
-        minPeople: 7,
-        maxPeople: 10,
-        perPerson: 3000,
-        label: "7–10 guests",
-        note: "Adult rate for groups of 7–10 guests.",
-      },
-      {
-        minPeople: 11,
-        maxPeople: null,
-        perPerson: null,
-        label: "11+ guests",
-        note: "Custom quote based on group size and requirements.",
-      },
-    ],
-  },
+      enabled: true,
+      icon: "",
+      tiers: [
+        {
+          minPeople: 2,
+          maxPeople: 3,
+          perPerson: 3200,
+          label: "2–3 guests",
+          note: "Adult rate. Minimum tour total of R6,400 covers 2 guests.",
+        },
+        {
+          minPeople: 4,
+          maxPeople: 6,
+          perPerson: 3100,
+          label: "4–6 guests",
+          note: "Adult rate for groups of 4–6 guests.",
+        },
+        {
+          minPeople: 7,
+          maxPeople: 10,
+          perPerson: 3000,
+          label: "7–10 guests",
+          note: "Adult rate for groups of 7–10 guests.",
+        },
+        {
+          minPeople: 11,
+          maxPeople: null,
+          perPerson: null,
+          label: "11+ guests",
+          note: "Custom quote based on group size and requirements.",
+        },
+      ],
+    },
 
 
     description:
@@ -10264,6 +10264,514 @@ export const tours = [
       "family-friendly",
     ],
   },
+    // 4-Day Gondwana & Garden Route
+  {
+    id: null, // assign
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.MULTI_DAY,
+
+    title: "4-Day Gondwana Safari & Garden Route Experience",
+    slug: "4-day-gondwana-garden-route-safari",
+    canonicalPath: "/tours/4-day-gondwana-garden-route-safari",
+    // childFriendly: ???, // QUERY CLIENT
+    // daysInAdvance: ???, // QUERY CLIENT (booking cut-off for the 12–15 Dec departure)
+
+    seo: {
+      title:
+        "4-Day Gondwana Big Five Safari & Garden Route Tour from Cape Town | Cape Frontier Tours",
+      description:
+        "4 days, 3 nights: luxury Big Five safari at Gondwana, Mossel Bay zipline, Knysna sunset cruise and wildlife sanctuaries. Departs Cape Town 12 Dec 2026.",
+      keywords: [
+        "Gondwana safari",
+        "Gondwana Private Game Reserve",
+        "Garden Route tour",
+        "4 day Garden Route tour",
+        "Big Five safari Garden Route",
+        "Mossel Bay zipline",
+        "Knysna sunset cruise",
+        "Knysna Elephant Park",
+        "Monkeyland",
+        "Birds of Eden",
+        "Cape Town multi-day tour",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image:
+      "/src/assets/images/tours/packages/4-day-gondwana-garden-route/hero.webp", // TODO
+    images: [], // TODO
+    imageFolder: "packages/4-day-gondwana-garden-route",
+    videos: [],
+
+    location: "Garden Route, South Africa",
+    duration: "4 Days / 3 Nights",
+
+    priceBase: 39500, // only known price; lower it if group discounts are confirmed
+    minPeople: 1, // QUERY CLIENT
+    baseCurrency: "ZAR",
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+
+    pricing: [
+      {
+        category: "Standard package",
+        pricePerPerson: 39500, // QUERY CLIENT: per person, per couple, or per room?
+        note: "4 days / 3 nights including accommodation, game drives, Mossel Bay zipline and Knysna sunset cruise.",
+      },
+
+      // QUERY CLIENT: left out on purpose. TourPricing runs Number(pricePerPerson),
+      // so null, "" or undefined would render "R0.00" or "RNaN" on the live page.
+      // { category: "Solo Traveller", pricePerPerson: ???, note: "" },
+      // { category: "Children (12-17 years)", pricePerPerson: ???, note: "" },
+      // { category: "Children (4–12 years)", pricePerPerson: ???, note: "" },
+      // { category: "Children (0–3 years)", pricePerPerson: ???, note: "" },
+    ],
+
+    additionalPricing: [
+      {
+        type: "request",
+        category: "Optional Wolf Sanctuary Visit (Day 4)",
+        price: null, // QUERY CLIENT
+        unit: "per person",
+        currency: "ZAR",
+        note: "Optional stop on the return to Cape Town. Price on request.",
+      },
+    ],
+
+    groupPricing: {
+      enabled: false, // QUERY CLIENT: turn on only if group discounts exist
+      icon: "/icons/savemore.png",
+      tiers: [
+        // { minPeople: 2, maxPeople: 2, perPerson: ???, label: "2 Guests", note: "" },
+        // { minPeople: 3, maxPeople: 4, perPerson: ???, label: "3–4 Guests", note: "" },
+        // { minPeople: 5, perPerson: ???, label: "5+ Guests", note: "" },
+      ],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "Escape on an unforgettable journey along South Africa's famous Garden Route. Enjoy luxury accommodation, thrilling adventure activities, spectacular coastal scenery and an authentic Big Five safari at Gondwana Private Game Reserve. This carefully crafted itinerary combines relaxation, wildlife encounters, breathtaking landscapes and adventure into one extraordinary holiday experience.",
+
+    highlights: [
+      {
+        text: "Gondwana Private Game Reserve — Luxury Big Five safari with game drives",
+      },
+      {
+        text: "Mossel Bay Zipline Adventure — The world's longest over-ocean zipline",
+      },
+      {
+        text: "Knysna Sunset Cruise — A lagoon cruise past the Knysna Heads",
+      },
+      { text: "Monkeyland Sanctuary" },
+      { text: "Birds of Eden" },
+      { text: "Jukani Wildlife Sanctuary" },
+      { text: "Knysna Elephant Park" },
+    ],
+
+    included: [
+      {
+        text: "3 nights' accommodation (Gondwana Private Game Reserve, then Knysna Waterfront Lodge)",
+      },
+      { text: "Free Wi-Fi in the lodge and rooms at Gondwana" },
+      { text: "Lunch and dinner on Day 1" },
+      { text: "Afternoon and morning game drives with beverages and snacks" },
+      { text: "Breakfast on the morning of 13 December" },
+      { text: "Housekeeping" },
+      {
+        text: "Mossel Bay Zipline experience (the world's longest over-ocean zipline)",
+      },
+      { text: "Knysna Sunset Lagoon Cruise" },
+      {
+        text: "Complimentary filtered water, coffee and tea in accommodation and during meals",
+      },
+      // QUERY CLIENT: entry fees (Jukani, Monkeyland, Birds of Eden, Elephant Park),
+      // vehicle, driver/guide and transfers are not stated in the source, so not listed.
+    ],
+
+    excluded: [
+      {
+        text: "Soft drinks and alcoholic beverages (except those served on game drives)",
+      },
+      { text: "Lunches and selected dinners not listed as included" },
+      { text: "Travel insurance" },
+      { text: "Personal expenses" },
+      { text: "Gratuities" },
+    ],
+
+    pickupOptions: [], // QUERY CLIENT: pickup points, if offered
+    requirements: [],
+
+    arrangements: {
+      availability: "Fixed dates: 12–15 December 2026",
+      duration: "4 Days / 3 Nights",
+      operatingTime: "",
+      departure: "11:00 from Cape Town",
+      return: "15 December 2026, return to Cape Town",
+      location: "Cape Town → Gondwana → Knysna → Cape Town",
+      clothing: [],
+      thingsToBring: [],
+      passengerPolicy: "",
+      notes: [
+        "Gondwana check-in 14:00; check-out 11:00 on 13 December 2026",
+        "Optional Wolf Sanctuary visit on Day 4",
+      ],
+    },
+
+    // null until supplied (empty objects are truthy and would
+    // render empty sections in TourDetails)
+    weatherPolicy: null,
+    cancellationPolicy: null,
+    safetyPolicy: null,
+
+    /*
+     * MULTI-DAY ITINERARY
+     */
+    itinerary: {
+      intro: {
+        title: "Your 4-Day Garden Route Journey",
+        description:
+          "From a luxury Big Five safari at Gondwana to the lagoon, forests and wildlife sanctuaries around Knysna.",
+      },
+
+      route: {
+        title: "Cape Town → Gondwana → Mossel Bay → Knysna → Cape Town",
+        description: "",
+      },
+
+      days: [
+        {
+          day: 1,
+          title: "Cape Town → Gondwana Game Reserve",
+          route: "Cape Town → Gondwana Private Game Reserve",
+          description:
+            "Drive the Garden Route to Gondwana Private Game Reserve, check in, enjoy lunch and head out on an afternoon game drive before dinner at the lodge.",
+
+          activities: [
+            {
+              id: "d1-depart",
+              title: "Depart Cape Town",
+              description:
+                "Scenic drive along the Garden Route towards Gondwana Private Game Reserve.",
+              time: "11:00",
+              duration: "",
+              type: "transfer",
+              optional: false,
+              image: "/images/tours/shared/pickup/1.webp",
+            },
+            {
+              id: "d1-checkin",
+              title: "Check in at Gondwana",
+              description:
+                "Settle into your room at the lodge. Lunch is included.",
+              time: "14:00",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+              image:
+                "/images/tours/packages/4-day-gondwana-garden-route/d1-lodge.webp", // TODO
+            },
+            {
+              id: "d1-gamedrive",
+              title: "Afternoon game drive",
+              description:
+                "Look for the Big Five on a guided game drive, with beverages and snacks. Dinner follows at the lodge.",
+              time: "",
+              duration: "",
+              type: "safari",
+              optional: false,
+              image:
+                "/images/tours/packages/4-day-gondwana-garden-route/d1-gamedrive.webp", // TODO
+            },
+          ],
+
+          meals: { breakfast: false, lunch: true, dinner: true },
+
+          accommodation: {
+            title: "Gondwana Private Game Reserve",
+            location: "Garden Route, Western Cape",
+            availabilityNote:
+              "Check-in 14:00. Check-out 11:00 on 13 December 2026.",
+            options: [
+              "Wi-Fi in lodge and rooms",
+              "Housekeeping",
+              "Filtered water, coffee & tea",
+            ],
+            image: "/images/tours/packages/4-day-gondwana-garden-route/gondwana-lodge.webp",// TODO
+          },
+
+          images: [],
+        },
+
+        {
+          day: 2,
+          title: "Game Drive, Zipline & Sunset Cruise",
+          route: "Gondwana → Mossel Bay → Knysna",
+          description:
+            "After a morning game drive and breakfast, ride the Mossel Bay zipline, then continue to Knysna to explore Thesen Island and cruise the lagoon at sunset.",
+
+          activities: [
+            {
+              id: "d2-gamedrive",
+              title: "Morning game drive",
+              description:
+                "A final game drive with beverages and snacks, then breakfast before check-out at 11:00.",
+              time: "",
+              duration: "",
+              type: "safari",
+              optional: false,
+              image:
+                "/images/tours/packages/4-day-gondwana-garden-route/d2-gamedrive.webp", // TODO
+            },
+            {
+              id: "d2-zipline",
+              title: "Mossel Bay Zipline",
+              description: "Ride the world's longest over-ocean zipline.",
+              time: "",
+              duration: "",
+              type: "adventure",
+              optional: false,
+              image:
+                "/images/tours/packages/4-day-gondwana-garden-route/d2-zipline.webp", // TODO
+            },
+            {
+              id: "d2-thesen",
+              title: "Explore Thesen Island",
+              description:
+                "Arrive at Knysna Waterfront Lodge, then stroll the marina pathways of this lagoon-side village with its boutique shops, galleries, yachts and waterfront views.",
+              time: "",
+              duration: "",
+              type: "leisure",
+              optional: false,
+              image:
+                "/images/tours/packages/4-day-gondwana-garden-route/.webp", // TODO
+            },
+            {
+              id: "d2-cruise",
+              title: "Sunset Lagoon Cruise",
+              description:
+                "Cruise the calm Knysna Lagoon, learn about the area, and pass the sandstone Knysna Heads. Look out for seabirds, cormorants, herons and African fish eagles as the sky turns orange and gold.",
+              time: "Late afternoon",
+              duration: "",
+              type: "leisure",
+              optional: false,
+              image:
+                "/images/tours/packages/4-day-gondwana-garden-route/d2-cruise.webp", // TODO
+            },
+          ],
+
+          meals: { breakfast: true, lunch: false, dinner: false },
+
+          accommodation: {
+            title: "Knysna Waterfront Lodge",
+            location: "Knysna, Garden Route",
+            availabilityNote: "",
+            options: [],
+              image:
+                "/images/tours/packages/4-day-gondwana-garden-route/knysna-waterfront-lodge.webp", // TODO
+          },
+
+          images: [],
+        },
+
+        {
+          day: 3,
+          title: "Wildlife & Nature Experience",
+          route: "Knysna Waterfront Lodge → Wildlife sanctuaries → Knysna",
+          description:
+            "A day of wildlife and nature around Knysna: Jukani Wildlife Sanctuary, Monkeyland, Birds of Eden and the Knysna Heads viewpoint.",
+
+          activities: [
+            {
+              id: "d3-jukani",
+              title: "Jukani Wildlife Sanctuary",
+              description: "TODO: short description.",
+              time: "",
+              duration: "",
+              type: "wildlife",
+              optional: false,
+              image:
+                "/images/tours/packages/4-day-gondwana-garden-route/d3-jukani.webp", // TODO
+            },
+            {
+              id: "d3-monkeyland",
+              title: "Monkeyland",
+              description: "TODO: short description.",
+              time: "",
+              duration: "",
+              type: "wildlife",
+              optional: false,
+              image:
+                "/images/tours/packages/4-day-gondwana-garden-route/d3-monkeyland.webp", // TODO
+            },
+            {
+              id: "d3-birds",
+              title: "Birds of Eden",
+              description: "TODO: short description.",
+              time: "",
+              duration: "",
+              type: "wildlife",
+              optional: false,
+              image:
+                "/images/tours/packages/4-day-gondwana-garden-route/d3-birds.webp", // TODO
+            },
+            {
+              id: "d3-heads",
+              title: "Knysna Heads Scenic Viewpoint",
+              description:
+                "See the dramatic sandstone cliffs that guard the entrance between the lagoon and the Indian Ocean.",
+              time: "",
+              duration: "",
+              type: "scenic",
+              optional: false,
+              image:
+                "/images/tours/packages/4-day-gondwana-garden-route/d3-heads.webp", // TODO
+            },
+          ],
+
+          // meals: QUERY CLIENT (breakfast on Days 3 and 4 not stated)
+          accommodation: {
+            title: "Knysna Waterfront Lodge",
+            location: "Knysna, Garden Route",
+            availabilityNote: "",
+            options: [],
+          },
+
+          images: [],
+        },
+
+        {
+          day: 4,
+          title: "Elephants & the Return to Cape Town",
+          route: "Knysna → Cape Town",
+          description:
+            "Visit Knysna Elephant Park, with an optional stop at the Wolf Sanctuary, then drive back to Cape Town with photo stops along the way.",
+
+          activities: [
+            {
+              id: "d4-elephants",
+              title: "Knysna Elephant Park",
+              description: "TODO: short description.",
+              time: "",
+              duration: "",
+              type: "wildlife",
+              optional: false,
+              image:
+                "/images/tours/packages/4-day-gondwana-garden-route/d4-elephants.webp", // TODO
+            },
+            {
+              id: "d4-wolf",
+              title: "Wolf Sanctuary",
+              description: "An optional extra stop. Price on request.",
+              time: "",
+              duration: "",
+              type: "wildlife",
+              optional: true,
+              image:
+                "/images/tours/packages/4-day-gondwana-garden-route/d4-wolf.webp", // TODO
+            },
+            {
+              id: "d4-return",
+              title: "Return to Cape Town",
+              description:
+                "Drive back with breathtaking views and photo stops on route.",
+              time: "",
+              duration: "",
+              type: "scenic",
+              optional: false,
+              image: "/images/tours/shared/return/1.webp",
+            },
+          ],
+
+          // meals: QUERY CLIENT
+
+          images: [],
+        },
+      ],
+    },
+
+    stops: null,
+
+    vehicle: null,
+
+    securityAndLiability: null,
+
+    accommodation: {
+      included: true,
+      type: "Luxury Lodge",
+      description:
+        "1 night at Gondwana Private Game Reserve and 2 nights at Knysna Waterfront Lodge.",
+    },
+
+    needToKnow: [
+      { text: "Fixed departure: 12–15 December 2026" },
+      {
+        text: "Gondwana check-in is 14:00 and check-out is 11:00 on 13 December",
+      },
+      {
+        text: "A guest conservation levy is charged per stay at Gondwana (amount to be confirmed)",
+      },
+      {
+        text: "Complimentary filtered water, coffee and tea are provided in all accommodation and during meals",
+      },
+      {
+        text: "Soft drinks and alcoholic drinks are for your own account, except those served on game drives",
+      },
+      { text: "The Wolf Sanctuary visit on Day 4 is optional" },
+    ],
+
+    faqs: [
+      {
+        question: "How long is the tour?",
+        answer:
+          "This is a 4-day, 3-night tour departing and returning to Cape Town, running 12–15 December 2026.",
+      },
+      {
+        question: "Where do we stay?",
+        answer:
+          "One night at Gondwana Private Game Reserve and two nights at Knysna Waterfront Lodge.",
+      },
+      {
+        question: "What is included?",
+        answer:
+          "Accommodation, Wi-Fi at the lodge, lunch and dinner on Day 1, afternoon and morning game drives with beverages and snacks, breakfast on 13 December, housekeeping, the Mossel Bay zipline and the Knysna sunset lagoon cruise.",
+      },
+      {
+        question: "What is not included?",
+        answer:
+          "Soft drinks and alcoholic drinks (except on game drives), lunches and selected dinners not listed as included, travel insurance, personal expenses and gratuities.",
+      },
+      {
+        question: "Which places does the tour visit?",
+        answer:
+          "Gondwana Private Game Reserve, the Mossel Bay zipline, Thesen Island, a Knysna sunset lagoon cruise, Jukani Wildlife Sanctuary, Monkeyland, Birds of Eden, the Knysna Heads viewpoint and Knysna Elephant Park, with an optional Wolf Sanctuary stop.",
+      },
+    ],
+
+    tags: [
+      "Garden Route",
+      "Gondwana Game Reserve",
+      "Big 5 Safari",
+      "Safari",
+      "Multi-Day",
+      "4 Day Tour",
+      "Mossel Bay",
+      "Zipline",
+      "Knysna",
+      "Sunset Cruise",
+      "Wildlife",
+      "Luxury Safari",
+      "Adventure",
+      "South Africa",
+    ],
+  },
+
 ];
 
 export const getAllTourGalleryImages = (tour) => {
@@ -10305,127 +10813,127 @@ export const getToursByCategory = (category) =>
 
 export default tours;
 
-  // TEMAPLTE
-  // {
-  //   id: null,
-  //   type: TOUR_TYPES.PACKAGES,
-  //   category: TOUR_MODIFIERS.MULTI_DAY,
+// TEMAPLTE
+// {
+//   id: null,
+//   type: TOUR_TYPES.PACKAGES,
+//   category: TOUR_MODIFIERS.MULTI_DAY,
 
-  //   title: "",
-  //   slug: "",
-  //   canonicalPath: "",
+//   title: "",
+//   slug: "",
+//   canonicalPath: "",
 
-  //   seo: {
-  //     title: "",
-  //     description: "",
-  //     keywords: [],
-  //   },
+//   seo: {
+//     title: "",
+//     description: "",
+//     keywords: [],
+//   },
 
-  //   workflow: defaultWorkflow,
+//   workflow: defaultWorkflow,
 
-  //   image: "",
-  //   images: [],
-  //   imageFolder: "",
-  //   videos: [],
+//   image: "",
+//   images: [],
+//   imageFolder: "",
+//   videos: [],
 
-  //   location: "",
-  //   duration: "",
+//   location: "",
+//   duration: "",
 
-  //   priceBase: 0,
-  //   minPeople: 1,
-  //   baseCurrency: "ZAR",
-  //   supportedCurrencies: SUPPORTED_CURRENCIES,
+//   priceBase: 0,
+//   minPeople: 1,
+//   baseCurrency: "ZAR",
+//   supportedCurrencies: SUPPORTED_CURRENCIES,
 
-  //   pricing: [],
+//   pricing: [],
 
-  //   additionalPricing: [],
+//   additionalPricing: [],
 
-  //   groupPricing: {
-  //     enabled: false,
-  //     icon: "",
-  //     tiers: [],
-  //   },
+//   groupPricing: {
+//     enabled: false,
+//     icon: "",
+//     tiers: [],
+//   },
 
-  //   rating: null,
-  //   stars: null,
-  //   mainReviewerName: "",
-  //   mainReviewerCountry: "",
-  //   reviewYear: null,
-  //   otherReviews: null,
-  //   mainReview: "",
+//   rating: null,
+//   stars: null,
+//   mainReviewerName: "",
+//   mainReviewerCountry: "",
+//   reviewYear: null,
+//   otherReviews: null,
+//   mainReview: "",
 
-  //   description: "",
+//   description: "",
 
-  //   highlights: [],
-  //   included: [],
-  //   excluded: [],
+//   highlights: [],
+//   included: [],
+//   excluded: [],
 
-  //   pickupOptions: [],
-  //   requirements: [],
+//   pickupOptions: [],
+//   requirements: [],
 
-  //   arrangements: {
-  //     availability: "",
-  //     duration: "",
-  //     operatingTime: "",
-  //     departure: "",
-  //     return: "",
-  //     location: "",
-  //     clothing: [],
-  //     thingsToBring: [],
-  //     passengerPolicy: "",
-  //     notes: [],
-  //   },
+//   arrangements: {
+//     availability: "",
+//     duration: "",
+//     operatingTime: "",
+//     departure: "",
+//     return: "",
+//     location: "",
+//     clothing: [],
+//     thingsToBring: [],
+//     passengerPolicy: "",
+//     notes: [],
+//   },
 
-  //   weatherPolicy: {
-  //     summary: "",
-  //     items: [],
-  //   },
+//   weatherPolicy: {
+//     summary: "",
+//     items: [],
+//   },
 
-  //   cancellationPolicy: {
-  //     summary: "",
-  //     items: [],
-  //   },
+//   cancellationPolicy: {
+//     summary: "",
+//     items: [],
+//   },
 
-  //   safetyPolicy: {
-  //     summary: "",
-  //     items: [],
-  //   },
+//   safetyPolicy: {
+//     summary: "",
+//     items: [],
+//   },
 
-  //   itinerary: {
-  //     intro: {
-  //       title: "",
-  //       description: "",
-  //     },
+//   itinerary: {
+//     intro: {
+//       title: "",
+//       description: "",
+//     },
 
-  //     route: {
-  //       title: "",
-  //       description: "",
-  //     },
+//     route: {
+//       title: "",
+//       description: "",
+//     },
 
-  //     days: [],
-  //   },
+//     days: [],
+//   },
 
-  //   stops: null,
+//   stops: null,
 
-  //   // routeInformation: {
-  //   //   title: "",
-  //   //   description: "",
-  //   //   items: [],
-  //   // },
+//   // routeInformation: {
+//   //   title: "",
+//   //   description: "",
+//   //   items: [],
+//   // },
 
-  //   vehicle: null,
+//   vehicle: null,
 
-  //   securityAndLiability: null,
+//   securityAndLiability: null,
 
-  //   accommodation: {
-  //     included: false,
-  //     type: "",
-  //     description: "",
-  //   },
+//   accommodation: {
+//     included: false,
+//     type: "",
+//     description: "",
+//   },
 
-  //   needToKnow: [],
+//   needToKnow: [],
 
-  //   faqs: [],
+//   faqs: [],
 
-  //   tags: [],
-  // },
+//   tags: [],
+// },

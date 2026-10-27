@@ -1,5 +1,6 @@
 import React, {
   useEffect,
+  useId,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -50,6 +51,8 @@ import TourFAQ from "../components/TourDetails/TourFAQ";
 gsap.registerPlugin(ScrollToPlugin, ScrollTrigger);
 
 const PIN_TOP_OFFSET = 96;
+
+const PHOTO_INBOX_EMAIL = "admin@cape-frontier.co.za";
 
 const formatCompactMoney = (amount, currencyCode = "ZAR") => formatMoney(amount, currencyCode);
 
@@ -197,6 +200,320 @@ const RouteIcon = ({ className = "h-4 w-4" }) => (
     <path d="M8.2 14.8 15.8 9.2" />
   </svg>
 );
+
+/* =========================================================
+   SECTION ICONS
+   Used inside the badge on the left of every content block title.
+   Pass icon="name" to ContentBlock / CollapsibleBlock.
+   ========================================================= */
+const SECTION_ICONS = {
+  pricing: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M14.5 9.2c-.6-.8-1.6-1.2-2.6-1.2-1.5 0-2.6.8-2.6 2s1 1.7 2.7 2.1c1.7.4 2.7.9 2.7 2.1s-1.1 2-2.7 2c-1.1 0-2.1-.5-2.7-1.3" />
+      <path d="M12 6.5V8" />
+      <path d="M12 16v1.5" />
+    </>
+  ),
+  overview: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5" />
+      <path d="M12 8h.01" />
+    </>
+  ),
+  gallery: (
+    <>
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <circle cx="9" cy="10" r="1.5" />
+      <path d="m21 16-5-5-9 9" />
+    </>
+  ),
+  included: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m8 12 3 3 5-6" />
+    </>
+  ),
+  highlights: (
+    <path d="m12 2.8 2.8 5.7 6.3.9-4.55 4.45 1.08 6.27L12 17.15l-5.63 2.97 1.08-6.27L2.9 9.4l6.3-.9L12 2.8Z" />
+  ),
+  requirements: (
+    <>
+      <path d="M7 3h7l4 4v14H7z" />
+      <path d="M14 3v4h4" />
+      <path d="M10 13h5" />
+      <path d="M10 17h5" />
+    </>
+  ),
+  arrangements: (
+    <>
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <path d="M3 10h18" />
+      <path d="M8 3v4" />
+      <path d="M16 3v4" />
+    </>
+  ),
+  weather: (
+    <path d="M7 18a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 9.5a4.25 4.25 0 0 1 0 8.5H7Z" />
+  ),
+  cancellation: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m9 9 6 6" />
+      <path d="m15 9-6 6" />
+    </>
+  ),
+  safety: (
+    <>
+      <path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6l-7-3Z" />
+      <path d="m9 12 2 2 4-4" />
+    </>
+  ),
+  vehicle: (
+    <>
+      <path d="M5 17H3v-5l2-5h14l2 5v5h-2" />
+      <circle cx="7.5" cy="17" r="1.5" />
+      <circle cx="16.5" cy="17" r="1.5" />
+      <path d="M3 12h18" />
+    </>
+  ),
+  route: (
+    <>
+      <path d="M6 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+      <path d="M18 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+      <path d="M8.2 14.8 15.8 9.2" />
+    </>
+  ),
+  security: (
+    <>
+      <rect x="5" y="11" width="14" height="10" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </>
+  ),
+  alert: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 8v5" />
+      <path d="M12 16h.01" />
+    </>
+  ),
+  faq: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7" />
+      <path d="M12 17h.01" />
+    </>
+  ),
+  camera: (
+    <>
+      <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </>
+  ),
+};
+
+function SectionIcon({ name, className = "h-4 w-4" }) {
+  const icon = SECTION_ICONS[name];
+
+  if (!icon) return null;
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      {icon}
+    </svg>
+  );
+}
+
+function PlusIcon({ className = "h-4 w-4" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.8"
+      strokeLinecap="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M12 5v14" />
+      <path d="M5 12h14" />
+    </svg>
+  );
+}
+
+/* =========================================================
+   COLLAPSIBLE BLOCK
+   One combined badge on the left: the section icon with a small
+   corner chip holding a plus that rotates into an X when open.
+   If no icon is passed, the badge itself shows the plus / X.
+
+   The whole header row gets a very light hover highlight.
+
+   hideInnerHeading: hides the first heading inside the child
+   (and a small eyebrow label above it) so the title only shows
+   once, in the collapsible header.
+
+   hideTexts: array of exact strings. Any inner element whose
+   text matches one of them is hidden.
+
+   Tip: move this to components/CollapsibleBlock.jsx and export.
+   ========================================================= */
+export function CollapsibleBlock({
+  eyebrow,
+  title,
+  icon,
+  children,
+  defaultOpen = true,
+  hideInnerHeading = false,
+  hideTexts = [],
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const panelId = useId();
+  const contentRef = useRef(null);
+  const hideTextsKey = hideTexts.join("|");
+
+  // Hide the wrapped component's own title / labels so they aren't duplicated.
+  useLayoutEffect(() => {
+    if (!hideInnerHeading && !hideTextsKey) return undefined;
+
+    const root = contentRef.current;
+    if (!root) return undefined;
+
+    const normalizedTexts = hideTextsKey
+      ? hideTextsKey.split("|").map((text) => text.trim().toLowerCase())
+      : [];
+
+    const applyHiding = () => {
+      if (hideInnerHeading) {
+        const heading = root.querySelector("h1, h2, h3");
+
+        if (heading && heading.dataset.collapsibleHidden !== "true") {
+          const previous = heading.previousElementSibling;
+
+          if (
+            previous &&
+            /^(SPAN|P)$/.test(previous.tagName) &&
+            (previous.textContent || "").trim().length < 60
+          ) {
+            previous.style.display = "none";
+          }
+
+          heading.style.display = "none";
+          heading.dataset.collapsibleHidden = "true";
+        }
+      }
+
+      if (normalizedTexts.length) {
+        root.querySelectorAll("*").forEach((element) => {
+          if (element.children.length > 0) return;
+
+          const text = (element.textContent || "").trim().toLowerCase();
+
+          if (normalizedTexts.includes(text)) {
+            element.style.display = "none";
+          }
+        });
+      }
+    };
+
+    applyHiding();
+
+    // Child content may render a moment later, or re-render.
+    const observer = new MutationObserver(applyHiding);
+    observer.observe(root, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, [hideInnerHeading, hideTextsKey]);
+
+  // Height changes shift every pinned ScrollTrigger on the page,
+  // so recalc once the transition has finished.
+  const handleTransitionEnd = (event) => {
+    if (event.target !== event.currentTarget) return;
+    ScrollTrigger.refresh();
+  };
+
+  return (
+    <section>
+      {eyebrow && (
+        <span className="block font-bitter text-sm font-bold uppercase tracking-[0.12em] text-blue-600">
+          {eyebrow}
+        </span>
+      )}
+
+      <h2 className="mt-2 font-bitter text-2xl font-bold leading-none text-neutral-950 md:text-4xl">
+        <button
+          type="button"
+          onClick={() => setOpen((current) => !current)}
+          aria-expanded={open}
+          aria-controls={panelId}
+          className="group -mx-2 flex w-[calc(100%+1rem)] items-center gap-3 rounded-[1rem] px-2 py-1.5 text-left transition-colors duration-200 hover:bg-blue-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 md:gap-4"
+        >
+          {/* COMBINED BADGE: section icon + open/close chip */}
+          <span
+            aria-hidden="true"
+            className="relative flex h-9 w-9 shrink-0 items-center justify-center md:h-10 md:w-10"
+          >
+            {icon ? (
+              <>
+                <span className="flex h-full w-full items-center justify-center rounded-full bg-blue-600 text-white shadow-[0_8px_20px_rgba(37,99,235,0.22)] transition-transform duration-200 group-hover:-translate-y-px">
+                  <SectionIcon name={icon} className="h-4 w-4 md:h-5 md:w-5" />
+                </span>
+
+                <span
+                  className={`absolute -bottom-1 -right-1 flex h-[18px] w-[18px] items-center justify-center rounded-full border border-blue-200 bg-white text-blue-700 shadow-sm transition-all duration-300 ease-out group-hover:border-blue-400 md:h-5 md:w-5 ${
+                    open ? "rotate-45" : "rotate-0"
+                  }`}
+                >
+                  <PlusIcon className="h-2.5 w-2.5 md:h-3 md:w-3" />
+                </span>
+              </>
+            ) : (
+              <span
+                className={`flex h-full w-full items-center justify-center rounded-full border border-blue-100 bg-blue-50 text-blue-700 transition-all duration-300 ease-out group-hover:border-blue-200 group-hover:bg-blue-100 ${
+                  open ? "rotate-45" : "rotate-0"
+                }`}
+              >
+                <PlusIcon className="h-4 w-4 md:h-5 md:w-5" />
+              </span>
+            )}
+          </span>
+
+          <span className="min-w-0 flex-1">{title}</span>
+        </button>
+      </h2>
+
+      <div
+        id={panelId}
+        onTransitionEnd={handleTransitionEnd}
+        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        }`}
+      >
+        <div
+          className="min-h-0 overflow-hidden"
+          style={{
+            visibility: open ? "visible" : "hidden",
+            transition: `visibility 0s linear ${open ? "0s" : "300ms"}`,
+          }}
+        >
+          <div ref={contentRef} className="pt-5">
+            {children}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function TourDetails() {
   const { slug } = useParams();
@@ -521,6 +838,24 @@ export default function TourDetails() {
     }, 200);
   }, [location.hash, isCompactLayout]);
 
+  // Kept above the `if (!tour)` early return so hooks run in a stable order.
+  useEffect(() => {
+    if (!location.hash) return;
+
+    const id = location.hash.replace("#", "");
+
+    const element = document.getElementById(id);
+
+    if (!element) return;
+
+    requestAnimationFrame(() => {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }, [location]);
+
   if (!tour) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-white px-6 text-center">
@@ -603,23 +938,6 @@ export default function TourDetails() {
     }, 260);
   };
 
-  useEffect(() => {
-    if (!location.hash) return;
-
-    const id = location.hash.replace("#", "");
-
-    const element = document.getElementById(id);
-
-    if (!element) return;
-
-    requestAnimationFrame(() => {
-      element.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    });
-  }, [location]);
-
   return (
     <>
       <Seo
@@ -668,7 +986,11 @@ export default function TourDetails() {
         >
           <div ref={contentColumnRef} className="space-y-9">
             {/* PRICING */}
-            <ContentBlock eyebrow="Pricing" title="Tour Pricing">
+            <ContentBlock
+              eyebrow="Pricing"
+              title="Tour Pricing"
+              icon="pricing"
+            >
               {/* BASE PRICE */}
               <TourPricing pricing={tour.pricing} />
 
@@ -684,64 +1006,204 @@ export default function TourDetails() {
             </ContentBlock>
 
             {/* DESCRIPTION */}
-            <ContentBlock eyebrow="Overview" title="About this experience">
+            <ContentBlock
+              eyebrow="Overview"
+              title="About this experience"
+              icon="overview"
+            >
               <p className="font-bitter text-lg text-black">
                 {tour.description}
               </p>
             </ContentBlock>
 
             {/* GALLERY */}
-            <TourGallery tour={tour} imageFolder={tour.imageFolder} />
+            <ContentBlock
+              eyebrow="Photos"
+              title="Gallery"
+              icon="gallery"
+              hideInnerHeading
+            >
+              <TourGallery tour={tour} imageFolder={tour.imageFolder} />
+
+              {/* SHARE YOUR PHOTOS BANNER */}
+              <div className="mt-5 flex flex-col gap-4 rounded-[1.1rem] border border-blue-100 bg-blue-50/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white"
+                  >
+                    <SectionIcon name="camera" className="h-5 w-5" />
+                  </span>
+
+                  <div>
+                    <p className="font-bitter text-sm font-bold text-neutral-900">
+                      Got some photos you'd like to share?
+                    </p>
+
+                    <p className="mt-1 font-bitter text-xs leading-relaxed text-neutral-600 sm:text-sm">
+                      Send them to our inbox at{" "}
+                      <a
+                        href={`mailto:${PHOTO_INBOX_EMAIL}?subject=${encodeURIComponent(
+                          `Photos from ${tour.title}`,
+                        )}`}
+                        className="font-semibold text-blue-700 underline decoration-blue-200 underline-offset-2 transition-colors hover:text-blue-900"
+                      >
+                        {PHOTO_INBOX_EMAIL}
+                      </a>{" "}
+                      and we may feature them here.
+                    </p>
+                  </div>
+                </div>
+
+                <a
+                  href={`mailto:${PHOTO_INBOX_EMAIL}?subject=${encodeURIComponent(
+                    `Photos from ${tour.title}`,
+                  )}`}
+                  className="hero-gradient inline-flex shrink-0 items-center justify-center rounded-full px-5 py-2.5 font-bitter text-xs font-semibold text-white shadow-[0_10px_24px_rgba(37,99,235,0.18)] transition hover:-translate-y-0.5 active:scale-95"
+                >
+                  Email photos
+                </a>
+              </div>
+            </ContentBlock>
 
             {/* INCLUDED AND EXCLUDED */}
-            <TourIncludedExcluded tour={tour} />
+            <ContentBlock
+              eyebrow="Inclusions"
+              title="What's included"
+              icon="included"
+              defaultOpen={false}
+              hideTexts={["Trip Clarity", "Included & Not Included"]}
+            >
+              <TourIncludedExcluded tour={tour} />
+            </ContentBlock>
 
             {/* HIGHLIGHTS */}
-            {tour.highlights && <TourHighlights highlights={tour.highlights} />}
+            {tour.highlights && (
+              <ContentBlock
+                eyebrow="Experience"
+                title="Highlights"
+                icon="highlights"
+                defaultOpen={false}
+                hideInnerHeading
+              >
+                <TourHighlights highlights={tour.highlights} />
+              </ContentBlock>
+            )}
 
             {/* REQUIREMENTS */}
             {tour.requirements?.length > 0 && (
-              <TourRequirements requirements={tour.requirements} />
+              <ContentBlock
+                eyebrow="Good to know"
+                title="Requirements"
+                icon="requirements"
+                defaultOpen={false}
+                hideInnerHeading
+              >
+                <TourRequirements requirements={tour.requirements} />
+              </ContentBlock>
             )}
 
             {/* ARRANGEMENTS */}
             {tour.arrangements && (
-              <Arrangements arrangements={tour.arrangements} />
+              <ContentBlock
+                eyebrow="Planning"
+                title="Arrangements"
+                icon="arrangements"
+                defaultOpen={false}
+                hideInnerHeading
+              >
+                <Arrangements arrangements={tour.arrangements} />
+              </ContentBlock>
             )}
 
             {/* WEATHER POLICY */}
             {tour.weatherPolicy && (
-              <TourWeatherPolicy weather={tour.weatherPolicy} />
+              <ContentBlock
+                eyebrow="Policy"
+                title="Weather policy"
+                icon="weather"
+                defaultOpen={false}
+                hideInnerHeading
+              >
+                <TourWeatherPolicy weather={tour.weatherPolicy} />
+              </ContentBlock>
             )}
 
             {/* CANCELLATION POLICY */}
             {tour.cancellationPolicy && (
-              <TourCancellationPolicy policy={tour.cancellationPolicy} />
+              <ContentBlock
+                eyebrow="Policy"
+                title="Cancellation policy"
+                icon="cancellation"
+                defaultOpen={false}
+                hideInnerHeading
+              >
+                <TourCancellationPolicy policy={tour.cancellationPolicy} />
+              </ContentBlock>
             )}
 
             {/* SAFETY POLICY */}
             {tour.safetyPolicy && (
-              <TourSafetyPolicy safety={tour.safetyPolicy} />
+              <ContentBlock
+                eyebrow="Good to know"
+                title="Safety & compliance"
+                icon="safety"
+                defaultOpen={false}
+                hideInnerHeading
+              >
+                <TourSafetyPolicy safety={tour.safetyPolicy} />
+              </ContentBlock>
             )}
 
             {/* ----------------- COBRA ------------------ */}
             {/* COBRA SPECIFIC */}
-            {tour.vehicle && <VehicleDetails vehicle={tour.vehicle} />}
+            {tour.vehicle && (
+              <ContentBlock
+                eyebrow="The ride"
+                title="Vehicle details"
+                icon="vehicle"
+                defaultOpen={false}
+                hideInnerHeading
+              >
+                <VehicleDetails vehicle={tour.vehicle} />
+              </ContentBlock>
+            )}
 
             {/* COBRA SPECIFIC */}
             {tour.routeInformation && (
-              <RouteInformation route={tour.routeInformation} />
+              <ContentBlock
+                eyebrow="Route"
+                title="Route information"
+                icon="route"
+                defaultOpen={false}
+                hideInnerHeading
+              >
+                <RouteInformation route={tour.routeInformation} />
+              </ContentBlock>
             )}
 
             {/* COBRA SPECIFIC */}
             {tour.securityAndLiability && (
-              <SecurityAndLiability security={tour.securityAndLiability} />
+              <ContentBlock
+                eyebrow="Legal"
+                title="Security & liability"
+                icon="security"
+                defaultOpen={false}
+                hideInnerHeading
+              >
+                <SecurityAndLiability security={tour.securityAndLiability} />
+              </ContentBlock>
             )}
             {/* ------------------------------------------- */}
 
             {/* NEED TO KNOW + FAQ */}
-            <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-12 sm:px-5 lg:px-5 lg:py-14 lg:grid-cols-2">
-              <ContentBlock eyebrow="Before you book..." title="Need to know">
+            <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 py-12 lg:py-14 lg:grid-cols-2">
+              <ContentBlock
+                eyebrow="Before you book..."
+                title="Need to know"
+                icon="alert"
+                defaultOpen={false}
+              >
                 <div className="grid grid-cols-1 gap-3">
                   {tour.needToKnow?.map((item, index) => (
                     <TickCard key={index} text={getItemText(item)} />
@@ -749,7 +1211,15 @@ export default function TourDetails() {
                 </div>
               </ContentBlock>
 
-              <TourFAQ faqs={tour.faqs} />
+              <ContentBlock
+                eyebrow="Questions"
+                title="FAQ"
+                icon="faq"
+                defaultOpen={false}
+                hideInnerHeading
+              >
+                <TourFAQ faqs={tour.faqs} />
+              </ContentBlock>
             </section>
           </div>
 
@@ -822,10 +1292,6 @@ export default function TourDetails() {
                     />
 
                     <div className="flex flex-col p-2">
-                      {/* <span className="rounded-full bg-green-200 px-3 py-2 font-bitter text-[10px] 
-                    font-bold w-fit uppercase text-black">
-                      Request this tour.
-                    </span> */}
                       <h3 className="font-frank text-2xl font-bold leading-[0.95] text-white">
                         {tour.title}
                       </h3>
@@ -1263,19 +1729,27 @@ function CompactLineItem({ text, variant = "tick" }) {
   );
 }
 
-function ContentBlock({ eyebrow, title, children }) {
+/* Thin wrapper around the collapsible block */
+function ContentBlock({
+  eyebrow,
+  title,
+  icon,
+  children,
+  defaultOpen = true,
+  hideInnerHeading = false,
+  hideTexts = [],
+}) {
   return (
-    <section>
-      <span className="font-bitter text-sm font-bold uppercase tracking-[0.12em] text-blue-600">
-        {eyebrow}
-      </span>
-
-      <h2 className="mt-2 font-bitter text-nuetral-950 text-2xl font-bold leading-none md:text-4xl">
-        {title}
-      </h2>
-
-      <div className="mt-5">{children}</div>
-    </section>
+    <CollapsibleBlock
+      eyebrow={eyebrow}
+      title={title}
+      icon={icon}
+      defaultOpen={defaultOpen}
+      hideInnerHeading={hideInnerHeading}
+      hideTexts={hideTexts}
+    >
+      {children}
+    </CollapsibleBlock>
   );
 }
 
@@ -1615,7 +2089,6 @@ function ItineraryImageFrame({ tour, stop, index }) {
     stop.name?.toLowerCase().includes("pickup") ||
     stop.name?.toLowerCase().includes("meeting point");
 
-  // const mainImage = stopImages[0];
   const mainImage = `images/tours/${tour.imageFolder}/stops/${index + 1}.webp`;
 
   return (
@@ -1675,10 +2148,8 @@ function MobileItineraryCarousel({ tour, stops }) {
 
   return (
     <div className="-mx-4 overflow-visible sm:-mx-5">
-      {/* <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 overscroll-x-contain touch-pan-x sm:px-5 [scrollbar-width:thin]"> */}
       <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 sm:px-5 [scrollbar-width:thin]">
         {stops.map((stop, index) => {
-          // const mainImage = stop.images?.[0];
           const mainImage = `images/tours/${tour.imageFolder}/stops/${index + 1}.webp`;
           const hasMapLink = Boolean(stop.exactLocation?.googleMapsUrl);
 
