@@ -9,13 +9,13 @@ import { resolveTourImage } from '../../utils/ImageLoader.js'
 
 // Import icons directly (or resolve via resolveImage)
 import mapPinIcon from '../../../public/icons/mapPin.png'
-import topRightArrowIcon from "../../../public/icons/topRightArrow.png"
 
 gsap.registerPlugin(ScrollTrigger)
 
-const REVIEW_CODE_PREFIX = 'TOUR-'
-const REVIEW_CODE_PATTERN = /^TOUR-[A-Z0-9]{8}$/
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+// Layout: first 3 reviews in the top row, next 4 in the bottom row,
+// everything after that lives inside the collapsible "See more reviews" area.
+const TOP_ROW_COUNT = 3
+const BOTTOM_ROW_COUNT = 4
 
 const pastelCards = [
   '#BEE9F7',
@@ -25,11 +25,7 @@ const pastelCards = [
   '#FFD1A6',
 ]
 
-const DefaultNumberBadge = ({ children }) => (
-  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-black font-frank text-xl font-black text-white shadow-[0_12px_24px_rgba(0,0,0,0.12)] sm:h-16 sm:w-16 sm:text-2xl">
-    {children}
-  </div>
-)
+const RATING_LABELS = ['Excellent', 'Amazing', 'Good', 'Decent', 'Terrible']
 
 const getTier = (rating) => {
   if (rating >= 4.8) return 'Excellent'
@@ -40,19 +36,6 @@ const getTier = (rating) => {
 }
 
 const getStarCount = (rating) => Math.max(1, Math.min(5, Math.round(rating)))
-
-// Tour references look like TOUR-H8VUM5DN — an 8-char alphanumeric code
-// prefixed with "TOUR-". We normalize whatever the traveller types into
-// that exact shape as they type.
-const formatReviewCode = (value) => {
-  const alphanumeric = value
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '')
-    .replace(/^TOUR/, '')
-    .slice(0, 8)
-
-  return alphanumeric ? `${REVIEW_CODE_PREFIX}${alphanumeric}` : ''
-}
 
 const normalizeText = (value = '') =>
   String(value)
@@ -95,8 +78,7 @@ const getTourSearchText = (tour = {}) =>
   )
 
 const findTourForReview = (review = {}) => {
-  // If the review was moderated in with an explicit tourSlug, trust that —
-  // no need to guess via text matching.
+  // If the review has an explicit tourSlug, trust that and skip text matching.
   if (review.tourSlug && Array.isArray(tours)) {
     const exact = tours.find((tour) => tour.slug === review.tourSlug)
     if (exact) return exact
@@ -174,29 +156,6 @@ const getReviewLocation = (review = {}) =>
   review.route ||
   'Cape Town, South Africa'
 
-// Fires a request to notify the Cape Frontier team by email that a new
-// review has come in. Backed by /api/reviews/notify (Resend on the server).
-async function sendReviewEmailNotification(payload) {
-  const response = await fetch('/api/reviews/notify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ review: payload }),
-  })
-
-  if (!response.ok) {
-    let message = 'Failed to send review notification email'
-    try {
-      const data = await response.json()
-      if (data?.error) message = data.error
-    } catch {
-      // ignore parse errors, use default message
-    }
-    throw new Error(message)
-  }
-
-  return response.json().catch(() => ({}))
-}
-
 const Chevron = ({ open }) => (
   <svg
     className={`h-4 w-4 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
@@ -209,196 +168,104 @@ const Chevron = ({ open }) => (
   </svg>
 )
 
-const AnimatedNumberBadge = ({ children, NumberBadge }) => {
-  const badgeRef = useRef(null)
-
-  useLayoutEffect(() => {
-    const badge = badgeRef.current
-    if (!badge) return undefined
-
-    const shine = badge.querySelector('.badge-shine')
-    const wash = badge.querySelector('.badge-color-wash')
-
-    const ctx = gsap.context(() => {
-      gsap.set(badge, {
-        transformOrigin: 'center center',
-        force3D: true,
-        willChange: 'transform',
-      })
-
-      gsap.set(shine, {
-        xPercent: -150,
-        force3D: true,
-      })
-
-      gsap.set(wash, {
-        opacity: 0,
-      })
-
-      const tl = gsap.timeline({
-        repeat: -1,
-        repeatDelay: 1.35,
-      })
-
-      tl.to(
-        badge,
-        {
-          scale: 1.025,
-          duration: 1.2,
-          yoyo: true,
-          repeat: 1,
-          ease: 'sine.inOut',
-        },
-        0
-      )
-        .to(
-          wash,
-          {
-            opacity: 0.32,
-            duration: 0.55,
-            yoyo: true,
-            repeat: 1,
-            ease: 'sine.inOut',
-          },
-          0
-        )
-        .fromTo(
-          shine,
-          {
-            xPercent: -150,
-          },
-          {
-            xPercent: 260,
-            duration: 0.62,
-            ease: 'power2.inOut',
-          },
-          0.18
-        )
-        .fromTo(
-          shine,
-          {
-            xPercent: -150,
-          },
-          {
-            xPercent: 260,
-            duration: 0.62,
-            ease: 'power2.inOut',
-          },
-          0.9
-        )
-    }, badge)
-
-    return () => ctx.revert()
-  }, [])
+// -----------------------------------------------------------------------------
+// Single review card used in every row of the grid.
+// -----------------------------------------------------------------------------
+const ReviewCard = ({ review, index, delay = 0 }) => {
+  const pastel = pastelCards[index % pastelCards.length]
+  const location = getReviewLocation(review)
+  const tour = getReviewTour(review)
 
   return (
-    <div
-      ref={badgeRef}
-      className="relative inline-flex shrink-0 overflow-hidden rounded-[28px]"
+    <motion.article
+      initial={{ opacity: 0, y: 22 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.45, delay, ease: 'easeOut' }}
+      className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-[28px] border border-white/40 shadow-[0_18px_46px_rgba(15,10,113,0.10)]"
+      style={{ backgroundColor: pastel }}
     >
-      <NumberBadge>{children}</NumberBadge>
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.38),transparent_32%)]" />
 
-      <span className="badge-color-wash pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(187,247,208,0.48),rgba(96,165,250,0.42),rgba(15,10,113,0.34))] mix-blend-screen" />
-      <span className="badge-shine pointer-events-none absolute inset-y-0 left-[-65%] w-[46%] skew-x-[-22deg] bg-white/28" />
-    </div>
+      <div className="relative z-10 flex h-full flex-col">
+        <div className="relative overflow-hidden">
+          <img
+            src={review.img}
+            className="h-40 w-full object-cover"
+            alt={tour?.title || review.tour || 'Tour'}
+            loading="lazy"
+          />
+
+          <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/30 to-transparent" />
+
+          <div className="absolute right-3 top-3 rounded-full bg-white/85 px-3 py-1 text-[11px] font-bold text-black/70 shadow-sm backdrop-blur-sm">
+            {review.rating} / 5
+          </div>
+        </div>
+
+        <div className="flex flex-1 flex-col gap-3 p-4">
+          <div className="inline-flex w-fit max-w-full items-center gap-1.5 rounded-full bg-white/78 px-3 py-1 font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-black/55 backdrop-blur-sm">
+            <img src={mapPinIcon} className="h-3.5 w-3.5 shrink-0 object-contain" alt="" />
+            <span className="truncate">{location}</span>
+          </div>
+
+          <div className="min-w-0">
+            <p className="line-clamp-2 font-frank text-xl font-bold leading-tight text-black/80">
+              {review.title}
+            </p>
+
+            <p className="mt-2 line-clamp-4 font-frank text-sm leading-snug text-black/68">
+              {review.desc}
+            </p>
+          </div>
+
+          <div className="mt-auto flex items-center justify-between gap-3 rounded-[20px] bg-white/50 px-3.5 py-3 shadow-inner backdrop-blur-[2px]">
+            <div className="flex min-w-0 items-center gap-3">
+              <img
+                src={review.avatar}
+                className="h-10 w-10 shrink-0 rounded-full border border-white/60 object-cover shadow-sm"
+                alt={review.name}
+                loading="lazy"
+              />
+
+              <div className="min-w-0">
+                <p className="truncate font-frank text-sm font-bold text-black/80">
+                  {review.name}
+                </p>
+                <p className="truncate text-xs text-black/50">{review.date}</p>
+              </div>
+            </div>
+
+            {review.verified && (
+              <div className="shrink-0 rounded-full bg-white/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-black/50 shadow-sm">
+                Verified
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </motion.article>
   )
 }
 
-// Shown in place of the form once a review has been submitted successfully.
-// Keeps the explanation simple — travellers just need to know their review
-// is being looked at and will appear within 24–48 hours.
-const ReviewSuccessPanel = ({ onClose }) => (
-  <div className="flex flex-col items-center gap-4 bg-white/95 px-6 py-10 text-center sm:px-10 sm:py-14">
-    <motion.div
-      initial={{ scale: 0.4, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-      className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500 text-white shadow-[0_16px_34px_rgba(22,163,74,0.35)] sm:h-20 sm:w-20"
-    >
-      <motion.svg
-        width="30"
-        height="30"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 0.5, delay: 0.15, ease: 'easeOut' }}
-      >
-        <path d="M4 12.5 9.5 18 20 6" />
-      </motion.svg>
-    </motion.div>
-
-    <motion.div
-      initial={{ y: 10, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.25, duration: 0.4 }}
-    >
-      <p className="font-frank text-2xl font-bold text-black/85 sm:text-3xl">
-        Review submitted!
-      </p>
-      <p className="mx-auto mt-3 max-w-md font-mont text-sm leading-6 text-black/60 sm:text-base">
-        Thanks for sharing your trip. Our team checks every submission against your tour
-        reference to keep things genuine, and yours will go live on the site within{' '}
-        <span className="font-bold text-black/75">24–48 hours</span>.
-      </p>
-    </motion.div>
-
-    <motion.button
-      type="button"
-      onClick={onClose}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 0.4 }}
-      className="mt-2 rounded-xl border border-black/10 px-5 py-2.5 font-bitter text-xs font-black uppercase tracking-[0.16em] text-black/60 transition hover:bg-black/[0.03]"
-    >
-      Close
-    </motion.button>
-  </div>
-)
-
-const EMPTY_REVIEW_FORM = { tour: '', title: '', rating: 5, review: '', name: '', email: '' }
-
 function ReviewsShowcase({
   // Optional override. When omitted, the component reads directly from
-  // src/data/reviews.js (only entries with verified: true) — that's the
-  // moderated, publish-ready set. Pass `tourSlug` instead if you just want
-  // this narrowed to one tour's reviews (e.g. embedded on a tour page).
+  // src/data/reviews.js (only entries with verified: true). Pass `tourSlug`
+  // to narrow it to one tour's reviews (e.g. embedded on a tour page).
   reviews,
   tourSlug,
-  NumberBadge = DefaultNumberBadge,
-  onSeeAllReviews,
-  onSubmitReview,
+  // Optional: override what happens on click. By default the button scrolls
+  // to the element with id={reviewFormId} and asks it to open.
+  onWriteReview,
+  reviewFormId = 'leave-review',
 }) {
-  const [currentReviewIndex, setCurrentReviewIndex] = useState(0)
-  const [isReviewAutoPlaying, setIsReviewAutoPlaying] = useState(true)
-  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false)
-  const [reviewCode, setReviewCode] = useState('')
-  const [reviewForm, setReviewForm] = useState(EMPTY_REVIEW_FORM)
-  // idle | submitting | success | error
-  const [submissionStatus, setSubmissionStatus] = useState('idle')
-  const [submissionError, setSubmissionError] = useState('')
-
+  const [showMoreReviews, setShowMoreReviews] = useState(false)
   const sectionRef = useRef(null)
-  const bannerShellRef = useRef(null)
-  const bannerRef = useRef(null)
-  const teaserButtonRef = useRef(null)
-  const reviewCoupleRef = useRef(null)
-  const mainReviewCardRef = useRef(null)
-  const previousPreviewRef = useRef(null)
-  const nextPreviewRef = useRef(null)
-  const ratingPanelRef = useRef(null)
-  const ratingBarRefs = useRef([])
-  const autoplayProgressRef = useRef(null)
-  const touchStartRef = useRef({ x: 0, y: 0 })
 
   // ---------------------------------------------------------------------------
-  // Source list: explicit `reviews` prop wins if passed (even an empty array,
-  // e.g. "show none"), otherwise fall back to the real moderated data —
-  // verified only, optionally narrowed to a single tour via tourSlug.
+  // Source list: explicit `reviews` prop wins if passed (even an empty array),
+  // otherwise fall back to the moderated data: verified only, optionally
+  // narrowed to a single tour via tourSlug.
   // ---------------------------------------------------------------------------
   const sourceReviews = useMemo(() => {
     if (reviews) return reviews
@@ -409,7 +276,7 @@ function ReviewsShowcase({
 
     const forTour = verified.filter((r) => r.tourSlug === tourSlug)
     // If this specific tour has no verified reviews yet, show the general
-    // pool rather than an empty/broken carousel.
+    // pool rather than an empty/broken grid.
     return forTour.length ? forTour : verified
   }, [reviews, tourSlug])
 
@@ -419,6 +286,7 @@ function ReviewsShowcase({
   const resolvedReviews = useMemo(() => {
     const list = sourceReviews.length ? sourceReviews : [
       {
+        id: 'fallback',
         img: '/images/tours/default/1.webp', // fallback
         title: 'A truly memorable Cape Town route',
         desc: 'From the scenery to the pacing of the day...',
@@ -426,811 +294,110 @@ function ReviewsShowcase({
         date: 'May 2026',
         avatar: '/images/content/reviews/profile-photos/1.webp',
         rating: 5,
-        breakdown: [72, 18, 7, 2, 1],
         verified: true,
       },
     ]
 
-    return list.map(review => ({
+    return list.map((review, i) => ({
       ...review,
       img: resolveTourImage(review.img),
-      avatar: resolveTourImage(review.avatar),
+      avatar: resolveTourImage(
+        review.avatar || `/images/content/reviews/profile-photos/${(i % 8) + 1}.webp`
+      ),
     }))
   }, [sourceReviews])
 
-  // Use resolvedReviews throughout
-  const review = resolvedReviews[currentReviewIndex]
-  const previousReview = resolvedReviews[(currentReviewIndex - 1 + resolvedReviews.length) % resolvedReviews.length]
-  const nextReview = resolvedReviews[(currentReviewIndex + 1) % resolvedReviews.length]
-
-  const currentPastel = pastelCards[currentReviewIndex % pastelCards.length]
-  const previousPastel = pastelCards[(currentReviewIndex - 1 + pastelCards.length) % pastelCards.length]
-  const nextPastel = pastelCards[(currentReviewIndex + 1) % pastelCards.length]
-
-  const currentTour = getReviewTour(review)
-  const previousTour = getReviewTour(previousReview)
-  const nextTour = getReviewTour(nextReview)
-
-  const canSubmitReview =
-    REVIEW_CODE_PATTERN.test(reviewCode) &&
-    Boolean(reviewForm.title.trim()) &&
-    Boolean(reviewForm.review.trim()) &&
-    Boolean(reviewForm.name.trim()) &&
-    EMAIL_PATTERN.test(reviewForm.email.trim()) &&
-    submissionStatus !== 'submitting'
-
-  // Tour dropdown is sourced straight from /src/data/tours.js, not from
-  // whatever reviews happen to be passed in.
-  const tourOptions = useMemo(
-    () => (Array.isArray(tours) ? tours.map((t) => t.title).filter(Boolean) : []),
-    []
+  // ---------------------------------------------------------------------------
+  // Row splitting: 3 on top, up to 4 on the bottom, the rest is collapsible.
+  // ---------------------------------------------------------------------------
+  const topRow = resolvedReviews.slice(0, TOP_ROW_COUNT)
+  const bottomRow = resolvedReviews.slice(
+    TOP_ROW_COUNT,
+    TOP_ROW_COUNT + BOTTOM_ROW_COUNT
   )
+  const extraReviews = resolvedReviews.slice(TOP_ROW_COUNT + BOTTOM_ROW_COUNT)
 
-  // --- GSAP effects (unchanged logic, just use resolvedReviews length) ---
-  useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      if (!bannerShellRef.current || !bannerRef.current) return
+  // "See more" is hidden when there are 3 or fewer reviews overall.
+  const showSeeMore = resolvedReviews.length > TOP_ROW_COUNT && extraReviews.length > 0
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: bannerShellRef.current,
-          start: 'top 70%',
-          end: 'top 40%',
-          scrub: true,
-        },
-      })
+  // ---------------------------------------------------------------------------
+  // Aggregate rating summary, computed from the reviews being displayed.
+  // ---------------------------------------------------------------------------
+  const stats = useMemo(() => {
+    const total = resolvedReviews.length || 1
+    const average =
+      resolvedReviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / total
 
-      tl.fromTo(
-        bannerRef.current,
-        {
-          y: 0,
-          backgroundColor: 'rgba(255, 255, 255, 0)',
-          boxShadow: '0 18px 40px rgba(0,0,0,0.05)',
-        },
-        {
-          y: -8,
-          backgroundColor: 'rgba(255,255,255,0.98)',
-          boxShadow: '0 24px 60px rgba(15,10,113,0.12)',
-          ease: 'none',
-        },
-        0
-      )
+    const distribution = [5, 4, 3, 2, 1].map((stars) => {
+      const count = resolvedReviews.filter(
+        (r) => getStarCount(Number(r.rating) || 0) === stars
+      ).length
+      return Math.round((count / total) * 100)
+    })
 
-      // Removed animation on teaserButtonRef to prevent upward translation
-    }, sectionRef)
-
-    return () => ctx.revert()
-  }, [isReviewFormOpen])
-
-  useLayoutEffect(() => {
-    const mainCard = mainReviewCardRef.current
-    const previousPreview = previousPreviewRef.current
-    const nextPreview = nextPreviewRef.current
-    const ratingPanel = ratingPanelRef.current
-    const bars = ratingBarRefs.current.filter(Boolean)
-
-    if (!mainCard) return undefined
-
-    const ctx = gsap.context(() => {
-      gsap.killTweensOf([mainCard, previousPreview, nextPreview, ratingPanel, ...bars].filter(Boolean))
-
-      gsap.fromTo(
-        mainCard,
-        {
-          autoAlpha: 0,
-          y: 18,
-          scale: 0.985,
-          filter: 'blur(5px)',
-        },
-        {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          filter: 'blur(0px)',
-          duration: 0.42,
-          ease: 'power3.out',
-        }
-      )
-
-      gsap.fromTo(
-        [previousPreview, nextPreview].filter(Boolean),
-        {
-          autoAlpha: 0,
-          y: 12,
-          scale: 0.96,
-        },
-        {
-          autoAlpha: 0.42,
-          y: 0,
-          scale: 1,
-          duration: 0.36,
-          stagger: 0.06,
-          ease: 'power2.out',
-        }
-      )
-
-      if (ratingPanel) {
-        gsap.fromTo(
-          ratingPanel,
-          {
-            autoAlpha: 0,
-            x: 16,
-          },
-          {
-            autoAlpha: 1,
-            x: 0,
-            duration: 0.36,
-            ease: 'power2.out',
-          }
-        )
-      }
-
-      if (bars.length) {
-        bars.forEach((bar) => {
-          const width = bar.dataset.width || '0%'
-          gsap.fromTo(
-            bar,
-            {
-              width: '0%',
-            },
-            {
-              width,
-              duration: 0.55,
-              ease: 'power3.out',
-            }
-          )
-        })
-      }
-    }, sectionRef)
-
-    return () => ctx.revert()
-  }, [currentReviewIndex])
-
-  useLayoutEffect(() => {
-    if (!isReviewAutoPlaying || isReviewFormOpen || resolvedReviews.length <= 1) {
-      gsap.killTweensOf(autoplayProgressRef.current)
-
-      if (autoplayProgressRef.current) {
-        gsap.set(autoplayProgressRef.current, {
-          scaleX: 0,
-          transformOrigin: 'left center',
-        })
-      }
-
-      return undefined
+    return {
+      average: Math.round(average * 10) / 10,
+      distribution,
+      count: resolvedReviews.length,
     }
+  }, [resolvedReviews])
 
-    const progress = autoplayProgressRef.current
+  // Expanding/collapsing the extra reviews changes page height, so tell
+  // ScrollTrigger to recalculate once the animation has had time to settle.
+  useLayoutEffect(() => {
+    const timer = window.setTimeout(() => ScrollTrigger.refresh(), 400)
+    return () => window.clearTimeout(timer)
+  }, [showMoreReviews])
 
-    if (progress) {
-      gsap.fromTo(
-        progress,
-        {
-          scaleX: 0,
-          transformOrigin: 'left center',
-        },
-        {
-          scaleX: 1,
-          duration: 5,
-          ease: 'none',
-        }
-      )
-    }
-
-    const timer = window.setTimeout(() => {
-      setCurrentReviewIndex((prevIndex) => (prevIndex + 1) % resolvedReviews.length)
-    }, 5000)
-
-    return () => {
-      window.clearTimeout(timer)
-      gsap.killTweensOf(progress)
-    }
-  }, [currentReviewIndex, isReviewAutoPlaying, isReviewFormOpen, resolvedReviews.length])
-
-  const prev = () => {
-    setCurrentReviewIndex(
-      (prevIndex) => (prevIndex - 1 + resolvedReviews.length) % resolvedReviews.length
-    )
-  }
-
-  const next = () => {
-    setCurrentReviewIndex((prevIndex) => (prevIndex + 1) % resolvedReviews.length)
-  }
-
-  const handleManualPrev = () => {
-    setIsReviewAutoPlaying(false)
-    prev()
-  }
-
-  const handleManualNext = () => {
-    setIsReviewAutoPlaying(false)
-    next()
-  }
-
-  const handleReviewTouchStart = (e) => {
-    const touch = e.touches[0]
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY }
-  }
-
-  const handleReviewTouchEnd = (e) => {
-    const touch = e.changedTouches[0]
-    const deltaX = touch.clientX - touchStartRef.current.x
-    const deltaY = touch.clientY - touchStartRef.current.y
-
-    if (Math.abs(deltaX) < 50) return
-    if (Math.abs(deltaY) > Math.abs(deltaX)) return
-
-    setIsReviewAutoPlaying(false)
-
-    if (deltaX < 0) next()
-    else prev()
-  }
-
-  const handleSeeAllReviews = () => {
-    if (onSeeAllReviews) {
-      onSeeAllReviews()
+  const handleWriteReview = (e) => {
+    if (onWriteReview) {
+      e.preventDefault()
+      onWriteReview()
       return
     }
 
-    console.log('See all reviews clicked')
-  }
+    const target = document.getElementById(reviewFormId)
+    if (!target) return // no form on this page: fall back to the plain #anchor
 
-  // Closes the form (used by the X buttons, Cancel, and the success panel's
-  // Close button). Always resets submission state and form fields.
-  const closeReviewForm = () => {
-    setIsReviewFormOpen(false)
-    setSubmissionStatus('idle')
-    setSubmissionError('')
-    setReviewCode('')
-    setReviewForm(EMPTY_REVIEW_FORM)
-  }
-
-  const handleSubmitReview = async (e) => {
     e.preventDefault()
-    if (!canSubmitReview) return
-
-    const payload = {
-      code: reviewCode,
-      ...reviewForm,
-    }
-
-    setSubmissionStatus('submitting')
-    setSubmissionError('')
-
-    try {
-      if (onSubmitReview) {
-        await onSubmitReview(payload)
-      } else {
-        await sendReviewEmailNotification(payload)
-      }
-
-      setSubmissionStatus('success')
-      setIsReviewAutoPlaying(false)
-      // No auto-close timeout — form stays open until user clicks Close
-    } catch (error) {
-      console.error('Review submission failed', error)
-      setSubmissionStatus('error')
-      setSubmissionError(
-        error?.message || 'Something went wrong sending your review — please try again.'
-      )
-    }
-  }
-
-  // Helper to resolve avatar – fallback to a generated URL if missing
-  const getAvatarSrc = (reviewItem) => {
-    if (reviewItem.avatar) return reviewItem.avatar
-    // Generate a fallback avatar if needed
-    const fallback = `/images/content/reviews/profile-photos/${(currentReviewIndex % 8) + 1}.webp`
-    return resolveTourImage(fallback)
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    // Tells the form block to expand itself.
+    window.dispatchEvent(new CustomEvent('open-review-form'))
   }
 
   return (
     <section
       ref={sectionRef}
-      aria-labelledby="reviews-showcase-title"
-      className="relative mx-auto w-full max-w-5xl overflow-visible"
+      aria-label="Traveller reviews"
+      className="relative mx-auto w-full max-w-6xl overflow-visible pb-12"
     >
-      <div
-        ref={reviewCoupleRef}
-        className="relative overflow-hidden rounded-[32px] bg-transparent"
-      >
+      <div className="relative overflow-hidden rounded-[32px] bg-transparent">
         <div className="pointer-events-none absolute inset-0 rounded-[32px] bg-transparent" />
         <div className="pointer-events-none absolute inset-x-2 bottom-2 top-[58%] rounded-[30px] hero-gradient opacity-95 sm:inset-x-3 sm:bottom-3 sm:top-[54%]" />
         <div className="pointer-events-none absolute inset-0 rounded-[32px] border border-black/5" />
 
-        <div className="relative z-10 flex w-full flex-col gap-5 px-2 pb-5 sm:gap-6 sm:px-4 sm:pb-6 lg:px-6 lg:pb-8">
-          <div ref={bannerShellRef} className="relative h-full overflow-visible pt-8 pb-6 sm:pt-10 sm:pb-7">
-            <div
-              ref={bannerRef}
-              className="relative z-20 overflow-hidden rounded-[28px] border border-black/6 bg-white/88 shadow-[0_14px_34px_rgba(15,10,113,0.06)]"
-            >
-              <div className="w-full text-left">
-                {/* Header content hidden when submission is successful */}
-                {submissionStatus !== 'success' && (
-                  <div className="flex flex-col gap-5 p-5 transition-colors sm:p-6 lg:p-8">
-                    <div className="flex min-w-0 items-center gap-4 sm:gap-5 md:gap-6">
-                      <div className="shrink-0">
-                        <AnimatedNumberBadge NumberBadge={NumberBadge}>2</AnimatedNumberBadge>
-                      </div>
+        <div className="relative z-10 flex w-full flex-col gap-5 px-2 pb-5 pt-5 sm:gap-6 sm:px-4 sm:pb-6 sm:pt-6 lg:px-6 lg:pb-8">
+          {/* ---------- RATING SUMMARY ---------- */}
+          <div className="grid grid-cols-1 gap-5 rounded-[28px] border border-black/6 bg-white/90 p-5 shadow-[0_22px_50px_rgba(15,10,113,0.07)] sm:p-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.2fr)] lg:items-center lg:gap-8 lg:p-7">
+            <div className="flex items-center justify-between gap-4 lg:justify-start lg:gap-5">
+              <div>
+                <p className="font-frank text-xs uppercase tracking-[0.22em] text-black/50 sm:text-sm">
+                  Overall Rating
+                </p>
 
-                      <div className="min-w-0 flex-1">
-                        <p
-                          className="font-bitter text-[10px] font-black uppercase tracking-[0.2em] sm:text-sm sm:tracking-[0.24em]"
-                          style={{ color: 'var(--color-brand-lightblue)' }}
-                        >
-                          Feedback step
-                        </p>
+                <p className="mt-2 font-frank text-4xl font-bold leading-none text-green-700 sm:text-5xl">
+                  {getTier(stats.average)}
+                </p>
 
-                        <p
-                          id="reviews-showcase-title"
-                          className="mt-1 font-frank text-3xl font-semibold leading-[0.95] sm:mt-2 sm:text-5xl lg:text-6xl"
-                          style={{ color: 'var(--color-brand-darkblue)' }}
-                        >
-                          Leave your review.
-                        </p>
-                      </div>
-
-                      {isReviewFormOpen && (
-                        <div className="hidden shrink-0 items-center gap-3 md:flex">
-                          <button
-                            type="button"
-                            onClick={closeReviewForm}
-                            className="group flex items-center gap-3 rounded-full border border-black/10 bg-white px-4 py-2.5 font-bitter text-xs font-black uppercase tracking-[0.18em] text-black/70 shadow-[0_12px_28px_rgba(0,0,0,0.08)] transition duration-300 hover:-translate-y-0.5 hover:border-blue-400/40 hover:text-blue-700"
-                          >
-                            <span>Close form</span>
-
-                            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green-200 text-black transition-transform duration-300 group-hover:translate-y-0.5">
-                              <Chevron open />
-                            </span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                      <p className="max-w-2xl font-mont text-sm leading-7 text-black/60 sm:text-base md:text-lg">
-                        <span className="font-bold text-black">Share your experience</span> using your
-                        tour reference and help future guests discover what made your route memorable.
-                      </p>
-
-                      {isReviewFormOpen && (
-                        <div className="flex items-center gap-3 self-start md:hidden">
-                          <button
-                            type="button"
-                            onClick={closeReviewForm}
-                            className="group flex items-center gap-3 rounded-full border border-black/10 bg-white px-4 py-2.5 font-bitter text-xs font-black uppercase tracking-[0.18em] text-black/70 shadow-[0_12px_28px_rgba(0,0,0,0.08)] transition duration-300 hover:-translate-y-0.5 hover:border-blue-400/40 hover:text-blue-700"
-                          >
-                            <span>Close form</span>
-
-                            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green-200 text-black transition-transform duration-300 group-hover:translate-y-0.5">
-                              <Chevron open />
-                            </span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {!isReviewFormOpen && (
-                      <motion.button
-                        ref={teaserButtonRef}
-                        type="button"
-                        onClick={() => {
-                          setIsReviewAutoPlaying(false)
-                          setIsReviewFormOpen(true)
-                        }}
-                        whileHover={{ y: -2 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="group relative mt-1 flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl hero-gradient px-6 py-4 font-frank text-base font-bold text-white shadow-[0_18px_40px_rgba(15,10,113,0.28)] transition-shadow duration-300 hover:shadow-[0_22px_48px_rgba(15,10,113,0.36)] sm:py-5 sm:text-lg"
-                      >
-                        <span className="pointer-events-none absolute inset-y-0 left-[-40%] w-1/3 -skew-x-12 bg-white/25 transition-transform duration-700 group-hover:translate-x-[260%]" />
-
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="shrink-0"
-                        >
-                          <path d="M12 20h9" />
-                          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                        </svg>
-
-                        <span className="tracking-[0.01em]">Write a review</span>
-
-                        <span className="rounded-full bg-white/20 px-2.5 py-1 font-bitter text-[10px] font-black uppercase tracking-[0.14em]">
-                          2 min
-                        </span>
-                      </motion.button>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <AnimatePresence initial={false}>
-                {isReviewFormOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.28, ease: 'easeOut' }}
-                    className="overflow-hidden"
-                  >
-                    {submissionStatus === 'success' ? (
-                      <ReviewSuccessPanel onClose={closeReviewForm} />
-                    ) : (
-                      <form
-                        onSubmit={handleSubmitReview}
-                        className="grid gap-4 bg-white/92 p-5 sm:p-6 lg:grid-cols-2 lg:gap-5 lg:p-8"
-                      >
-                        <div className="lg:col-span-2">
-                          <label className="mb-2 block font-bitter text-xs font-black uppercase tracking-[0.18em] text-black/45">
-                            Tour reference
-                          </label>
-
-                          <input
-                            value={reviewCode}
-                            onChange={(e) => setReviewCode(formatReviewCode(e.target.value))}
-                            placeholder="TOUR-H8VUM5DN"
-                            disabled={submissionStatus === 'submitting'}
-                            className="w-full rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-3 font-mono text-base tracking-[0.14em] text-black outline-none transition focus:border-black/20 focus:bg-white disabled:opacity-60"
-                          />
-
-                          <p className="mt-2 text-xs text-black/45">
-                            Use your tour reference from your booking confirmation, in this format: TOUR-XXXXXXXX
-                          </p>
-                        </div>
-
-                        <div>
-                          <label className="mb-2 block font-bitter text-xs font-black uppercase tracking-[0.18em] text-black/45">
-                            Tour
-                          </label>
-
-                          <select
-                            value={reviewForm.tour}
-                            onChange={(e) =>
-                              setReviewForm((prevValue) => ({
-                                ...prevValue,
-                                tour: e.target.value,
-                              }))
-                            }
-                            disabled={submissionStatus === 'submitting'}
-                            className="w-full rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-3 font-mont text-black outline-none transition focus:border-black/20 focus:bg-white disabled:opacity-60"
-                          >
-                            <option value="">Select a tour</option>
-
-                            {tourOptions.map((option) => (
-                              <option key={option} value={option}>
-                                {option}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="mb-2 block font-bitter text-xs font-black uppercase tracking-[0.18em] text-black/45">
-                            Rating
-                          </label>
-
-                          <select
-                            value={reviewForm.rating}
-                            onChange={(e) =>
-                              setReviewForm((prevValue) => ({
-                                ...prevValue,
-                                rating: Number(e.target.value),
-                              }))
-                            }
-                            disabled={submissionStatus === 'submitting'}
-                            className="w-full rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-3 font-mont text-black outline-none transition focus:border-black/20 focus:bg-white disabled:opacity-60"
-                          >
-                            {[5, 4, 3, 2, 1].map((value) => (
-                              <option key={value} value={value}>
-                                {value} / 5
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="mb-2 block font-bitter text-xs font-black uppercase tracking-[0.18em] text-black/45">
-                            Review title
-                          </label>
-
-                          <input
-                            value={reviewForm.title}
-                            onChange={(e) =>
-                              setReviewForm((prevValue) => ({
-                                ...prevValue,
-                                title: e.target.value,
-                              }))
-                            }
-                            placeholder="A route worth taking"
-                            disabled={submissionStatus === 'submitting'}
-                            className="w-full rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-3 font-mont text-black outline-none transition focus:border-black/20 focus:bg-white disabled:opacity-60"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="mb-2 block font-bitter text-xs font-black uppercase tracking-[0.18em] text-black/45">
-                            Your name
-                          </label>
-
-                          <input
-                            value={reviewForm.name}
-                            onChange={(e) =>
-                              setReviewForm((prevValue) => ({
-                                ...prevValue,
-                                name: e.target.value,
-                              }))
-                            }
-                            placeholder="Aaliyah M"
-                            disabled={submissionStatus === 'submitting'}
-                            className="w-full rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-3 font-mont text-black outline-none transition focus:border-black/20 focus:bg-white disabled:opacity-60"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="mb-2 block font-bitter text-xs font-black uppercase tracking-[0.18em] text-black/45">
-                            Your email
-                          </label>
-
-                          <input
-                            type="email"
-                            value={reviewForm.email}
-                            onChange={(e) =>
-                              setReviewForm((prevValue) => ({
-                                ...prevValue,
-                                email: e.target.value,
-                              }))
-                            }
-                            placeholder="you@example.com"
-                            disabled={submissionStatus === 'submitting'}
-                            className="w-full rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-3 font-mont text-black outline-none transition focus:border-black/20 focus:bg-white disabled:opacity-60"
-                          />
-
-                          <p className="mt-2 text-xs text-black/45">
-                            Only used if we have a question about your review — never shown publicly.
-                          </p>
-                        </div>
-
-                        <div className="lg:col-span-2">
-                          <label className="mb-2 block font-bitter text-xs font-black uppercase tracking-[0.18em] text-black/45">
-                            Your review
-                          </label>
-
-                          <textarea
-                            rows={5}
-                            value={reviewForm.review}
-                            onChange={(e) =>
-                              setReviewForm((prevValue) => ({
-                                ...prevValue,
-                                review: e.target.value,
-                              }))
-                            }
-                            placeholder="Tell future travellers what made this route special..."
-                            disabled={submissionStatus === 'submitting'}
-                            className="w-full resize-none rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-3 font-mont text-black outline-none transition focus:border-black/20 focus:bg-white disabled:opacity-60"
-                          />
-                        </div>
-
-                        <div className="flex flex-col gap-3 lg:col-span-2 sm:flex-row sm:items-center sm:justify-between">
-                          <p className={`text-xs ${submissionStatus === 'error' ? 'text-red-600' : 'text-black/45'}`}>
-                            {submissionStatus === 'error'
-                              ? submissionError
-                              : 'Reviews can only be submitted with a valid tour reference and email.'}
-                          </p>
-
-                          <div className="flex flex-col gap-3 sm:flex-row">
-                            <button
-                              type="button"
-                              onClick={closeReviewForm}
-                              disabled={submissionStatus === 'submitting'}
-                              className="rounded-xl border border-black/10 px-5 py-3 font-bitter text-sm font-black text-black/70 transition hover:bg-black/[0.03] disabled:opacity-60"
-                            >
-                              Cancel
-                            </button>
-
-                            <button
-                              type="submit"
-                              disabled={!canSubmitReview}
-                              className="hero-gradient rounded-xl px-5 py-3 font-bitter text-sm font-black text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
-                            >
-                              {submissionStatus === 'submitting' ? 'Submitting…' : 'Submit review'}
-                            </button>
-                          </div>
-                        </div>
-                      </form>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* ---------- REVIEW CARDS ---------- */}
-          <div className="grid grid-cols-1 gap-5 pb-0 sm:grid-cols-2 sm:items-stretch sm:gap-7">
-            {/* left – main card */}
-            <div
-              onTouchStart={handleReviewTouchStart}
-              onTouchEnd={handleReviewTouchEnd}
-              className="relative min-h-[410px] min-w-0 overflow-hidden rounded-[32px] sm:min-h-[460px] sm:h-full"
-            >
-              <div className="hidden sm:block leading-none">
-                <div
-                  ref={previousPreviewRef}
-                  className="absolute left-0 top-7 h-[72%] w-[68%] overflow-hidden rounded-[28px] opacity-40 shadow-[0_16px_34px_rgba(0,0,0,0.08)]"
-                  style={{
-                    backgroundColor: previousPastel,
-                    transform: 'translateX(-12px) scale(0.95)',
-                  }}
-                >
-                  <img
-                    src={previousReview.img}
-                    className="h-32 w-full object-cover opacity-75"
-                    alt="Previous review"
-                  />
-
-                  <div className="p-4">
-                    <p className="line-clamp-2 font-frank text-lg font-bold text-black/65">
-                      {previousReview.title}...
-                    </p>
-
-                    <p className="mt-2 line-clamp-1 font-bitter text-[10px] font-black uppercase tracking-[0.14em] text-black/45">
-                      {previousTour?.location || 'Cape Town, South Africa'}
-                    </p>
-                  </div>
-                </div>
-
-                <div
-                  ref={nextPreviewRef}
-                  className="absolute right-0 top-7 h-[72%] w-[68%] overflow-hidden rounded-[28px] opacity-40 shadow-[0_16px_34px_rgba(0,0,0,0.08)]"
-                  style={{
-                    backgroundColor: nextPastel,
-                    transform: 'translateX(12px) scale(0.95)',
-                  }}
-                >
-                  <img
-                    src={nextReview.img}
-                    className="h-32 w-full object-cover opacity-75"
-                    alt="Next review"
-                  />
-
-                  <div className="p-4">
-                    <p className="line-clamp-2 font-frank text-lg font-bold text-black/65">
-                      {nextReview.title}...
-                    </p>
-
-                    <p className="mt-2 line-clamp-1 font-bitter text-[10px] font-black uppercase tracking-[0.14em] text-black/45">
-                      {nextTour?.location || 'Cape Town, South Africa'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                key={currentReviewIndex}
-                ref={mainReviewCardRef}
-                className="relative z-10 h-full min-h-[410px] overflow-hidden rounded-[32px] border border-white/40 shadow-[0_22px_60px_rgba(0,0,0,0.10)] sm:min-h-[460px] sm:shadow-[0_28px_70px_rgba(15,10,113,0.14)]"
-                style={{ backgroundColor: currentPastel }}
-              >
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.38),transparent_32%)]" />
-
-                <div className="relative z-10 flex h-full flex-col">
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={review.img}
-                      className="h-44 w-full object-cover sm:h-52 lg:h-60"
-                      alt="Tour"
-                    />
-
-                    <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/30 to-transparent" />
-
-                    <div className="absolute right-4 top-4 rounded-full bg-white/85 px-3 py-1 text-[11px] font-bold text-black/70 shadow-sm backdrop-blur-sm">
-                      {review.rating} / 5
-                    </div>
-                  </div>
-
-                  <div className="flex flex-1 flex-col px-4 pb-4 pt-3 sm:gap-4 sm:p-6">
-                    <div className="min-w-0">
-                      <div className="inline-flex w-fit max-w-full items-center gap-1.5 rounded-full bg-white/78 px-3 py-1 font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-black/55 backdrop-blur-sm">
-                        <img src={mapPinIcon} className="h-3.5 w-3.5 shrink-0 object-contain" alt="" />
-                        <span className="truncate">{currentTour?.location || getReviewLocation(review)}</span>
-                        {currentTour?.title && (
-                          <span className="sr-only">Matched tour: {currentTour.title}</span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="mt-auto min-w-0 pt-7 sm:pt-0">
-                      <p className="line-clamp-2 font-frank text-2xl font-bold leading-none text-black/80 sm:text-[2rem]">
-                        {review.title}
-                      </p>
-
-                      <p className="mt-3 line-clamp-3 font-frank text-sm leading-snug text-black/68 sm:line-clamp-4 sm:text-[15px]">
-                        {review.desc}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 flex items-center justify-between gap-3 rounded-[22px] bg-white/50 px-4 py-3 shadow-inner backdrop-blur-[2px] sm:px-5 sm:py-4">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <img
-                          src={getAvatarSrc(review)}
-                          className="h-11 w-11 shrink-0 rounded-full border border-white/60 object-cover shadow-sm sm:h-12 sm:w-12"
-                          alt="Reviewer"
-                        />
-
-                        <div className="min-w-0">
-                          <p className="truncate font-frank text-sm font-bold text-black/80 sm:text-base">
-                            {review.name}
-                          </p>
-                          <p className="text-xs text-black/50 sm:text-sm">{review.date}</p>
-                        </div>
-                      </div>
-
-                      {review.verified && (
-                        <div className="rounded-full bg-white/75 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-black/50 shadow-sm">
-                          Verified
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* mobile: lightweight CTA only — the full control player (progress bar,
-                play/pause, dots, prev/next) is desktop-only; swipe handles nav on mobile */}
-            <div className="sm:hidden">
-              <button
-                type="button"
-                onClick={handleSeeAllReviews}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-green-600 px-4 py-3 font-frank text-sm font-bold text-white shadow-[0_12px_28px_rgba(22,163,74,0.22)] transition hover:bg-green-700"
-              >
-                <span className="tracking-[0.08em]">See all reviews</span>
-                <img src={topRightArrowIcon} className="h-4" alt="" />
-              </button>
-            </div>
-
-            {/* right – rating panel (desktop only) */}
-            <div
-              ref={ratingPanelRef}
-              className="hidden min-w-0 flex-col gap-6 rounded-[32px] border border-black/6 bg-white/90 p-5 shadow-[0_22px_50px_rgba(15,10,113,0.07)] sm:flex sm:h-full lg:gap-7 lg:p-7"
-            >
-              <div className="flex flex-col gap-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="font-frank text-xs uppercase tracking-[0.22em] text-black/50 sm:text-sm">
-                      Overall Rating
-                    </p>
-
-                    <p className="mt-2 font-frank text-4xl font-bold leading-none text-green-700 sm:text-5xl">
-                      {getTier(review.rating)}
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl bg-green-50 px-4 py-3 text-center shadow-inner">
-                    <p className="font-frank text-2xl font-bold text-green-700 sm:text-3xl">
-                      {review.rating}
-                    </p>
-
-                    <p className="mt-1 text-[11px] uppercase tracking-[0.16em] text-green-800/60">
-                      out of 5
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 border-b border-black/6 pb-5">
+                <div className="mt-3 flex items-center gap-2">
                   <div className="flex items-center gap-1">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <svg
                         key={i}
-                        width="20"
-                        height="20"
+                        width="18"
+                        height="18"
                         viewBox="0 0 24 24"
-                        fill={i < getStarCount(review.rating) ? '#22C55E' : '#FFFFFF'}
+                        fill={i < getStarCount(stats.average) ? '#22C55E' : '#FFFFFF'}
                         stroke="#22C55E"
                         strokeWidth="1.5"
                       >
@@ -1239,130 +406,151 @@ function ReviewsShowcase({
                     ))}
                   </div>
 
-                  <span className="font-frank text-sm text-black/50">
-                    Based on recent traveller feedback
+                  <span className="font-frank text-xs text-black/50 sm:text-sm">
+                    {stats.count} {stats.count === 1 ? 'review' : 'reviews'}
                   </span>
                 </div>
-
-                <div className="flex flex-col gap-3.5">
-                  {['Excellent', 'Amazing', 'Good', 'Decent', 'Terrible'].map((tier, i) => (
-                    <div key={tier} className="flex items-center gap-3">
-                      <span className="w-16 shrink-0 text-xs font-medium text-black/55 sm:w-20">
-                        {tier}
-                      </span>
-
-                      <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-black/8">
-                        <div
-                          ref={(el) => {
-                            ratingBarRefs.current[i] = el
-                          }}
-                          data-width={`${review.breakdown[i]}%`}
-                          className="h-full rounded-full bg-green-500"
-                          style={{ width: `${review.breakdown[i]}%` }}
-                        />
-                      </div>
-
-                      <span className="w-10 shrink-0 text-right text-xs text-black/45">
-                        {review.breakdown[i]}%
-                      </span>
-                    </div>
-                  ))}
-                </div>
               </div>
 
-              <div className="mt-auto flex flex-col gap-4 border-t border-black/6 pt-5">
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleManualPrev}
-                    className="flex h-11 w-11 items-center justify-center rounded-full border border-black/12 bg-white text-black/80 transition-colors hover:border-black/20 hover:bg-black/5"
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M15 18l-6-6 6-6" />
-                    </svg>
-                  </button>
+              <div className="rounded-2xl bg-green-50 px-4 py-3 text-center shadow-inner">
+                <p className="font-frank text-2xl font-bold text-green-700 sm:text-3xl">
+                  {stats.average}
+                </p>
 
-                  <button
-                    onClick={handleManualNext}
-                    className="flex h-11 w-11 items-center justify-center rounded-full border border-black/12 bg-white text-black/80 transition-colors hover:border-black/20 hover:bg-black/5"
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M9 18l6-6-6-6" />
-                    </svg>
-                  </button>
-
-                  <div className="ml-1 flex items-center gap-2">
-                    {resolvedReviews.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => {
-                          setIsReviewAutoPlaying(false)
-                          setCurrentReviewIndex(i)
-                        }}
-                        className={`h-2.5 rounded-full transition-all ${
-                          i === currentReviewIndex ? 'w-8 bg-green-700' : 'w-2.5 bg-black/18'
-                        }`}
-                        aria-label={`Go to review ${i + 1}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="h-1.5 overflow-hidden rounded-full bg-black/10">
-                  <div
-                    ref={autoplayProgressRef}
-                    className="h-full origin-left rounded-full bg-green-600"
-                    style={{ transform: 'scaleX(0)' }}
-                  />
-                </div>
-
-                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setIsReviewAutoPlaying((current) => !current)}
-                    className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl border border-black/12 bg-white px-4 py-4 font-bitter text-[11px] font-black uppercase tracking-[0.14em] text-black/65 transition-colors hover:bg-black/5 sm:px-5"
-                    aria-pressed={!isReviewAutoPlaying}
-                  >
-                    {isReviewAutoPlaying ? 'Pause' : 'Play'}
-                    <span
-                      className={`flex h-6 w-6 items-center justify-center rounded-full ${
-                        isReviewAutoPlaying ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                      }`}
-                      aria-hidden="true"
-                    >
-                      {isReviewAutoPlaying ? 'Ⅱ' : '▶'}
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleSeeAllReviews}
-                    className="group flex w-full items-center justify-center gap-3 rounded-2xl bg-green-600 px-5 py-4 font-frank text-base font-bold text-white shadow-[0_16px_34px_rgba(22,163,74,0.22)] transition hover:bg-green-700 sm:text-lg"
-                  >
-                    <span className="tracking-[0.08em]">See all reviews</span>
-
-                    <img
-                      src={topRightArrowIcon}
-                      className="h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                      alt=""
-                    />
-                  </button>
-                </div>
+                <p className="mt-1 text-[11px] uppercase tracking-[0.16em] text-green-800/60">
+                  out of 5
+                </p>
               </div>
             </div>
+
+            <div className="flex flex-col gap-2.5">
+              {RATING_LABELS.map((label, i) => (
+                <div key={label} className="flex items-center gap-3">
+                  <span className="w-16 shrink-0 text-xs font-medium text-black/55 sm:w-20">
+                    {label}
+                  </span>
+
+                  <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-black/8">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${stats.distribution[i]}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.7, ease: 'easeOut', delay: i * 0.06 }}
+                      className="h-full rounded-full bg-green-500"
+                    />
+                  </div>
+
+                  <span className="w-10 shrink-0 text-right text-xs text-black/45">
+                    {stats.distribution[i]}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ---------- WRITE A REVIEW CTA ---------- */}
+          <div className="flex justify-center">
+            <a
+              href={`#${reviewFormId}`}
+              onClick={handleWriteReview}
+              className="group flex items-center justify-center gap-3 rounded-2xl bg-green-600 px-6 py-4 font-frank text-base font-bold text-white shadow-[0_16px_34px_rgba(22,163,74,0.22)] transition hover:-translate-y-0.5 hover:bg-green-700 sm:text-lg"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="shrink-0"
+              >
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+              </svg>
+
+              <span className="tracking-[0.08em]">Write your review</span>
+            </a>
+          </div>
+
+          {/* ---------- REVIEW CARDS ---------- */}
+          <div className="flex flex-col gap-5 sm:gap-6">
+            {/* top row: first 3 reviews */}
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
+              {topRow.map((review, i) => (
+                <ReviewCard
+                  key={review.id ?? `top-${i}`}
+                  review={review}
+                  index={i}
+                  delay={i * 0.07}
+                />
+              ))}
+            </div>
+
+            {/* bottom row: next 4 reviews */}
+            {bottomRow.length > 0 && (
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
+                {bottomRow.map((review, i) => (
+                  <ReviewCard
+                    key={review.id ?? `bottom-${i}`}
+                    review={review}
+                    index={TOP_ROW_COUNT + i}
+                    delay={i * 0.07}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* collapsible: anything past 7 reviews; hidden for 3 or fewer */}
+            {showSeeMore && (
+              <>
+                <AnimatePresence initial={false}>
+                  {showMoreReviews && (
+                    <motion.div
+                      key="extra-reviews"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.35, ease: 'easeOut' }}
+                      className="overflow-hidden"
+                    >
+                      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
+                        {extraReviews.map((review, i) => (
+                          <ReviewCard
+                            key={review.id ?? `extra-${i}`}
+                            review={review}
+                            index={TOP_ROW_COUNT + BOTTOM_ROW_COUNT + i}
+                            delay={(i % 4) * 0.05}
+                          />
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <div className="flex justify-center">
+                  <motion.button
+                    type="button"
+                    onClick={() => setShowMoreReviews((current) => !current)}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    aria-expanded={showMoreReviews}
+                    className="group flex items-center gap-3 rounded-full border border-black/10 bg-white px-5 py-3 font-bitter text-xs font-black uppercase tracking-[0.18em] text-black/70 shadow-[0_12px_28px_rgba(0,0,0,0.08)] transition duration-300 hover:border-blue-400/40 hover:text-blue-700"
+                  >
+                    <span>
+                      {showMoreReviews
+                        ? 'Show fewer reviews'
+                        : `See more reviews (${extraReviews.length})`}
+                    </span>
+
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-200 text-black">
+                      <Chevron open={showMoreReviews} />
+                    </span>
+                  </motion.button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

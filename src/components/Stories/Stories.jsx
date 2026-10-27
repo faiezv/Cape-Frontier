@@ -3,7 +3,6 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 import TestimonialsSection from './TestimonialsSection'
-import Gallery from './GoalsGallery'
 import reviews from '../../data/reviews.js'
 import ContactPlatforms from '../ContactPlatforms.jsx'
 
@@ -189,10 +188,7 @@ const Stories = () => {
         rotate: 2,
       })
 
-      gsap.set([copyRef.current, buttonsRef.current, recentBadgeRef.current, reviewMetaRef.current], {
-        autoAlpha: 0,
-        y: 18,
-      })
+   
 
       if (reducedMotion) {
         gsap.set(
@@ -432,75 +428,7 @@ const Stories = () => {
               </div>
             </div>
 
-            <div className="grid items-center gap-6 lg:grid-cols-[0.96fr_1.04fr] lg:gap-8">
-              {/* Left image frame: only 3 sliding images */}
-              <div
-                ref={imageFrameRef}
-                className="relative min-h-[320px] w-full overflow-hidden rounded-[1.6rem] bg-black shadow-[0_24px_60px_rgba(10,38,20,0.16)] sm:min-h-[380px] md:min-h-[430px]"
-              >
-                {storyImages.map((src, index) => (
-                  <img
-                    key={`${src}-${index}`}
-                    ref={(el) => {
-                      imageRefs.current[index] = el
-                    }}
-                    src={src}
-                    className="absolute inset-0 h-full w-full object-cover"
-                    alt={`Cape Frontier guest story ${index + 1}`}
-                    loading={index === 0 ? 'eager' : 'lazy'}
-                    decoding={index === 0 ? 'sync' : 'async'}
-                  />
-                ))}
-
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-950/68 via-black/12 to-black/5" />
-
-                <div className="absolute left-4 top-4 rounded-full border border-white/20 bg-white/14 px-3 py-2 font-bitter text-[10px] font-black uppercase tracking-[0.2em] text-white backdrop-blur-md">
-                  Guest moments
-                </div>
-
-              </div>
-
-              {/* Right story content */}
-              <div className="flex w-full flex-col justify-center self-center">
-                <div className="flex w-full flex-col justify-center lg:py-6">
-                  <div>
-                    <div
-                      ref={headingRef}
-                      className="overflow-hidden font-frank text-5xl font-bold leading-none tracking-tight text-black sm:text-6xl lg:text-7xl"
-                    >
-                      <span className="story-heading-word inline-block">REAL</span>{' '}
-                      <span className="story-heading-word inline-block">STORIES.</span>
-                    </div>
-
-                    <div className="mt-2 overflow-hidden font-frank text-3xl font-bold leading-none tracking-tight sm:text-4xl lg:text-5xl">
-                      <span className="story-heading-word inline-block bg-gradient-to-r from-green-700 via-emerald-500 to-blue-700 bg-clip-text text-transparent">
-                        Beyond the Ordinary.
-                      </span>
-                    </div>
-
-                    <p
-                      ref={copyRef}
-                      className="mt-5 max-w-xl font-bitter text-sm leading-relaxed text-black/58 sm:text-base"
-                    >
-                      Real guest feedback helps future travellers understand the
-                      pace, atmosphere, and care behind each Cape Frontier route.
-                      Explore recent stories, then choose the tour that feels right
-                      for your own group.
-                    </p>
-                  </div>
-
-                  <div ref={buttonsRef} className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <button className="flex min-h-[3.4rem] items-center justify-center rounded-full border border-blue-400/45 bg-white px-6 py-3 font-bitter text-sm font-semibold text-blue-700 shadow-[0_12px_28px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500 hover:text-white">
-                      Read their stories
-                    </button>
-
-                    <button className="hero-gradient flex min-h-[3.4rem] items-center justify-center rounded-full px-6 py-3 font-bitter text-sm font-semibold text-white shadow-[0_14px_32px_rgba(0,0,0,0.10)] transition-all duration-300 hover:-translate-y-0.5">
-                      View Tours
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+           
           </div>
         </div>
       </section>
@@ -521,13 +449,6 @@ const Stories = () => {
         <div className="absolute top-0 z-0 h-1/5 md:h-1/8  w-full bg-white" />
 
         <TestimonialsSection />
-
-        <div 
-          id="gallery"
-          className="mx-auto max-w-5xl rounded-lg px-4 sm:px-6 lg:px-0">
-          <Gallery />
-        </div>
-
         <ContactPlatforms className='w-5xl mx-auto ' />
         {/* Commented out leave review block – if you uncomment, update image sources similarly */}
       </section>

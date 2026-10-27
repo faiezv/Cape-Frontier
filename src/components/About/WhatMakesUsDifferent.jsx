@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Gallery from '../Stories/GoalsGallery'; // Adjust the import path as needed
 
 // Import the image resolver and vehicle data
 import { resolveTourImage } from '../../utils/ImageLoader';
@@ -352,6 +353,15 @@ const WhatMakesUsDifferent = () => {
           ))}
         </div>
 
+
+        <div 
+          id="gallery"
+          className="mx-auto max-w-5xl rounded-lg px-4 sm:px-6 lg:px-0">
+          <Gallery />
+        </div>
+
+
+
         {/* PROMO BANNER */}
         <div className="promo-banner relative z-10">
           <div className="promo-piece mx-auto flex max-w-2xl items-center gap-3 rounded-full bg-green-100 px-4 py-2.5 shadow-sm transition hover:shadow-md">
@@ -364,118 +374,6 @@ const WhatMakesUsDifferent = () => {
           </div>
         </div>
 
-        {/* TRUST SECTION */}
-        <div className="trust-section relative z-10 overflow-hidden rounded-3xl bg-white/80 p-4 sm:p-6 shadow-2xl backdrop-blur-sm">
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/40 to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-white/40 to-transparent" />
-
-          <div className="relative z-10 grid gap-4 md:grid-cols-2 xl:grid-cols-12">
-            {trustCards.map((item) => {
-              const resolvedImage = resolveTourImage(item.image);
-              return (
-                <article
-                  key={item.title}
-                  className={`trust-card group overflow-hidden rounded-2xl bg-white shadow-md transition-shadow hover:shadow-xl will-change-transform ${item.layout}`}
-                >
-                  <div
-                    className={`grid h-full ${item.horizontal ? 'xl:grid-cols-[0.9fr_1.1fr]' : ''}`}
-                  >
-                    {/* Image */}
-                    <div
-                      className={`parallax-frame relative overflow-hidden ${item.imageHeight} ${
-                        item.reverse ? 'xl:order-2' : ''
-                      }`}
-                    >
-                      <img
-                        src={resolvedImage}
-                        className="parallax-img h-[108%] w-full object-cover will-change-transform"
-                        alt={item.label}
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-                      <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 font-bitter text-[11px] font-bold text-black shadow-sm backdrop-blur-sm">
-                        {item.label}
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="trust-copy relative flex flex-col justify-between gap-4 p-5 sm:p-6">
-                      <div className="trust-icon-wrap -mt-12 flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 shadow-md ring-4 ring-white xl:mt-0">
-                        <img src={item.icon} className="h-8 w-8 object-contain" alt="" />
-                      </div>
-
-                      <div className="flex flex-col gap-2">
-                        <h3 className="font-frank text-2xl sm:text-3xl font-black text-black/85 leading-tight">
-                          {item.title}
-                        </h3>
-                        <p className="font-bitter text-sm text-gray-500 leading-relaxed">
-                          {item.desc}
-                        </p>
-
-                        {item.title === 'Reliable vehicle planning' && (
-                          <div className="mt-2">
-                            <p className="mb-2 font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-gray-400">
-                              Fleet support
-                            </p>
-                            <div className="grid grid-cols-3 gap-1.5">
-                              {vehicleImages.map((src, idx) => (
-                                <img
-                                  key={src}
-                                  src={src}
-                                  className="h-12 w-full rounded-lg object-cover shadow-sm"
-                                  alt={['Hyundai Staria Silver', 'Hyundai Staria White', 'Mitsubishi Xpander'][idx]}
-                                  loading="lazy"
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex items-center justify-between border-t border-gray-100 pt-3">
-                        <span className="font-bitter text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">
-                          Cape Frontier
-                        </span>
-                        <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
-                      </div>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-
-          {/* Extra info cards */}
-          <div className="relative z-10 mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl bg-white/70 px-5 py-4 shadow-sm backdrop-blur-sm transition hover:shadow-md">
-              <p className="font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-blue-600">
-                Reschedule support
-              </p>
-              <p className="mt-1 font-bitter text-sm text-gray-500 leading-relaxed">
-                Weather-affected trips can be guided through reschedule options depending on availability.
-              </p>
-            </div>
-            <div className="rounded-2xl bg-white/70 px-5 py-4 shadow-sm backdrop-blur-sm transition hover:shadow-md">
-              <p className="font-bitter text-[10px] font-black uppercase tracking-[0.16em] text-green-600">
-                Refund clarity
-              </p>
-              <p className="mt-1 font-bitter text-sm text-gray-500 leading-relaxed">
-                Refund handling follows the stated cancellation window, with weather cases reviewed fairly.
-              </p>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="relative z-10 mt-6 flex justify-center">
-            <a
-              href="#popular-tours"
-              className="inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 px-8 py-3.5 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-xl"
-            >
-              Learn More
-              <img src="/icons/go.png" className="h-4 w-4 object-contain" alt="" />
-            </a>
-          </div>
-        </div>
       </div>
     </section>
   );

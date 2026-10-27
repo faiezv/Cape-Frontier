@@ -2,7 +2,6 @@ import React, { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-import TourSelect from '../Tours/TourSelect.jsx'
 import SuggestedTours from './SuggestedTours.jsx'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -129,23 +128,6 @@ const FloatingFormPill = React.forwardRef(function FloatingFormPill({ onOpen }, 
           </span>
         </span>
       </button>
-    </div>
-  )
-})
-
-// -----------------------------------------------------------------------------
-// collapsible tour select dropdown
-// -----------------------------------------------------------------------------
-const TourSelectPanel = React.forwardRef(function TourSelectPanel(props, ref) {
-  return (
-    <div
-      id="journey-tour-select"
-      ref={ref}
-      className="relative z-20 mx-auto w-full max-w-5xl overflow-hidden"
-    >
-      <div className="rounded-b-[24px] border border-t-0 border-black/8 bg-white/95 px-2 pb-4 pt-4 shadow-[0_24px_60px_rgba(15,10,113,0.10)] backdrop-blur-sm sm:rounded-b-[28px] sm:px-4 sm:pt-5">
-        <TourSelect />
-      </div>
     </div>
   )
 })
@@ -507,29 +489,10 @@ function JourneyToursBlock() {
     <section
       ref={shellRef}
       aria-labelledby="journey-tours-title"
-      className="relative mx-auto h-full max-w-6xl overflow-visible pt-6 sm:pt-8 md:pt-10"
+      className="relative mx-auto h-full max-w-6xl overflow-visible "
     >
-      {/* shared background keeps the booking step, form, and suggested tours visually coupled */}
-      <div className="pointer-events-none absolute inset-x-[-0.75rem] bottom-[-1.5rem] top-16 rounded-[2rem] bg-[linear-gradient(180deg,transparent_0%,rgba(0,30,255,0.05)_38%,rgba(15,10,113,0.08)_100%)]" />
-
-      {/* start your journey */}
-      <div className="relative">
-        <StartJourneyCard
-          isOpen={isTourSelectOpen}
-          onToggle={handleToggleTourSelect}
-          badgeRef={badgeRef}
-        />
-
-        <FloatingFormPill ref={teaserRef} onOpen={handleOpenTourSelect} />
-      </div>
-
-      {/* tour select dropdown — pulled upward so it visually attaches to the card */}
-      <div className="-mt-2 sm:-mt-3">
-        <TourSelectPanel ref={panelRef} />
-      </div>
-
       {/* suggested tours remain inside the same coupled journey area */}
-      <div className="relative z-10 mt-4 sm:mt-5 md:mt-6">
+      <div className="relative z-10 ">
         <SuggestedTours />
       </div>
     </section>

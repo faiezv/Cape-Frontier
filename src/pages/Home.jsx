@@ -9,11 +9,16 @@ import Seo from "../components/Seo.jsx";
 import Hero from "../components/Hero.jsx";
 import About from "../components/About/About.jsx";
 import Stories from "../components/Stories/Stories.jsx";
-import Tours from "../components/Tours/Tours.jsx";
+
 import Contact from "../components/Contact.jsx";
 import TourSelect from "../components/Tours/TourSelect.jsx";
 
 gsap.registerPlugin(ScrollTrigger);
+
+// The floating "Tour Select" button shows once the visitor is past the hero.
+// It always hides over the contact section. Set this to true if you also want
+// it hidden while the tours list is on screen.
+const HIDE_BUTTON_OVER_TOURS = false;
 
 const isTouchDevice = () => {
   if (typeof window === "undefined") return false;
@@ -24,6 +29,13 @@ const isTouchDevice = () => {
   );
 };
 
+// true only while the element actually overlaps the viewport
+const isInViewport = (el) => {
+  if (!el) return false;
+  const rect = el.getBoundingClientRect();
+  return rect.top < window.innerHeight && rect.bottom > 0;
+};
+
 const Home = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -32,13 +44,10 @@ const Home = () => {
   const heroRef = useRef(null);
   const aboutRef = useRef(null);
   const tourSelectSectionRef = useRef(null);
-  const toursSectionRef = useRef(null);
   const contactSectionRef = useRef(null);
 
   // ---------- BUTTON STATE ----------
   const [showButton, setShowButton] = useState(false);
-  const [isToursVisible, setIsToursVisible] = useState(false);
-  const [isContactVisible, setIsContactVisible] = useState(false);
 
   // ---------- HASH OVERRIDE ----------
   useEffect(() => {
@@ -57,36 +66,47 @@ const Home = () => {
   }, [location]);
 
   // ---------- SCROLL LISTENER (for button visibility) ----------
+  // Bug fixed: the old check treated the tours section as "visible" whenever
+  // its top edge was above the bottom of the screen. That stays true for the
+  // whole rest of the page once you scroll past the tours start, so the button
+  // vanished right after the hero. It now uses a real viewport-overlap check.
   useEffect(() => {
-    const handleScroll = () => {
-      if (!heroRef.current) return;
-      const heroHeight = heroRef.current.offsetHeight;
-      const threshold = heroHeight * 0.5;
-      const pastHero = window.scrollY > threshold;
+    let frame = 0;
 
-      let toursVisible = false;
-      let contactVisible = false;
+    const update = () => {
+      frame = 0;
 
-      if (toursSectionRef.current) {
-        const rect = toursSectionRef.current.getBoundingClientRect();
-        if (rect.top < window.innerHeight) toursVisible = true;
-      }
-      if (contactSectionRef.current) {
-        const rect = contactSectionRef.current.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
-          contactVisible = true;
-        }
-      }
+      const hero = heroRef.current;
+      if (!hero) return;
 
-      setIsToursVisible(toursVisible);
-      setIsContactVisible(contactVisible);
+      const pastHero = window.scrollY > hero.offsetHeight * 0.5;
+
+      const toursVisible =
+        HIDE_BUTTON_OVER_TOURS && isInViewport(document.getElementById("tours"));
+      const contactVisible = isInViewport(contactSectionRef.current);
+
       setShowButton(pastHero && !toursVisible && !contactVisible);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
+    // one update per animation frame, however many scroll events fire
+    const requestUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    // section heights change once tours/images settle
+    window.addEventListener("tours:stable", requestUpdate);
+    window.addEventListener("app:layout-stable", requestUpdate);
+    update();
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+      window.removeEventListener("tours:stable", requestUpdate);
+      window.removeEventListener("app:layout-stable", requestUpdate);
+    };
   }, []);
 
   // ---------- SCROLL TO TOP (Tour Select button) ----------
@@ -370,10 +390,6 @@ const Home = () => {
           <Stories />
         </section>
 
-        <section id="tours" ref={toursSectionRef} className="relative z-26">
-          <Tours />
-        </section>
-
         <section id="contact" ref={contactSectionRef} className="relative z-26">
           <Contact />
         </section>
@@ -388,7 +404,8 @@ const Home = () => {
         >
           <button
             onClick={scrollToTourSelect}
-            className="flex items-center rounded-full bg-blue-600 px-5 py-2.5 shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            tabIndex={showButton ? 0 : -1}
+            className="mt-4 flex items-center rounded-full bg-blue-600 px-5 py-2 shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
             aria-label="Jump to tour selection"
           >
             <svg

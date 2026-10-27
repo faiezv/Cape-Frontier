@@ -168,18 +168,6 @@ const Styles = () => (
   `}</style>
 );
 
-const StarRating = ({ rating = 4.7 }) => {
-  const rounded = Math.round(Number(rating) || 0);
-  return (
-    <div className="flex items-center gap-0.5" role="img" aria-label={`${rating} out of 5 stars`}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <svg key={i} className="h-3.5 w-3.5" viewBox="0 0 24 24" fill={i < rounded ? "#22C55E" : "none"} stroke="#22C55E" strokeWidth="1.7" aria-hidden="true">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-        </svg>
-      ))}
-    </div>
-  );
-};
 
 const CloseIcon = () => (
   <span className="relative block h-4 w-4" aria-hidden="true">
@@ -213,6 +201,10 @@ const useDialog = (onKeyDown) => {
 const focusRing =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500";
 
+// Hover zoom only on devices that really hover, so taps on a phone never leave
+// a tile stuck in its zoomed "hover" state.
+const hoverZoom = "[@media(hover:hover)]:group-hover:scale-105";
+
 // ============================================================
 // 4. IMAGES
 // ============================================================
@@ -230,7 +222,7 @@ const ImageCard = memo(({ image, index, onOpen }) => {
       type="button"
       onClick={() => onOpen(index)}
       style={{ animationDelay: `${(index % IMAGES_STEP) * 30}ms` }}
-      className={`gf-rise group relative overflow-hidden rounded-2xl bg-neutral-100 ${focusRing} ${
+      className={`gf-rise group relative min-w-0 touch-manipulation overflow-hidden rounded-xl bg-neutral-100 sm:rounded-2xl ${focusRing} ${
         index === 0 ? "col-span-2 row-span-2" : ""
       }`}
     >
@@ -245,11 +237,11 @@ const ImageCard = memo(({ image, index, onOpen }) => {
         loading={index < 6 ? "eager" : "lazy"}
         onLoad={() => setLoaded(true)}
         onError={() => setLoaded(true)}
-        className={`absolute inset-0 h-full w-full transform-gpu object-cover transition-[opacity,transform] duration-500 ease-out group-hover:scale-105 ${
+        className={`absolute inset-0 h-full w-full transform-gpu object-cover transition-[opacity,transform] duration-500 ease-out ${hoverZoom} ${
           loaded ? "opacity-100" : "opacity-0"
         }`}
       />
-      <span className="pointer-events-none absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/60 to-transparent px-3 pb-2.5 pt-8 text-left font-frank text-sm font-bold text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+      <span className="pointer-events-none absolute inset-x-0 bottom-0 hidden truncate bg-gradient-to-t from-black/60 to-transparent px-3 pb-2.5 pt-8 text-left font-frank text-sm font-bold text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 sm:block">
         {image.title}
       </span>
     </button>
@@ -269,25 +261,25 @@ const ImageGrid = ({ onOpen }) => {
   };
 
   return (
-    <div ref={sectionRef} className="scroll-mt-4 p-4 sm:p-5">
-      <div className="mb-4 flex items-end justify-between gap-4">
-        <h3 className="font-frank text-2xl font-bold leading-none text-black lg:text-3xl">Photo highlights</h3>
+    <div ref={sectionRef} className="w-screen min-w-0 max-w-full scroll-mt-4 p-3 sm:p-5">
+      <div className="mb-3 flex items-end justify-between gap-4 sm:mb-4">
+        <h3 className="font-frank text-xl font-bold leading-none text-black sm:text-2xl lg:text-3xl">Photo highlights</h3>
         <p className="hidden font-bitter text-xs text-black/40 lg:block">Tap a photo to view it full size.</p>
       </div>
 
-      <div className="grid auto-rows-[8.5rem] grid-flow-dense grid-cols-2 gap-2.5 sm:auto-rows-[10rem] sm:grid-cols-3 lg:auto-rows-[11rem] lg:grid-cols-4">
+      <div className="grid auto-rows-[7.25rem] grid-flow-dense grid-cols-2 gap-2 min-[400px]:auto-rows-[8.5rem] sm:auto-rows-[10rem] sm:grid-cols-3 sm:gap-2.5 lg:auto-rows-[11rem] lg:grid-cols-4">
         {images.slice(0, visible).map((image, i) => (
           <ImageCard key={image.id} image={image} index={i} onOpen={onOpen} />
         ))}
       </div>
 
       {(hasMore || expanded) && (
-        <div className="mt-5 flex justify-center gap-3">
+        <div className="mt-4 flex flex-wrap justify-center gap-2.5 sm:mt-5 sm:gap-3">
           {hasMore && (
             <button
               type="button"
               onClick={() => setVisible((v) => Math.min(v + IMAGES_STEP, images.length))}
-              className={`rounded-full border border-black/10 bg-white px-6 py-2.5 font-bitter text-sm font-bold text-black/70 shadow-sm transition hover:border-green-300 hover:text-green-700 ${focusRing}`}
+              className={`min-h-11 rounded-full border border-black/10 bg-white px-6 py-2.5 font-bitter text-sm font-bold text-black/70 shadow-sm transition hover:border-green-300 hover:text-green-700 ${focusRing}`}
             >
               See more ({images.length - visible} left)
             </button>
@@ -296,7 +288,7 @@ const ImageGrid = ({ onOpen }) => {
             <button
               type="button"
               onClick={collapse}
-              className={`rounded-full border border-black/10 px-6 py-2.5 font-bitter text-sm font-bold text-black/45 transition hover:text-black/70 ${focusRing}`}
+              className={`min-h-11 rounded-full border border-black/10 px-6 py-2.5 font-bitter text-sm font-bold text-black/45 transition hover:text-black/70 ${focusRing}`}
             >
               See less
             </button>
@@ -344,22 +336,24 @@ const Lightbox = ({ index, onChange, onClose }) => {
       role="dialog"
       aria-modal="true"
       aria-label={image.title}
-      className="gf-fade fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 p-3 sm:p-6"
+      className="gf-fade fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:p-6"
       onClick={onClose}
     >
-      <div className="relative w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
+      <div className="relative w-full min-w-0 max-w-4xl" onClick={(e) => e.stopPropagation()}>
+        {/* On phones the close button sits inside the photo's corner so it can
+            never be pushed off-screen; from sm up it floats above the photo. */}
         <button
           type="button"
           onClick={onClose}
           autoFocus
           aria-label="Close image"
-          className={`absolute -top-12 right-0 z-20 grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 ${focusRing}`}
+          className={`absolute right-2 top-2 z-30 grid h-11 w-11 place-items-center rounded-full bg-black/55 text-white transition hover:bg-black/75 sm:-top-12 sm:right-0 sm:h-10 sm:w-10 sm:bg-white/10 sm:hover:bg-white/20 ${focusRing}`}
         >
           <CloseIcon />
         </button>
 
         <div
-          className="relative flex items-center justify-center overflow-hidden rounded-2xl bg-black"
+          className="relative flex items-center justify-center overflow-hidden rounded-xl bg-black sm:rounded-2xl"
           onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
           onTouchEnd={onTouchEnd}
         >
@@ -368,7 +362,12 @@ const Lightbox = ({ index, onChange, onClose }) => {
               <Chevron dir="left" />
             </button>
           )}
-          <img key={image.id} src={image.src} alt={image.title} className="gf-fade max-h-[70dvh] w-full object-contain" />
+          <img
+            key={image.id}
+            src={image.src}
+            alt={image.title}
+            className="gf-fade max-h-[58dvh] w-full object-contain landscape:max-h-[52dvh] sm:max-h-[70dvh]"
+          />
           {count > 1 && (
             <button type="button" onClick={next} aria-label="Next image" className={`absolute right-2 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/40 text-white transition hover:bg-black/60 sm:right-4 sm:h-12 sm:w-12 ${focusRing}`}>
               <Chevron dir="right" />
@@ -377,15 +376,15 @@ const Lightbox = ({ index, onChange, onClose }) => {
         </div>
 
         <div className="flex items-center justify-between gap-4 px-1 pt-3">
-          <p className="truncate font-frank text-lg font-bold text-white sm:text-xl">{image.title}</p>
-          <span className="shrink-0 font-bitter text-xs font-bold text-white/50">
+          <p className="truncate font-frank text-base font-bold text-white sm:text-xl">{image.title}</p>
+          <span className="shrink-0 font-bitter text-xs font-bold text-white/60">
             {index + 1} / {count}
           </span>
         </div>
 
         <div
           ref={stripRef}
-          className="mt-3 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="mt-2.5 flex touch-pan-x gap-2 overflow-x-auto overscroll-x-contain pb-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:mt-3 [&::-webkit-scrollbar]:hidden"
         >
           {images.map((img, i) => (
             <button
@@ -395,7 +394,7 @@ const Lightbox = ({ index, onChange, onClose }) => {
               onClick={() => onChange(i)}
               aria-label={`View ${img.title}`}
               aria-current={i === index}
-              className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border transition ${focusRing} ${
+              className={`relative h-12 w-[4.5rem] shrink-0 overflow-hidden rounded-lg border transition sm:h-14 sm:w-20 ${focusRing} ${
                 i === index ? "border-green-300 ring-2 ring-green-300/60" : "border-white/15 opacity-50 hover:opacity-80"
               }`}
             >
@@ -461,13 +460,13 @@ const VideoGallery = () => {
   };
 
   return (
-    <div className="grid gap-5 p-4 sm:p-5 lg:grid-cols-[1fr_0.72fr] lg:items-start">
+    <div className="grid min-w-0 grid-cols-1 gap-4 p-3 sm:gap-5 sm:p-5 lg:grid-cols-[1fr_0.72fr] lg:items-start">
       {/* Player */}
       <div className="min-w-0">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="font-bitter text-xs font-bold text-green-600">Now playing</p>
-            <h3 className="mt-0.5 truncate font-frank text-xl font-bold leading-tight text-black sm:text-2xl">
+            <h3 className="mt-0.5 truncate font-frank text-lg font-bold leading-tight text-black sm:text-2xl">
               {selected.title}
             </h3>
           </div>
@@ -475,7 +474,7 @@ const VideoGallery = () => {
             type="button"
             onClick={() => setManualPause((p) => !p)}
             aria-label={paused ? "Play gallery video" : "Pause gallery video"}
-            className={`grid h-9 w-9 shrink-0 place-items-center rounded-full border border-black/10 text-black/60 transition hover:border-green-300 hover:bg-green-400 hover:text-green-950 ${focusRing}`}
+            className={`grid h-10 w-10 shrink-0 place-items-center rounded-full border border-black/10 text-black/60 transition hover:border-green-300 hover:bg-green-400 hover:text-green-950 sm:h-9 sm:w-9 ${focusRing}`}
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d={paused ? "M8 5v14l11-7z" : "M7 5h4v14H7zM13 5h4v14h-4z"} />
@@ -486,15 +485,15 @@ const VideoGallery = () => {
         {/* Fixed-size stage: switching clips never shifts the layout. */}
         <div
           ref={stageRef}
-          className={`overflow-hidden rounded-2xl bg-neutral-950 ${
-            aspect === "landscape" ? "aspect-video" : "h-[min(72vh,38rem)]"
+          className={`w-full max-w-full overflow-hidden rounded-xl bg-neutral-950 sm:rounded-2xl ${
+            aspect === "landscape" ? "aspect-video" : "h-[min(66dvh,34rem)] sm:h-[min(72dvh,38rem)]"
           }`}
         >
           <video
             ref={playerRef}
             key={selected.id}
             src={selected.src}
-            className="gf-fade h-full w-full object-contain"
+            className="gf-fade h-full w-full max-w-full object-contain"
             controls
             autoPlay={!paused}
             muted
@@ -521,9 +520,9 @@ const VideoGallery = () => {
 
       {/* Filmstrip: paged grid, same See more / See less behaviour as photos */}
       <div className="min-w-0">
-        <p className="mb-3 font-bitter text-xs font-bold text-green-600">All clips ({videos.length})</p>
+        <p className="mb-2.5 font-bitter text-xs font-bold text-green-600 sm:mb-3">All clips ({videos.length})</p>
 
-        <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-6 lg:grid-cols-3">
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 sm:gap-2.5 lg:grid-cols-3">
           {videos.slice(0, visible).map((video, i) => {
             const active = video.id === selected.id;
             return (
@@ -534,7 +533,7 @@ const VideoGallery = () => {
                 aria-label={`Play ${video.title}`}
                 aria-current={active}
                 style={{ animationDelay: `${(i % VIDEOS_STEP) * 30}ms` }}
-                className={`gf-rise group relative aspect-[3/4] w-full overflow-hidden rounded-xl border text-left transition ${focusRing} ${
+                className={`gf-rise group relative aspect-[3/4] w-full min-w-0 touch-manipulation overflow-hidden rounded-lg border text-left transition sm:rounded-xl ${focusRing} ${
                   active
                     ? "border-green-400 ring-2 ring-green-400/30"
                     : "border-black/[0.06] opacity-90 hover:opacity-100"
@@ -542,7 +541,7 @@ const VideoGallery = () => {
               >
                 <video
                   src={`${video.src}#t=0.1`}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className={`h-full w-full object-cover transition-transform duration-500 ${hoverZoom}`}
                   muted
                   playsInline
                   preload="metadata"
@@ -551,8 +550,8 @@ const VideoGallery = () => {
                   onMouseLeave={onThumbLeave}
                 />
                 <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-transparent" />
-                {active && <span className="absolute left-2 top-2 h-2 w-2 rounded-full bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.8)]" />}
-                <span className="absolute inset-x-2 bottom-2 line-clamp-2 font-frank text-xs font-bold leading-tight text-white">
+                {active && <span className="absolute left-1.5 top-1.5 h-2 w-2 rounded-full bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.8)] sm:left-2 sm:top-2" />}
+                <span className="absolute inset-x-1.5 bottom-1.5 line-clamp-2 font-frank text-[11px] font-bold leading-tight text-white sm:inset-x-2 sm:bottom-2 sm:text-xs">
                   {video.title}
                 </span>
               </button>
@@ -561,12 +560,12 @@ const VideoGallery = () => {
         </div>
 
         {(hasMore || expanded) && (
-          <div className="mt-4 flex flex-wrap justify-center gap-3">
+          <div className="mt-4 flex flex-wrap justify-center gap-2.5 sm:gap-3">
             {hasMore && (
               <button
                 type="button"
                 onClick={() => setVisible((v) => Math.min(v + VIDEOS_STEP, videos.length))}
-                className={`rounded-full border border-black/10 bg-white px-5 py-2.5 font-bitter text-sm font-bold text-black/70 shadow-sm transition hover:border-green-300 hover:text-green-700 ${focusRing}`}
+                className={`min-h-11 rounded-full border border-black/10 bg-white px-5 py-2.5 font-bitter text-sm font-bold text-black/70 shadow-sm transition hover:border-green-300 hover:text-green-700 ${focusRing}`}
               >
                 See more ({videos.length - visible} left)
               </button>
@@ -575,7 +574,7 @@ const VideoGallery = () => {
               <button
                 type="button"
                 onClick={() => setVisible(VIDEOS_INITIAL_COUNT)}
-                className={`rounded-full border border-black/10 px-5 py-2.5 font-bitter text-sm font-bold text-black/45 transition hover:text-black/70 ${focusRing}`}
+                className={`min-h-11 rounded-full border border-black/10 px-5 py-2.5 font-bitter text-sm font-bold text-black/45 transition hover:text-black/70 ${focusRing}`}
               >
                 See less
               </button>
@@ -595,18 +594,18 @@ const FleetCard = memo(({ vehicle, onOpen }) => (
   <button
     type="button"
     onClick={() => onOpen(vehicle)}
-    className={`group w-[10.5rem] shrink-0 snap-start overflow-hidden rounded-2xl border border-black/[0.06] bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md lg:w-auto ${focusRing}`}
+    className={`group w-[9.5rem] shrink-0 snap-start touch-manipulation overflow-hidden rounded-2xl border border-black/[0.06] bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md min-[400px]:w-[10.5rem] lg:w-auto ${focusRing}`}
   >
-    <div className="h-28 overflow-hidden lg:h-32">
+    <div className="h-24 overflow-hidden min-[400px]:h-28 lg:h-32">
       <img
         src={vehicle.image}
         alt={vehicle.title}
         loading="lazy"
         decoding="async"
-        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        className={`h-full w-full object-cover transition-transform duration-500 ${hoverZoom}`}
       />
     </div>
-    <div className="p-3">
+    <div className="p-2.5 sm:p-3">
       <p className="truncate font-frank text-base font-bold leading-tight text-black">{vehicle.title}</p>
       <p className="mt-1 truncate font-bitter text-xs font-bold text-green-600">{vehicle.capacity}</p>
     </div>
@@ -620,24 +619,36 @@ const FleetModal = ({ vehicle, onClose }) => {
       role="dialog"
       aria-modal="true"
       aria-label={vehicle.title}
-      className="gf-fade fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 p-4"
+      className="gf-fade fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:p-4"
       onClick={onClose}
     >
-      <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl bg-white p-2 shadow-2xl sm:p-3" onClick={(e) => e.stopPropagation()}>
+      {/* The card itself does not scroll, so the close button always stays put;
+          only its content area scrolls on short screens. */}
+      <div
+        className="relative flex max-h-full w-full min-w-0 max-w-4xl flex-col overflow-hidden rounded-2xl bg-white p-2 shadow-2xl sm:rounded-3xl sm:p-3"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           type="button"
           onClick={onClose}
           autoFocus
           aria-label="Close fleet image"
-          className={`absolute right-4 top-4 z-20 grid h-10 w-10 place-items-center rounded-full bg-black/70 text-white transition hover:bg-black ${focusRing}`}
+          className={`absolute right-4 top-4 z-20 grid h-11 w-11 place-items-center rounded-full bg-black/70 text-white transition hover:bg-black sm:h-10 sm:w-10 ${focusRing}`}
         >
           <CloseIcon />
         </button>
-        <img src={vehicle.image} alt={vehicle.title} className="max-h-[72dvh] w-full rounded-2xl object-contain" />
-        <div className="p-3 sm:p-4">
-          <h3 className="font-frank text-3xl font-bold leading-none text-black">{vehicle.title}</h3>
-          <p className="mt-1.5 font-bitter text-sm font-bold text-green-700">{vehicle.capacity}</p>
-          <p className="mt-3 max-w-2xl font-bitter text-base leading-relaxed text-black/80">{vehicle.description}</p>
+
+        <div className="min-h-0 overflow-y-auto overscroll-contain">
+          <img
+            src={vehicle.image}
+            alt={vehicle.title}
+            className="max-h-[50dvh] w-full rounded-xl object-contain sm:max-h-[64dvh] sm:rounded-2xl"
+          />
+          <div className="p-3 sm:p-4">
+            <h3 className="font-frank text-2xl font-bold leading-none text-black sm:text-3xl">{vehicle.title}</h3>
+            <p className="mt-1.5 font-bitter text-sm font-bold text-green-700">{vehicle.capacity}</p>
+            <p className="mt-3 max-w-2xl font-bitter text-sm leading-relaxed text-black/80 sm:text-base">{vehicle.description}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -659,7 +670,7 @@ const TABS = [
 ].filter((t) => t.show);
 
 const GoalsGallery = () => {
-  const [tab, setTab] = useState(hasImages ? "images" : "videos");
+  const [tab, setTab] = useState("videos");
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const [fleetVehicle, setFleetVehicle] = useState(null);
 
@@ -669,12 +680,17 @@ const GoalsGallery = () => {
   const closeFleet = useCallback(() => setFleetVehicle(null), []);
 
   return (
-    <div className="relative w-full">
+    // min-w-0 + max-w-full keep this block inside its parent. The one thing
+    // that used to push a flex/grid parent wider than the screen is the fleet
+    // strip (a long row of cards), so that strip alone is size-contained below.
+    // (Do NOT put `contain: inline-size` on this root: if the parent sizes
+    // itself to its content, the whole gallery collapses to zero width.)
+    <div className="relative w-full min-w-0 max-w-full overflow-x-clip">
       <Styles />
 
       {/* Media card */}
-      <section className="mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] border border-black/[0.06] bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
-        <header className="relative flex flex-col items-center gap-3 overflow-hidden border-b border-black/[0.05] px-5 py-5 text-center sm:py-6">
+      <section className="mx-auto w-full min-w-0 max-w-6xl overflow-hidden rounded-3xl border border-black/[0.06] bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)] sm:rounded-[2rem]">
+        <header className="relative flex flex-col items-center gap-3 overflow-hidden border-b border-black/[0.05] px-4 py-4 text-center sm:px-5 sm:py-6">
           {/* cheap gradient wash instead of large blurred divs */}
           <div
             aria-hidden="true"
@@ -686,7 +702,7 @@ const GoalsGallery = () => {
           </svg>
 
           {TABS.length > 1 && (
-            <div role="tablist" aria-label="Media type" className="relative inline-flex rounded-full border border-black/[0.07] bg-black/[0.03] p-1">
+            <div role="tablist" aria-label="Media type" className="relative flex w-full max-w-xs rounded-full border border-black/[0.07] bg-black/[0.03] p-1 sm:inline-flex sm:w-auto sm:max-w-none">
               {TABS.map((t) => {
                 const active = tab === t.key;
                 return (
@@ -696,7 +712,7 @@ const GoalsGallery = () => {
                     type="button"
                     aria-selected={active}
                     onClick={() => setTab(t.key)}
-                    className={`flex items-center gap-1.5 rounded-full px-5 py-2.5 font-bitter text-sm font-bold transition-colors ${focusRing} ${
+                    className={`flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-full px-4 py-2 font-bitter text-sm font-bold transition-colors sm:flex-none sm:px-5 ${focusRing} ${
                       active ? "bg-black text-white shadow-sm" : "text-black/45 hover:text-black/75"
                     }`}
                   >
@@ -720,15 +736,17 @@ const GoalsGallery = () => {
       </section>
 
       {/* Fleet */}
-      <section className="mx-auto mt-4 w-full max-w-6xl overflow-hidden rounded-[2rem] border border-black/[0.06] bg-white p-4 shadow-[0_10px_30px_rgba(15,23,42,0.05)] [contain-intrinsic-size:auto_22rem] [content-visibility:auto] sm:p-5">
-        <div className="mb-4 flex items-end justify-between gap-4">
-          <h3 className="font-frank text-3xl font-bold leading-none text-black">Our fleet</h3>
+      <section className="mx-auto mt-3 w-full min-w-0 max-w-6xl overflow-hidden rounded-3xl border border-black/[0.06] bg-white p-3 shadow-[0_10px_30px_rgba(15,23,42,0.05)] [contain-intrinsic-size:auto_22rem] [content-visibility:auto] sm:mt-4 sm:rounded-[2rem] sm:p-5">
+        <div className="mb-3 flex items-end justify-between gap-4 sm:mb-4">
+          <h3 className="font-frank text-2xl font-bold leading-none text-black sm:text-3xl">Our fleet</h3>
           <p className="hidden max-w-sm text-right font-bitter text-xs leading-relaxed text-black/60 lg:block">
             Vehicles are matched to the route, group size and needs of each booking.
           </p>
         </div>
 
-        <div className="flex snap-x gap-2.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-5 lg:overflow-visible [&::-webkit-scrollbar]:hidden">
+        {/* On phones the strip runs edge to edge inside the card (negative margin
+            + matching padding) so cards slide off the screen edge naturally. */}
+        <div className="-mx-3 flex snap-x touch-pan-x [contain:inline-size] gap-2.5 overflow-x-auto overscroll-x-contain scroll-px-3 px-3 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:-mx-5 sm:scroll-px-5 sm:px-5 lg:mx-0 lg:grid lg:grid-cols-5 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden">
           {fleetItems.map((v) => (
             <FleetCard key={v.id} vehicle={v} onOpen={openFleet} />
           ))}

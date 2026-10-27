@@ -191,13 +191,14 @@ function ToursBanner() {
   );
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col pb-7 pt-8 sm:pb-10 sm:pt-12 lg:pt-14">
-      <header className="mx-4 max-w-4xl text-center font-frank lg:mx-auto">
-        <p className="cf-tours-intro-item text-xs font-black uppercase tracking-[0.28em] text-[#071f4f]/60">
+    <div className="mx-auto flex max-w-5xl flex-col pb- pt-8 sm:pb- sm:pt-12 lg:pt-30 ">
+      <header className="mx-4 max-w-4xl text-center font-bitter lg:mx-auto">
+        <p className="cf-tours-intro-item text-xs font-bold uppercase tracking-[0.28em] text-[#071f4f]/60">
           Cape Frontier experiences
         </p>
 
-        <h2 className="cf-tours-intro-item mt-3 text-[3rem] font-black leading-[0.86] tracking-[-0.055em] text-neutral-950 sm:text-6xl md:text-7xl">
+        <h2 className="cf-tours-intro-item mt-3 text-[3rem] font-bold leading-[0.86] tracking-[-0.055em] text-neutral-950 sm:text-6xl 
+        md:text-7xl">
           Book Your Adventure.
         </h2>
 
@@ -215,7 +216,7 @@ function ToursBanner() {
 
       {/* Two-column grid: image | TourSelect */}
       {/* <div className="mt-7 grid items-stretch gap-4 md:mt-9 lg:grid-cols-[1fr_0fr]"> */}
-      <div className="mt-7 max-w-4xl flex items-center place-self-center gap-4 md:mt-9">
+      <div className="mt- max-w-4xl flex items-center place-self-center gap">
         {/* <figure className="cf-tours-intro-item relative hidden min-h-[330px] overflow-hidden rounded-[2rem] bg-[#071f4f] shadow-[0_24px_70px_rgba(7,31,79,0.12)] md:block">
           <img
             src={bannerImage}
@@ -228,9 +229,9 @@ function ToursBanner() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/24 to-transparent" />
         </figure> */}
 
-        <div className="cf-tours-intro-item relative z-10 mx-4 lg:mx-auto">
+        {/* <div className="cf-tours-intro-item relative z-10 mx-4 lg:mx-auto">
           <TourSelect />
-        </div>
+        </div> */}
       </div>
 
 
