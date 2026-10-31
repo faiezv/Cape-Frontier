@@ -8,6 +8,7 @@ import './index.css'
 
 // PAGES
 import Home from './pages/Home.jsx'
+import Tour from './pages/Tours.jsx'
 import TourDetails from './pages/TourDetails'
 import Policies from './pages/Policies.jsx'
 import PageNotFound from './pages/PageNotFound.jsx'
@@ -22,6 +23,7 @@ const routes = [
     children: [
       { index: true, element: <Home /> },
       { path: 'tours/:slug', element: <TourDetails /> },
+      { path: "tours", element: <Tour /> },
       { path: 'policies', element: <Policies /> },
       { path: 'checkout', element: <CheckoutPaystack /> },
       { path: 'success', element: <CheckoutSuccessPaystack /> },

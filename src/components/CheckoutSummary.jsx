@@ -5,14 +5,21 @@ import gsap from "gsap";
 import { KIDS_ACTIVITIES } from "../data/kidsActivities";
 import { resolveImage } from "../utils/ImageLoader.js";
 
-// ============================================================
-// Single source of truth for pricing math — the exact same
-// function /api/verify-price uses server-side.
-// ============================================================
+// Single source of truth for pricing math — the same function
+// /api/verify-price uses server-side.
 import { computePricing } from "../utils/pricingEngine.js";
 
 // ============================================================
-// COMPONENT
+// Layout modes
+//   default  → original two-column layout (breakdown | sticky total)
+//   stacked  → one centred column (breakdown, then total card).
+//              Use this inside a bottom sheet / narrow container.
+//
+// Pay button
+//   onSubmit → button is type="button" and calls onSubmit (used by the
+//              Tours page to go straight to Paystack).
+//   no onSubmit → original behaviour: submits <form id="booking-form">.
+//   hideSubmit → no button at all (parent renders its own pay bar).
 // ============================================================
 
 const CheckoutSummary = ({
@@ -39,8 +46,13 @@ const CheckoutSummary = ({
 
   submitting = false,
   submitError = "",
-  verifyStatus = "idle",   // "idle" | "pending" | "verified" | "failed"
+  verifyStatus = "idle", // "idle" | "pending" | "verified" | "failed"
   verifyError = "",
+
+  stacked = false,
+  onSubmit = null,
+  hideSubmit = false,
+  payLabel = null,
 }) => {
   const [activeDetail, setActiveDetail] = useState("tour");
 
@@ -50,7 +62,7 @@ const CheckoutSummary = ({
   const iconButtonRefs = useRef({});
 
   // ============================================================
-  // PRICING CALCULATION — delegated entirely to pricingEngine
+  // PRICING — delegated entirely to pricingEngine
   // ============================================================
 
   const childAges = Array.isArray(formData?.childAges)
@@ -71,13 +83,14 @@ const CheckoutSummary = ({
         formData,
         kidsActivities: KIDS_ACTIVITIES,
       }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       tour,
       JSON.stringify(childAges),
       adultCount,
       currency,
       selectedOption,
-      selectedExtras,
+      JSON.stringify(selectedExtras),
       formData?.isPrivate,
       formData?.isCustom,
       formData?.selectedKidsActivity,
@@ -89,7 +102,6 @@ const CheckoutSummary = ({
     children,
     toddlers,
     teens,
-    participantCount,
     qualifyingHeadcount,
     hasOptions,
     selectedTourOption,
@@ -105,11 +117,9 @@ const CheckoutSummary = ({
     kidsActivityAdultTotal,
     kidsActivityChildTotal,
     kidsActivityToddlerTotal,
-    kidsActivityTotal,
     privateFee,
     customFee,
     extrasTotal,
-    finalTotal,
     currency: resolvedCurrency,
 
     adultPrice,
@@ -122,13 +132,7 @@ const CheckoutSummary = ({
     effectiveChildPrice,
     effectiveToddlerPrice,
 
-    adultSubtotal,
-    teenSubtotal,
-    childSubtotal,
-    toddlerSubtotal,
     originalSubtotal,
-
-    groupDiscountAmount,
     discountedSubtotal: discountedTourTotal,
 
     displayExtrasTotal,
@@ -141,13 +145,11 @@ const CheckoutSummary = ({
     return `${resolvedCurrency} ${(Number.isFinite(n) ? n : 0).toFixed(2)}`;
   };
 
-  const displayActivePrivateFee =
-    privateFee > 0 ? `+${formatCurrency(privateFee)}` : "—";
-  const displayActiveCustomFee =
-    customFee > 0 ? `+${formatCurrency(customFee)}` : "—";
+  const displayActivePrivateFee = privateFee > 0 ? formatCurrency(privateFee) : "—";
+  const displayActiveCustomFee = customFee > 0 ? formatCurrency(customFee) : "—";
 
   // ============================================================
-  // NORMALIZATION
+  // NORMALISATION
   // ============================================================
 
   const toNum = (v) => {
@@ -165,19 +167,15 @@ const CheckoutSummary = ({
 
   const _effectiveAdultPrice = toNum(effectiveAdultPrice) ?? _adultPrice;
   const _effectiveTeenPrice =
-    toNum(effectiveTeenPrice) ??
-    toNum(teenBasePrice) ??
-    _effectiveAdultPrice;
+    toNum(effectiveTeenPrice) ?? toNum(teenBasePrice) ?? _effectiveAdultPrice;
   const _effectiveChildPrice = toNum(effectiveChildPrice) ?? 0;
   const _effectiveToddlerPrice = toNum(effectiveToddlerPrice) ?? 0;
 
-  // Always derive row subtotals from effective (post-group-tier) rates.
-  // The engine's adultSubtotal/teenSubtotal are pre-adjustment base
-  // totals; using them here renders the base amount next to the
-  // discounted per-person rate.
-  const adultRowSubtotal   = adults   * _effectiveAdultPrice;
-  const teenRowSubtotal    = teens    * _effectiveTeenPrice;
-  const childRowSubtotal   = effectiveChildren * _effectiveChildPrice;
+  // Row subtotals come from effective (post-group-tier) rates so the
+  // base amount is never shown next to the discounted per-person rate.
+  const adultRowSubtotal = adults * _effectiveAdultPrice;
+  const teenRowSubtotal = teens * _effectiveTeenPrice;
+  const childRowSubtotal = effectiveChildren * _effectiveChildPrice;
   const toddlerRowSubtotal = effectiveToddlers * _effectiveToddlerPrice;
 
   const engineTourSubtotal =
@@ -193,57 +191,40 @@ const CheckoutSummary = ({
     groupPricingType === "perPerson"
       ? `${formatCurrency(_effectiveAdultPrice)} per person`
       : groupPricingType === "groupTotal"
-      ? "fixed group total"
-      : `${(toNum(groupDiscountPercent) ?? 0).toFixed(0)}% off`;
+        ? "fixed group total"
+        : `${(toNum(groupDiscountPercent) ?? 0).toFixed(0)}% off`;
 
   // ============================================================
-  // GSAP ANIMATION
+  // GSAP — guest emoji pop
   // ============================================================
 
   useEffect(() => {
     if (activeDetail === "guests" && guestEmojisRef.current.length) {
-      gsap.killTweensOf(guestEmojisRef.current);
-
+      const targets = guestEmojisRef.current.filter(Boolean);
+      gsap.killTweensOf(targets);
       gsap.fromTo(
-        guestEmojisRef.current,
+        targets,
         { scale: 0, opacity: 0, y: 20 },
-        {
-          scale: 1,
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-          stagger: 0.15,
-          ease: "back.out(1.7)",
-        }
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, stagger: 0.15, ease: "back.out(1.7)" },
       );
     }
   }, [activeDetail, adults, teens, effectiveChildren, effectiveToddlers]);
 
-  // ============================================================
-  // SCROLL TO CENTER SELECTED ICON BUTTON ON MOBILE
-  // ============================================================
-
   const scrollToCenterButton = (key) => {
     const container = iconButtonsContainerRef.current;
     const button = iconButtonRefs.current[key];
-
     if (!container || !button) return;
 
     requestAnimationFrame(() => {
       const containerRect = container.getBoundingClientRect();
       const buttonRect = button.getBoundingClientRect();
-
-      const scrollLeft =
+      const left =
         container.scrollLeft +
         buttonRect.left -
         containerRect.left -
         containerRect.width / 2 +
         buttonRect.width / 2;
-
-      container.scrollTo({
-        left: scrollLeft,
-        behavior: "smooth",
-      });
+      container.scrollTo({ left, behavior: "smooth" });
     });
   };
 
@@ -258,9 +239,7 @@ const CheckoutSummary = ({
       perPerson: _effectiveAdultPrice,
       subtotal: adultRowSubtotal,
       basePerPerson:
-        Math.abs(_effectiveAdultPrice - _adultPrice) > 0.005
-          ? _adultPrice
-          : null,
+        Math.abs(_effectiveAdultPrice - _adultPrice) > 0.005 ? _adultPrice : null,
     },
     {
       label: "Teens",
@@ -268,7 +247,9 @@ const CheckoutSummary = ({
       perPerson: _effectiveTeenPrice,
       subtotal: teenRowSubtotal,
       basePerPerson:
-        Math.abs(_effectiveTeenPrice - (toNum(teenBasePrice) ?? _effectiveTeenPrice)) > 0.005
+        Math.abs(
+          _effectiveTeenPrice - (toNum(teenBasePrice) ?? _effectiveTeenPrice),
+        ) > 0.005
           ? toNum(teenBasePrice)
           : null,
     },
@@ -289,39 +270,45 @@ const CheckoutSummary = ({
   ].filter((item) => item.count > 0);
 
   // ============================================================
-  // DETAILS DATA
+  // DETAIL TABS
   // ============================================================
 
   const detailItems = [
-    { key: "tour",      icon: "🏝️", label: "Tour",      complete: true },
+    { key: "tour", icon: "🏝️", label: "Tour", complete: true },
     { key: "traveller", icon: "👤", label: "Traveller", complete: contactDetailsComplete },
-    { key: "date",      icon: "📅", label: "Date",      complete: dateDetailsComplete },
-    { key: "guests",    icon: "👥", label: "Guests",    complete: true },
-    { key: "pickup",    icon: "🚐", label: "Pickup",    complete: pickupDetailsComplete },
+    { key: "date", icon: "📅", label: "Date", complete: dateDetailsComplete },
+    { key: "guests", icon: "👥", label: "Guests", complete: true },
+    { key: "pickup", icon: "🚐", label: "Pickup", complete: pickupDetailsComplete },
   ];
 
-  // ---- Render rich content for each detail ----
+  const tourThumb = tour?.image || tour?.images?.[0];
+
+  const guestRows = [
+    { show: adults > 0, emoji: "🧑", count: adults },
+    { show: teens > 0, emoji: "👦", count: teens },
+    { show: effectiveChildren > 0, emoji: "👧", count: effectiveChildren },
+    { show: effectiveToddlers > 0, emoji: "👶", count: effectiveToddlers },
+  ];
+
   const renderDetailContent = (key) => {
     switch (key) {
       case "tour":
         return (
           <div className="flex flex-col items-center justify-center gap-3 text-center sm:flex-row lg:justify-start lg:text-left">
-            {tour?.images?.[0] ? (
+            {tourThumb ? (
               <img
-                src={resolveImage(tour.images[0])}
-                alt={tour.title}
-                className="w-12 h-12 rounded-full object-cover border-2 border-blue-200"
+                src={resolveImage(tourThumb)}
+                alt={tour?.title || ""}
+                className="h-12 w-12 rounded-full border-2 border-blue-200 object-cover"
               />
             ) : (
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-2xl">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-2xl">
                 🏝️
               </div>
             )}
-            <div>
-              <p className="text-sm font-bold text-neutral-900">
-                {tour?.title || tour?.info || "Unnamed Tour"}
-              </p>
-            </div>
+            <p className="text-sm font-bold text-neutral-900">
+              {tour?.title || tour?.info || "Unnamed Tour"}
+            </p>
           </div>
         );
       case "traveller":
@@ -355,60 +342,23 @@ const CheckoutSummary = ({
             ref={guestContainerRef}
             className="flex flex-wrap items-center justify-center gap-4 lg:justify-start"
           >
-            {adults > 0 && (
-              <div className="flex items-center gap-1">
-                <span
-                  ref={(el) => (guestEmojisRef.current[0] = el)}
-                  className="text-2xl"
-                  style={{ opacity: 0, transform: "scale(0)" }}
-                >
-                  🧑
-                </span>
-                <span className="text-sm font-bold">×{adults}</span>
-              </div>
+            {guestRows.map((row, i) =>
+              row.show ? (
+                <div key={i} className="flex items-center gap-1">
+                  <span
+                    ref={(el) => (guestEmojisRef.current[i] = el)}
+                    className="text-2xl"
+                    style={{ opacity: 0, transform: "scale(0)" }}
+                  >
+                    {row.emoji}
+                  </span>
+                  <span className="text-sm font-bold">×{row.count}</span>
+                </div>
+              ) : null,
             )}
-            {teens > 0 && (
-              <div className="flex items-center gap-1">
-                <span
-                  ref={(el) => (guestEmojisRef.current[1] = el)}
-                  className="text-2xl"
-                  style={{ opacity: 0, transform: "scale(0)" }}
-                >
-                  👦
-                </span>
-                <span className="text-sm font-bold">×{teens}</span>
-              </div>
+            {guestRows.every((r) => !r.show) && (
+              <span className="text-sm text-neutral-500">No guests</span>
             )}
-            {effectiveChildren > 0 && (
-              <div className="flex items-center gap-1">
-                <span
-                  ref={(el) => (guestEmojisRef.current[2] = el)}
-                  className="text-2xl"
-                  style={{ opacity: 0, transform: "scale(0)" }}
-                >
-                  👧
-                </span>
-                <span className="text-sm font-bold">×{effectiveChildren}</span>
-              </div>
-            )}
-            {effectiveToddlers > 0 && (
-              <div className="flex items-center gap-1">
-                <span
-                  ref={(el) => (guestEmojisRef.current[3] = el)}
-                  className="text-2xl"
-                  style={{ opacity: 0, transform: "scale(0)" }}
-                >
-                  👶
-                </span>
-                <span className="text-sm font-bold">×{effectiveToddlers}</span>
-              </div>
-            )}
-            {adults === 0 &&
-              teens === 0 &&
-              effectiveChildren === 0 &&
-              effectiveToddlers === 0 && (
-                <span className="text-sm text-neutral-500">No guests</span>
-              )}
           </div>
         );
       case "pickup":
@@ -428,77 +378,94 @@ const CheckoutSummary = ({
     detailItems.find((d) => d.key === activeDetail) || detailItems[0];
 
   // ============================================================
+  // BUTTON STATE
+  // ============================================================
+
+  const buttonDisabled =
+    submitting ||
+    verifyStatus === "pending" ||
+    (hasOptions && !selectedTourOption) ||
+    (!isCustomQuote && verifyStatus !== "verified" && verifyStatus !== "failed");
+
+  const buttonLabel = (() => {
+    if (submitting || verifyStatus === "pending") return "Verifying price…";
+    if (isCustomQuote) return "Request custom quote";
+    if (hasOptions && !selectedTourOption) return "Select option";
+    if (verifyStatus === "failed") return "Retry verification";
+    if (verifyStatus === "idle") return "Complete your details";
+    return payLabel || "Continue to checkout";
+  })();
+
+  // ============================================================
   // RENDER
   // ============================================================
 
   return (
     <div
       ref={checkoutRef}
-      className="border-t border-black/5 bg-white/92"
+      className={`border-t border-black/5 bg-white/92 ${
+        stacked ? "rounded-t-[2rem]" : ""
+      }`}
     >
-      <div className="grid gap-3 grid-cols-1">
+      <div className="grid grid-cols-1 gap-3">
         <div className="rounded-2xl border border-black/10 bg-white p-4 text-neutral-950 shadow-[0_12px_30px_rgba(0,0,0,0.05)]">
-          {/* HEADER — centered on mobile/tablet, left on lg */}
-          <div className="flex items-center justify-center gap-2 mb-4 lg:justify-start">
-            {CheckoutCartIcon && (
-              <CheckoutCartIcon className="h-7 w-7 text-blue-600" />
-            )}
-            <p className="text-2xl font-frank font-bold text-neutral-800">
+          {/* HEADER */}
+          <div
+            className={`mb-4 flex items-center justify-center gap-2 ${
+              stacked ? "" : "lg:justify-start"
+            }`}
+          >
+            {CheckoutCartIcon && <CheckoutCartIcon className="h-7 w-7 text-blue-600" />}
+            <p className="font-frank text-2xl font-bold text-neutral-800">
               Checkout summary
             </p>
           </div>
 
           {/* BOOKING DETAILS */}
-          <div className="flex flex-col lg:flex-row gap-4 mb-6">
+          <div className={`mb-6 flex flex-col gap-4 ${stacked ? "" : "lg:flex-row"}`}>
             <div
               ref={iconButtonsContainerRef}
-              className="overflow-x-auto pb-2 lg:overflow-visible lg:pb-0 scroll-smooth icon-scroll-container"
-              style={{
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
-              }}
+              className={`icon-scroll-container scroll-smooth overflow-x-auto pb-2 ${
+                stacked ? "" : "lg:overflow-visible lg:pb-0"
+              }`}
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
               <style>{`
-                .icon-scroll-container::-webkit-scrollbar {
-                  display: none;
-                }
+                .icon-scroll-container::-webkit-scrollbar { display: none; }
               `}</style>
-              <div className="flex w-max mx-auto flex-nowrap gap-2 lg:w-full lg:flex-wrap lg:gap-3">
+              <div
+                className={`mx-auto flex w-max flex-nowrap gap-2 ${
+                  stacked ? "" : "lg:w-full lg:flex-wrap lg:gap-3"
+                }`}
+              >
                 {detailItems.map((item) => {
                   const isActive = activeDetail === item.key;
                   const isComplete = item.complete;
                   return (
                     <button
                       key={item.key}
+                      type="button"
                       ref={(el) => {
-                        if (el) {
-                          iconButtonRefs.current[item.key] = el;
-                        }
+                        if (el) iconButtonRefs.current[item.key] = el;
                       }}
                       onClick={() => {
                         setActiveDetail(item.key);
                         scrollToCenterButton(item.key);
                       }}
-                      className={`
-                        flex flex-col items-center justify-center
-                        px-3 py-2 rounded-xl
-                        min-w-[70px] flex-shrink-0
-                        transition-all duration-200
-                        ${
-                          isActive
-                            ? "bg-blue-600 text-white shadow-md scale-105"
-                            : isComplete
-                            ? "bg-neutral-50 text-neutral-600 hover:bg-neutral-100 hover:scale-105"
+                      className={`flex min-w-[70px] flex-shrink-0 flex-col items-center justify-center rounded-xl px-3 py-2 transition-all duration-200 ${
+                        isActive
+                          ? "scale-105 bg-blue-600 text-white shadow-md"
+                          : isComplete
+                            ? "bg-neutral-50 text-neutral-600 hover:scale-105 hover:bg-neutral-100"
                             : "bg-neutral-100 text-neutral-400 opacity-60 hover:bg-neutral-200"
-                        }
-                      `}
+                      }`}
                     >
                       <span className="text-xl">{item.icon}</span>
-                      <span className="text-[10px] font-bold uppercase tracking-wide mt-0.5">
+                      <span className="mt-0.5 text-[10px] font-bold uppercase tracking-wide">
                         {item.label}
                       </span>
                       {!isComplete && (
-                        <span className="text-[10px] mt-0.5 text-amber-500">⚠️</span>
+                        <span className="mt-0.5 text-[10px] text-amber-500">⚠️</span>
                       )}
                     </button>
                   );
@@ -506,57 +473,61 @@ const CheckoutSummary = ({
               </div>
             </div>
 
-            <div className="flex-1 relative z-40">
+            <div className="relative z-40 flex-1">
               <div
-                className={`
-                  rounded-xl p-4 z-30 text-center lg:text-left
-                  transition-all duration-300 ease-out
-                  ${
-                    activeDetailData.complete
-                      ? "bg-neutral-50 border-l-4 border-blue-500"
-                      : "bg-neutral-100 border-l-4 border-amber-400"
-                  }
-                `}
+                className={`z-30 rounded-xl p-4 text-center transition-all duration-300 ease-out ${
+                  stacked ? "" : "lg:text-left"
+                } ${
+                  activeDetailData.complete
+                    ? "border-l-4 border-blue-500 bg-neutral-50"
+                    : "border-l-4 border-amber-400 bg-neutral-100"
+                }`}
               >
                 <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-400">
                   {activeDetailData.label}
                 </p>
-                <div className="mt-1">
-                  {renderDetailContent(activeDetailData.key)}
-                </div>
+                <div className="mt-1">{renderDetailContent(activeDetailData.key)}</div>
                 {!activeDetailData.complete && (
-                  <p className="mt-2 flex items-center justify-center gap-1 text-xs font-medium text-amber-600 lg:justify-start">
+                  <p
+                    className={`mt-2 flex items-center justify-center gap-1 text-xs font-medium text-amber-600 ${
+                      stacked ? "" : "lg:justify-start"
+                    }`}
+                  >
                     ⚠️ Incomplete – please fill in this field
                   </p>
                 )}
               </div>
               <div
-                className="z-[-1] absolute -bottom-2 left-1/2 -translate-x-1/2 w-3/4 h-4 rounded-full bg-black/20 blur-lg pointer-events-none"
+                className="pointer-events-none absolute -bottom-2 left-1/2 z-[-1] h-4 w-3/4 -translate-x-1/2 rounded-full bg-black/20"
                 style={{ filter: "blur(6px)" }}
               />
             </div>
           </div>
 
-          {/* ====================================================
-              PRICE BREAKDOWN + TOTAL
-          ==================================================== */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-6 mt-6">
-
-            {/* ───────── LEFT — PRICE BREAKDOWN ───────── */}
-            <div className="lg:col-span-2 rounded-3xl border border-black/5 bg-gradient-to-b from-stone-50 to-stone-100/70 p-4 sm:p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
-
-              <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
+          {/* PRICE BREAKDOWN + TOTAL */}
+          <div
+            className={`mt-6 grid grid-cols-1 gap-5 ${
+              stacked ? "" : "lg:grid-cols-3 lg:gap-6"
+            }`}
+          >
+            {/* BREAKDOWN */}
+            <div
+              className={`rounded-3xl border border-black/5 bg-gradient-to-b from-stone-50 to-stone-100/70 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] sm:p-6 ${
+                stacked ? "" : "lg:col-span-2"
+              }`}
+            >
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5">
                   <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-100 text-lg">
                     💰
                   </span>
-                  <h4 className="text-base sm:text-lg font-black uppercase tracking-[0.16em] text-neutral-800">
+                  <h4 className="text-base font-black uppercase tracking-[0.16em] text-neutral-800 sm:text-lg">
                     Price breakdown
                   </h4>
                 </div>
 
                 {hasGroupAdjustment && groupAdjustmentIsSaving && (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-3.5 py-1.5 text-xs sm:text-sm font-black uppercase tracking-wider text-white shadow-[0_4px_14px_rgba(34,197,94,0.35)]">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-3.5 py-1.5 text-xs font-black uppercase tracking-wider text-white shadow-[0_4px_14px_rgba(34,197,94,0.35)] sm:text-sm">
                     <span>🎉</span>
                     <span>Save {formatCurrency(Math.abs(groupAdjustmentAmount))}</span>
                   </span>
@@ -566,9 +537,7 @@ const CheckoutSummary = ({
               <div className="space-y-2.5">
                 {breakdownItems.map((item) => {
                   const hasItemDiscount = item.basePerPerson != null;
-                  const baseTotal = hasItemDiscount
-                    ? item.basePerPerson * item.count
-                    : null;
+                  const baseTotal = hasItemDiscount ? item.basePerPerson * item.count : null;
 
                   return (
                     <div
@@ -587,21 +556,17 @@ const CheckoutSummary = ({
                         <div className="min-w-0 flex-1">
                           <p
                             className={`text-base font-black leading-tight sm:text-lg ${
-                              hasItemDiscount
-                                ? "text-green-900"
-                                : "text-neutral-900"
+                              hasItemDiscount ? "text-green-900" : "text-neutral-900"
                             }`}
                           >
                             {item.label}
                           </p>
 
                           <p className="mt-1 text-xs font-semibold text-neutral-500 sm:text-sm">
-                            <span className="tabular-nums">
-                              {item.count} ×{" "}
-                            </span>
+                            <span className="tabular-nums">{item.count} × </span>
                             {hasItemDiscount ? (
                               <>
-                                <span className="line-through text-neutral-400">
+                                <span className="text-neutral-400 line-through">
                                   {formatCurrency(item.basePerPerson)}
                                 </span>{" "}
                                 <span className="font-black text-green-700">
@@ -619,15 +584,15 @@ const CheckoutSummary = ({
                         <div className="shrink-0 text-right">
                           {hasItemDiscount && baseTotal != null ? (
                             <>
-                              <p className="text-xs font-semibold text-neutral-400 line-through tabular-nums sm:text-sm">
+                              <p className="text-xs font-semibold tabular-nums text-neutral-400 line-through sm:text-sm">
                                 {formatCurrency(baseTotal)}
                               </p>
-                              <p className="text-xl font-black leading-tight text-green-700 tabular-nums sm:text-2xl">
+                              <p className="text-xl font-black leading-tight tabular-nums text-green-700 sm:text-2xl">
                                 {formatCurrency(item.subtotal)}
                               </p>
                             </>
                           ) : (
-                            <p className="text-xl font-black leading-tight text-neutral-900 tabular-nums sm:text-2xl">
+                            <p className="text-xl font-black leading-tight tabular-nums text-neutral-900 sm:text-2xl">
                               {formatCurrency(item.subtotal)}
                             </p>
                           )}
@@ -649,9 +614,7 @@ const CheckoutSummary = ({
                   <div>
                     <p
                       className={`text-base font-black uppercase tracking-wider sm:text-lg ${
-                        hasGroupAdjustment
-                          ? "text-green-900"
-                          : "text-neutral-900"
+                        hasGroupAdjustment ? "text-green-900" : "text-neutral-900"
                       }`}
                     >
                       Tour subtotal
@@ -666,15 +629,15 @@ const CheckoutSummary = ({
                   <div className="text-right">
                     {hasGroupAdjustment ? (
                       <>
-                        <p className="text-sm font-semibold text-neutral-400 line-through tabular-nums">
+                        <p className="text-sm font-semibold tabular-nums text-neutral-400 line-through">
                           {formatCurrency(baseTourSubtotal)}
                         </p>
-                        <p className="text-2xl font-black leading-tight text-green-700 tabular-nums sm:text-3xl">
+                        <p className="text-2xl font-black leading-tight tabular-nums text-green-700 sm:text-3xl">
                           {formatCurrency(engineTourSubtotal)}
                         </p>
                       </>
                     ) : (
-                      <p className="text-2xl font-black leading-tight text-neutral-900 tabular-nums sm:text-3xl">
+                      <p className="text-2xl font-black leading-tight tabular-nums text-neutral-900 sm:text-3xl">
                         {formatCurrency(engineTourSubtotal)}
                       </p>
                     )}
@@ -693,11 +656,10 @@ const CheckoutSummary = ({
                     </p>
                     <p className="mt-0.5 text-xs font-semibold text-green-800 sm:text-sm">
                       {groupRateLabel}
-                      {qualifyingHeadcount != null &&
-                        ` · ${qualifyingHeadcount} qualifying guests`}
+                      {qualifyingHeadcount != null && ` · ${qualifyingHeadcount} qualifying guests`}
                     </p>
                   </div>
-                  <span className="shrink-0 rounded-full bg-white/80 px-3 py-1.5 text-sm font-black text-green-700 tabular-nums sm:text-base">
+                  <span className="shrink-0 rounded-full bg-white/80 px-3 py-1.5 text-sm font-black tabular-nums text-green-700 sm:text-base">
                     −{formatCurrency(Math.abs(groupAdjustmentAmount))}
                   </span>
                 </div>
@@ -714,8 +676,7 @@ const CheckoutSummary = ({
                     </p>
                     <p className="mt-0.5 text-xs font-semibold text-amber-800 sm:text-sm">
                       {groupRateLabel}
-                      {qualifyingHeadcount != null &&
-                        ` · ${qualifyingHeadcount} qualifying guests`}
+                      {qualifyingHeadcount != null && ` · ${qualifyingHeadcount} qualifying guests`}
                       . Rates shown above already reflect this adjustment.
                     </p>
                   </div>
@@ -727,8 +688,8 @@ const CheckoutSummary = ({
                   <span className="text-sm font-bold text-neutral-700 sm:text-base">
                     Private tour fee
                   </span>
-                  <span className="text-base font-black text-neutral-900 tabular-nums sm:text-lg">
-                    {displayActivePrivateFee.replace("+", "")}
+                  <span className="text-base font-black tabular-nums text-neutral-900 sm:text-lg">
+                    {displayActivePrivateFee}
                   </span>
                 </div>
               )}
@@ -737,8 +698,8 @@ const CheckoutSummary = ({
                   <span className="text-sm font-bold text-neutral-700 sm:text-base">
                     Custom trip fee
                   </span>
-                  <span className="text-base font-black text-neutral-900 tabular-nums sm:text-lg">
-                    {displayActiveCustomFee.replace("+", "")}
+                  <span className="text-base font-black tabular-nums text-neutral-900 sm:text-lg">
+                    {displayActiveCustomFee}
                   </span>
                 </div>
               )}
@@ -746,7 +707,7 @@ const CheckoutSummary = ({
               {extrasBreakdown.length > 0 && (
                 <div className="mt-3 rounded-2xl border border-black/5 bg-white p-4 sm:p-5">
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-neutral-500">
-                    Optional Extras
+                    Optional extras
                   </p>
                   <div className="mt-3 space-y-2">
                     {extrasBreakdown.map((item, idx) => (
@@ -754,10 +715,8 @@ const CheckoutSummary = ({
                         key={idx}
                         className="flex items-center justify-between gap-3 text-sm sm:text-base"
                       >
-                        <span className="font-semibold text-neutral-700">
-                          {item.label}
-                        </span>
-                        <span className="font-bold text-neutral-900 tabular-nums">
+                        <span className="font-semibold text-neutral-700">{item.label}</span>
+                        <span className="font-bold tabular-nums text-neutral-900">
                           {item.formattedCost}
                         </span>
                       </div>
@@ -766,7 +725,7 @@ const CheckoutSummary = ({
                       <span className="font-black uppercase tracking-wider text-neutral-900">
                         Extras total
                       </span>
-                      <span className="font-black text-neutral-900 tabular-nums">
+                      <span className="font-black tabular-nums text-neutral-900">
                         {displayExtrasTotal}
                       </span>
                     </div>
@@ -786,59 +745,39 @@ const CheckoutSummary = ({
                       </p>
                       <p className="mt-0.5 text-xs font-semibold text-blue-700 sm:text-sm">
                         {selectedKidsActivity.category}
-                        {selectedKidsActivity.location
-                          ? ` · ${selectedKidsActivity.location}`
-                          : ""}
+                        {selectedKidsActivity.location ? ` · ${selectedKidsActivity.location}` : ""}
                       </p>
                     </div>
-                    <span className="shrink-0 text-base font-black text-blue-700 tabular-nums sm:text-lg">
+                    <span className="shrink-0 text-base font-black tabular-nums text-blue-700 sm:text-lg">
                       + {displayKidsActivityTotal}
                     </span>
                   </div>
                   <div className="mt-4 grid gap-2.5 sm:grid-cols-3">
-                    <div className="rounded-xl bg-white/80 p-3">
-                      <p className="text-[10px] font-black uppercase tracking-[0.14em] text-blue-500">
-                        Adults
-                      </p>
-                      <p className="mt-1 text-xs font-semibold text-blue-700">
-                        {adults} × {formatCurrency(kidsActivityAdultPrice)}
-                      </p>
-                      <p className="mt-1 text-base font-black text-blue-950 tabular-nums">
-                        {formatCurrency(kidsActivityAdultTotal)}
-                      </p>
-                    </div>
-                    <div className="rounded-xl bg-white/80 p-3">
-                      <p className="text-[10px] font-black uppercase tracking-[0.14em] text-blue-500">
-                        Children
-                      </p>
-                      <p className="mt-1 text-xs font-semibold text-blue-700">
-                        {effectiveChildren} × {formatCurrency(kidsActivityChildPrice)}
-                      </p>
-                      <p className="mt-1 text-base font-black text-blue-950 tabular-nums">
-                        {formatCurrency(kidsActivityChildTotal)}
-                      </p>
-                    </div>
-                    <div className="rounded-xl bg-white/80 p-3">
-                      <p className="text-[10px] font-black uppercase tracking-[0.14em] text-blue-500">
-                        Toddlers
-                      </p>
-                      <p className="mt-1 text-xs font-semibold text-blue-700">
-                        {effectiveToddlers} × {formatCurrency(kidsActivityToddlerPrice)}
-                      </p>
-                      <p className="mt-1 text-base font-black text-blue-950 tabular-nums">
-                        {formatCurrency(kidsActivityToddlerTotal)}
-                      </p>
-                    </div>
+                    {[
+                      ["Adults", adults, kidsActivityAdultPrice, kidsActivityAdultTotal],
+                      ["Children", effectiveChildren, kidsActivityChildPrice, kidsActivityChildTotal],
+                      ["Toddlers", effectiveToddlers, kidsActivityToddlerPrice, kidsActivityToddlerTotal],
+                    ].map(([label, count, price, total]) => (
+                      <div key={label} className="rounded-xl bg-white/80 p-3">
+                        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-blue-500">
+                          {label}
+                        </p>
+                        <p className="mt-1 text-xs font-semibold text-blue-700">
+                          {count} × {formatCurrency(price)}
+                        </p>
+                        <p className="mt-1 text-base font-black tabular-nums text-blue-950">
+                          {formatCurrency(total)}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
 
               {isCustomQuote && (
                 <div className="mt-3 rounded-2xl border border-blue-200 bg-blue-50 p-4">
-                  <p className="text-base font-black text-blue-900">
-                    Custom quote required
-                  </p>
-                  <p className="mt-1 text-sm leading-6 font-medium text-blue-700">
+                  <p className="text-base font-black text-blue-900">Custom quote required</p>
+                  <p className="mt-1 text-sm font-medium leading-6 text-blue-700">
                     {matchedGroupTier?.note ||
                       "This group size requires a custom quote. The final price will be confirmed with you before payment."}
                   </p>
@@ -847,28 +786,29 @@ const CheckoutSummary = ({
 
               {hasOptions && !selectedTourOption && (
                 <div className="mt-3 rounded-2xl border border-blue-200 bg-blue-50 p-4">
-                  <p className="text-base font-black text-blue-900">
-                    Select an option
-                  </p>
-                  <p className="mt-1 text-sm leading-6 font-medium text-blue-700">
-                    Choose your preferred experience above before continuing to
-                    checkout.
+                  <p className="text-base font-black text-blue-900">Select an option</p>
+                  <p className="mt-1 text-sm font-medium leading-6 text-blue-700">
+                    Choose your preferred experience above before continuing to checkout.
                   </p>
                 </div>
               )}
             </div>
 
-            {/* ───────── RIGHT — TOTAL + CHECKOUT ───────── */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-4 overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-blue-650 to-indigo-700 p-5 text-white shadow-[0_20px_50px_rgba(37,99,235,0.35)] sm:p-6">
+            {/* TOTAL (+ pay button unless hidden) */}
+            <div className={stacked ? "" : "lg:col-span-1"}>
+              <div
+                className={`relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 p-5 text-white shadow-[0_20px_50px_rgba(37,99,235,0.35)] sm:p-6 ${
+                  stacked ? "mx-auto max-w-xl" : "sticky top-4"
+                }`}
+              >
                 <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/10 blur-3xl" />
 
                 <div className="relative">
                   <p className="text-xs font-black uppercase tracking-[0.2em] text-white/70 sm:text-sm">
-                    Total Due
+                    Total due
                   </p>
                   <p className="mt-1.5 font-frank text-4xl font-black leading-none tabular-nums sm:text-5xl">
-                    {displayTotal}
+                    {isCustomQuote ? "Custom quote" : displayTotal}
                   </p>
 
                   {hasGroupAdjustment && groupAdjustmentIsSaving && (
@@ -888,50 +828,41 @@ const CheckoutSummary = ({
                     {privateFee > 0 && (
                       <div className="flex items-center justify-between gap-3">
                         <span className="font-medium text-white/80">Private fee</span>
-                        <span className="font-black tabular-nums">
-                          {displayActivePrivateFee.replace("+", "")}
-                        </span>
+                        <span className="font-black tabular-nums">{displayActivePrivateFee}</span>
                       </div>
                     )}
 
                     {customFee > 0 && (
                       <div className="flex items-center justify-between gap-3">
                         <span className="font-medium text-white/80">Custom fee</span>
-                        <span className="font-black tabular-nums">
-                          {displayActiveCustomFee.replace("+", "")}
-                        </span>
+                        <span className="font-black tabular-nums">{displayActiveCustomFee}</span>
                       </div>
                     )}
 
                     {extrasTotal > 0 && (
                       <div className="flex items-center justify-between gap-3">
                         <span className="font-medium text-white/80">Extras</span>
-                        <span className="font-black tabular-nums">
-                          {displayExtrasTotal}
-                        </span>
+                        <span className="font-black tabular-nums">{displayExtrasTotal}</span>
                       </div>
                     )}
 
                     {selectedKidsActivity && (
                       <div className="flex items-center justify-between gap-3">
                         <span className="font-medium text-white/80">Activity</span>
-                        <span className="font-black tabular-nums">
-                          {displayKidsActivityTotal}
-                        </span>
+                        <span className="font-black tabular-nums">{displayKidsActivityTotal}</span>
                       </div>
                     )}
                   </div>
 
-                  {/* Pre-flight verification indicator — hidden for
-                      custom-quote tours (no fixed price to verify). */}
+                  {/* Pre-flight verification indicator (not for custom quotes) */}
                   {!isCustomQuote && verifyStatus !== "idle" && (
                     <div
                       className={`mt-4 flex items-start gap-2 rounded-xl border px-3 py-2.5 text-xs font-semibold ${
                         verifyStatus === "verified"
                           ? "border-green-300 bg-green-50 text-green-800"
                           : verifyStatus === "failed"
-                          ? "border-red-300 bg-red-50 text-red-700"
-                          : "border-amber-200 bg-amber-50 text-amber-800"
+                            ? "border-red-300 bg-red-50 text-red-700"
+                            : "border-amber-200 bg-amber-50 text-amber-800"
                       }`}
                     >
                       {verifyStatus === "pending" && (
@@ -943,15 +874,14 @@ const CheckoutSummary = ({
                       {verifyStatus === "verified" && (
                         <>
                           <span className="shrink-0 text-sm leading-none">✓</span>
-                          <span>Price verified — ready for checkout.</span>
+                          <span>Price verified — ready for payment.</span>
                         </>
                       )}
                       {verifyStatus === "failed" && (
                         <>
                           <span className="shrink-0 text-sm leading-none">⚠</span>
                           <span>
-                            {verifyError || "Price verification failed."} Click
-                            retry to try again.
+                            {verifyError || "Price verification failed."} Tap retry to try again.
                           </span>
                         </>
                       )}
@@ -964,35 +894,21 @@ const CheckoutSummary = ({
                     </p>
                   )}
 
-                  <button
-                    type="submit"
-                    form="booking-form"
-                    disabled={
-                      submitting ||
-                      verifyStatus === "pending" ||
-                      (hasOptions && !selectedTourOption) ||
-                      // Custom-quote tours skip verification entirely.
-                      (!isCustomQuote &&
-                        verifyStatus !== "verified" &&
-                        verifyStatus !== "failed")
-                    }
-                    className={`mt-4 w-full rounded-2xl py-4 text-center text-sm font-black uppercase tracking-wider shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_14px_30px_rgba(0,0,0,0.22)] disabled:opacity-50 disabled:hover:scale-100 ${
-                      verifyStatus === "failed"
-                        ? "bg-red-600 text-white hover:bg-red-700"
-                        : "bg-white text-blue-700"
-                    }`}
-                  >
-                    {(() => {
-                      if (submitting || verifyStatus === "pending")
-                        return "Verifying price…";
-                      if (isCustomQuote) return "Request custom quote";
-                      if (hasOptions && !selectedTourOption)
-                        return "Select option";
-                      if (verifyStatus === "failed") return "Retry verification";
-                      if (verifyStatus === "idle") return "Complete your details";
-                      return "Continue to checkout";
-                    })()}
-                  </button>
+                  {!hideSubmit && (
+                    <button
+                      type={onSubmit ? "button" : "submit"}
+                      form={onSubmit ? undefined : "booking-form"}
+                      onClick={onSubmit || undefined}
+                      disabled={buttonDisabled}
+                      className={`mt-4 w-full rounded-2xl py-4 text-center text-sm font-black uppercase tracking-wider shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_14px_30px_rgba(0,0,0,0.22)] disabled:opacity-50 disabled:hover:scale-100 ${
+                        verifyStatus === "failed"
+                          ? "bg-red-600 text-white hover:bg-red-700"
+                          : "bg-white text-blue-700"
+                      }`}
+                    >
+                      {buttonLabel}
+                    </button>
+                  )}
 
                   <div className="mt-4 flex justify-center gap-3 text-[10px] font-black uppercase tracking-[0.16em] text-white/60">
                     <span>Terms</span>

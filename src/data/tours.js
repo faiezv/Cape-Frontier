@@ -801,6 +801,7 @@ export const tours = [
     id: 3, // New tour ID to be assigned (e.g., 22)
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.HALF_DAY,
+    childFriendly: false,
 
     title: "Paragliding – Cape Town",
     slug: "paragliding-experience-cape-town",
@@ -5607,2406 +5608,2406 @@ export const tours = [
     ],
   },
   // 3Day - Garden Route
-  {
-    id: 18, // New tour ID to be assigned (e.g., 38)
-    type: TOUR_TYPES.PACKAGES,
-    category: TOUR_MODIFIERS.MULTI_DAY,
+  // {
+  //   id: 18, // New tour ID to be assigned (e.g., 38)
+  //   type: TOUR_TYPES.PACKAGES,
+  //   category: TOUR_MODIFIERS.MULTI_DAY,
 
-    title: "3‑Day Garden Route & Route 62 Tour",
-    slug: "3-day-garden-route-route-62-tour",
-    canonicalPath: "/tours/3-day-garden-route-route-62-tour",
-    childFriendly: true,
-    daysInAdvance: 14,
+  //   title: "3‑Day Garden Route & Route 62 Tour",
+  //   slug: "3-day-garden-route-route-62-tour",
+  //   canonicalPath: "/tours/3-day-garden-route-route-62-tour",
+  //   childFriendly: true,
+  //   daysInAdvance: 14,
 
-    seo: {
-      title: "3‑Day Garden Route & Route 62 Tour | Cape Frontier Tours",
-      description:
-        "Experience South Africa's most iconic road trip — a 3‑day private journey through the Cape Winelands, Route 62, Klein Karoo, Cango Caves, Botlierskop Safari, Knysna, Hermanus, and the Garden Route coastline.",
-      keywords: [
-        "Garden Route tour",
-        "3 day Garden Route tour",
-        "Route 62 tour",
-        "Cango Caves tour",
-        "Botlierskop safari",
-        "Knysna Heads tour",
-        "Klein Karoo tour",
-        "South Africa road trip",
-        "Garden Route itinerary",
-        "Cape Town to Garden Route",
-        "private Garden Route tour",
-      ],
-    },
+  //   seo: {
+  //     title: "3‑Day Garden Route & Route 62 Tour | Cape Frontier Tours",
+  //     description:
+  //       "Experience South Africa's most iconic road trip — a 3‑day private journey through the Cape Winelands, Route 62, Klein Karoo, Cango Caves, Botlierskop Safari, Knysna, Hermanus, and the Garden Route coastline.",
+  //     keywords: [
+  //       "Garden Route tour",
+  //       "3 day Garden Route tour",
+  //       "Route 62 tour",
+  //       "Cango Caves tour",
+  //       "Botlierskop safari",
+  //       "Knysna Heads tour",
+  //       "Klein Karoo tour",
+  //       "South Africa road trip",
+  //       "Garden Route itinerary",
+  //       "Cape Town to Garden Route",
+  //       "private Garden Route tour",
+  //     ],
+  //   },
 
-    workflow: defaultWorkflow,
+  //   workflow: defaultWorkflow,
 
-    image:
-      "/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp",
-    images: [
-      "/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp",
-      "/src/assets/images/tours/packages/3-day-garden-route/960px-Benguela_Cove_Lagoon_Wine.webp",
-      "/src/assets/images/tours/packages/3-day-garden-route/960px-Botlierskop_Landscape_2.webp",
-    ],
-    imageFolder: "/packages/3-day-garden-route",
-    videos: [],
+  //   image:
+  //     "/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp",
+  //   images: [
+  //     "/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp",
+  //     "/src/assets/images/tours/packages/3-day-garden-route/960px-Benguela_Cove_Lagoon_Wine.webp",
+  //     "/src/assets/images/tours/packages/3-day-garden-route/960px-Botlierskop_Landscape_2.webp",
+  //   ],
+  //   imageFolder: "/packages/3-day-garden-route",
+  //   videos: [],
 
-    location: "Garden Route, South Africa",
-    duration: "3 Days / 2 Nights",
+  //   location: "Garden Route, South Africa",
+  //   duration: "3 Days / 2 Nights",
 
-    priceBase: 10500,
-    minPeople: 1,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
+  //   priceBase: 10500,
+  //   minPeople: 1,
+  //   baseCurrency: "ZAR",
+  //   supportedCurrencies: SUPPORTED_CURRENCIES,
 
-    pricing: [
-      {
-        category: "Solo Traveller",
-        pricePerPerson: 17000,
-        note: "Includes accommodation, breakfast, transport",
-      },
-      {
-        category: "Teens: (12-17 years)",
-        pricePerPerson: 17000,
-        note: "Full rates apply.",
-      },
-      {
-        category: "Child: (5–12 years)",
-        pricePerPerson: 9300,
-        note: "Discounted rates apply.",
-      },
-      {
-        category: "Toddler: (0–4 years)",
-        pricePerPerson: 0,
-        note: "Free of charge",
-      },
-    ],
+  //   pricing: [
+  //     {
+  //       category: "Solo Traveller",
+  //       pricePerPerson: 17000,
+  //       note: "Includes accommodation, breakfast, transport",
+  //     },
+  //     {
+  //       category: "Teens: (12-17 years)",
+  //       pricePerPerson: 17000,
+  //       note: "Full rates apply.",
+  //     },
+  //     {
+  //       category: "Child: (5–12 years)",
+  //       pricePerPerson: 9300,
+  //       note: "Discounted rates apply.",
+  //     },
+  //     {
+  //       category: "Toddler: (0–4 years)",
+  //       pricePerPerson: 0,
+  //       note: "Free of charge",
+  //     },
+  //   ],
 
-    additionalPricing: [],
+  //   additionalPricing: [],
 
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 2,
-          maxPeople: 2,
-          perPerson: 14800,
-          label: "2 Guests",
-          note: "Includes accommodation, breakfast, transport",
-        },
-        {
-          minPeople: 3,
-          maxPeople: 4,
-          perPerson: 12500,
-          label: "3–4 Guests",
-          note: "Includes accommodation, breakfast, transport",
-        },
-        {
-          minPeople: 5,
-          perPerson: 10500,
-          label: "5+ Guests",
-          note: "Includes accommodation, breakfast, transport",
-        },
-      ],
-    },
+  //   groupPricing: {
+  //     enabled: true,
+  //     icon: "/icons/savemore.png",
+  //     tiers: [
+  //       {
+  //         minPeople: 2,
+  //         maxPeople: 2,
+  //         perPerson: 14800,
+  //         label: "2 Guests",
+  //         note: "Includes accommodation, breakfast, transport",
+  //       },
+  //       {
+  //         minPeople: 3,
+  //         maxPeople: 4,
+  //         perPerson: 12500,
+  //         label: "3–4 Guests",
+  //         note: "Includes accommodation, breakfast, transport",
+  //       },
+  //       {
+  //         minPeople: 5,
+  //         perPerson: 10500,
+  //         label: "5+ Guests",
+  //         note: "Includes accommodation, breakfast, transport",
+  //       },
+  //     ],
+  //   },
 
-    highlights: [
-      {
-        text: "Robertson Winelands — coffee stop or optional wine tasting with scenic vineyards and mountain views",
-      },
-      {
-        text: "Route 62 Scenic Drive — South Africa's most iconic country road through Montagu, Ashton, and Barrydale",
-      },
-      {
-        text: "Cango Caves — guided Heritage or Adventure Tour through ancient limestone chambers and incredible formations",
-      },
-      {
-        text: "Botlierskop Private Game Reserve — 3‑hour morning safari with lions, rhino, giraffe, buffalo, and zebra",
-      },
-      {
-        text: "Knysna Heads — panoramic views over the lagoon and Indian Ocean",
-      },
-      {
-        text: "Knysna Quays Waterfront — restaurants, cafés, boutique shops, optional lagoon cruise",
-      },
-      {
-        text: "Hermanus — Whale Coast cliff paths, ocean views, markets, and cafés",
-      },
-      {
-        text: "Benguela Cove Lagoon Wine Estate — premium wine tasting with lagoon views",
-      },
-      {
-        text: "Betty's Bay — Stony Point Penguin Colony with boardwalks and African penguins in a natural coastal habitat",
-      },
-      { text: "Scenic Clarence Drive (R44) return route to Cape Town" },
-    ],
+  //   highlights: [
+  //     {
+  //       text: "Robertson Winelands — coffee stop or optional wine tasting with scenic vineyards and mountain views",
+  //     },
+  //     {
+  //       text: "Route 62 Scenic Drive — South Africa's most iconic country road through Montagu, Ashton, and Barrydale",
+  //     },
+  //     {
+  //       text: "Cango Caves — guided Heritage or Adventure Tour through ancient limestone chambers and incredible formations",
+  //     },
+  //     {
+  //       text: "Botlierskop Private Game Reserve — 3‑hour morning safari with lions, rhino, giraffe, buffalo, and zebra",
+  //     },
+  //     {
+  //       text: "Knysna Heads — panoramic views over the lagoon and Indian Ocean",
+  //     },
+  //     {
+  //       text: "Knysna Quays Waterfront — restaurants, cafés, boutique shops, optional lagoon cruise",
+  //     },
+  //     {
+  //       text: "Hermanus — Whale Coast cliff paths, ocean views, markets, and cafés",
+  //     },
+  //     {
+  //       text: "Benguela Cove Lagoon Wine Estate — premium wine tasting with lagoon views",
+  //     },
+  //     {
+  //       text: "Betty's Bay — Stony Point Penguin Colony with boardwalks and African penguins in a natural coastal habitat",
+  //     },
+  //     { text: "Scenic Clarence Drive (R44) return route to Cape Town" },
+  //   ],
 
-    included: [
-      { text: "Hotel pickup in Cape Town CBD" },
-      { text: "Private vehicle" },
-      { text: "Professional driver/guide" },
-      { text: "2 nights guest house accommodation" },
-      { text: "Breakfast (Day 2 & Day 3)" },
-      { text: "Cango Caves entrance" },
-      { text: "Botlierskop Safari" },
-      { text: "Wine tasting at Benguela Cove" },
-      { text: "Bottled water" },
-    ],
+  //   included: [
+  //     { text: "Hotel pickup in Cape Town CBD" },
+  //     { text: "Private vehicle" },
+  //     { text: "Professional driver/guide" },
+  //     { text: "2 nights guest house accommodation" },
+  //     { text: "Breakfast (Day 2 & Day 3)" },
+  //     { text: "Cango Caves entrance" },
+  //     { text: "Botlierskop Safari" },
+  //     { text: "Wine tasting at Benguela Cove" },
+  //     { text: "Bottled water" },
+  //   ],
 
-    excluded: [
-      { text: "Lunch and dinner" },
-      { text: "Optional activities" },
-      { text: "Personal purchases" },
-      { text: "Gratuities" },
-    ],
+  //   excluded: [
+  //     { text: "Lunch and dinner" },
+  //     { text: "Optional activities" },
+  //     { text: "Personal purchases" },
+  //     { text: "Gratuities" },
+  //   ],
 
-    pickupOptions: [
-      "Cape Town CBD",
-      "Green Point",
-      "Sea Point",
-      "V&A Waterfront",
-      "Custom pickup on request",
-    ],
+  //   pickupOptions: [
+  //     "Cape Town CBD",
+  //     "Green Point",
+  //     "Sea Point",
+  //     "V&A Waterfront",
+  //     "Custom pickup on request",
+  //   ],
 
-    requirements: [],
+  //   requirements: [],
 
-    arrangements: {
-      availability: "Available all year",
-      duration: "3 Days / 2 Nights",
-      operatingTime: "Flexible",
-      departure: "06:30 – 07:00",
-      return: "Day 3 evening",
-      location: "Cape Town → Garden Route → Cape Town",
+  //   arrangements: {
+  //     availability: "Available all year",
+  //     duration: "3 Days / 2 Nights",
+  //     operatingTime: "Flexible",
+  //     departure: "06:30 – 07:00",
+  //     return: "Day 3 evening",
+  //     location: "Cape Town → Garden Route → Cape Town",
 
-      clothing: [
-        "Comfortable clothing",
-        "Comfortable walking shoes",
-        "Warm jacket (evenings can be cool)",
-        "Sunscreen",
-        "Hat",
-        "Swimwear (optional)",
-      ],
+  //     clothing: [
+  //       "Comfortable clothing",
+  //       "Comfortable walking shoes",
+  //       "Warm jacket (evenings can be cool)",
+  //       "Sunscreen",
+  //       "Hat",
+  //       "Swimwear (optional)",
+  //     ],
 
-      thingsToBring: [
-        "Camera",
-        "Cash for personal purchases",
-        "Water bottle",
-        "Chargers for electronics",
-      ],
+  //     thingsToBring: [
+  //       "Camera",
+  //       "Cash for personal purchases",
+  //       "Water bottle",
+  //       "Chargers for electronics",
+  //     ],
 
-      passengerPolicy: "",
-      notes: ["Accommodation subject to availability"],
-    },
+  //     passengerPolicy: "",
+  //     notes: ["Accommodation subject to availability"],
+  //   },
 
-    weatherPolicy: {
-      summary:
-        "The Garden Route experiences mild weather year‑round. However, weather can change quickly — bring layers and rain gear.",
-      items: [
-        { text: "Garden Route has mild weather year‑round" },
-        { text: "Weather can change quickly — bring layers and rain gear" },
-        { text: "Cango Caves are indoors and not weather dependent" },
-        { text: "Game drives may be adjusted in extreme weather" },
-      ],
-    },
+  //   weatherPolicy: {
+  //     summary:
+  //       "The Garden Route experiences mild weather year‑round. However, weather can change quickly — bring layers and rain gear.",
+  //     items: [
+  //       { text: "Garden Route has mild weather year‑round" },
+  //       { text: "Weather can change quickly — bring layers and rain gear" },
+  //       { text: "Cango Caves are indoors and not weather dependent" },
+  //       { text: "Game drives may be adjusted in extreme weather" },
+  //     ],
+  //   },
 
-    cancellationPolicy: {
-      summary:
-        "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
-      items: [
-        {
-          text: "Cancellations must be made at least 24 hours before the trip starts",
-        },
-        {
-          text: "Refunds are forfeited for cancellations within 24 hours of departure",
-        },
-      ],
-    },
+  //   cancellationPolicy: {
+  //     summary:
+  //       "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
+  //     items: [
+  //       {
+  //         text: "Cancellations must be made at least 24 hours before the trip starts",
+  //       },
+  //       {
+  //         text: "Refunds are forfeited for cancellations within 24 hours of departure",
+  //       },
+  //     ],
+  //   },
 
-    safetyPolicy: {
-      summary:
-        "All game drives are conducted by experienced rangers at Botlierskop Private Game Reserve. Guests must follow all safety instructions during wildlife encounters.",
-      items: [
-        { text: "Game drives conducted by experienced rangers" },
-        { text: "Follow all safety instructions during wildlife encounters" },
-        { text: "Keep vehicle windows closed near wildlife" },
-        { text: "Do not feed or approach wild animals" },
-        { text: "Cango Caves tours follow strict safety protocols" },
-      ],
-    },
+  //   safetyPolicy: {
+  //     summary:
+  //       "All game drives are conducted by experienced rangers at Botlierskop Private Game Reserve. Guests must follow all safety instructions during wildlife encounters.",
+  //     items: [
+  //       { text: "Game drives conducted by experienced rangers" },
+  //       { text: "Follow all safety instructions during wildlife encounters" },
+  //       { text: "Keep vehicle windows closed near wildlife" },
+  //       { text: "Do not feed or approach wild animals" },
+  //       { text: "Cango Caves tours follow strict safety protocols" },
+  //     ],
+  //   },
 
-    /*
-     * MULTI‑DAY ITINERARY
-     */
-    itinerary: {
-      intro: {
-        title: "The Ultimate Garden Road Trip",
-        description:
-          "The Garden Route is one of South Africa's most famous and beautiful travel regions — a 300 km stretch of coastline from Mossel Bay to Storms River, known for forests, beaches, lagoons, wildlife, adventure activities, and charming towns. It's a place where mountains meet the ocean, where ancient forests run alongside sparkling lakes, and where every town offers its own unique charm.",
-      },
+  //   /*
+  //    * MULTI‑DAY ITINERARY
+  //    */
+  //   itinerary: {
+  //     intro: {
+  //       title: "The Ultimate Garden Road Trip",
+  //       description:
+  //         "The Garden Route is one of South Africa's most famous and beautiful travel regions — a 300 km stretch of coastline from Mossel Bay to Storms River, known for forests, beaches, lagoons, wildlife, adventure activities, and charming towns. It's a place where mountains meet the ocean, where ancient forests run alongside sparkling lakes, and where every town offers its own unique charm.",
+  //     },
 
-      route: {
-        title:
-          "Cape Town → Robertson → Route 62 → Cango Caves → Botlierskop → Knysna → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
-        description:
-          "A premium private tour combining mountains, wildlife, wine estates, coastal scenery, and adventure. Each day blends scenic drives with guided experiences, wildlife encounters, wine tasting, and coastal highlights.",
-      },
+  //     route: {
+  //       title:
+  //         "Cape Town → Robertson → Route 62 → Cango Caves → Botlierskop → Knysna → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
+  //       description:
+  //         "A premium private tour combining mountains, wildlife, wine estates, coastal scenery, and adventure. Each day blends scenic drives with guided experiences, wildlife encounters, wine tasting, and coastal highlights.",
+  //     },
 
-      days: [
-        {
-          day: 1,
-          title: "Cape Town → Robertson → Route 62 → Klein Karoo → Cango Caves",
-          route:
-            "Robertson → Route 62 → Montagu → Barrydale → Oudtshoorn → Cango Caves",
-          description:
-            "Depart from Cape Town and travel through the Cape Winelands to Robertson for a coffee stop or optional wine tasting. Continue along South Africa's most iconic country road — Route 62 — passing through Montagu, Ashton, and Barrydale before arriving in Oudtshoorn, the ostrich capital of South Africa. Explore the ancient Cango Caves with a guided Heritage or Adventure Tour.",
+  //     days: [
+  //       {
+  //         day: 1,
+  //         title: "Cape Town → Robertson → Route 62 → Klein Karoo → Cango Caves",
+  //         route:
+  //           "Robertson → Route 62 → Montagu → Barrydale → Oudtshoorn → Cango Caves",
+  //         description:
+  //           "Depart from Cape Town and travel through the Cape Winelands to Robertson for a coffee stop or optional wine tasting. Continue along South Africa's most iconic country road — Route 62 — passing through Montagu, Ashton, and Barrydale before arriving in Oudtshoorn, the ostrich capital of South Africa. Explore the ancient Cango Caves with a guided Heritage or Adventure Tour.",
 
-          activities: [
-            {
-              title: "Hotel Pickup & Departure",
-              description:
-                "Your driver/guide collects you from your hotel in Cape Town.",
-              time: "06:30 – 07:00",
-              duration: "30 min",
-              type: "transfer",
-              optional: false,
-              image: "images/tours/shared/pickup/1.webp",
-            },
-            {
-              title: "Robertson Winelands Stop",
-              description:
-                "Coffee stop or optional wine tasting. Scenic vineyards and mountain views.",
-              time: "09:00",
-              duration: "45 min",
-              type: "wine",
-              optional: true,
-              image:
-                "/images/tours/packages/3-day-garden-route/robertson-wine-valley.webp",
-            },
-            {
-              title: "Route 62 Scenic Drive",
-              description:
-                "Travel through Montagu, Ashton, and Barrydale — South Africa's most iconic country road.",
-              time: "Flexible",
-              duration: "2.5 hours",
-              type: "scenic",
-              optional: false,
-              image:
-                "/images/tours/packages/3-day-garden-route/960px-Montagu_street.webp",
-            },
-            {
-              title: "Cango Caves Guided Tour",
-              description:
-                "Choose between the Heritage Tour or Adventure Tour. Explore ancient limestone chambers and incredible formations.",
-              time: "Flexible",
-              duration: "1.5 - 2 hours",
-              type: "adventure",
-              optional: false,
-              image:
-                "images/tours/packages/3-day-garden-route/960px-Cango_Caves_-_Western_Cape.webp",
-            },
-            {
-              title: "Arrival & Check-in",
-              description:
-                "Arrive in Oudtshoorn and check in to your accommodation.",
-              time: "Evening",
-              duration: "",
-              type: "accommodation",
-              optional: false,
-              image:
-                "images/tours/packages/3-day-garden-route/960px-Oudtshoorn_Ostriches_-_Gar.webp",
-            },
-          ],
+  //         activities: [
+  //           {
+  //             title: "Hotel Pickup & Departure",
+  //             description:
+  //               "Your driver/guide collects you from your hotel in Cape Town.",
+  //             time: "06:30 – 07:00",
+  //             duration: "30 min",
+  //             type: "transfer",
+  //             optional: false,
+  //             image: "images/tours/shared/pickup/1.webp",
+  //           },
+  //           {
+  //             title: "Robertson Winelands Stop",
+  //             description:
+  //               "Coffee stop or optional wine tasting. Scenic vineyards and mountain views.",
+  //             time: "09:00",
+  //             duration: "45 min",
+  //             type: "wine",
+  //             optional: true,
+  //             image:
+  //               "/images/tours/packages/3-day-garden-route/robertson-wine-valley.webp",
+  //           },
+  //           {
+  //             title: "Route 62 Scenic Drive",
+  //             description:
+  //               "Travel through Montagu, Ashton, and Barrydale — South Africa's most iconic country road.",
+  //             time: "Flexible",
+  //             duration: "2.5 hours",
+  //             type: "scenic",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/3-day-garden-route/960px-Montagu_street.webp",
+  //           },
+  //           {
+  //             title: "Cango Caves Guided Tour",
+  //             description:
+  //               "Choose between the Heritage Tour or Adventure Tour. Explore ancient limestone chambers and incredible formations.",
+  //             time: "Flexible",
+  //             duration: "1.5 - 2 hours",
+  //             type: "adventure",
+  //             optional: false,
+  //             image:
+  //               "images/tours/packages/3-day-garden-route/960px-Cango_Caves_-_Western_Cape.webp",
+  //           },
+  //           {
+  //             title: "Arrival & Check-in",
+  //             description:
+  //               "Arrive in Oudtshoorn and check in to your accommodation.",
+  //             time: "Evening",
+  //             duration: "",
+  //             type: "accommodation",
+  //             optional: false,
+  //             image:
+  //               "images/tours/packages/3-day-garden-route/960px-Oudtshoorn_Ostriches_-_Gar.webp",
+  //           },
+  //         ],
 
-          meals: {
-            breakfast: false,
-            lunch: false,
-            dinner: false,
-          },
+  //         meals: {
+  //           breakfast: false,
+  //           lunch: false,
+  //           dinner: false,
+  //         },
 
-          accommodation: {
-            title: "Oudtshoorn Accommodation (Based on Availability)",
-            location: "Oudtshoorn, Klein Karoo",
-            availabilityNote:
-              "Accommodation subject to availability — please enquire for current options.",
-            options: [
-              "De Oude Meul Country Lodge",
-              "Old Mill Nature Lodge",
-              "Die Fonteine Guest House",
-              "Cango Retreat Ou Tol",
-            ],
-          },
+  //         accommodation: {
+  //           title: "Oudtshoorn Accommodation (Based on Availability)",
+  //           location: "Oudtshoorn, Klein Karoo",
+  //           availabilityNote:
+  //             "Accommodation subject to availability — please enquire for current options.",
+  //           options: [
+  //             "De Oude Meul Country Lodge",
+  //             "Old Mill Nature Lodge",
+  //             "Die Fonteine Guest House",
+  //             "Cango Retreat Ou Tol",
+  //           ],
+  //         },
 
-          images: [],
-        },
+  //         images: [],
+  //       },
 
-        {
-          day: 2,
-          title:
-            "Oudtshoorn → Botlierskop → Knysna Heads → Knysna Quays Waterfront",
-          route:
-            "Oudtshoorn → Botlierskop Private Game Reserve → Knysna Heads → Knysna Quays Waterfront",
-          description:
-            "Start your day with breakfast before heading to Botlierskop Private Game Reserve for a 3‑hour morning safari with sightings of lions, rhino, giraffe, buffalo, and zebra. After your safari, travel to Knysna to experience the panoramic views from the Knysna Heads and explore the Knysna Quays Waterfront with its restaurants, cafés, and boutique shops.",
+  //       {
+  //         day: 2,
+  //         title:
+  //           "Oudtshoorn → Botlierskop → Knysna Heads → Knysna Quays Waterfront",
+  //         route:
+  //           "Oudtshoorn → Botlierskop Private Game Reserve → Knysna Heads → Knysna Quays Waterfront",
+  //         description:
+  //           "Start your day with breakfast before heading to Botlierskop Private Game Reserve for a 3‑hour morning safari with sightings of lions, rhino, giraffe, buffalo, and zebra. After your safari, travel to Knysna to experience the panoramic views from the Knysna Heads and explore the Knysna Quays Waterfront with its restaurants, cafés, and boutique shops.",
 
-          activities: [
-            {
-              title: "Breakfast",
-              description:
-                "Enjoy breakfast at your accommodation in Oudtshoorn.",
-              time: "07:00",
-              duration: "45 min",
-              type: "meal",
-              optional: false,
-              image: "images/tours/shared/breakfast.webp",
-            },
-            {
-              title: "Botlierskop Morning Safari",
-              description:
-                "3‑hour guided game drive with sightings of lions, rhino, giraffe, buffalo, and zebra.",
-              time: "08:30",
-              duration: "3 hours",
-              type: "safari",
-              optional: false,
-              image:
-                "/images/tours/packages/3-day-garden-route/960px-Botlierskop_Landscape_2.webp",
-            },
-            {
-              title: "Knysna Heads Viewpoint",
-              description: "Panoramic views over the lagoon and Indian Ocean.",
-              time: "Afternoon",
-              duration: "30 min",
-              type: "scenic",
-              optional: false,
-              image:
-                "/images/tours/packages/3-day-garden-route/960px-Knysna_ZA,_Knysna_River,_E.webp",
-            },
-            {
-              title: "Knysna Quays Waterfront",
-              description:
-                "Explore restaurants, cafés, boutique shops, optional lagoon cruise.",
-              time: "Afternoon",
-              duration: "2 hours",
-              type: "leisure",
-              optional: true,
-              image:
-                "/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp",
-            },
-          ],
+  //         activities: [
+  //           {
+  //             title: "Breakfast",
+  //             description:
+  //               "Enjoy breakfast at your accommodation in Oudtshoorn.",
+  //             time: "07:00",
+  //             duration: "45 min",
+  //             type: "meal",
+  //             optional: false,
+  //             image: "images/tours/shared/breakfast.webp",
+  //           },
+  //           {
+  //             title: "Botlierskop Morning Safari",
+  //             description:
+  //               "3‑hour guided game drive with sightings of lions, rhino, giraffe, buffalo, and zebra.",
+  //             time: "08:30",
+  //             duration: "3 hours",
+  //             type: "safari",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/3-day-garden-route/960px-Botlierskop_Landscape_2.webp",
+  //           },
+  //           {
+  //             title: "Knysna Heads Viewpoint",
+  //             description: "Panoramic views over the lagoon and Indian Ocean.",
+  //             time: "Afternoon",
+  //             duration: "30 min",
+  //             type: "scenic",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/3-day-garden-route/960px-Knysna_ZA,_Knysna_River,_E.webp",
+  //           },
+  //           {
+  //             title: "Knysna Quays Waterfront",
+  //             description:
+  //               "Explore restaurants, cafés, boutique shops, optional lagoon cruise.",
+  //             time: "Afternoon",
+  //             duration: "2 hours",
+  //             type: "leisure",
+  //             optional: true,
+  //             image:
+  //               "/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp",
+  //           },
+  //         ],
 
-          meals: {
-            breakfast: true,
-            lunch: false,
-            dinner: false,
-          },
+  //         meals: {
+  //           breakfast: true,
+  //           lunch: false,
+  //           dinner: false,
+  //         },
 
-          accommodation: {
-            title: "Knysna / Wilderness Accommodation (Based on Availability)",
-            location: "Knysna or Wilderness, Garden Route",
-            availabilityNote:
-              "Accommodation subject to availability — please enquire for current options.",
-            options: [
-              "Knysna Country House",
-              "Paradise Found Guest House",
-              "Waterfront Lodge",
-              "Wilderness Beach Hotel",
-            ],
-          },
+  //         accommodation: {
+  //           title: "Knysna / Wilderness Accommodation (Based on Availability)",
+  //           location: "Knysna or Wilderness, Garden Route",
+  //           availabilityNote:
+  //             "Accommodation subject to availability — please enquire for current options.",
+  //           options: [
+  //             "Knysna Country House",
+  //             "Paradise Found Guest House",
+  //             "Waterfront Lodge",
+  //             "Wilderness Beach Hotel",
+  //           ],
+  //         },
 
-          images: [],
-        },
+  //         images: [],
+  //       },
 
-        {
-          day: 3,
-          title:
-            "Knysna/Wilderness → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
-          route:
-            "Knysna/Wilderness → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
-          description:
-            "After breakfast, depart for Hermanus — the heart of the Whale Coast. Explore the cliff paths with ocean views, visit markets and cafés. Continue to Benguela Cove Lagoon Wine Estate for premium wine tasting with stunning lagoon views. Visit Stony Point Penguin Colony at Betty's Bay before returning to Cape Town via the scenic Clarence Drive (R44).",
+  //       {
+  //         day: 3,
+  //         title:
+  //           "Knysna/Wilderness → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
+  //         route:
+  //           "Knysna/Wilderness → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
+  //         description:
+  //           "After breakfast, depart for Hermanus — the heart of the Whale Coast. Explore the cliff paths with ocean views, visit markets and cafés. Continue to Benguela Cove Lagoon Wine Estate for premium wine tasting with stunning lagoon views. Visit Stony Point Penguin Colony at Betty's Bay before returning to Cape Town via the scenic Clarence Drive (R44).",
 
-          activities: [
-            {
-              title: "Breakfast",
-              description:
-                "Enjoy breakfast at your accommodation in Knysna or Wilderness.",
-              time: "07:00",
-              duration: "45 min",
-              type: "meal",
-              optional: false,
-              image: "images/tours/shared/breakfast.webp",
-            },
-            {
-              title: "Hermanus Whale Coast",
-              description:
-                "Cliff paths, ocean views, markets, and cafés in the heart of the Whale Coast.",
-              time: "10:30",
-              duration: "1.5 hours",
-              type: "scenic",
-              optional: false,
-              image: "images/tours/packages/3-day-garden-route/Hermanus.webp",
-            },
-            {
-              title: "Benguela Cove Lagoon Wine Estate",
-              description: "Premium wine tasting with lagoon views.",
-              time: "12:30",
-              duration: "1.5 hours",
-              type: "wine",
-              optional: false,
-              image:
-                "/images/tours/packages/3-day-garden-route/960px-Benguela_Cove_Lagoon_Wine.webp",
-            },
-            {
-              title: "Betty's Bay – Stony Point Penguin Colony",
-              description:
-                "Boardwalks and African penguins in a natural coastal habitat.",
-              time: "14:30",
-              duration: "1 hour",
-              type: "wildlife",
-              optional: false,
-              image:
-                "/images/tours/packages/3-day-garden-route/960px-BB_-_Bettys_Bay_seen_from.webp",
-            },
-            {
-              title: "Scenic Drive to Cape Town",
-              description:
-                "Return to Cape Town via the scenic Clarence Drive (R44) with spectacular coastal views.",
-              time: "15:30",
-              duration: "2 hours",
-              type: "transfer",
-              optional: false,
-              image: "/images/tours/shared/return/1.webp",
-            },
-          ],
+  //         activities: [
+  //           {
+  //             title: "Breakfast",
+  //             description:
+  //               "Enjoy breakfast at your accommodation in Knysna or Wilderness.",
+  //             time: "07:00",
+  //             duration: "45 min",
+  //             type: "meal",
+  //             optional: false,
+  //             image: "images/tours/shared/breakfast.webp",
+  //           },
+  //           {
+  //             title: "Hermanus Whale Coast",
+  //             description:
+  //               "Cliff paths, ocean views, markets, and cafés in the heart of the Whale Coast.",
+  //             time: "10:30",
+  //             duration: "1.5 hours",
+  //             type: "scenic",
+  //             optional: false,
+  //             image: "images/tours/packages/3-day-garden-route/Hermanus.webp",
+  //           },
+  //           {
+  //             title: "Benguela Cove Lagoon Wine Estate",
+  //             description: "Premium wine tasting with lagoon views.",
+  //             time: "12:30",
+  //             duration: "1.5 hours",
+  //             type: "wine",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/3-day-garden-route/960px-Benguela_Cove_Lagoon_Wine.webp",
+  //           },
+  //           {
+  //             title: "Betty's Bay – Stony Point Penguin Colony",
+  //             description:
+  //               "Boardwalks and African penguins in a natural coastal habitat.",
+  //             time: "14:30",
+  //             duration: "1 hour",
+  //             type: "wildlife",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/3-day-garden-route/960px-BB_-_Bettys_Bay_seen_from.webp",
+  //           },
+  //           {
+  //             title: "Scenic Drive to Cape Town",
+  //             description:
+  //               "Return to Cape Town via the scenic Clarence Drive (R44) with spectacular coastal views.",
+  //             time: "15:30",
+  //             duration: "2 hours",
+  //             type: "transfer",
+  //             optional: false,
+  //             image: "/images/tours/shared/return/1.webp",
+  //           },
+  //         ],
 
-          meals: {
-            breakfast: true,
-            lunch: false,
-            dinner: false,
-          },
+  //         meals: {
+  //           breakfast: true,
+  //           lunch: false,
+  //           dinner: false,
+  //         },
 
-          accommodation: {
-            title: "",
-            location: "",
-            availabilityNote: "",
-            options: [],
-          },
+  //         accommodation: {
+  //           title: "",
+  //           location: "",
+  //           availabilityNote: "",
+  //           options: [],
+  //         },
 
-          images: [],
-        },
-      ],
-    },
+  //         images: [],
+  //       },
+  //     ],
+  //   },
 
-    stops: null,
+  //   stops: null,
 
-    // routeInformation: {
-    //   title: "3‑Day Garden Route & Route 62 Tour Route",
-    //   description:
-    //     "A premium private tour combining mountains, wildlife, wine estates, coastal scenery, and adventure — from Cape Town to the Garden Route and back.",
-    //   items: [
-    //     "Cape Town → Robertson Winelands → Route 62 → Montagu → Barrydale → Oudtshoorn",
-    //     "Cango Caves (Heritage or Adventure Tour)",
-    //     "Botlierskop Private Game Reserve – Morning Safari",
-    //     "Knysna Heads & Knysna Quays Waterfront",
-    //     "Hermanus Whale Coast Cliff Paths",
-    //     "Benguela Cove Lagoon Wine Estate",
-    //     "Betty's Bay – Stony Point Penguin Colony",
-    //     "Clarence Drive (R44) – Scenic return to Cape Town",
-    //   ],
-    // },
+  //   // routeInformation: {
+  //   //   title: "3‑Day Garden Route & Route 62 Tour Route",
+  //   //   description:
+  //   //     "A premium private tour combining mountains, wildlife, wine estates, coastal scenery, and adventure — from Cape Town to the Garden Route and back.",
+  //   //   items: [
+  //   //     "Cape Town → Robertson Winelands → Route 62 → Montagu → Barrydale → Oudtshoorn",
+  //   //     "Cango Caves (Heritage or Adventure Tour)",
+  //   //     "Botlierskop Private Game Reserve – Morning Safari",
+  //   //     "Knysna Heads & Knysna Quays Waterfront",
+  //   //     "Hermanus Whale Coast Cliff Paths",
+  //   //     "Benguela Cove Lagoon Wine Estate",
+  //   //     "Betty's Bay – Stony Point Penguin Colony",
+  //   //     "Clarence Drive (R44) – Scenic return to Cape Town",
+  //   //   ],
+  //   // },
 
-    vehicle: null,
+  //   vehicle: null,
 
-    securityAndLiability: null,
+  //   securityAndLiability: null,
 
-    accommodation: {
-      included: true,
-      type: "Guest House / Lodge",
-      description:
-        "Hand‑selected guest houses in Oudtshoorn and Knysna/Wilderness. Breakfast included. Accommodation subject to availability.",
-    },
+  //   accommodation: {
+  //     included: true,
+  //     type: "Guest House / Lodge",
+  //     description:
+  //       "Hand‑selected guest houses in Oudtshoorn and Knysna/Wilderness. Breakfast included. Accommodation subject to availability.",
+  //   },
 
-    needToKnow: [
-      {
-        text: "Accommodation subject to availability — options listed are examples only",
-      },
-      {
-        text: "Child rates: 0–3 years free, 4–12 years at 60–75% of adult rate, 13–17 years at adult rate",
-      },
-      { text: "Cancellations must be made at least 24 hours before departure" },
-      {
-        text: "Cango Caves offers Heritage Tour (easy) or Adventure Tour (more strenuous)",
-      },
-      {
-        text: "Game drives are subject to wildlife sightings — not guaranteed",
-      },
-      { text: "Whale watching in Hermanus is seasonal (June–November)" },
-      {
-        text: "Comfortable walking shoes recommended for Cango Caves and penguin viewing",
-      },
-      { text: "This is a private tour with a dedicated driver/guide" },
-    ],
+  //   needToKnow: [
+  //     {
+  //       text: "Accommodation subject to availability — options listed are examples only",
+  //     },
+  //     {
+  //       text: "Child rates: 0–3 years free, 4–12 years at 60–75% of adult rate, 13–17 years at adult rate",
+  //     },
+  //     { text: "Cancellations must be made at least 24 hours before departure" },
+  //     {
+  //       text: "Cango Caves offers Heritage Tour (easy) or Adventure Tour (more strenuous)",
+  //     },
+  //     {
+  //       text: "Game drives are subject to wildlife sightings — not guaranteed",
+  //     },
+  //     { text: "Whale watching in Hermanus is seasonal (June–November)" },
+  //     {
+  //       text: "Comfortable walking shoes recommended for Cango Caves and penguin viewing",
+  //     },
+  //     { text: "This is a private tour with a dedicated driver/guide" },
+  //   ],
 
-    faqs: [
-      {
-        question: "How long is the Garden Route tour?",
-        answer:
-          "This is a 3‑day, 2‑night tour from Cape Town, exploring the Garden Route, Route 62, and the Klein Karoo.",
-      },
-      {
-        question: "What is included in the tour price?",
-        answer:
-          "The tour includes hotel pickup, private vehicle, professional driver/guide, 2 nights guest house accommodation, breakfast (Day 2 & 3), Cango Caves entrance, Botlierskop Safari, wine tasting at Benguela Cove, and bottled water.",
-      },
-      {
-        question: "What is not included?",
-        answer:
-          "Lunch and dinner, optional activities, personal purchases, and gratuities are not included.",
-      },
-      {
-        question: "What is the cancellation policy?",
-        answer:
-          "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
-      },
-      {
-        question: "What are the accommodation options?",
-        answer:
-          "Accommodation is in hand‑selected guest houses in Oudtshoorn and Knysna/Wilderness, subject to availability. Example options include De Oude Meul Country Lodge, Old Mill Nature Lodge, Knysna Country House, and Wilderness Beach Hotel.",
-      },
-      {
-        question: "Can children join the tour?",
-        answer:
-          "Yes. Children 0–3 years are free, 4–12 years are charged at 60–75% of the adult rate, and teens 13–17 years pay the adult rate.",
-      },
-      {
-        question: "What activities are included?",
-        answer:
-          "The tour includes a Cango Caves guided tour, Botlierskop morning safari, wine tasting at Benguela Cove, and visits to Knysna Heads, Hermanus, and Betty's Bay Penguin Colony.",
-      },
-      {
-        question: "What should I bring?",
-        answer:
-          "Bring comfortable clothing, walking shoes, a warm jacket, sunscreen, a hat, swimwear (optional), a camera, and cash for personal purchases.",
-      },
-      {
-        question: "Is this a private tour?",
-        answer:
-          "Yes. This is a private tour with a dedicated driver/guide and private vehicle.",
-      },
-      {
-        question: "What is the best time of year for this tour?",
-        answer:
-          "The Garden Route has a mild climate year‑round. Whale watching in Hermanus is best from June to November.",
-      },
-    ],
+  //   faqs: [
+  //     {
+  //       question: "How long is the Garden Route tour?",
+  //       answer:
+  //         "This is a 3‑day, 2‑night tour from Cape Town, exploring the Garden Route, Route 62, and the Klein Karoo.",
+  //     },
+  //     {
+  //       question: "What is included in the tour price?",
+  //       answer:
+  //         "The tour includes hotel pickup, private vehicle, professional driver/guide, 2 nights guest house accommodation, breakfast (Day 2 & 3), Cango Caves entrance, Botlierskop Safari, wine tasting at Benguela Cove, and bottled water.",
+  //     },
+  //     {
+  //       question: "What is not included?",
+  //       answer:
+  //         "Lunch and dinner, optional activities, personal purchases, and gratuities are not included.",
+  //     },
+  //     {
+  //       question: "What is the cancellation policy?",
+  //       answer:
+  //         "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
+  //     },
+  //     {
+  //       question: "What are the accommodation options?",
+  //       answer:
+  //         "Accommodation is in hand‑selected guest houses in Oudtshoorn and Knysna/Wilderness, subject to availability. Example options include De Oude Meul Country Lodge, Old Mill Nature Lodge, Knysna Country House, and Wilderness Beach Hotel.",
+  //     },
+  //     {
+  //       question: "Can children join the tour?",
+  //       answer:
+  //         "Yes. Children 0–3 years are free, 4–12 years are charged at 60–75% of the adult rate, and teens 13–17 years pay the adult rate.",
+  //     },
+  //     {
+  //       question: "What activities are included?",
+  //       answer:
+  //         "The tour includes a Cango Caves guided tour, Botlierskop morning safari, wine tasting at Benguela Cove, and visits to Knysna Heads, Hermanus, and Betty's Bay Penguin Colony.",
+  //     },
+  //     {
+  //       question: "What should I bring?",
+  //       answer:
+  //         "Bring comfortable clothing, walking shoes, a warm jacket, sunscreen, a hat, swimwear (optional), a camera, and cash for personal purchases.",
+  //     },
+  //     {
+  //       question: "Is this a private tour?",
+  //       answer:
+  //         "Yes. This is a private tour with a dedicated driver/guide and private vehicle.",
+  //     },
+  //     {
+  //       question: "What is the best time of year for this tour?",
+  //       answer:
+  //         "The Garden Route has a mild climate year‑round. Whale watching in Hermanus is best from June to November.",
+  //     },
+  //   ],
 
-    tags: [
-      "Garden Route",
-      "Route 62",
-      "Multi-Day",
-      "3 Day Tour",
-      "Cango Caves",
-      "Safari",
-      "Botlierskop",
-      "Knysna",
-      "Hermanus",
-      "Wine Tasting",
-      "Klein Karoo",
-      "South Africa",
-      "Road Trip",
-      "Private Tour",
-      "Family Friendly",
-      "Wildlife",
-    ],
-  },
+  //   tags: [
+  //     "Garden Route",
+  //     "Route 62",
+  //     "Multi-Day",
+  //     "3 Day Tour",
+  //     "Cango Caves",
+  //     "Safari",
+  //     "Botlierskop",
+  //     "Knysna",
+  //     "Hermanus",
+  //     "Wine Tasting",
+  //     "Klein Karoo",
+  //     "South Africa",
+  //     "Road Trip",
+  //     "Private Tour",
+  //     "Family Friendly",
+  //     "Wildlife",
+  //   ],
+  // },
   // 5Day - Botliersklop
-  {
-    id: 19, // New tour ID to be assigned (e.g., 39)
-    type: TOUR_TYPES.PACKAGES,
-    category: TOUR_MODIFIERS.MULTI_DAY,
+  // {
+  //   id: 19, // New tour ID to be assigned (e.g., 39)
+  //   type: TOUR_TYPES.PACKAGES,
+  //   category: TOUR_MODIFIERS.MULTI_DAY,
 
-    title: "5‑Day Garden Route & Botlierskop Luxury Safari Tour",
-    slug: "5-day-garden-route-botlierskop-safari-tour",
-    canonicalPath: "/tours/5-day-garden-route-botlierskop-safari-tour",
-    childFriendly: true,
-    daysInAdvance: 14,
+  //   title: "5‑Day Garden Route & Botlierskop Luxury Safari Tour",
+  //   slug: "5-day-garden-route-botlierskop-safari-tour",
+  //   canonicalPath: "/tours/5-day-garden-route-botlierskop-safari-tour",
+  //   childFriendly: true,
+  //   daysInAdvance: 14,
 
-    seo: {
-      title:
-        "5‑Day Garden Route & Botlierskop Luxury Safari Tour | Cape Frontier Tours",
-      description:
-        "A premium Garden Route journey featuring a luxury safari at Botlierskop, dramatic mountain passes, forests, coastline, wine tasting, and charming towns. Includes 4 nights accommodation, breakfast daily, and private driver/guide.",
-      keywords: [
-        "Garden Route tour",
-        "5 day Garden Route tour",
-        "Botlierskop safari",
-        "luxury safari Garden Route",
-        "Cango Caves tour",
-        "Knysna Heads tour",
-        "Tsitsikamma National Park",
-        "South Africa road trip",
-        "Garden Route itinerary",
-        "Cape Town to Garden Route",
-        "private Garden Route tour",
-        "Storms River suspension bridge",
-      ],
-    },
+  //   seo: {
+  //     title:
+  //       "5‑Day Garden Route & Botlierskop Luxury Safari Tour | Cape Frontier Tours",
+  //     description:
+  //       "A premium Garden Route journey featuring a luxury safari at Botlierskop, dramatic mountain passes, forests, coastline, wine tasting, and charming towns. Includes 4 nights accommodation, breakfast daily, and private driver/guide.",
+  //     keywords: [
+  //       "Garden Route tour",
+  //       "5 day Garden Route tour",
+  //       "Botlierskop safari",
+  //       "luxury safari Garden Route",
+  //       "Cango Caves tour",
+  //       "Knysna Heads tour",
+  //       "Tsitsikamma National Park",
+  //       "South Africa road trip",
+  //       "Garden Route itinerary",
+  //       "Cape Town to Garden Route",
+  //       "private Garden Route tour",
+  //       "Storms River suspension bridge",
+  //     ],
+  //   },
 
-    workflow: defaultWorkflow,
+  //   workflow: defaultWorkflow,
 
-    image:
-      "/src/assets/images/tours/packages/5-day-boltierskop/960px-KNYSNA_-_Waterfront_terrac.webp",
-    images: [
-      "/src/assets/images/tours/packages/5-day-boltierskop/960px-KNYSNA_-_Waterfront_terrac.webp",
-      "/src/assets/images/tours/packages/5-day-garden-route/960px-Big_five_gam.webp",
-      "/src/assets/images/tours/packages/5-day-garden-route/gamedrive2-1-1536x899.webp",
-    ],
-    imageFolder: "packages/5-day-boltierskop",
-    videos: [],
+  //   image:
+  //     "/src/assets/images/tours/packages/5-day-boltierskop/960px-KNYSNA_-_Waterfront_terrac.webp",
+  //   images: [
+  //     "/src/assets/images/tours/packages/5-day-boltierskop/960px-KNYSNA_-_Waterfront_terrac.webp",
+  //     "/src/assets/images/tours/packages/5-day-garden-route/960px-Big_five_gam.webp",
+  //     "/src/assets/images/tours/packages/5-day-garden-route/gamedrive2-1-1536x899.webp",
+  //   ],
+  //   imageFolder: "packages/5-day-boltierskop",
+  //   videos: [],
 
-    location: "Garden Route, South Africa",
-    duration: "5 Days / 4 Nights",
+  //   location: "Garden Route, South Africa",
+  //   duration: "5 Days / 4 Nights",
 
-    priceBase: 15500,
-    minPeople: 1,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
+  //   priceBase: 15500,
+  //   minPeople: 1,
+  //   baseCurrency: "ZAR",
+  //   supportedCurrencies: SUPPORTED_CURRENCIES,
 
-    pricing: [
-      {
-        category: "Adults",
-        pricePerPerson: 23500,
-        note: "Includes accommodation, breakfast, transport, safari",
-      },
-      {
-        category: "Teens: 12 - 17",
-        pricePerPerson: 23500,
-        note: "Includes accommodation, breakfast, transport, safari",
-      },
-      {
-        category: "Child: (4–12 years)",
-        pricePerPerson: 9300,
-        note: "Child rate (60–75% of adult rate) – R9,300 to R11,600 depending on group size",
-      },
-      {
-        category: "Toddler: (0–3 years)",
-        pricePerPerson: 0,
-        note: "Free of charge",
-      },
-    ],
+  //   pricing: [
+  //     {
+  //       category: "Adults",
+  //       pricePerPerson: 23500,
+  //       note: "Includes accommodation, breakfast, transport, safari",
+  //     },
+  //     {
+  //       category: "Teens: 12 - 17",
+  //       pricePerPerson: 23500,
+  //       note: "Includes accommodation, breakfast, transport, safari",
+  //     },
+  //     {
+  //       category: "Child: (4–12 years)",
+  //       pricePerPerson: 9300,
+  //       note: "Child rate (60–75% of adult rate) – R9,300 to R11,600 depending on group size",
+  //     },
+  //     {
+  //       category: "Toddler: (0–3 years)",
+  //       pricePerPerson: 0,
+  //       note: "Free of charge",
+  //     },
+  //   ],
 
-    additionalPricing: [
-      {
-        type: "request",
-        category: "Optional Adventure Activities (Tsitsikamma)",
-        price: null,
-        unit: "per person",
-        currency: "ZAR",
-        note: "Ziplining, kayak, Lilo – available on request at Tsitsikamma",
-      },
-    ],
+  //   additionalPricing: [
+  //     {
+  //       type: "request",
+  //       category: "Optional Adventure Activities (Tsitsikamma)",
+  //       price: null,
+  //       unit: "per person",
+  //       currency: "ZAR",
+  //       note: "Ziplining, kayak, Lilo – available on request at Tsitsikamma",
+  //     },
+  //   ],
 
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 2,
-          maxPeople: 2,
-          perPerson: 20000,
-          label: "2 Guests",
-          note: "Includes accommodation, breakfast, transport, safari",
-        },
-        {
-          minPeople: 3,
-          maxPeople: 4,
-          perPerson: 17500,
-          label: "3–4 Guests",
-          note: "Includes accommodation, breakfast, transport, safari",
-        },
-        {
-          minPeople: 5,
-          perPerson: 15500,
-          label: "5+ Guests",
-          note: "Includes accommodation, breakfast, transport, safari",
-        },
-      ],
-    },
-    description:
-      "Experience the Garden Route in comfort and style with a private driver/guide and hand‑selected accommodation. Your adventure begins with a luxury safari at Botlierskop Private Game Reserve, followed by the scenic Route 62, the world‑famous Cango Caves, the lagoon views of Knysna, and the forested trails of Tsitsikamma National Park. The final day includes Hermanus, Benguela Cove, and the penguins of Betty's Bay, ending with the breathtaking Clarence Drive back to Cape Town. This tour offers a perfect balance of adventure, scenery, wildlife, and relaxation — ideal for families, couples, solo travellers, and small groups.",
+  //   groupPricing: {
+  //     enabled: true,
+  //     icon: "/icons/savemore.png",
+  //     tiers: [
+  //       {
+  //         minPeople: 2,
+  //         maxPeople: 2,
+  //         perPerson: 20000,
+  //         label: "2 Guests",
+  //         note: "Includes accommodation, breakfast, transport, safari",
+  //       },
+  //       {
+  //         minPeople: 3,
+  //         maxPeople: 4,
+  //         perPerson: 17500,
+  //         label: "3–4 Guests",
+  //         note: "Includes accommodation, breakfast, transport, safari",
+  //       },
+  //       {
+  //         minPeople: 5,
+  //         perPerson: 15500,
+  //         label: "5+ Guests",
+  //         note: "Includes accommodation, breakfast, transport, safari",
+  //       },
+  //     ],
+  //   },
+  //   description:
+  //     "Experience the Garden Route in comfort and style with a private driver/guide and hand‑selected accommodation. Your adventure begins with a luxury safari at Botlierskop Private Game Reserve, followed by the scenic Route 62, the world‑famous Cango Caves, the lagoon views of Knysna, and the forested trails of Tsitsikamma National Park. The final day includes Hermanus, Benguela Cove, and the penguins of Betty's Bay, ending with the breathtaking Clarence Drive back to Cape Town. This tour offers a perfect balance of adventure, scenery, wildlife, and relaxation — ideal for families, couples, solo travellers, and small groups.",
 
-    highlights: [
-      {
-        text: "Botlierskop Safari — 3‑hour guided safari with lion, rhino, giraffe, buffalo, zebra and more",
-      },
-      {
-        text: "Luxury Tented Camp Stay — Mountain views, private decks, and premium comfort",
-      },
-      { text: "Route 62 — Vineyards, orchards, and Karoo landscapes" },
-      {
-        text: "Cango Caves — Heritage or Adventure guided tour through ancient limestone chambers",
-      },
-      { text: "Outeniqua Pass — Dramatic mountain scenery" },
-      { text: "Knysna Heads — Iconic lagoon and ocean viewpoint" },
-      { text: "Knysna Waterfront — Restaurants, cafés, boutique shops" },
-      {
-        text: "Tsitsikamma National Park — Suspension bridge & adventure activities",
-      },
-      {
-        text: "Hermanus Whale Coast — Seasonal whale watching (June–November)",
-      },
-      { text: "Benguela Cove Wine Estate — Lagoon‑side wine tasting" },
-      {
-        text: "Betty's Bay Penguins — Stony Point Nature Reserve with boardwalks and African penguins",
-      },
-      { text: "Clarence Drive (R44) — One of SA's most scenic coastal roads" },
-    ],
+  //   highlights: [
+  //     {
+  //       text: "Botlierskop Safari — 3‑hour guided safari with lion, rhino, giraffe, buffalo, zebra and more",
+  //     },
+  //     {
+  //       text: "Luxury Tented Camp Stay — Mountain views, private decks, and premium comfort",
+  //     },
+  //     { text: "Route 62 — Vineyards, orchards, and Karoo landscapes" },
+  //     {
+  //       text: "Cango Caves — Heritage or Adventure guided tour through ancient limestone chambers",
+  //     },
+  //     { text: "Outeniqua Pass — Dramatic mountain scenery" },
+  //     { text: "Knysna Heads — Iconic lagoon and ocean viewpoint" },
+  //     { text: "Knysna Waterfront — Restaurants, cafés, boutique shops" },
+  //     {
+  //       text: "Tsitsikamma National Park — Suspension bridge & adventure activities",
+  //     },
+  //     {
+  //       text: "Hermanus Whale Coast — Seasonal whale watching (June–November)",
+  //     },
+  //     { text: "Benguela Cove Wine Estate — Lagoon‑side wine tasting" },
+  //     {
+  //       text: "Betty's Bay Penguins — Stony Point Nature Reserve with boardwalks and African penguins",
+  //     },
+  //     { text: "Clarence Drive (R44) — One of SA's most scenic coastal roads" },
+  //   ],
 
-    included: [
-      { text: "Private vehicle" },
-      { text: "Professional driver/guide" },
-      { text: "Botlierskop Safari" },
-      { text: "4 nights accommodation" },
-      { text: "Breakfast daily" },
-      { text: "Cango Caves entrance" },
-      { text: "Tsitsikamma National Park entrance" },
-      { text: "Benguela Cove wine tasting" },
-      { text: "Bottled water" },
-    ],
+  //   included: [
+  //     { text: "Private vehicle" },
+  //     { text: "Professional driver/guide" },
+  //     { text: "Botlierskop Safari" },
+  //     { text: "4 nights accommodation" },
+  //     { text: "Breakfast daily" },
+  //     { text: "Cango Caves entrance" },
+  //     { text: "Tsitsikamma National Park entrance" },
+  //     { text: "Benguela Cove wine tasting" },
+  //     { text: "Bottled water" },
+  //   ],
 
-    excluded: [
-      { text: "Lunch and dinner" },
-      { text: "Optional adventure activities (ziplining, kayak, Lilo)" },
-      { text: "Personal purchases" },
-      { text: "Gratuities" },
-    ],
+  //   excluded: [
+  //     { text: "Lunch and dinner" },
+  //     { text: "Optional adventure activities (ziplining, kayak, Lilo)" },
+  //     { text: "Personal purchases" },
+  //     { text: "Gratuities" },
+  //   ],
 
-    pickupOptions: [
-      "Cape Town CBD",
-      "Green Point",
-      "Sea Point",
-      "V&A Waterfront",
-      "Custom pickup on request",
-    ],
+  //   pickupOptions: [
+  //     "Cape Town CBD",
+  //     "Green Point",
+  //     "Sea Point",
+  //     "V&A Waterfront",
+  //     "Custom pickup on request",
+  //   ],
 
-    requirements: [],
+  //   requirements: [],
 
-    arrangements: {
-      availability: "Available all year",
-      duration: "5 Days / 4 Nights",
-      operatingTime: "Flexible",
-      departure: "07:30 – 08:00",
-      return: "Day 5 evening",
-      location: "Cape Town → Garden Route → Cape Town",
+  //   arrangements: {
+  //     availability: "Available all year",
+  //     duration: "5 Days / 4 Nights",
+  //     operatingTime: "Flexible",
+  //     departure: "07:30 – 08:00",
+  //     return: "Day 5 evening",
+  //     location: "Cape Town → Garden Route → Cape Town",
 
-      clothing: [
-        "Comfortable clothing",
-        "Comfortable walking shoes",
-        "Warm jacket (evenings can be cool)",
-        "Sunscreen",
-        "Hat",
-        "Swimwear (optional)",
-      ],
+  //     clothing: [
+  //       "Comfortable clothing",
+  //       "Comfortable walking shoes",
+  //       "Warm jacket (evenings can be cool)",
+  //       "Sunscreen",
+  //       "Hat",
+  //       "Swimwear (optional)",
+  //     ],
 
-      thingsToBring: [
-        "Camera",
-        "Cash for personal purchases",
-        "Water bottle",
-        "Chargers for electronics",
-        "Binoculars (recommended for safari)",
-      ],
+  //     thingsToBring: [
+  //       "Camera",
+  //       "Cash for personal purchases",
+  //       "Water bottle",
+  //       "Chargers for electronics",
+  //       "Binoculars (recommended for safari)",
+  //     ],
 
-      passengerPolicy: "",
-      notes: [
-        "Accommodation subject to availability",
-        "Optional adventure activities in Tsitsikamma available on request",
-        "Whale watching in Hermanus is seasonal (June–November)",
-      ],
-    },
+  //     passengerPolicy: "",
+  //     notes: [
+  //       "Accommodation subject to availability",
+  //       "Optional adventure activities in Tsitsikamma available on request",
+  //       "Whale watching in Hermanus is seasonal (June–November)",
+  //     ],
+  //   },
 
-    weatherPolicy: {
-      summary:
-        "The Garden Route experiences mild weather year‑round. However, weather can change quickly — bring layers and rain gear.",
-      items: [
-        { text: "Garden Route has mild weather year‑round" },
-        { text: "Weather can change quickly — bring layers and rain gear" },
-        { text: "Cango Caves are indoors and not weather dependent" },
-        { text: "Game drives may be adjusted in extreme weather" },
-        { text: "Tsitsikamma activities may be affected by weather" },
-      ],
-    },
+  //   weatherPolicy: {
+  //     summary:
+  //       "The Garden Route experiences mild weather year‑round. However, weather can change quickly — bring layers and rain gear.",
+  //     items: [
+  //       { text: "Garden Route has mild weather year‑round" },
+  //       { text: "Weather can change quickly — bring layers and rain gear" },
+  //       { text: "Cango Caves are indoors and not weather dependent" },
+  //       { text: "Game drives may be adjusted in extreme weather" },
+  //       { text: "Tsitsikamma activities may be affected by weather" },
+  //     ],
+  //   },
 
-    cancellationPolicy: {
-      summary:
-        "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
-      items: [
-        {
-          text: "Cancellations must be made at least 24 hours before the trip starts",
-        },
-        {
-          text: "Refunds are forfeited for cancellations within 24 hours of departure",
-        },
-      ],
-    },
+  //   cancellationPolicy: {
+  //     summary:
+  //       "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
+  //     items: [
+  //       {
+  //         text: "Cancellations must be made at least 24 hours before the trip starts",
+  //       },
+  //       {
+  //         text: "Refunds are forfeited for cancellations within 24 hours of departure",
+  //       },
+  //     ],
+  //   },
 
-    safetyPolicy: {
-      summary:
-        "All game drives are conducted by experienced rangers at Botlierskop Private Game Reserve. Guests must follow all safety instructions during wildlife encounters.",
-      items: [
-        { text: "Game drives conducted by experienced rangers" },
-        { text: "Follow all safety instructions during wildlife encounters" },
-        { text: "Keep vehicle windows closed near wildlife" },
-        { text: "Do not feed or approach wild animals" },
-        { text: "Cango Caves tours follow strict safety protocols" },
-        {
-          text: "Tsitsikamma activities have their own safety briefings and equipment",
-        },
-      ],
-    },
+  //   safetyPolicy: {
+  //     summary:
+  //       "All game drives are conducted by experienced rangers at Botlierskop Private Game Reserve. Guests must follow all safety instructions during wildlife encounters.",
+  //     items: [
+  //       { text: "Game drives conducted by experienced rangers" },
+  //       { text: "Follow all safety instructions during wildlife encounters" },
+  //       { text: "Keep vehicle windows closed near wildlife" },
+  //       { text: "Do not feed or approach wild animals" },
+  //       { text: "Cango Caves tours follow strict safety protocols" },
+  //       {
+  //         text: "Tsitsikamma activities have their own safety briefings and equipment",
+  //       },
+  //     ],
+  //   },
 
-    /*
-     * MULTI‑DAY ITINERARY
-     */
-    itinerary: {
-      intro: {
-        title: "The Ultimate Garden Route Luxury Safari",
-        description:
-          "Experience the Garden Route in comfort and style with a private driver/guide and hand‑selected accommodation. Your adventure begins with a luxury safari at Botlierskop Private Game Reserve, followed by the scenic Route 62, the world‑famous Cango Caves, the lagoon views of Knysna, and the forested trails of Tsitsikamma National Park. The final day includes Hermanus, Benguela Cove, and the penguins of Betty's Bay, ending with the breathtaking Clarence Drive back to Cape Town.",
-      },
+  //   /*
+  //    * MULTI‑DAY ITINERARY
+  //    */
+  //   itinerary: {
+  //     intro: {
+  //       title: "The Ultimate Garden Route Luxury Safari",
+  //       description:
+  //         "Experience the Garden Route in comfort and style with a private driver/guide and hand‑selected accommodation. Your adventure begins with a luxury safari at Botlierskop Private Game Reserve, followed by the scenic Route 62, the world‑famous Cango Caves, the lagoon views of Knysna, and the forested trails of Tsitsikamma National Park. The final day includes Hermanus, Benguela Cove, and the penguins of Betty's Bay, ending with the breathtaking Clarence Drive back to Cape Town.",
+  //     },
 
-      route: {
-        title:
-          "Cape Town → Botlierskop → Oudtshoorn → Knysna → Tsitsikamma → Hermanus → Cape Town",
-        description:
-          "This itinerary blends wildlife, nature, coastline, wine, and culture into one unforgettable 5‑day experience. Each day blends scenic drives with guided experiences, wildlife encounters, wine tasting, and coastal highlights.",
-      },
+  //     route: {
+  //       title:
+  //         "Cape Town → Botlierskop → Oudtshoorn → Knysna → Tsitsikamma → Hermanus → Cape Town",
+  //       description:
+  //         "This itinerary blends wildlife, nature, coastline, wine, and culture into one unforgettable 5‑day experience. Each day blends scenic drives with guided experiences, wildlife encounters, wine tasting, and coastal highlights.",
+  //     },
 
-      days: [
-        {
-          day: 1,
-          title: "Botlierskop Safari Experience",
-          route: "Cape Town → Botlierskop Private Game Reserve",
-          description:
-            "Depart from Cape Town and travel to Botlierskop Private Game Reserve for a 3‑hour guided safari with sightings of lion, rhino, giraffe, buffalo, zebra and more. Stay overnight in a luxury tented suite with mountain and river views.",
+  //     days: [
+  //       {
+  //         day: 1,
+  //         title: "Botlierskop Safari Experience",
+  //         route: "Cape Town → Botlierskop Private Game Reserve",
+  //         description:
+  //           "Depart from Cape Town and travel to Botlierskop Private Game Reserve for a 3‑hour guided safari with sightings of lion, rhino, giraffe, buffalo, zebra and more. Stay overnight in a luxury tented suite with mountain and river views.",
 
-          activities: [
-            {
-              title: "Hotel Pickup & Departure",
-              description:
-                "Your driver/guide collects you from your hotel in Cape Town.",
-              time: "07:30 – 08:00",
-              duration: "30 min",
-              type: "transfer",
-              optional: false,
-              image: "images/tours/shared/pickup/1.webp",
-            },
-            {
-              title: "Scenic Drive to Botlierskop",
-              description:
-                "Travel along the N2 through scenic landscapes towards Botlierskop Private Game Reserve.",
-              time: "08:00 – 11:00",
-              duration: "3 hours",
-              type: "transfer",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-boltierskop/960px-Botlierskop_Landscape_2.webp",
-            },
-            {
-              title: "Botlierskop Safari",
-              description:
-                "3‑hour guided safari with sightings of lion, rhino, giraffe, buffalo, zebra and more.",
-              time: "11:30 – 14:30",
-              duration: "3 hours",
-              type: "safari",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-boltierskop/960px-Game_Lodge_Botlierskop,_So.webp",
-            },
-            {
-              title: "Arrival & Check-in",
-              description:
-                "Check in to your luxury tented suite at Botlierskop with mountain and river views.",
-              time: "Afternoon",
-              duration: "",
-              type: "accommodation",
-              optional: false,
-              image: "/images/tours/packages/5-day-boltierskop/check-in.webp",
-            },
-            {
-              title: "Dinner (Own Account)",
-              description:
-                "Enjoy dinner at the lodge restaurant with views over the reserve.",
-              time: "Evening",
-              duration: "",
-              type: "meal",
-              optional: true,
-              image: "images/tours/shared/dinner.webp",
-            },
-          ],
+  //         activities: [
+  //           {
+  //             title: "Hotel Pickup & Departure",
+  //             description:
+  //               "Your driver/guide collects you from your hotel in Cape Town.",
+  //             time: "07:30 – 08:00",
+  //             duration: "30 min",
+  //             type: "transfer",
+  //             optional: false,
+  //             image: "images/tours/shared/pickup/1.webp",
+  //           },
+  //           {
+  //             title: "Scenic Drive to Botlierskop",
+  //             description:
+  //               "Travel along the N2 through scenic landscapes towards Botlierskop Private Game Reserve.",
+  //             time: "08:00 – 11:00",
+  //             duration: "3 hours",
+  //             type: "transfer",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/960px-Botlierskop_Landscape_2.webp",
+  //           },
+  //           {
+  //             title: "Botlierskop Safari",
+  //             description:
+  //               "3‑hour guided safari with sightings of lion, rhino, giraffe, buffalo, zebra and more.",
+  //             time: "11:30 – 14:30",
+  //             duration: "3 hours",
+  //             type: "safari",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/960px-Game_Lodge_Botlierskop,_So.webp",
+  //           },
+  //           {
+  //             title: "Arrival & Check-in",
+  //             description:
+  //               "Check in to your luxury tented suite at Botlierskop with mountain and river views.",
+  //             time: "Afternoon",
+  //             duration: "",
+  //             type: "accommodation",
+  //             optional: false,
+  //             image: "/images/tours/packages/5-day-boltierskop/check-in.webp",
+  //           },
+  //           {
+  //             title: "Dinner (Own Account)",
+  //             description:
+  //               "Enjoy dinner at the lodge restaurant with views over the reserve.",
+  //             time: "Evening",
+  //             duration: "",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "images/tours/shared/dinner.webp",
+  //           },
+  //         ],
 
-          meals: {
-            breakfast: false,
-            lunch: false,
-            dinner: false,
-          },
+  //         meals: {
+  //           breakfast: false,
+  //           lunch: false,
+  //           dinner: false,
+  //         },
 
-          accommodation: {
-            title: "Botlierskop Private Game Reserve",
-            location: "Botlierskop, Garden Route",
-            availabilityNote:
-              "Luxury tented suites with mountain and river views.",
-            options: ["Luxury Tented Suite", "Premium Suite with Private Deck"],
-          },
+  //         accommodation: {
+  //           title: "Botlierskop Private Game Reserve",
+  //           location: "Botlierskop, Garden Route",
+  //           availabilityNote:
+  //             "Luxury tented suites with mountain and river views.",
+  //           options: ["Luxury Tented Suite", "Premium Suite with Private Deck"],
+  //         },
 
-          images: [],
-        },
+  //         images: [],
+  //       },
 
-        {
-          day: 2,
-          title: "Route 62 & Cango Caves",
-          route: "Botlierskop → Route 62 → Oudtshoorn → Cango Caves",
-          description:
-            "After breakfast, travel along the scenic Route 62 with its vineyards, orchards, and Karoo landscapes. Visit the world‑famous Cango Caves for a guided Heritage or Adventure Tour through ancient limestone chambers. Overnight in Oudtshoorn.",
+  //       {
+  //         day: 2,
+  //         title: "Route 62 & Cango Caves",
+  //         route: "Botlierskop → Route 62 → Oudtshoorn → Cango Caves",
+  //         description:
+  //           "After breakfast, travel along the scenic Route 62 with its vineyards, orchards, and Karoo landscapes. Visit the world‑famous Cango Caves for a guided Heritage or Adventure Tour through ancient limestone chambers. Overnight in Oudtshoorn.",
 
-          activities: [
-            {
-              title: "Breakfast",
-              description: "Enjoy breakfast at your Botlierskop accommodation.",
-              time: "07:00 – 08:00",
-              duration: "1 hour",
-              type: "meal",
-              optional: false,
-              image: "/images/tours/shared/breakfast2.webp",
-            },
-            {
-              title: "Route 62 Scenic Drive",
-              description:
-                "Travel along South Africa's most iconic country road with vineyards, orchards, and Karoo landscapes.",
-              time: "08:00 – 11:00",
-              duration: "3 hours",
-              type: "scenic",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-boltierskop/960px-Karoo,_Eastern_Cape,_South.webp",
-            },
-            {
-              title: "Lunch Stop (Own Account)",
-              description:
-                "Lunch stop in Oudtshoorn, the ostrich capital of South Africa.",
-              time: "11:30 – 12:30",
-              duration: "1 hour",
-              type: "meal",
-              optional: true,
-              image: "/images/tours/shared/lunch.webp",
-            },
-            {
-              title: "Cango Caves Guided Tour",
-              description:
-                "Choose between the Heritage Tour or Adventure Tour. Explore ancient limestone chambers and incredible formations.",
-              time: "13:00 – 15:00",
-              duration: "2 hours",
-              type: "adventure",
-              optional: false,
-              image:
-                "images/tours/packages/5-day-boltierskop/960px-Cango_Caves_-_Western_Cape.webp",
-            },
-            {
-              title: "Arrival & Check-in",
-              description: "Check in to your accommodation in Oudtshoorn.",
-              time: "Afternoon",
-              duration: "",
-              type: "accommodation",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-boltierskop/check-in-oude-muele.webp",
-            },
-            {
-              title: "Dinner (Own Account)",
-              description:
-                "Explore local restaurants in Oudtshoorn for dinner.",
-              time: "Evening",
-              duration: "",
-              type: "meal",
-              optional: true,
-              image: "/images/tours/shared/dinner.webp",
-            },
-          ],
+  //         activities: [
+  //           {
+  //             title: "Breakfast",
+  //             description: "Enjoy breakfast at your Botlierskop accommodation.",
+  //             time: "07:00 – 08:00",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: false,
+  //             image: "/images/tours/shared/breakfast2.webp",
+  //           },
+  //           {
+  //             title: "Route 62 Scenic Drive",
+  //             description:
+  //               "Travel along South Africa's most iconic country road with vineyards, orchards, and Karoo landscapes.",
+  //             time: "08:00 – 11:00",
+  //             duration: "3 hours",
+  //             type: "scenic",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/960px-Karoo,_Eastern_Cape,_South.webp",
+  //           },
+  //           {
+  //             title: "Lunch Stop (Own Account)",
+  //             description:
+  //               "Lunch stop in Oudtshoorn, the ostrich capital of South Africa.",
+  //             time: "11:30 – 12:30",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "/images/tours/shared/lunch.webp",
+  //           },
+  //           {
+  //             title: "Cango Caves Guided Tour",
+  //             description:
+  //               "Choose between the Heritage Tour or Adventure Tour. Explore ancient limestone chambers and incredible formations.",
+  //             time: "13:00 – 15:00",
+  //             duration: "2 hours",
+  //             type: "adventure",
+  //             optional: false,
+  //             image:
+  //               "images/tours/packages/5-day-boltierskop/960px-Cango_Caves_-_Western_Cape.webp",
+  //           },
+  //           {
+  //             title: "Arrival & Check-in",
+  //             description: "Check in to your accommodation in Oudtshoorn.",
+  //             time: "Afternoon",
+  //             duration: "",
+  //             type: "accommodation",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/check-in-oude-muele.webp",
+  //           },
+  //           {
+  //             title: "Dinner (Own Account)",
+  //             description:
+  //               "Explore local restaurants in Oudtshoorn for dinner.",
+  //             time: "Evening",
+  //             duration: "",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "/images/tours/shared/dinner.webp",
+  //           },
+  //         ],
 
-          meals: {
-            breakfast: true,
-            lunch: false,
-            dinner: false,
-          },
+  //         meals: {
+  //           breakfast: true,
+  //           lunch: false,
+  //           dinner: false,
+  //         },
 
-          accommodation: {
-            title: "Oudtshoorn Accommodation",
-            location: "Oudtshoorn, Klein Karoo",
-            availabilityNote:
-              "Accommodation subject to availability — please enquire for current options.",
-            options: [
-              "De Oude Meul Country Lodge",
-              "Old Mill Nature Lodge",
-              "Die Fonteine Guest House",
-              "Cango Retreat Ou Tol",
-            ],
-          },
+  //         accommodation: {
+  //           title: "Oudtshoorn Accommodation",
+  //           location: "Oudtshoorn, Klein Karoo",
+  //           availabilityNote:
+  //             "Accommodation subject to availability — please enquire for current options.",
+  //           options: [
+  //             "De Oude Meul Country Lodge",
+  //             "Old Mill Nature Lodge",
+  //             "Die Fonteine Guest House",
+  //             "Cango Retreat Ou Tol",
+  //           ],
+  //         },
 
-          images: [],
-        },
+  //         images: [],
+  //       },
 
-        {
-          day: 3,
-          title: "Knysna Lagoon & Heads",
-          route:
-            "Oudtshoorn → Outeniqua Pass → Knysna Heads → Knysna Waterfront",
-          description:
-            "After breakfast, travel through the dramatic Outeniqua Pass to Knysna. Visit the iconic Knysna Heads viewpoint overlooking the lagoon and Indian Ocean, then explore the Knysna Waterfront with its restaurants, cafés, and boutique shops. Overnight in Knysna.",
+  //       {
+  //         day: 3,
+  //         title: "Knysna Lagoon & Heads",
+  //         route:
+  //           "Oudtshoorn → Outeniqua Pass → Knysna Heads → Knysna Waterfront",
+  //         description:
+  //           "After breakfast, travel through the dramatic Outeniqua Pass to Knysna. Visit the iconic Knysna Heads viewpoint overlooking the lagoon and Indian Ocean, then explore the Knysna Waterfront with its restaurants, cafés, and boutique shops. Overnight in Knysna.",
 
-          activities: [
-            {
-              title: "Breakfast",
-              description:
-                "Enjoy breakfast at your accommodation in Oudtshoorn.",
-              time: "07:00 – 08:00",
-              duration: "1 hour",
-              type: "meal",
-              optional: false,
-              image: "/images/tours/shared/breakfast2.webp",
-            },
-            {
-              title: "Outeniqua Pass Drive",
-              description:
-                "Travel through the dramatic Outeniqua Pass with mountain and valley views.",
-              time: "08:00 – 10:30",
-              duration: "2.5 hours",
-              type: "scenic",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-boltierskop/960px-Outeniqua_mountains_158882.webp",
-              // Bob Adams from Amanzimtoti, South Africa
-              // Creative Commons Attribution-Share Alike 2.0
-              // Outeniqua mountains (15888233442).jpg Copy
-              // [[File:Outeniqua mountains (15888233442).jpg|Outeniqua_mountains_(15888233442)]]
-              // Copy
-              // November 26, 2014
-            },
-            {
-              title: "Knysna Heads Viewpoint",
-              description:
-                "Iconic viewpoint overlooking the lagoon and Indian Ocean.",
-              time: "10:30 – 11:30",
-              duration: "1 hour",
-              type: "scenic",
-              optional: false,
-              image:
-                "images/tours/packages/5-day-boltierskop/960px-Knysna_Heads_view.webp",
-              // Steveknysna
-              // Creative Commons Attribution-Share Alike 3.0
-              // Knysna Heads view.JPG Copy
-              // [[File:Knysna Heads view.JPG|Knysna_Heads_view]]
-              // Copy
-              // February 7, 2013
-            },
-            {
-              title: "Lunch Stop (Own Account)",
-              description:
-                "Lunch at the Knysna Waterfront with views over the lagoon.",
-              time: "12:00 – 13:30",
-              duration: "1.5 hours",
-              type: "meal",
-              optional: true,
-              image: "/images/tours/shared/lunch.webp",
-            },
-            {
-              title: "Knysna Waterfront Exploration",
-              description:
-                "Explore restaurants, cafés, boutique shops, optional lagoon cruise.",
-              time: "13:30 – 15:00",
-              duration: "1.5 hours",
-              type: "leisure",
-              optional: true,
-              image:
-                "/images/tours/packages/5-day-boltierskop/960px-KNYSNA_-_Waterfront_terrac.webp",
-              // Josep M. Gracia
-              // Creative Commons Attribution-Share Alike 4.0
-              // KNYSNA - Waterfront terraces in Knysna, South Africa, 2017.jpg Copy
-              // [[File:KNYSNA - Waterfront terraces in Knysna, South Africa, 2017.jpg|KNYSNA_-_Waterfront_terraces_in_Knysna,_South_Africa,_2017]]
-              // Copy
-              // August 2017
-            },
-            {
-              title: "Arrival & Check-in",
-              description: "Check in to your accommodation in Knysna.",
-              time: "Afternoon",
-              duration: "",
-              type: "accommodation",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-boltierskop/check-in-country-house-2.webp",
-            },
-            {
-              title: "Dinner (Own Account)",
-              description:
-                "Enjoy dinner at one of Knysna's renowned seafood restaurants.",
-              time: "Evening",
-              duration: "",
-              type: "meal",
-              optional: true,
-              image: "/images/tours/shared/dinner.webp",
-            },
-          ],
+  //         activities: [
+  //           {
+  //             title: "Breakfast",
+  //             description:
+  //               "Enjoy breakfast at your accommodation in Oudtshoorn.",
+  //             time: "07:00 – 08:00",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: false,
+  //             image: "/images/tours/shared/breakfast2.webp",
+  //           },
+  //           {
+  //             title: "Outeniqua Pass Drive",
+  //             description:
+  //               "Travel through the dramatic Outeniqua Pass with mountain and valley views.",
+  //             time: "08:00 – 10:30",
+  //             duration: "2.5 hours",
+  //             type: "scenic",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/960px-Outeniqua_mountains_158882.webp",
+  //             // Bob Adams from Amanzimtoti, South Africa
+  //             // Creative Commons Attribution-Share Alike 2.0
+  //             // Outeniqua mountains (15888233442).jpg Copy
+  //             // [[File:Outeniqua mountains (15888233442).jpg|Outeniqua_mountains_(15888233442)]]
+  //             // Copy
+  //             // November 26, 2014
+  //           },
+  //           {
+  //             title: "Knysna Heads Viewpoint",
+  //             description:
+  //               "Iconic viewpoint overlooking the lagoon and Indian Ocean.",
+  //             time: "10:30 – 11:30",
+  //             duration: "1 hour",
+  //             type: "scenic",
+  //             optional: false,
+  //             image:
+  //               "images/tours/packages/5-day-boltierskop/960px-Knysna_Heads_view.webp",
+  //             // Steveknysna
+  //             // Creative Commons Attribution-Share Alike 3.0
+  //             // Knysna Heads view.JPG Copy
+  //             // [[File:Knysna Heads view.JPG|Knysna_Heads_view]]
+  //             // Copy
+  //             // February 7, 2013
+  //           },
+  //           {
+  //             title: "Lunch Stop (Own Account)",
+  //             description:
+  //               "Lunch at the Knysna Waterfront with views over the lagoon.",
+  //             time: "12:00 – 13:30",
+  //             duration: "1.5 hours",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "/images/tours/shared/lunch.webp",
+  //           },
+  //           {
+  //             title: "Knysna Waterfront Exploration",
+  //             description:
+  //               "Explore restaurants, cafés, boutique shops, optional lagoon cruise.",
+  //             time: "13:30 – 15:00",
+  //             duration: "1.5 hours",
+  //             type: "leisure",
+  //             optional: true,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/960px-KNYSNA_-_Waterfront_terrac.webp",
+  //             // Josep M. Gracia
+  //             // Creative Commons Attribution-Share Alike 4.0
+  //             // KNYSNA - Waterfront terraces in Knysna, South Africa, 2017.jpg Copy
+  //             // [[File:KNYSNA - Waterfront terraces in Knysna, South Africa, 2017.jpg|KNYSNA_-_Waterfront_terraces_in_Knysna,_South_Africa,_2017]]
+  //             // Copy
+  //             // August 2017
+  //           },
+  //           {
+  //             title: "Arrival & Check-in",
+  //             description: "Check in to your accommodation in Knysna.",
+  //             time: "Afternoon",
+  //             duration: "",
+  //             type: "accommodation",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/check-in-country-house-2.webp",
+  //           },
+  //           {
+  //             title: "Dinner (Own Account)",
+  //             description:
+  //               "Enjoy dinner at one of Knysna's renowned seafood restaurants.",
+  //             time: "Evening",
+  //             duration: "",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "/images/tours/shared/dinner.webp",
+  //           },
+  //         ],
 
-          meals: {
-            breakfast: true,
-            lunch: false,
-            dinner: false,
-          },
+  //         meals: {
+  //           breakfast: true,
+  //           lunch: false,
+  //           dinner: false,
+  //         },
 
-          accommodation: {
-            title: "Knysna Accommodation",
-            location: "Knysna, Garden Route",
-            availabilityNote:
-              "Accommodation subject to availability — please enquire for current options.",
-            options: [
-              "Knysna Country House",
-              "Paradise Found Guest House",
-              "Waterfront Lodge",
-            ],
-          },
+  //         accommodation: {
+  //           title: "Knysna Accommodation",
+  //           location: "Knysna, Garden Route",
+  //           availabilityNote:
+  //             "Accommodation subject to availability — please enquire for current options.",
+  //           options: [
+  //             "Knysna Country House",
+  //             "Paradise Found Guest House",
+  //             "Waterfront Lodge",
+  //           ],
+  //         },
 
-          images: [],
-        },
+  //         images: [],
+  //       },
 
-        {
-          day: 4,
-          title: "Tsitsikamma Forests & Adventure",
-          route: "Knysna → Tsitsikamma National Park → Storms River",
-          description:
-            "After breakfast, travel to Tsitsikamma National Park for a forest experience. Walk across the famous Storms River Suspension Bridge and explore the dramatic coastline. Optional adventure activities include ziplining, kayak, and Lilo (own expense). Overnight in Tsitsikamma.",
+  //       {
+  //         day: 4,
+  //         title: "Tsitsikamma Forests & Adventure",
+  //         route: "Knysna → Tsitsikamma National Park → Storms River",
+  //         description:
+  //           "After breakfast, travel to Tsitsikamma National Park for a forest experience. Walk across the famous Storms River Suspension Bridge and explore the dramatic coastline. Optional adventure activities include ziplining, kayak, and Lilo (own expense). Overnight in Tsitsikamma.",
 
-          activities: [
-            {
-              title: "Breakfast",
-              description: "Enjoy breakfast at your accommodation in Knysna.",
-              time: "07:00 – 08:00",
-              duration: "1 hour",
-              type: "meal",
-              optional: false,
-              image: "/images/tours/shared/breakfast2.webp",
-            },
-            {
-              title: "Scenic Drive to Tsitsikamma",
-              description:
-                "Travel along the Garden Route coast to Tsitsikamma National Park.",
-              time: "08:00 – 09:30",
-              duration: "1.5 hours",
-              type: "transfer",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-boltierskop/960px-Tsitsikamma_National_Park.webp",
-            },
-            {
-              title: "Storms River Suspension Bridge",
-              description:
-                "Walk across the famous suspension bridge with views over the dramatic coastline and Storms River mouth.",
-              time: "09:30 – 11:30",
-              duration: "2 hours",
-              type: "adventure",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-boltierskop/960px-2014-11-30_Tsitsikamma_Nat.webp",
-            },
-            {
-              title: "Lunch Stop (Own Account)",
-              description: "Lunch at a local restaurant near Tsitsikamma.",
-              time: "12:00 – 13:00",
-              duration: "1 hour",
-              type: "meal",
-              optional: true,
-              image: "/images/tours/shared/lunch2.webp",
-            },
-            {
-              title: "Optional Adventure Activities",
-              description:
-                "Choose from ziplining, kayak, or Lilo (own expense). Activities subject to availability and weather.",
-              time: "13:00 – 15:00",
-              duration: "2 hours",
-              type: "adventure",
-              optional: true,
-              image: "/images/tours/shared/kayak.webp",
-            },
-            {
-              title: "Arrival & Check-in",
-              description: "Check in to your accommodation in Tsitsikamma.",
-              time: "Afternoon",
-              duration: "",
-              type: "accommodation",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-boltierskop/check-in-tsitsikama-lodge.webp",
-            },
-            {
-              title: "Dinner (Own Account)",
-              description:
-                "Enjoy dinner at your accommodation or a local restaurant.",
-              time: "Evening",
-              duration: "",
-              type: "meal",
-              optional: true,
-              image: "/images/tours/shared/dinner2.webp",
-            },
-          ],
+  //         activities: [
+  //           {
+  //             title: "Breakfast",
+  //             description: "Enjoy breakfast at your accommodation in Knysna.",
+  //             time: "07:00 – 08:00",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: false,
+  //             image: "/images/tours/shared/breakfast2.webp",
+  //           },
+  //           {
+  //             title: "Scenic Drive to Tsitsikamma",
+  //             description:
+  //               "Travel along the Garden Route coast to Tsitsikamma National Park.",
+  //             time: "08:00 – 09:30",
+  //             duration: "1.5 hours",
+  //             type: "transfer",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/960px-Tsitsikamma_National_Park.webp",
+  //           },
+  //           {
+  //             title: "Storms River Suspension Bridge",
+  //             description:
+  //               "Walk across the famous suspension bridge with views over the dramatic coastline and Storms River mouth.",
+  //             time: "09:30 – 11:30",
+  //             duration: "2 hours",
+  //             type: "adventure",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/960px-2014-11-30_Tsitsikamma_Nat.webp",
+  //           },
+  //           {
+  //             title: "Lunch Stop (Own Account)",
+  //             description: "Lunch at a local restaurant near Tsitsikamma.",
+  //             time: "12:00 – 13:00",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "/images/tours/shared/lunch2.webp",
+  //           },
+  //           {
+  //             title: "Optional Adventure Activities",
+  //             description:
+  //               "Choose from ziplining, kayak, or Lilo (own expense). Activities subject to availability and weather.",
+  //             time: "13:00 – 15:00",
+  //             duration: "2 hours",
+  //             type: "adventure",
+  //             optional: true,
+  //             image: "/images/tours/shared/kayak.webp",
+  //           },
+  //           {
+  //             title: "Arrival & Check-in",
+  //             description: "Check in to your accommodation in Tsitsikamma.",
+  //             time: "Afternoon",
+  //             duration: "",
+  //             type: "accommodation",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/check-in-tsitsikama-lodge.webp",
+  //           },
+  //           {
+  //             title: "Dinner (Own Account)",
+  //             description:
+  //               "Enjoy dinner at your accommodation or a local restaurant.",
+  //             time: "Evening",
+  //             duration: "",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "/images/tours/shared/dinner2.webp",
+  //           },
+  //         ],
 
-          meals: {
-            breakfast: true,
-            lunch: false,
-            dinner: false,
-          },
+  //         meals: {
+  //           breakfast: true,
+  //           lunch: false,
+  //           dinner: false,
+  //         },
 
-          accommodation: {
-            title: "Tsitsikamma Accommodation",
-            location: "Tsitsikamma, Garden Route",
-            availabilityNote:
-              "Accommodation subject to availability — please enquire for current options.",
-            options: [
-              "Tsitsikamma Lodge",
-              "Forest Hideaway",
-              "Storms River Guest House",
-            ],
-          },
+  //         accommodation: {
+  //           title: "Tsitsikamma Accommodation",
+  //           location: "Tsitsikamma, Garden Route",
+  //           availabilityNote:
+  //             "Accommodation subject to availability — please enquire for current options.",
+  //           options: [
+  //             "Tsitsikamma Lodge",
+  //             "Forest Hideaway",
+  //             "Storms River Guest House",
+  //           ],
+  //         },
 
-          images: [],
-        },
+  //         images: [],
+  //       },
 
-        {
-          day: 5,
-          title: "Hermanus, Wine & Penguins",
-          route:
-            "Tsitsikamma → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
-          description:
-            "After breakfast, travel along the coast to Hermanus — the heart of the Whale Coast. Explore the cliff paths with ocean views, visit markets and cafés. Continue to Benguela Cove Lagoon Wine Estate for premium wine tasting with stunning lagoon views. Visit Stony Point Penguin Colony at Betty's Bay before returning to Cape Town via the scenic Clarence Drive (R44).",
+  //       {
+  //         day: 5,
+  //         title: "Hermanus, Wine & Penguins",
+  //         route:
+  //           "Tsitsikamma → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
+  //         description:
+  //           "After breakfast, travel along the coast to Hermanus — the heart of the Whale Coast. Explore the cliff paths with ocean views, visit markets and cafés. Continue to Benguela Cove Lagoon Wine Estate for premium wine tasting with stunning lagoon views. Visit Stony Point Penguin Colony at Betty's Bay before returning to Cape Town via the scenic Clarence Drive (R44).",
 
-          activities: [
-            {
-              title: "Breakfast",
-              description:
-                "Enjoy breakfast at your accommodation in Tsitsikamma.",
-              time: "07:00 – 08:00",
-              duration: "1 hour",
-              type: "meal",
-              optional: false,
-              image: "/images/tours/shared/breakfast.webp",
-            },
-            {
-              title: "Hermanus Whale Coast",
-              description:
-                "Explore the cliff paths with ocean views, markets, and cafés. Seasonal whale watching (June–November).",
-              time: "10:00 – 12:00",
-              duration: "2 hours",
-              type: "scenic",
-              optional: false,
-              image: "images/tours/packages/3-day-garden-route/Hermanus.webp",
-            },
-            {
-              title: "Lunch Stop (Own Account)",
-              description: "Lunch at a local restaurant in Hermanus.",
-              time: "12:00 – 13:00",
-              duration: "1 hour",
-              type: "meal",
-              optional: true,
-              image: "/images/tours/shared/lunch.webp",
-            },
-            {
-              title: "Benguela Cove Wine Estate",
-              description: "Premium wine tasting with stunning lagoon views.",
-              time: "13:30 – 15:00",
-              duration: "1.5 hours",
-              type: "wine",
-              optional: false,
-              image:
-                "images/tours/packages/3-day-garden-route/960px-Benguela_Cove_Lagoon_Wine.webp",
-            },
-            {
-              title: "Betty's Bay – Stony Point Penguin Colony",
-              description:
-                "Boardwalks and African penguins in a natural coastal habitat.",
-              time: "15:30 – 16:30",
-              duration: "1 hour",
-              type: "wildlife",
-              optional: false,
-              image:
-                "images/tours/packages/3-day-garden-route/960px-BB_-_Bettys_Bay_seen_from.webp",
-            },
-            {
-              title: "Clarence Drive Return to Cape Town",
-              description:
-                "Return to Cape Town via the scenic Clarence Drive (R44) with spectacular coastal views.",
-              time: "16:30 – 19:00",
-              duration: "2.5 hours",
-              type: "transfer",
-              optional: false,
-              image: "/images/tours/shared/return/1.webp",
-            },
-          ],
+  //         activities: [
+  //           {
+  //             title: "Breakfast",
+  //             description:
+  //               "Enjoy breakfast at your accommodation in Tsitsikamma.",
+  //             time: "07:00 – 08:00",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: false,
+  //             image: "/images/tours/shared/breakfast.webp",
+  //           },
+  //           {
+  //             title: "Hermanus Whale Coast",
+  //             description:
+  //               "Explore the cliff paths with ocean views, markets, and cafés. Seasonal whale watching (June–November).",
+  //             time: "10:00 – 12:00",
+  //             duration: "2 hours",
+  //             type: "scenic",
+  //             optional: false,
+  //             image: "images/tours/packages/3-day-garden-route/Hermanus.webp",
+  //           },
+  //           {
+  //             title: "Lunch Stop (Own Account)",
+  //             description: "Lunch at a local restaurant in Hermanus.",
+  //             time: "12:00 – 13:00",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "/images/tours/shared/lunch.webp",
+  //           },
+  //           {
+  //             title: "Benguela Cove Wine Estate",
+  //             description: "Premium wine tasting with stunning lagoon views.",
+  //             time: "13:30 – 15:00",
+  //             duration: "1.5 hours",
+  //             type: "wine",
+  //             optional: false,
+  //             image:
+  //               "images/tours/packages/3-day-garden-route/960px-Benguela_Cove_Lagoon_Wine.webp",
+  //           },
+  //           {
+  //             title: "Betty's Bay – Stony Point Penguin Colony",
+  //             description:
+  //               "Boardwalks and African penguins in a natural coastal habitat.",
+  //             time: "15:30 – 16:30",
+  //             duration: "1 hour",
+  //             type: "wildlife",
+  //             optional: false,
+  //             image:
+  //               "images/tours/packages/3-day-garden-route/960px-BB_-_Bettys_Bay_seen_from.webp",
+  //           },
+  //           {
+  //             title: "Clarence Drive Return to Cape Town",
+  //             description:
+  //               "Return to Cape Town via the scenic Clarence Drive (R44) with spectacular coastal views.",
+  //             time: "16:30 – 19:00",
+  //             duration: "2.5 hours",
+  //             type: "transfer",
+  //             optional: false,
+  //             image: "/images/tours/shared/return/1.webp",
+  //           },
+  //         ],
 
-          meals: {
-            breakfast: true,
-            lunch: false,
-            dinner: false,
-          },
+  //         meals: {
+  //           breakfast: true,
+  //           lunch: false,
+  //           dinner: false,
+  //         },
 
-          accommodation: {
-            title: "",
-            location: "",
-            availabilityNote: "",
-            options: [],
-          },
+  //         accommodation: {
+  //           title: "",
+  //           location: "",
+  //           availabilityNote: "",
+  //           options: [],
+  //         },
 
-          images: [],
-        },
-      ],
-    },
+  //         images: [],
+  //       },
+  //     ],
+  //   },
 
-    stops: [],
+  //   stops: [],
 
-    // routeInformation: {
-    //   title: "5‑Day Garden Route & Botlierskop Luxury Safari Route",
-    //   description:
-    //     "A premium Garden Route journey featuring a luxury safari, dramatic mountain passes, forests, coastline, wine tasting, and charming towns.",
-    //   items: [
-    //     "Cape Town → Botlierskop Private Game Reserve",
-    //     "Botlierskop Safari (lion, rhino, giraffe, buffalo, zebra)",
-    //     "Route 62 – Vineyards, orchards, and Karoo landscapes",
-    //     "Cango Caves – Heritage or Adventure Tour",
-    //     "Outeniqua Pass – Dramatic mountain scenery",
-    //     "Knysna Heads – Iconic lagoon and ocean viewpoint",
-    //     "Knysna Waterfront – Restaurants, cafés, boutique shops",
-    //     "Tsitsikamma National Park – Storms River Suspension Bridge",
-    //     "Hermanus Whale Coast – Seasonal whale watching",
-    //     "Benguela Cove – Lagoon‑side wine tasting",
-    //     "Betty's Bay – Stony Point Penguin Colony",
-    //     "Clarence Drive (R44) – Scenic return to Cape Town",
-    //   ],
-    // },
+  //   // routeInformation: {
+  //   //   title: "5‑Day Garden Route & Botlierskop Luxury Safari Route",
+  //   //   description:
+  //   //     "A premium Garden Route journey featuring a luxury safari, dramatic mountain passes, forests, coastline, wine tasting, and charming towns.",
+  //   //   items: [
+  //   //     "Cape Town → Botlierskop Private Game Reserve",
+  //   //     "Botlierskop Safari (lion, rhino, giraffe, buffalo, zebra)",
+  //   //     "Route 62 – Vineyards, orchards, and Karoo landscapes",
+  //   //     "Cango Caves – Heritage or Adventure Tour",
+  //   //     "Outeniqua Pass – Dramatic mountain scenery",
+  //   //     "Knysna Heads – Iconic lagoon and ocean viewpoint",
+  //   //     "Knysna Waterfront – Restaurants, cafés, boutique shops",
+  //   //     "Tsitsikamma National Park – Storms River Suspension Bridge",
+  //   //     "Hermanus Whale Coast – Seasonal whale watching",
+  //   //     "Benguela Cove – Lagoon‑side wine tasting",
+  //   //     "Betty's Bay – Stony Point Penguin Colony",
+  //   //     "Clarence Drive (R44) – Scenic return to Cape Town",
+  //   //   ],
+  //   // },
 
-    vehicle: null,
+  //   vehicle: null,
 
-    securityAndLiability: null,
+  //   securityAndLiability: null,
 
-    accommodation: {
-      included: true,
-      type: "Luxury Tented Suite / Guest House / Lodge",
-      description:
-        "Hand‑selected accommodation in Botlierskop (luxury tented suite), Oudtshoorn, Knysna, and Tsitsikamma. Breakfast included daily. Accommodation subject to availability.",
-    },
+  //   accommodation: {
+  //     included: true,
+  //     type: "Luxury Tented Suite / Guest House / Lodge",
+  //     description:
+  //       "Hand‑selected accommodation in Botlierskop (luxury tented suite), Oudtshoorn, Knysna, and Tsitsikamma. Breakfast included daily. Accommodation subject to availability.",
+  //   },
 
-    needToKnow: [
-      {
-        text: "Accommodation subject to availability — options listed are examples only",
-      },
-      {
-        text: "Child rates: 0–3 years free, 4–12 years at 60–75% of adult rate, 13–17 years at adult rate",
-      },
-      { text: "Cancellations must be made at least 24 hours before departure" },
-      {
-        text: "Cango Caves offers Heritage Tour (easy) or Adventure Tour (more strenuous)",
-      },
-      {
-        text: "Game drives are subject to wildlife sightings — not guaranteed",
-      },
-      { text: "Whale watching in Hermanus is seasonal (June–November)" },
-      {
-        text: "Optional Tsitsikamma activities: ziplining, kayak, Lilo (own expense)",
-      },
-      {
-        text: "Comfortable walking shoes recommended for Cango Caves, Tsitsikamma, and penguin viewing",
-      },
-      { text: "This is a private tour with a dedicated driver/guide" },
-    ],
+  //   needToKnow: [
+  //     {
+  //       text: "Accommodation subject to availability — options listed are examples only",
+  //     },
+  //     {
+  //       text: "Child rates: 0–3 years free, 4–12 years at 60–75% of adult rate, 13–17 years at adult rate",
+  //     },
+  //     { text: "Cancellations must be made at least 24 hours before departure" },
+  //     {
+  //       text: "Cango Caves offers Heritage Tour (easy) or Adventure Tour (more strenuous)",
+  //     },
+  //     {
+  //       text: "Game drives are subject to wildlife sightings — not guaranteed",
+  //     },
+  //     { text: "Whale watching in Hermanus is seasonal (June–November)" },
+  //     {
+  //       text: "Optional Tsitsikamma activities: ziplining, kayak, Lilo (own expense)",
+  //     },
+  //     {
+  //       text: "Comfortable walking shoes recommended for Cango Caves, Tsitsikamma, and penguin viewing",
+  //     },
+  //     { text: "This is a private tour with a dedicated driver/guide" },
+  //   ],
 
-    faqs: [
-      {
-        question: "How long is the Garden Route tour?",
-        answer:
-          "This is a 5‑day, 4‑night tour from Cape Town, exploring the Garden Route, Botlierskop, Route 62, and the Klein Karoo.",
-      },
-      {
-        question: "What is included in the tour price?",
-        answer:
-          "The tour includes private vehicle, professional driver/guide, Botlierskop Safari, 4 nights accommodation, breakfast daily, Cango Caves entrance, Tsitsikamma National Park entrance, Benguela Cove wine tasting, and bottled water.",
-      },
-      {
-        question: "What is not included?",
-        answer:
-          "Lunch and dinner, optional adventure activities (ziplining, kayak, Lilo), personal purchases, and gratuities are not included.",
-      },
-      {
-        question: "What is the cancellation policy?",
-        answer:
-          "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
-      },
-      {
-        question: "What is Botlierskop Private Game Reserve?",
-        answer:
-          "Botlierskop is a luxury private game reserve offering 3‑hour guided safaris with sightings of the Big 5 (lion, rhino, buffalo, elephant, leopard) as well as giraffe, zebra, and more.",
-      },
-      {
-        question: "Can children join the tour?",
-        answer:
-          "Yes. Children 0–3 years are free, 4–12 years are charged at 60–75% of the adult rate, and teens 13–17 years pay the adult rate.",
-      },
-      {
-        question: "What activities are included?",
-        answer:
-          "The tour includes Botlierskop Safari, Cango Caves guided tour, Tsitsikamma National Park entrance, Knysna Heads viewpoint, Hermanus Whale Coast, Benguela Cove wine tasting, and Betty's Bay Penguin Colony.",
-      },
-      {
-        question: "What are the optional activities in Tsitsikamma?",
-        answer:
-          "Optional activities include ziplining, kayak, and Lilo (own expense). These can be arranged on request and are subject to availability and weather.",
-      },
-      {
-        question: "What should I bring?",
-        answer:
-          "Bring comfortable clothing, walking shoes, a warm jacket, sunscreen, a hat, swimwear (optional), a camera, and cash for personal purchases.",
-      },
-      {
-        question: "Is this a private tour?",
-        answer:
-          "Yes. This is a private tour with a dedicated driver/guide and private vehicle.",
-      },
-      {
-        question: "What is the best time of year for this tour?",
-        answer:
-          "The Garden Route has a mild climate year‑round. Whale watching in Hermanus is best from June to November.",
-      },
-    ],
+  //   faqs: [
+  //     {
+  //       question: "How long is the Garden Route tour?",
+  //       answer:
+  //         "This is a 5‑day, 4‑night tour from Cape Town, exploring the Garden Route, Botlierskop, Route 62, and the Klein Karoo.",
+  //     },
+  //     {
+  //       question: "What is included in the tour price?",
+  //       answer:
+  //         "The tour includes private vehicle, professional driver/guide, Botlierskop Safari, 4 nights accommodation, breakfast daily, Cango Caves entrance, Tsitsikamma National Park entrance, Benguela Cove wine tasting, and bottled water.",
+  //     },
+  //     {
+  //       question: "What is not included?",
+  //       answer:
+  //         "Lunch and dinner, optional adventure activities (ziplining, kayak, Lilo), personal purchases, and gratuities are not included.",
+  //     },
+  //     {
+  //       question: "What is the cancellation policy?",
+  //       answer:
+  //         "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
+  //     },
+  //     {
+  //       question: "What is Botlierskop Private Game Reserve?",
+  //       answer:
+  //         "Botlierskop is a luxury private game reserve offering 3‑hour guided safaris with sightings of the Big 5 (lion, rhino, buffalo, elephant, leopard) as well as giraffe, zebra, and more.",
+  //     },
+  //     {
+  //       question: "Can children join the tour?",
+  //       answer:
+  //         "Yes. Children 0–3 years are free, 4–12 years are charged at 60–75% of the adult rate, and teens 13–17 years pay the adult rate.",
+  //     },
+  //     {
+  //       question: "What activities are included?",
+  //       answer:
+  //         "The tour includes Botlierskop Safari, Cango Caves guided tour, Tsitsikamma National Park entrance, Knysna Heads viewpoint, Hermanus Whale Coast, Benguela Cove wine tasting, and Betty's Bay Penguin Colony.",
+  //     },
+  //     {
+  //       question: "What are the optional activities in Tsitsikamma?",
+  //       answer:
+  //         "Optional activities include ziplining, kayak, and Lilo (own expense). These can be arranged on request and are subject to availability and weather.",
+  //     },
+  //     {
+  //       question: "What should I bring?",
+  //       answer:
+  //         "Bring comfortable clothing, walking shoes, a warm jacket, sunscreen, a hat, swimwear (optional), a camera, and cash for personal purchases.",
+  //     },
+  //     {
+  //       question: "Is this a private tour?",
+  //       answer:
+  //         "Yes. This is a private tour with a dedicated driver/guide and private vehicle.",
+  //     },
+  //     {
+  //       question: "What is the best time of year for this tour?",
+  //       answer:
+  //         "The Garden Route has a mild climate year‑round. Whale watching in Hermanus is best from June to November.",
+  //     },
+  //   ],
 
-    tags: [
-      "Garden Route",
-      "Botlierskop",
-      "Safari",
-      "Multi-Day",
-      "5 Day Tour",
-      "Cango Caves",
-      "Knysna",
-      "Tsitsikamma",
-      "Hermanus",
-      "Wine Tasting",
-      "South Africa",
-      "Road Trip",
-      "Private Tour",
-      "Luxury Safari",
-      "Family Friendly",
-      "Wildlife",
-      "Adventure",
-    ],
-  },
+  //   tags: [
+  //     "Garden Route",
+  //     "Botlierskop",
+  //     "Safari",
+  //     "Multi-Day",
+  //     "5 Day Tour",
+  //     "Cango Caves",
+  //     "Knysna",
+  //     "Tsitsikamma",
+  //     "Hermanus",
+  //     "Wine Tasting",
+  //     "South Africa",
+  //     "Road Trip",
+  //     "Private Tour",
+  //     "Luxury Safari",
+  //     "Family Friendly",
+  //     "Wildlife",
+  //     "Adventure",
+  //   ],
+  // },
   // 5Day - Garden Route
-  {
-    id: 20, // New tour ID to be assigned (e.g., 40)
-    type: TOUR_TYPES.PACKAGES,
-    category: TOUR_MODIFIERS.MULTI_DAY,
+  // {
+  //   id: 20, // New tour ID to be assigned (e.g., 40)
+  //   type: TOUR_TYPES.PACKAGES,
+  //   category: TOUR_MODIFIERS.MULTI_DAY,
 
-    title: "5‑Day Garden Route & Gondwana Big 5 Safari Tour",
-    slug: "5-day-garden-route-gondwana-big-5-safari",
-    canonicalPath: "/tours/5-day-garden-route-gondwana-big-5-safari",
-    childFriendly: true,
-    daysInAdvance: 14,
+  //   title: "5‑Day Garden Route & Gondwana Big 5 Safari Tour",
+  //   slug: "5-day-garden-route-gondwana-big-5-safari",
+  //   canonicalPath: "/tours/5-day-garden-route-gondwana-big-5-safari",
+  //   childFriendly: true,
+  //   daysInAdvance: 14,
 
-    seo: {
-      title:
-        "5‑Day Garden Route & Gondwana Big 5 Safari Tour | Cape Frontier Tours",
-      description:
-        "A premium 5‑day journey combining a luxury Big 5 safari at Gondwana Game Reserve, mountain passes, forests, coastline, wine tasting, and hand‑selected guest‑house accommodation.",
-      keywords: [
-        "Garden Route tour",
-        "5 day Garden Route tour",
-        "Gondwana Game Reserve",
-        "Big 5 safari Garden Route",
-        "Cango Caves tour",
-        "Knysna Heads tour",
-        "Tsitsikamma National Park",
-        "South Africa road trip",
-        "Garden Route itinerary",
-        "Cape Town to Garden Route",
-        "private Garden Route tour",
-        "Storms River suspension bridge",
-        "Big 5 safari South Africa",
-      ],
-    },
+  //   seo: {
+  //     title:
+  //       "5‑Day Garden Route & Gondwana Big 5 Safari Tour | Cape Frontier Tours",
+  //     description:
+  //       "A premium 5‑day journey combining a luxury Big 5 safari at Gondwana Game Reserve, mountain passes, forests, coastline, wine tasting, and hand‑selected guest‑house accommodation.",
+  //     keywords: [
+  //       "Garden Route tour",
+  //       "5 day Garden Route tour",
+  //       "Gondwana Game Reserve",
+  //       "Big 5 safari Garden Route",
+  //       "Cango Caves tour",
+  //       "Knysna Heads tour",
+  //       "Tsitsikamma National Park",
+  //       "South Africa road trip",
+  //       "Garden Route itinerary",
+  //       "Cape Town to Garden Route",
+  //       "private Garden Route tour",
+  //       "Storms River suspension bridge",
+  //       "Big 5 safari South Africa",
+  //     ],
+  //   },
 
-    workflow: defaultWorkflow,
+  //   workflow: defaultWorkflow,
 
-    // image: "/src/assets/images/tours/packages/5-day-garden-route/image.webp",
-    image:
-      "/src/assets/images/tours/packages/5-day-garden-route/960px-Big_five_gam.webp",
-    images: [
-      "/src/assets/images/tours/packages/5-day-garden-route/960px-Big_five_gam.webp",
-      "/src/assets/images/tours/packages/5-day-garden-route/gamedrive2-1-1536x899.webp",
-      "/src/assets/images/tours/packages/5-day-garden-route/kwenalodge1.webp",
-    ],
-    imageFolder: "packages/5-day-garden-route",
-    videos: [],
+  //   // image: "/src/assets/images/tours/packages/5-day-garden-route/image.webp",
+  //   image:
+  //     "/src/assets/images/tours/packages/5-day-garden-route/960px-Big_five_gam.webp",
+  //   images: [
+  //     "/src/assets/images/tours/packages/5-day-garden-route/960px-Big_five_gam.webp",
+  //     "/src/assets/images/tours/packages/5-day-garden-route/gamedrive2-1-1536x899.webp",
+  //     "/src/assets/images/tours/packages/5-day-garden-route/kwenalodge1.webp",
+  //   ],
+  //   imageFolder: "packages/5-day-garden-route",
+  //   videos: [],
 
-    location: "Garden Route, South Africa",
-    duration: "5 Days / 4 Nights",
+  //   location: "Garden Route, South Africa",
+  //   duration: "5 Days / 4 Nights",
 
-    priceBase: 17500,
-    minPeople: 1,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
+  //   priceBase: 17500,
+  //   minPeople: 1,
+  //   baseCurrency: "ZAR",
+  //   supportedCurrencies: SUPPORTED_CURRENCIES,
 
-    pricing: [
-      {
-        category: "Solo Traveller",
-        pricePerPerson: 26000,
-        note: "Includes Gondwana safari, 4 nights accommodation, breakfast, transport",
-      },
-      {
-        category: "Children (12-17 years)",
-        pricePerPerson: 13000,
-        note: "Full rates apply.",
-      },
-      {
-        category: "Children (4–12 years)",
-        pricePerPerson: 11000,
-        note: "Discounted rates apply.",
-      },
-      {
-        category: "Children (0–3 years)",
-        pricePerPerson: 0,
-        note: "Free of charge",
-      },
-    ],
+  //   pricing: [
+  //     {
+  //       category: "Solo Traveller",
+  //       pricePerPerson: 26000,
+  //       note: "Includes Gondwana safari, 4 nights accommodation, breakfast, transport",
+  //     },
+  //     {
+  //       category: "Children (12-17 years)",
+  //       pricePerPerson: 13000,
+  //       note: "Full rates apply.",
+  //     },
+  //     {
+  //       category: "Children (4–12 years)",
+  //       pricePerPerson: 11000,
+  //       note: "Discounted rates apply.",
+  //     },
+  //     {
+  //       category: "Children (0–3 years)",
+  //       pricePerPerson: 0,
+  //       note: "Free of charge",
+  //     },
+  //   ],
 
-    additionalPricing: [
-      {
-        type: "request",
-        category: "Optional Adventure Activities (Tsitsikamma)",
-        price: null,
-        unit: "per person",
-        currency: "ZAR",
-        note: "Ziplining, kayak, Lilo, forest hiking – available on request at Tsitsikamma",
-      },
-      {
-        type: "request",
-        category: "Optional Ostrich Farm Experience (Oudtshoorn)",
-        price: null,
-        unit: "per person",
-        currency: "ZAR",
-        note: "Available on request",
-      },
-    ],
+  //   additionalPricing: [
+  //     {
+  //       type: "request",
+  //       category: "Optional Adventure Activities (Tsitsikamma)",
+  //       price: null,
+  //       unit: "per person",
+  //       currency: "ZAR",
+  //       note: "Ziplining, kayak, Lilo, forest hiking – available on request at Tsitsikamma",
+  //     },
+  //     {
+  //       type: "request",
+  //       category: "Optional Ostrich Farm Experience (Oudtshoorn)",
+  //       price: null,
+  //       unit: "per person",
+  //       currency: "ZAR",
+  //       note: "Available on request",
+  //     },
+  //   ],
 
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 2,
-          maxPeople: 2,
-          perPerson: 22000,
-          label: "2 Guests",
-          note: "Includes Gondwana safari, accommodation, breakfast, transport",
-        },
-        {
-          minPeople: 3,
-          maxPeople: 4,
-          perPerson: 19500,
-          label: "3–4 Guests",
-          note: "Includes Gondwana safari, accommodation, breakfast, transport",
-        },
-        {
-          minPeople: 5,
-          perPerson: 17500,
-          label: "5+ Guests",
-          note: "Includes Gondwana safari, accommodation, breakfast, transport",
-        },
-      ],
-    },
+  //   groupPricing: {
+  //     enabled: true,
+  //     icon: "/icons/savemore.png",
+  //     tiers: [
+  //       {
+  //         minPeople: 2,
+  //         maxPeople: 2,
+  //         perPerson: 22000,
+  //         label: "2 Guests",
+  //         note: "Includes Gondwana safari, accommodation, breakfast, transport",
+  //       },
+  //       {
+  //         minPeople: 3,
+  //         maxPeople: 4,
+  //         perPerson: 19500,
+  //         label: "3–4 Guests",
+  //         note: "Includes Gondwana safari, accommodation, breakfast, transport",
+  //       },
+  //       {
+  //         minPeople: 5,
+  //         perPerson: 17500,
+  //         label: "5+ Guests",
+  //         note: "Includes Gondwana safari, accommodation, breakfast, transport",
+  //       },
+  //     ],
+  //   },
 
-    description:
-      "This 5‑day journey combines the very best of the Garden Route with an exclusive Big 5 safari experience at Gondwana Game Reserve. Travellers enjoy a seamless blend of wildlife, mountain passes, forests, coastline, wine tasting, and charming towns — all guided privately and comfortably. The tour begins with a luxury safari stay at Gondwana, followed by the scenic Route 62, the dramatic Cango Caves, the lagoon views of Knysna, and the adventure‑rich Tsitsikamma National Park. The final day includes Hermanus, Benguela Cove, and the penguins of Betty's Bay before returning to Cape Town via the iconic Clarence Drive. With 4 nights of hand‑selected accommodation, breakfast included, and a dedicated driver/guide throughout, this itinerary offers a complete Garden Route experience with the added value of a premium Big 5 safari.",
+  //   description:
+  //     "This 5‑day journey combines the very best of the Garden Route with an exclusive Big 5 safari experience at Gondwana Game Reserve. Travellers enjoy a seamless blend of wildlife, mountain passes, forests, coastline, wine tasting, and charming towns — all guided privately and comfortably. The tour begins with a luxury safari stay at Gondwana, followed by the scenic Route 62, the dramatic Cango Caves, the lagoon views of Knysna, and the adventure‑rich Tsitsikamma National Park. The final day includes Hermanus, Benguela Cove, and the penguins of Betty's Bay before returning to Cape Town via the iconic Clarence Drive. With 4 nights of hand‑selected accommodation, breakfast included, and a dedicated driver/guide throughout, this itinerary offers a complete Garden Route experience with the added value of a premium Big 5 safari.",
 
-    highlights: [
-      {
-        text: "Exclusive Big 5 Safari at Gondwana Game Reserve — Lion, elephant, rhino, buffalo, giraffe, zebra and more",
-      },
-      {
-        text: "Luxury Lodge Stay — Panoramic views, private suites, and exceptional hospitality",
-      },
-      {
-        text: "Route 62 Scenic Drive — Mountain passes, orchards, vineyards, and Karoo landscapes",
-      },
-      {
-        text: "Cango Caves Guided Tour — Heritage or Adventure route through ancient limestone chambers",
-      },
-      {
-        text: "Outeniqua Pass — A dramatic mountain drive into the Garden Route forests",
-      },
-      {
-        text: "Knysna Heads & Lagoon — One of South Africa's most photographed coastal viewpoints",
-      },
-      {
-        text: "Knysna Waterfront — Restaurants, cafés, boutique shops, and lagoon cruises",
-      },
-      {
-        text: "Tsitsikamma National Park — Storms River Suspension Bridge and optional adventure activities",
-      },
-      {
-        text: "Hermanus Whale Coast — Seasonal whale watching from cliff paths (June–November)",
-      },
-      {
-        text: "Benguela Cove Wine Estate — Premium wine tasting with lagoon and mountain views",
-      },
-      {
-        text: "Betty's Bay Penguin Colony — African penguins at Stony Point Nature Reserve",
-      },
-      {
-        text: "Clarence Drive (R44) — One of the most scenic coastal roads in South Africa",
-      },
-    ],
+  //   highlights: [
+  //     {
+  //       text: "Exclusive Big 5 Safari at Gondwana Game Reserve — Lion, elephant, rhino, buffalo, giraffe, zebra and more",
+  //     },
+  //     {
+  //       text: "Luxury Lodge Stay — Panoramic views, private suites, and exceptional hospitality",
+  //     },
+  //     {
+  //       text: "Route 62 Scenic Drive — Mountain passes, orchards, vineyards, and Karoo landscapes",
+  //     },
+  //     {
+  //       text: "Cango Caves Guided Tour — Heritage or Adventure route through ancient limestone chambers",
+  //     },
+  //     {
+  //       text: "Outeniqua Pass — A dramatic mountain drive into the Garden Route forests",
+  //     },
+  //     {
+  //       text: "Knysna Heads & Lagoon — One of South Africa's most photographed coastal viewpoints",
+  //     },
+  //     {
+  //       text: "Knysna Waterfront — Restaurants, cafés, boutique shops, and lagoon cruises",
+  //     },
+  //     {
+  //       text: "Tsitsikamma National Park — Storms River Suspension Bridge and optional adventure activities",
+  //     },
+  //     {
+  //       text: "Hermanus Whale Coast — Seasonal whale watching from cliff paths (June–November)",
+  //     },
+  //     {
+  //       text: "Benguela Cove Wine Estate — Premium wine tasting with lagoon and mountain views",
+  //     },
+  //     {
+  //       text: "Betty's Bay Penguin Colony — African penguins at Stony Point Nature Reserve",
+  //     },
+  //     {
+  //       text: "Clarence Drive (R44) — One of the most scenic coastal roads in South Africa",
+  //     },
+  //   ],
 
-    included: [
-      { text: "Exclusive Gondwana Big 5 Safari" },
-      { text: "4 nights guest‑house accommodation" },
-      { text: "Breakfast daily" },
-      { text: "Private vehicle" },
-      { text: "Professional driver/guide" },
-      { text: "Driver accommodation" },
-      { text: "Cango Caves entrance" },
-      { text: "Tsitsikamma National Park entrance" },
-      { text: "Wine tasting at Benguela Cove" },
-      { text: "Bottled water" },
-    ],
+  //   included: [
+  //     { text: "Exclusive Gondwana Big 5 Safari" },
+  //     { text: "4 nights guest‑house accommodation" },
+  //     { text: "Breakfast daily" },
+  //     { text: "Private vehicle" },
+  //     { text: "Professional driver/guide" },
+  //     { text: "Driver accommodation" },
+  //     { text: "Cango Caves entrance" },
+  //     { text: "Tsitsikamma National Park entrance" },
+  //     { text: "Wine tasting at Benguela Cove" },
+  //     { text: "Bottled water" },
+  //   ],
 
-    excluded: [
-      { text: "Lunch and dinner" },
-      { text: "Optional adventure activities" },
-      { text: "Optional Ostrich Farm Experience" },
-      { text: "Personal purchases" },
-      { text: "Gratuities" },
-    ],
+  //   excluded: [
+  //     { text: "Lunch and dinner" },
+  //     { text: "Optional adventure activities" },
+  //     { text: "Optional Ostrich Farm Experience" },
+  //     { text: "Personal purchases" },
+  //     { text: "Gratuities" },
+  //   ],
 
-    pickupOptions: [
-      "Cape Town CBD",
-      "Green Point",
-      "Sea Point",
-      "V&A Waterfront",
-      "Custom pickup on request",
-    ],
+  //   pickupOptions: [
+  //     "Cape Town CBD",
+  //     "Green Point",
+  //     "Sea Point",
+  //     "V&A Waterfront",
+  //     "Custom pickup on request",
+  //   ],
 
-    requirements: [],
+  //   requirements: [],
 
-    arrangements: {
-      availability: "Available all year",
-      duration: "5 Days / 4 Nights",
-      operatingTime: "Flexible",
-      departure: "07:00 – 08:00",
-      return: "Day 5 evening",
-      location: "Cape Town → Garden Route → Cape Town",
+  //   arrangements: {
+  //     availability: "Available all year",
+  //     duration: "5 Days / 4 Nights",
+  //     operatingTime: "Flexible",
+  //     departure: "07:00 – 08:00",
+  //     return: "Day 5 evening",
+  //     location: "Cape Town → Garden Route → Cape Town",
 
-      clothing: [
-        "Comfortable clothing",
-        "Comfortable walking shoes",
-        "Warm jacket (evenings can be cool)",
-        "Sunscreen",
-        "Hat",
-        "Swimwear (optional)",
-      ],
+  //     clothing: [
+  //       "Comfortable clothing",
+  //       "Comfortable walking shoes",
+  //       "Warm jacket (evenings can be cool)",
+  //       "Sunscreen",
+  //       "Hat",
+  //       "Swimwear (optional)",
+  //     ],
 
-      thingsToBring: [
-        "Camera",
-        "Cash for personal purchases",
-        "Water bottle",
-        "Chargers for electronics",
-        "Binoculars (recommended for safari)",
-      ],
+  //     thingsToBring: [
+  //       "Camera",
+  //       "Cash for personal purchases",
+  //       "Water bottle",
+  //       "Chargers for electronics",
+  //       "Binoculars (recommended for safari)",
+  //     ],
 
-      passengerPolicy: "",
-      notes: [
-        "Accommodation subject to availability",
-        "Optional adventure activities in Tsitsikamma available on request",
-        "Optional Ostrich Farm experience available on request",
-        "Whale watching in Hermanus is seasonal (June–November)",
-      ],
-    },
+  //     passengerPolicy: "",
+  //     notes: [
+  //       "Accommodation subject to availability",
+  //       "Optional adventure activities in Tsitsikamma available on request",
+  //       "Optional Ostrich Farm experience available on request",
+  //       "Whale watching in Hermanus is seasonal (June–November)",
+  //     ],
+  //   },
 
-    weatherPolicy: {
-      summary:
-        "The Garden Route experiences mild weather year‑round. However, weather can change quickly — bring layers and rain gear.",
-      items: [
-        { text: "Garden Route has mild weather year‑round" },
-        { text: "Weather can change quickly — bring layers and rain gear" },
-        { text: "Cango Caves are indoors and not weather dependent" },
-        { text: "Game drives may be adjusted in extreme weather" },
-        { text: "Tsitsikamma activities may be affected by weather" },
-      ],
-    },
+  //   weatherPolicy: {
+  //     summary:
+  //       "The Garden Route experiences mild weather year‑round. However, weather can change quickly — bring layers and rain gear.",
+  //     items: [
+  //       { text: "Garden Route has mild weather year‑round" },
+  //       { text: "Weather can change quickly — bring layers and rain gear" },
+  //       { text: "Cango Caves are indoors and not weather dependent" },
+  //       { text: "Game drives may be adjusted in extreme weather" },
+  //       { text: "Tsitsikamma activities may be affected by weather" },
+  //     ],
+  //   },
 
-    cancellationPolicy: {
-      summary:
-        "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
-      items: [
-        {
-          text: "Cancellations must be made at least 24 hours before the trip starts",
-        },
-        {
-          text: "Refunds are forfeited for cancellations within 24 hours of departure",
-        },
-      ],
-    },
+  //   cancellationPolicy: {
+  //     summary:
+  //       "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
+  //     items: [
+  //       {
+  //         text: "Cancellations must be made at least 24 hours before the trip starts",
+  //       },
+  //       {
+  //         text: "Refunds are forfeited for cancellations within 24 hours of departure",
+  //       },
+  //     ],
+  //   },
 
-    safetyPolicy: {
-      summary:
-        "All game drives are conducted by experienced rangers at Gondwana Game Reserve. Guests must follow all safety instructions during wildlife encounters.",
-      items: [
-        { text: "Game drives conducted by experienced rangers" },
-        { text: "Follow all safety instructions during wildlife encounters" },
-        { text: "Keep vehicle windows closed near wildlife" },
-        { text: "Do not feed or approach wild animals" },
-        { text: "Cango Caves tours follow strict safety protocols" },
-        {
-          text: "Tsitsikamma activities have their own safety briefings and equipment",
-        },
-      ],
-    },
+  //   safetyPolicy: {
+  //     summary:
+  //       "All game drives are conducted by experienced rangers at Gondwana Game Reserve. Guests must follow all safety instructions during wildlife encounters.",
+  //     items: [
+  //       { text: "Game drives conducted by experienced rangers" },
+  //       { text: "Follow all safety instructions during wildlife encounters" },
+  //       { text: "Keep vehicle windows closed near wildlife" },
+  //       { text: "Do not feed or approach wild animals" },
+  //       { text: "Cango Caves tours follow strict safety protocols" },
+  //       {
+  //         text: "Tsitsikamma activities have their own safety briefings and equipment",
+  //       },
+  //     ],
+  //   },
 
-    /*
-     * MULTI‑DAY ITINERARY
-     */
-    itinerary: {
-      intro: {
-        title: "The Ultimate Garden Route & Big 5 Safari",
-        description:
-          "This 5‑day journey combines the very best of the Garden Route with an exclusive Big 5 safari experience at Gondwana Game Reserve. Travellers enjoy a seamless blend of wildlife, mountain passes, forests, coastline, wine tasting, and charming towns — all guided privately and comfortably.",
-      },
+  //   /*
+  //    * MULTI‑DAY ITINERARY
+  //    */
+  //   itinerary: {
+  //     intro: {
+  //       title: "The Ultimate Garden Route & Big 5 Safari",
+  //       description:
+  //         "This 5‑day journey combines the very best of the Garden Route with an exclusive Big 5 safari experience at Gondwana Game Reserve. Travellers enjoy a seamless blend of wildlife, mountain passes, forests, coastline, wine tasting, and charming towns — all guided privately and comfortably.",
+  //     },
 
-      route: {
-        title:
-          "Cape Town → Gondwana → Oudtshoorn → Knysna → Tsitsikamma → Hermanus → Cape Town",
-        description:
-          "A premium 5‑day journey combining a luxury Big 5 safari, mountain passes, forests, coastline, wine tasting, and hand‑selected guest‑house accommodation.",
-      },
+  //     route: {
+  //       title:
+  //         "Cape Town → Gondwana → Oudtshoorn → Knysna → Tsitsikamma → Hermanus → Cape Town",
+  //       description:
+  //         "A premium 5‑day journey combining a luxury Big 5 safari, mountain passes, forests, coastline, wine tasting, and hand‑selected guest‑house accommodation.",
+  //     },
 
-      days: [
-        {
-          day: 1,
-          title: "Cape Town → Gondwana Game Reserve (Exclusive Big 5 Safari)",
-          route: "Cape Town → Gondwana Game Reserve",
-          description:
-            "Your tour begins with a luxury safari at Gondwana Game Reserve, one of the Garden Route's premier Big 5 destinations. Expect sightings of lion, elephant, rhino, buffalo, giraffe, zebra, and more. Enjoy panoramic views, private suites, and exceptional hospitality at your luxury lodge stay.",
+  //     days: [
+  //       {
+  //         day: 1,
+  //         title: "Cape Town → Gondwana Game Reserve (Exclusive Big 5 Safari)",
+  //         route: "Cape Town → Gondwana Game Reserve",
+  //         description:
+  //           "Your tour begins with a luxury safari at Gondwana Game Reserve, one of the Garden Route's premier Big 5 destinations. Expect sightings of lion, elephant, rhino, buffalo, giraffe, zebra, and more. Enjoy panoramic views, private suites, and exceptional hospitality at your luxury lodge stay.",
 
-          activities: [
-            {
-              title: "Hotel Pickup & Departure",
-              description:
-                "Your driver/guide collects you from your hotel in Cape Town.",
-              time: "07:00 – 08:00",
-              duration: "1 hour",
-              type: "transfer",
-              optional: false,
-              image: "/images/tours/shared/pickup/1.webp",
-            },
-            {
-              title: "Scenic Drive to Gondwana",
-              description:
-                "Travel along the N2 through scenic landscapes towards Gondwana Game Reserve.",
-              time: "08:00 – 11:30",
-              duration: "3.5 hours",
-              type: "transfer",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-garden-route/gamedrive2-1-1536x899.webp",
-            },
-            {
-              title: "Arrival & Check-in",
-              description:
-                "Check in to your luxury lodge at Gondwana Game Reserve with panoramic views.",
-              time: "11:30 – 12:30",
-              duration: "1 hour",
-              type: "accommodation",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-garden-route/kwenalodge1.webp",
-            },
-            {
-              title: "Lunch (Own Account)",
-              description: "Enjoy lunch at the lodge restaurant.",
-              time: "12:30 – 13:30",
-              duration: "1 hour",
-              type: "meal",
-              optional: true,
-              image: "images/tours/shared/lunch.webp",
-            },
-            {
-              title: "Afternoon Big 5 Safari",
-              description:
-                "Exclusive 3‑hour guided safari with sightings of lion, elephant, rhino, buffalo, giraffe, zebra and more.",
-              time: "14:00 – 17:00",
-              duration: "3 hours",
-              type: "safari",
-              optional: false,
-              // image: "/images/tours/packages/5-day-garden-route/960px-Big_five_gam.webp"
-              image: "/images/tours/packages/5-day-garden-route/image.webp",
-              // User:מנחם.אל
-              // Creative Commons Attribution 4.0
-              // Big five gam.jpg Copy
-              // [[File:Big five gam.jpg|Big_five_gam]]
-              // Copy
-              // 26 September 2016 (upload date)
-            },
-            {
-              title: "Dinner (Own Account)",
-              description:
-                "Enjoy dinner at the lodge restaurant with views over the reserve.",
-              time: "Evening",
-              duration: "",
-              type: "meal",
-              optional: true,
-              image: "images/tours/shared/dinner.webp",
-            },
-          ],
+  //         activities: [
+  //           {
+  //             title: "Hotel Pickup & Departure",
+  //             description:
+  //               "Your driver/guide collects you from your hotel in Cape Town.",
+  //             time: "07:00 – 08:00",
+  //             duration: "1 hour",
+  //             type: "transfer",
+  //             optional: false,
+  //             image: "/images/tours/shared/pickup/1.webp",
+  //           },
+  //           {
+  //             title: "Scenic Drive to Gondwana",
+  //             description:
+  //               "Travel along the N2 through scenic landscapes towards Gondwana Game Reserve.",
+  //             time: "08:00 – 11:30",
+  //             duration: "3.5 hours",
+  //             type: "transfer",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-garden-route/gamedrive2-1-1536x899.webp",
+  //           },
+  //           {
+  //             title: "Arrival & Check-in",
+  //             description:
+  //               "Check in to your luxury lodge at Gondwana Game Reserve with panoramic views.",
+  //             time: "11:30 – 12:30",
+  //             duration: "1 hour",
+  //             type: "accommodation",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-garden-route/kwenalodge1.webp",
+  //           },
+  //           {
+  //             title: "Lunch (Own Account)",
+  //             description: "Enjoy lunch at the lodge restaurant.",
+  //             time: "12:30 – 13:30",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "images/tours/shared/lunch.webp",
+  //           },
+  //           {
+  //             title: "Afternoon Big 5 Safari",
+  //             description:
+  //               "Exclusive 3‑hour guided safari with sightings of lion, elephant, rhino, buffalo, giraffe, zebra and more.",
+  //             time: "14:00 – 17:00",
+  //             duration: "3 hours",
+  //             type: "safari",
+  //             optional: false,
+  //             // image: "/images/tours/packages/5-day-garden-route/960px-Big_five_gam.webp"
+  //             image: "/images/tours/packages/5-day-garden-route/image.webp",
+  //             // User:מנחם.אל
+  //             // Creative Commons Attribution 4.0
+  //             // Big five gam.jpg Copy
+  //             // [[File:Big five gam.jpg|Big_five_gam]]
+  //             // Copy
+  //             // 26 September 2016 (upload date)
+  //           },
+  //           {
+  //             title: "Dinner (Own Account)",
+  //             description:
+  //               "Enjoy dinner at the lodge restaurant with views over the reserve.",
+  //             time: "Evening",
+  //             duration: "",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "images/tours/shared/dinner.webp",
+  //           },
+  //         ],
 
-          meals: {
-            breakfast: false,
-            lunch: false,
-            dinner: false,
-          },
+  //         meals: {
+  //           breakfast: false,
+  //           lunch: false,
+  //           dinner: false,
+  //         },
 
-          accommodation: {
-            title: "Gondwana Game Reserve",
-            location: "Gondwana, Garden Route",
-            availabilityNote:
-              "Luxury lodge accommodation with panoramic views and private suites.",
-            options: ["Kwena Lodge", "Bush Villas"],
-          },
+  //         accommodation: {
+  //           title: "Gondwana Game Reserve",
+  //           location: "Gondwana, Garden Route",
+  //           availabilityNote:
+  //             "Luxury lodge accommodation with panoramic views and private suites.",
+  //           options: ["Kwena Lodge", "Bush Villas"],
+  //         },
 
-          images: [],
-        },
+  //         images: [],
+  //       },
 
-        {
-          day: 2,
-          title: "Gondwana → Oudtshoorn (Route 62 & Cango Caves)",
-          route: "Gondwana → Route 62 → Oudtshoorn → Cango Caves",
-          description:
-            "After breakfast, travel along the scenic Route 62 through mountain passes, orchards, and Karoo landscapes. Visit the world‑famous Cango Caves for a guided Heritage or Adventure Tour through ancient limestone chambers. Optional Ostrich Farm experience available. Overnight in Oudtshoorn.",
+  //       {
+  //         day: 2,
+  //         title: "Gondwana → Oudtshoorn (Route 62 & Cango Caves)",
+  //         route: "Gondwana → Route 62 → Oudtshoorn → Cango Caves",
+  //         description:
+  //           "After breakfast, travel along the scenic Route 62 through mountain passes, orchards, and Karoo landscapes. Visit the world‑famous Cango Caves for a guided Heritage or Adventure Tour through ancient limestone chambers. Optional Ostrich Farm experience available. Overnight in Oudtshoorn.",
 
-          activities: [
-            {
-              title: "Breakfast",
-              description: "Enjoy breakfast at your Gondwana lodge.",
-              time: "07:00 – 08:00",
-              duration: "1 hour",
-              type: "meal",
-              optional: false,
-              image: "images/tours/shared/breakfast2.webp",
-            },
-            {
-              title: "Route 62 Scenic Drive",
-              description:
-                "Travel through mountain passes, orchards, vineyards, and Karoo landscapes.",
-              time: "08:00 – 11:00",
-              duration: "3 hours",
-              type: "scenic",
-              optional: false,
-              image:
-                "/images/tours/packages/3-day-garden-route/960px-Montagu_street.webp",
-            },
-            {
-              title: "Lunch Stop (Own Account)",
-              description:
-                "Lunch stop in Oudtshoorn, the ostrich capital of South Africa.",
-              time: "11:30 – 12:30",
-              duration: "1 hour",
-              type: "meal",
-              optional: true,
-              image: "images/tours/shared/lunch2.webp",
-            },
-            {
-              title: "Cango Caves Guided Tour",
-              description:
-                "Choose between the Heritage Tour or Adventure Tour. Explore ancient limestone chambers and incredible formations.",
-              time: "13:00 – 15:00",
-              duration: "2 hours",
-              type: "adventure",
-              optional: false,
-              image:
-                "/images/tours/packages/3-day-garden-route/960px-Cango_Caves_-_Western_Cape.webp",
-            },
-            {
-              title: "Optional Ostrich Farm Experience",
-              description:
-                "Optional visit to an ostrich farm to learn about these fascinating birds.",
-              time: "15:00 – 16:00",
-              duration: "1 hour",
-              type: "wildlife",
-              optional: true,
-              image:
-                "/images/tours/packages/3-day-garden-route/960px-Oudtshoorn_Ostriches_-_Gar.webp",
-            },
-            {
-              title: "Arrival & Check-in",
-              description: "Check in to your accommodation in Oudtshoorn.",
-              time: "16:30",
-              duration: "",
-              type: "accommodation",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-garden-route/check-in-buffel.webp",
-            },
-            {
-              title: "Dinner (Own Account)",
-              description:
-                "Explore local restaurants in Oudtshoorn for dinner.",
-              time: "Evening",
-              duration: "",
-              type: "meal",
-              optional: true,
-              image: "images/tours/shared/dinner2.webp",
-            },
-          ],
+  //         activities: [
+  //           {
+  //             title: "Breakfast",
+  //             description: "Enjoy breakfast at your Gondwana lodge.",
+  //             time: "07:00 – 08:00",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: false,
+  //             image: "images/tours/shared/breakfast2.webp",
+  //           },
+  //           {
+  //             title: "Route 62 Scenic Drive",
+  //             description:
+  //               "Travel through mountain passes, orchards, vineyards, and Karoo landscapes.",
+  //             time: "08:00 – 11:00",
+  //             duration: "3 hours",
+  //             type: "scenic",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/3-day-garden-route/960px-Montagu_street.webp",
+  //           },
+  //           {
+  //             title: "Lunch Stop (Own Account)",
+  //             description:
+  //               "Lunch stop in Oudtshoorn, the ostrich capital of South Africa.",
+  //             time: "11:30 – 12:30",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "images/tours/shared/lunch2.webp",
+  //           },
+  //           {
+  //             title: "Cango Caves Guided Tour",
+  //             description:
+  //               "Choose between the Heritage Tour or Adventure Tour. Explore ancient limestone chambers and incredible formations.",
+  //             time: "13:00 – 15:00",
+  //             duration: "2 hours",
+  //             type: "adventure",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/3-day-garden-route/960px-Cango_Caves_-_Western_Cape.webp",
+  //           },
+  //           {
+  //             title: "Optional Ostrich Farm Experience",
+  //             description:
+  //               "Optional visit to an ostrich farm to learn about these fascinating birds.",
+  //             time: "15:00 – 16:00",
+  //             duration: "1 hour",
+  //             type: "wildlife",
+  //             optional: true,
+  //             image:
+  //               "/images/tours/packages/3-day-garden-route/960px-Oudtshoorn_Ostriches_-_Gar.webp",
+  //           },
+  //           {
+  //             title: "Arrival & Check-in",
+  //             description: "Check in to your accommodation in Oudtshoorn.",
+  //             time: "16:30",
+  //             duration: "",
+  //             type: "accommodation",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-garden-route/check-in-buffel.webp",
+  //           },
+  //           {
+  //             title: "Dinner (Own Account)",
+  //             description:
+  //               "Explore local restaurants in Oudtshoorn for dinner.",
+  //             time: "Evening",
+  //             duration: "",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "images/tours/shared/dinner2.webp",
+  //           },
+  //         ],
 
-          meals: {
-            breakfast: true,
-            lunch: false,
-            dinner: false,
-          },
+  //         meals: {
+  //           breakfast: true,
+  //           lunch: false,
+  //           dinner: false,
+  //         },
 
-          accommodation: {
-            title: "Oudtshoorn Accommodation",
-            location: "Oudtshoorn, Klein Karoo",
-            availabilityNote:
-              "Accommodation subject to availability — please enquire for current options.",
-            options: ["Buffelsdrift Game Lodge", "De Zeekoe Guest Farm"],
-          },
+  //         accommodation: {
+  //           title: "Oudtshoorn Accommodation",
+  //           location: "Oudtshoorn, Klein Karoo",
+  //           availabilityNote:
+  //             "Accommodation subject to availability — please enquire for current options.",
+  //           options: ["Buffelsdrift Game Lodge", "De Zeekoe Guest Farm"],
+  //         },
 
-          images: [],
-        },
+  //         images: [],
+  //       },
 
-        {
-          day: 3,
-          title: "Oudtshoorn → Knysna (Lagoon & Heads)",
-          route:
-            "Oudtshoorn → Outeniqua Pass → Knysna Heads → Knysna Waterfront",
-          description:
-            "After breakfast, travel through the dramatic Outeniqua Pass into the Garden Route forests. Visit the iconic Knysna Heads viewpoint overlooking the lagoon and Indian Ocean, then explore the Knysna Waterfront with its restaurants, cafés, boutique shops, and optional lagoon cruises. Overnight in Knysna.",
+  //       {
+  //         day: 3,
+  //         title: "Oudtshoorn → Knysna (Lagoon & Heads)",
+  //         route:
+  //           "Oudtshoorn → Outeniqua Pass → Knysna Heads → Knysna Waterfront",
+  //         description:
+  //           "After breakfast, travel through the dramatic Outeniqua Pass into the Garden Route forests. Visit the iconic Knysna Heads viewpoint overlooking the lagoon and Indian Ocean, then explore the Knysna Waterfront with its restaurants, cafés, boutique shops, and optional lagoon cruises. Overnight in Knysna.",
 
-          activities: [
-            {
-              title: "Breakfast",
-              description:
-                "Enjoy breakfast at your accommodation in Oudtshoorn.",
-              time: "07:00 – 08:00",
-              duration: "1 hour",
-              type: "meal",
-              optional: false,
-              image: "images/tours/shared/breakfast2.webp",
-            },
-            {
-              title: "Outeniqua Pass Drive",
-              description:
-                "A dramatic mountain drive through the Outeniqua Pass into the Garden Route forests.",
-              time: "08:00 – 10:30",
-              duration: "2.5 hours",
-              type: "scenic",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-boltierskop/960px-Outeniqua_mountains_158882.webp",
-            },
-            {
-              title: "Knysna Heads Viewpoint",
-              description:
-                "One of South Africa's most photographed coastal viewpoints overlooking the lagoon and Indian Ocean.",
-              time: "10:30 – 11:30",
-              duration: "1 hour",
-              type: "scenic",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-boltierskop/960px-Knysna_Heads_view.webp",
-            },
-            {
-              title: "Lunch Stop (Own Account)",
-              description:
-                "Lunch at the Knysna Waterfront with views over the lagoon.",
-              time: "12:00 – 13:30",
-              duration: "1.5 hours",
-              type: "meal",
-              optional: true,
-              image: "images/tours/shared/lunch.webp",
-            },
-            {
-              title: "Knysna Waterfront Exploration",
-              description:
-                "Explore restaurants, cafés, boutique shops, optional lagoon cruises.",
-              time: "13:30 – 15:00",
-              duration: "1.5 hours",
-              type: "leisure",
-              optional: true,
-              image:
-                "/images/tours/packages/5-day-boltierskop/960px-KNYSNA_-_Waterfront_terrac.webp",
-            },
-            {
-              title: "Arrival & Check-in",
-              description: "Check in to your accommodation in Knysna.",
-              time: "15:30",
-              duration: "",
-              type: "accommodation",
-              optional: false,
-              image:
-                "images/tours/packages/5-day-garden-route/check-in-paradise.webp",
-            },
-            {
-              title: "Dinner (Own Account)",
-              description:
-                "Enjoy dinner at one of Knysna's renowned seafood restaurants.",
-              time: "Evening",
-              duration: "",
-              type: "meal",
-              optional: true,
-              image: "images/tours/shared/dinner.webp",
-            },
-          ],
+  //         activities: [
+  //           {
+  //             title: "Breakfast",
+  //             description:
+  //               "Enjoy breakfast at your accommodation in Oudtshoorn.",
+  //             time: "07:00 – 08:00",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: false,
+  //             image: "images/tours/shared/breakfast2.webp",
+  //           },
+  //           {
+  //             title: "Outeniqua Pass Drive",
+  //             description:
+  //               "A dramatic mountain drive through the Outeniqua Pass into the Garden Route forests.",
+  //             time: "08:00 – 10:30",
+  //             duration: "2.5 hours",
+  //             type: "scenic",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/960px-Outeniqua_mountains_158882.webp",
+  //           },
+  //           {
+  //             title: "Knysna Heads Viewpoint",
+  //             description:
+  //               "One of South Africa's most photographed coastal viewpoints overlooking the lagoon and Indian Ocean.",
+  //             time: "10:30 – 11:30",
+  //             duration: "1 hour",
+  //             type: "scenic",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/960px-Knysna_Heads_view.webp",
+  //           },
+  //           {
+  //             title: "Lunch Stop (Own Account)",
+  //             description:
+  //               "Lunch at the Knysna Waterfront with views over the lagoon.",
+  //             time: "12:00 – 13:30",
+  //             duration: "1.5 hours",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "images/tours/shared/lunch.webp",
+  //           },
+  //           {
+  //             title: "Knysna Waterfront Exploration",
+  //             description:
+  //               "Explore restaurants, cafés, boutique shops, optional lagoon cruises.",
+  //             time: "13:30 – 15:00",
+  //             duration: "1.5 hours",
+  //             type: "leisure",
+  //             optional: true,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/960px-KNYSNA_-_Waterfront_terrac.webp",
+  //           },
+  //           {
+  //             title: "Arrival & Check-in",
+  //             description: "Check in to your accommodation in Knysna.",
+  //             time: "15:30",
+  //             duration: "",
+  //             type: "accommodation",
+  //             optional: false,
+  //             image:
+  //               "images/tours/packages/5-day-garden-route/check-in-paradise.webp",
+  //           },
+  //           {
+  //             title: "Dinner (Own Account)",
+  //             description:
+  //               "Enjoy dinner at one of Knysna's renowned seafood restaurants.",
+  //             time: "Evening",
+  //             duration: "",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "images/tours/shared/dinner.webp",
+  //           },
+  //         ],
 
-          meals: {
-            breakfast: true,
-            lunch: false,
-            dinner: false,
-          },
+  //         meals: {
+  //           breakfast: true,
+  //           lunch: false,
+  //           dinner: false,
+  //         },
 
-          accommodation: {
-            title: "Knysna Accommodation",
-            location: "Knysna, Garden Route",
-            availabilityNote:
-              "Accommodation subject to availability — please enquire for current options.",
-            options: ["Paradise Found Guest House", "Waterfront Lodge"],
-          },
+  //         accommodation: {
+  //           title: "Knysna Accommodation",
+  //           location: "Knysna, Garden Route",
+  //           availabilityNote:
+  //             "Accommodation subject to availability — please enquire for current options.",
+  //           options: ["Paradise Found Guest House", "Waterfront Lodge"],
+  //         },
 
-          images: [],
-        },
+  //         images: [],
+  //       },
 
-        {
-          day: 4,
-          title: "Knysna → Tsitsikamma (Forests & Adventure)",
-          route: "Knysna → Tsitsikamma National Park → Storms River",
-          description:
-            "After breakfast, travel to Tsitsikamma National Park for a forest experience. Walk the famous Storms River Suspension Bridge and explore the dramatic coastline. Optional adventure activities include ziplining, kayak, Lilo, and forest hiking (own expense). Overnight in Tsitsikamma.",
+  //       {
+  //         day: 4,
+  //         title: "Knysna → Tsitsikamma (Forests & Adventure)",
+  //         route: "Knysna → Tsitsikamma National Park → Storms River",
+  //         description:
+  //           "After breakfast, travel to Tsitsikamma National Park for a forest experience. Walk the famous Storms River Suspension Bridge and explore the dramatic coastline. Optional adventure activities include ziplining, kayak, Lilo, and forest hiking (own expense). Overnight in Tsitsikamma.",
 
-          activities: [
-            {
-              title: "Breakfast",
-              description: "Enjoy breakfast at your accommodation in Knysna.",
-              time: "07:00 – 08:00",
-              duration: "1 hour",
-              type: "meal",
-              optional: false,
-              image: "images/tours/shared/breakfast2.webp",
-            },
-            {
-              title: "Scenic Drive to Tsitsikamma",
-              description:
-                "Travel along the Garden Route coast to Tsitsikamma National Park.",
-              time: "08:00 – 09:30",
-              duration: "1.5 hours",
-              type: "transfer",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-boltierskop/960px-Tsitsikamma_National_Park.webp",
-            },
-            {
-              title: "Storms River Suspension Bridge",
-              description:
-                "Walk the famous suspension bridge with views over the dramatic coastline and Storms River mouth.",
-              time: "09:30 – 11:30",
-              duration: "2 hours",
-              type: "adventure",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-boltierskop/960px-2014-11-30_Tsitsikamma_Nat.webp",
-            },
-            {
-              title: "Lunch Stop (Own Account)",
-              description: "Lunch at a local restaurant near Tsitsikamma.",
-              time: "12:00 – 13:00",
-              duration: "1 hour",
-              type: "meal",
-              optional: true,
-              image: "images/tours/shared/lunch.webp",
-            },
-            {
-              title: "Optional Adventure Activities",
-              description:
-                "Choose from ziplining, kayak, Lilo, or forest hiking (own expense). Activities subject to availability and weather.",
-              time: "13:00 – 15:00",
-              duration: "2 hours",
-              type: "adventure",
-              optional: true,
-            },
-            {
-              title: "Arrival & Check-in",
-              description: "Check in to your accommodation in Tsitsikamma.",
-              time: "15:30",
-              duration: "",
-              type: "accommodation",
-              optional: false,
-              image:
-                "/images/tours/packages/5-day-garden-route/tsitsikamma-village-inn-village.webp",
-            },
-            {
-              title: "Dinner (Own Account)",
-              description:
-                "Enjoy dinner at your accommodation or a local restaurant.",
-              time: "Evening",
-              duration: "",
-              type: "meal",
-              optional: true,
-              image: "images/tours/shared/dinner.webp",
-            },
-          ],
+  //         activities: [
+  //           {
+  //             title: "Breakfast",
+  //             description: "Enjoy breakfast at your accommodation in Knysna.",
+  //             time: "07:00 – 08:00",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: false,
+  //             image: "images/tours/shared/breakfast2.webp",
+  //           },
+  //           {
+  //             title: "Scenic Drive to Tsitsikamma",
+  //             description:
+  //               "Travel along the Garden Route coast to Tsitsikamma National Park.",
+  //             time: "08:00 – 09:30",
+  //             duration: "1.5 hours",
+  //             type: "transfer",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/960px-Tsitsikamma_National_Park.webp",
+  //           },
+  //           {
+  //             title: "Storms River Suspension Bridge",
+  //             description:
+  //               "Walk the famous suspension bridge with views over the dramatic coastline and Storms River mouth.",
+  //             time: "09:30 – 11:30",
+  //             duration: "2 hours",
+  //             type: "adventure",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-boltierskop/960px-2014-11-30_Tsitsikamma_Nat.webp",
+  //           },
+  //           {
+  //             title: "Lunch Stop (Own Account)",
+  //             description: "Lunch at a local restaurant near Tsitsikamma.",
+  //             time: "12:00 – 13:00",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "images/tours/shared/lunch.webp",
+  //           },
+  //           {
+  //             title: "Optional Adventure Activities",
+  //             description:
+  //               "Choose from ziplining, kayak, Lilo, or forest hiking (own expense). Activities subject to availability and weather.",
+  //             time: "13:00 – 15:00",
+  //             duration: "2 hours",
+  //             type: "adventure",
+  //             optional: true,
+  //           },
+  //           {
+  //             title: "Arrival & Check-in",
+  //             description: "Check in to your accommodation in Tsitsikamma.",
+  //             time: "15:30",
+  //             duration: "",
+  //             type: "accommodation",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/5-day-garden-route/tsitsikamma-village-inn-village.webp",
+  //           },
+  //           {
+  //             title: "Dinner (Own Account)",
+  //             description:
+  //               "Enjoy dinner at your accommodation or a local restaurant.",
+  //             time: "Evening",
+  //             duration: "",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "images/tours/shared/dinner.webp",
+  //           },
+  //         ],
 
-          meals: {
-            breakfast: true,
-            lunch: false,
-            dinner: false,
-          },
+  //         meals: {
+  //           breakfast: true,
+  //           lunch: false,
+  //           dinner: false,
+  //         },
 
-          accommodation: {
-            title: "Tsitsikamma Accommodation",
-            location: "Tsitsikamma, Garden Route",
-            availabilityNote:
-              "Accommodation subject to availability — please enquire for current options.",
-            options: ["Tsitsikamma Village Inn", "At the Woods Guest House"],
-          },
+  //         accommodation: {
+  //           title: "Tsitsikamma Accommodation",
+  //           location: "Tsitsikamma, Garden Route",
+  //           availabilityNote:
+  //             "Accommodation subject to availability — please enquire for current options.",
+  //           options: ["Tsitsikamma Village Inn", "At the Woods Guest House"],
+  //         },
 
-          images: [],
-        },
+  //         images: [],
+  //       },
 
-        {
-          day: 5,
-          title: "Tsitsikamma → Hermanus → Cape Town",
-          route:
-            "Tsitsikamma → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
-          description:
-            "After breakfast, travel along the coast to Hermanus — the heart of the Whale Coast. Explore the cliff paths with ocean views and seasonal whale watching. Continue to Benguela Cove Lagoon Wine Estate for premium wine tasting with stunning lagoon views. Visit Stony Point Penguin Colony at Betty's Bay before returning to Cape Town via the scenic Clarence Drive (R44).",
+  //       {
+  //         day: 5,
+  //         title: "Tsitsikamma → Hermanus → Cape Town",
+  //         route:
+  //           "Tsitsikamma → Hermanus → Benguela Cove → Betty's Bay → Cape Town",
+  //         description:
+  //           "After breakfast, travel along the coast to Hermanus — the heart of the Whale Coast. Explore the cliff paths with ocean views and seasonal whale watching. Continue to Benguela Cove Lagoon Wine Estate for premium wine tasting with stunning lagoon views. Visit Stony Point Penguin Colony at Betty's Bay before returning to Cape Town via the scenic Clarence Drive (R44).",
 
-          activities: [
-            {
-              title: "Breakfast",
-              description:
-                "Enjoy breakfast at your accommodation in Tsitsikamma.",
-              time: "07:00 – 08:00",
-              duration: "1 hour",
-              type: "meal",
-              optional: false,
-              image: "images/tours/shared/breakfast2.webp",
-            },
-            {
-              title: "Hermanus Whale Coast",
-              description:
-                "Explore the cliff paths with ocean views, markets, and cafés. Seasonal whale watching (June–November).",
-              time: "10:00 – 12:00",
-              duration: "2 hours",
-              type: "scenic",
-              optional: false,
-              image: "/images/tours/packages/3-day-garden-route/Hermanus.webp",
-            },
-            {
-              title: "Lunch Stop (Own Account)",
-              description: "Lunch at a local restaurant in Hermanus.",
-              time: "12:00 – 13:00",
-              duration: "1 hour",
-              type: "meal",
-              optional: true,
-              image: "images/tours/shared/lunch2.webp",
-            },
-            {
-              title: "Benguela Cove Wine Estate",
-              description:
-                "Premium wine tasting with lagoon and mountain views.",
-              time: "13:30 – 15:00",
-              duration: "1.5 hours",
-              type: "wine",
-              optional: false,
-              image:
-                "/images/tours/packages/3-day-garden-route/960px-Benguela_Cove_Lagoon_Wine.webp",
-            },
-            {
-              title: "Betty's Bay – Stony Point Penguin Colony",
-              description:
-                "Boardwalks and African penguins in a natural coastal habitat.",
-              time: "15:30 – 16:30",
-              duration: "1 hour",
-              type: "wildlife",
-              optional: false,
-              image:
-                "/images/tours/packages/3-day-garden-route/960px-BB_-_Bettys_Bay_seen_from.webp",
-            },
-            {
-              title: "Clarence Drive Return to Cape Town",
-              description:
-                "Return to Cape Town via the scenic Clarence Drive (R44) with spectacular coastal views.",
-              time: "16:30 – 19:00",
-              duration: "2.5 hours",
-              type: "transfer",
-              optional: false,
-              image: "images/tours/shared/return/1.webp",
-            },
-          ],
+  //         activities: [
+  //           {
+  //             title: "Breakfast",
+  //             description:
+  //               "Enjoy breakfast at your accommodation in Tsitsikamma.",
+  //             time: "07:00 – 08:00",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: false,
+  //             image: "images/tours/shared/breakfast2.webp",
+  //           },
+  //           {
+  //             title: "Hermanus Whale Coast",
+  //             description:
+  //               "Explore the cliff paths with ocean views, markets, and cafés. Seasonal whale watching (June–November).",
+  //             time: "10:00 – 12:00",
+  //             duration: "2 hours",
+  //             type: "scenic",
+  //             optional: false,
+  //             image: "/images/tours/packages/3-day-garden-route/Hermanus.webp",
+  //           },
+  //           {
+  //             title: "Lunch Stop (Own Account)",
+  //             description: "Lunch at a local restaurant in Hermanus.",
+  //             time: "12:00 – 13:00",
+  //             duration: "1 hour",
+  //             type: "meal",
+  //             optional: true,
+  //             image: "images/tours/shared/lunch2.webp",
+  //           },
+  //           {
+  //             title: "Benguela Cove Wine Estate",
+  //             description:
+  //               "Premium wine tasting with lagoon and mountain views.",
+  //             time: "13:30 – 15:00",
+  //             duration: "1.5 hours",
+  //             type: "wine",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/3-day-garden-route/960px-Benguela_Cove_Lagoon_Wine.webp",
+  //           },
+  //           {
+  //             title: "Betty's Bay – Stony Point Penguin Colony",
+  //             description:
+  //               "Boardwalks and African penguins in a natural coastal habitat.",
+  //             time: "15:30 – 16:30",
+  //             duration: "1 hour",
+  //             type: "wildlife",
+  //             optional: false,
+  //             image:
+  //               "/images/tours/packages/3-day-garden-route/960px-BB_-_Bettys_Bay_seen_from.webp",
+  //           },
+  //           {
+  //             title: "Clarence Drive Return to Cape Town",
+  //             description:
+  //               "Return to Cape Town via the scenic Clarence Drive (R44) with spectacular coastal views.",
+  //             time: "16:30 – 19:00",
+  //             duration: "2.5 hours",
+  //             type: "transfer",
+  //             optional: false,
+  //             image: "images/tours/shared/return/1.webp",
+  //           },
+  //         ],
 
-          meals: {
-            breakfast: true,
-            lunch: false,
-            dinner: false,
-          },
+  //         meals: {
+  //           breakfast: true,
+  //           lunch: false,
+  //           dinner: false,
+  //         },
 
-          accommodation: {
-            title: "",
-            location: "",
-            availabilityNote: "",
-            options: [],
-          },
+  //         accommodation: {
+  //           title: "",
+  //           location: "",
+  //           availabilityNote: "",
+  //           options: [],
+  //         },
 
-          images: [],
-        },
-      ],
-    },
+  //         images: [],
+  //       },
+  //     ],
+  //   },
 
-    stops: [],
+  //   stops: [],
 
-    // routeInformation: {
-    //   title: "5‑Day Garden Route & Gondwana Big 5 Safari Route",
-    //   description:
-    //     "A premium 5‑day journey combining a luxury Big 5 safari, mountain passes, forests, coastline, wine tasting, and hand‑selected guest‑house accommodation.",
-    //   items: [
-    //     "Cape Town → Gondwana Game Reserve",
-    //     "Exclusive Big 5 Safari (lion, elephant, rhino, buffalo, giraffe, zebra)",
-    //     "Route 62 – Mountain passes, orchards, vineyards, and Karoo landscapes",
-    //     "Cango Caves – Heritage or Adventure Tour",
-    //     "Outeniqua Pass – Dramatic mountain drive",
-    //     "Knysna Heads – Iconic lagoon and ocean viewpoint",
-    //     "Knysna Waterfront – Restaurants, cafés, boutique shops",
-    //     "Tsitsikamma National Park – Storms River Suspension Bridge",
-    //     "Hermanus Whale Coast – Seasonal whale watching",
-    //     "Benguela Cove – Lagoon‑side wine tasting",
-    //     "Betty's Bay – Stony Point Penguin Colony",
-    //     "Clarence Drive (R44) – Scenic return to Cape Town",
-    //   ],
-    // },
+  //   // routeInformation: {
+  //   //   title: "5‑Day Garden Route & Gondwana Big 5 Safari Route",
+  //   //   description:
+  //   //     "A premium 5‑day journey combining a luxury Big 5 safari, mountain passes, forests, coastline, wine tasting, and hand‑selected guest‑house accommodation.",
+  //   //   items: [
+  //   //     "Cape Town → Gondwana Game Reserve",
+  //   //     "Exclusive Big 5 Safari (lion, elephant, rhino, buffalo, giraffe, zebra)",
+  //   //     "Route 62 – Mountain passes, orchards, vineyards, and Karoo landscapes",
+  //   //     "Cango Caves – Heritage or Adventure Tour",
+  //   //     "Outeniqua Pass – Dramatic mountain drive",
+  //   //     "Knysna Heads – Iconic lagoon and ocean viewpoint",
+  //   //     "Knysna Waterfront – Restaurants, cafés, boutique shops",
+  //   //     "Tsitsikamma National Park – Storms River Suspension Bridge",
+  //   //     "Hermanus Whale Coast – Seasonal whale watching",
+  //   //     "Benguela Cove – Lagoon‑side wine tasting",
+  //   //     "Betty's Bay – Stony Point Penguin Colony",
+  //   //     "Clarence Drive (R44) – Scenic return to Cape Town",
+  //   //   ],
+  //   // },
 
-    vehicle: null,
+  //   vehicle: null,
 
-    securityAndLiability: null,
+  //   securityAndLiability: null,
 
-    accommodation: {
-      included: true,
-      type: "Luxury Lodge / Guest House",
-      description:
-        "Hand‑selected accommodation in Gondwana (luxury lodge), Oudtshoorn, Knysna, and Tsitsikamma. Breakfast included daily. Accommodation subject to availability.",
-    },
+  //   accommodation: {
+  //     included: true,
+  //     type: "Luxury Lodge / Guest House",
+  //     description:
+  //       "Hand‑selected accommodation in Gondwana (luxury lodge), Oudtshoorn, Knysna, and Tsitsikamma. Breakfast included daily. Accommodation subject to availability.",
+  //   },
 
-    needToKnow: [
-      {
-        text: "Accommodation subject to availability — options listed are examples only",
-      },
-      {
-        text: "Child rates: 0–3 years free, 4–12 years at 60–75% of adult rate, 13–17 years at adult rate",
-      },
-      { text: "Cancellations must be made at least 24 hours before departure" },
-      {
-        text: "Gondwana is a Big 5 game reserve — sightings of lion, elephant, rhino, buffalo, and leopard are possible but not guaranteed",
-      },
-      {
-        text: "Cango Caves offers Heritage Tour (easy) or Adventure Tour (more strenuous)",
-      },
-      { text: "Whale watching in Hermanus is seasonal (June–November)" },
-      {
-        text: "Optional Tsitsikamma activities: ziplining, kayak, Lilo, forest hiking (own expense)",
-      },
-      { text: "Optional Ostrich Farm experience available on request" },
-      {
-        text: "Comfortable walking shoes recommended for Cango Caves, Tsitsikamma, and penguin viewing",
-      },
-      { text: "This is a private tour with a dedicated driver/guide" },
-    ],
+  //   needToKnow: [
+  //     {
+  //       text: "Accommodation subject to availability — options listed are examples only",
+  //     },
+  //     {
+  //       text: "Child rates: 0–3 years free, 4–12 years at 60–75% of adult rate, 13–17 years at adult rate",
+  //     },
+  //     { text: "Cancellations must be made at least 24 hours before departure" },
+  //     {
+  //       text: "Gondwana is a Big 5 game reserve — sightings of lion, elephant, rhino, buffalo, and leopard are possible but not guaranteed",
+  //     },
+  //     {
+  //       text: "Cango Caves offers Heritage Tour (easy) or Adventure Tour (more strenuous)",
+  //     },
+  //     { text: "Whale watching in Hermanus is seasonal (June–November)" },
+  //     {
+  //       text: "Optional Tsitsikamma activities: ziplining, kayak, Lilo, forest hiking (own expense)",
+  //     },
+  //     { text: "Optional Ostrich Farm experience available on request" },
+  //     {
+  //       text: "Comfortable walking shoes recommended for Cango Caves, Tsitsikamma, and penguin viewing",
+  //     },
+  //     { text: "This is a private tour with a dedicated driver/guide" },
+  //   ],
 
-    faqs: [
-      {
-        question: "How long is the Garden Route tour?",
-        answer:
-          "This is a 5‑day, 4‑night tour from Cape Town, exploring the Garden Route with a Big 5 safari at Gondwana Game Reserve.",
-      },
-      {
-        question: "What is included in the tour price?",
-        answer:
-          "The tour includes exclusive Gondwana Big 5 Safari, 4 nights guest‑house accommodation, breakfast daily, private vehicle, professional driver/guide, Cango Caves entrance, Tsitsikamma National Park entrance, Benguela Cove wine tasting, and bottled water.",
-      },
-      {
-        question: "What is not included?",
-        answer:
-          "Lunch and dinner, optional adventure activities, optional Ostrich Farm experience, personal purchases, and gratuities are not included.",
-      },
-      {
-        question: "What is the cancellation policy?",
-        answer:
-          "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
-      },
-      {
-        question: "What is Gondwana Game Reserve?",
-        answer:
-          "Gondwana is a premier Big 5 game reserve in the Garden Route, offering guided safaris with sightings of lion, elephant, rhino, buffalo, leopard, giraffe, zebra, and more.",
-      },
-      {
-        question: "Can children join the tour?",
-        answer:
-          "Yes. Children 0–3 years are free, 4–12 years are charged at 60–75% of the adult rate, and teens 13–17 years pay the adult rate.",
-      },
-      {
-        question: "What activities are included?",
-        answer:
-          "The tour includes Gondwana Big 5 Safari, Cango Caves guided tour, Tsitsikamma National Park entrance, Knysna Heads viewpoint, Hermanus Whale Coast, Benguela Cove wine tasting, and Betty's Bay Penguin Colony.",
-      },
-      {
-        question: "What are the optional activities?",
-        answer:
-          "Optional activities include Tsitsikamma adventure activities (ziplining, kayak, Lilo, forest hiking) and an Ostrich Farm experience in Oudtshoorn. These are at own expense.",
-      },
-      {
-        question: "What should I bring?",
-        answer:
-          "Bring comfortable clothing, walking shoes, a warm jacket, sunscreen, a hat, swimwear (optional), a camera, and cash for personal purchases.",
-      },
-      {
-        question: "Is this a private tour?",
-        answer:
-          "Yes. This is a private tour with a dedicated driver/guide and private vehicle.",
-      },
-      {
-        question: "What is the best time of year for this tour?",
-        answer:
-          "The Garden Route has a mild climate year‑round. Whale watching in Hermanus is best from June to November.",
-      },
-    ],
+  //   faqs: [
+  //     {
+  //       question: "How long is the Garden Route tour?",
+  //       answer:
+  //         "This is a 5‑day, 4‑night tour from Cape Town, exploring the Garden Route with a Big 5 safari at Gondwana Game Reserve.",
+  //     },
+  //     {
+  //       question: "What is included in the tour price?",
+  //       answer:
+  //         "The tour includes exclusive Gondwana Big 5 Safari, 4 nights guest‑house accommodation, breakfast daily, private vehicle, professional driver/guide, Cango Caves entrance, Tsitsikamma National Park entrance, Benguela Cove wine tasting, and bottled water.",
+  //     },
+  //     {
+  //       question: "What is not included?",
+  //       answer:
+  //         "Lunch and dinner, optional adventure activities, optional Ostrich Farm experience, personal purchases, and gratuities are not included.",
+  //     },
+  //     {
+  //       question: "What is the cancellation policy?",
+  //       answer:
+  //         "Cancellations must be made at least 24 hours before the trip starts. Anything later than the 24-hour window period, the refund will be forfeited.",
+  //     },
+  //     {
+  //       question: "What is Gondwana Game Reserve?",
+  //       answer:
+  //         "Gondwana is a premier Big 5 game reserve in the Garden Route, offering guided safaris with sightings of lion, elephant, rhino, buffalo, leopard, giraffe, zebra, and more.",
+  //     },
+  //     {
+  //       question: "Can children join the tour?",
+  //       answer:
+  //         "Yes. Children 0–3 years are free, 4–12 years are charged at 60–75% of the adult rate, and teens 13–17 years pay the adult rate.",
+  //     },
+  //     {
+  //       question: "What activities are included?",
+  //       answer:
+  //         "The tour includes Gondwana Big 5 Safari, Cango Caves guided tour, Tsitsikamma National Park entrance, Knysna Heads viewpoint, Hermanus Whale Coast, Benguela Cove wine tasting, and Betty's Bay Penguin Colony.",
+  //     },
+  //     {
+  //       question: "What are the optional activities?",
+  //       answer:
+  //         "Optional activities include Tsitsikamma adventure activities (ziplining, kayak, Lilo, forest hiking) and an Ostrich Farm experience in Oudtshoorn. These are at own expense.",
+  //     },
+  //     {
+  //       question: "What should I bring?",
+  //       answer:
+  //         "Bring comfortable clothing, walking shoes, a warm jacket, sunscreen, a hat, swimwear (optional), a camera, and cash for personal purchases.",
+  //     },
+  //     {
+  //       question: "Is this a private tour?",
+  //       answer:
+  //         "Yes. This is a private tour with a dedicated driver/guide and private vehicle.",
+  //     },
+  //     {
+  //       question: "What is the best time of year for this tour?",
+  //       answer:
+  //         "The Garden Route has a mild climate year‑round. Whale watching in Hermanus is best from June to November.",
+  //     },
+  //   ],
 
-    tags: [
-      "Garden Route",
-      "Gondwana Game Reserve",
-      "Big 5 Safari",
-      "Safari",
-      "Multi-Day",
-      "5 Day Tour",
-      "Cango Caves",
-      "Knysna",
-      "Tsitsikamma",
-      "Hermanus",
-      "Wine Tasting",
-      "South Africa",
-      "Road Trip",
-      "Private Tour",
-      "Luxury Safari",
-      "Family Friendly",
-      "Wildlife",
-      "Adventure",
-    ],
-  },
+  //   tags: [
+  //     "Garden Route",
+  //     "Gondwana Game Reserve",
+  //     "Big 5 Safari",
+  //     "Safari",
+  //     "Multi-Day",
+  //     "5 Day Tour",
+  //     "Cango Caves",
+  //     "Knysna",
+  //     "Tsitsikamma",
+  //     "Hermanus",
+  //     "Wine Tasting",
+  //     "South Africa",
+  //     "Road Trip",
+  //     "Private Tour",
+  //     "Luxury Safari",
+  //     "Family Friendly",
+  //     "Wildlife",
+  //     "Adventure",
+  //   ],
+  // },
   // Cool-Runnings Toboggan Park, Winelands & Adventure Loop
   {
     id: 21,
