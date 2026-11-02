@@ -3539,6 +3539,7 @@ export const tours = [
     id: 12 || "heritage-tour", // New tour ID to be assigned (e.g., 34)
     type: TOUR_TYPES.HISTORICAL,
     category: TOUR_MODIFIERS.FULL_DAY,
+    onPromo: true,
 
     title: "Heritage, Faith & Cape Flats Community Tour",
     slug: "heritage-faith-cape-flats-community-tour",
@@ -4644,7 +4645,7 @@ export const tours = [
     id: 14,
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.FULL_DAY,
-
+    onPromo: true,
     title: "Cape Peninsula Tour",
     slug: "peninsula-tour-2",
     canonicalPath: "/tours/peninsula-tour-2",

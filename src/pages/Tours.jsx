@@ -24,7 +24,11 @@ import TourAdditionalPricing from "../components/TourDetails/TourAdditionalPrici
 import TourGroupPricing from "../components/TourDetails/TourGroupPricing";
 import { tours } from "../data/tours";
 import { resolveImage } from "../utils/ImageLoader";
-import { hasGroupDeal, getDurationBucket, getPriceLabel } from "../utils/tourHelpers";
+import {
+  hasGroupDeal,
+  getDurationBucket,
+  getPriceLabel,
+} from "../utils/tourHelpers";
 import { getTourPromo, getPromoPrice } from "../data/promos";
 import {
   computePricing,
@@ -37,13 +41,21 @@ const Map = lazy(() => import("../components/Map"));
 
 gsap.registerPlugin(ScrollTrigger);
 
-const PIN_TOP_OFFSET = 96;
 const MAX_PEOPLE = 8;
 const DEFAULT_CENTER = { lat: -33.9249, lng: 18.4241 };
 
 const CONTACT_EMAIL = "admin@cape-frontier.co.za";
 const CONTACT_NUMBER = "(+27)72 264 7284";
 const CONTACT_TEL = "+27722647284";
+
+// ─── Background slideshow config ─────────────────────────────────────────────
+// Slides are built from the tours' own images (promo tours first), so they load
+// exactly like the cards do. Optionally add wide landscape shots here; they are
+// used first. Pass them through resolveImage() or use plain /public URLs.
+const BG_EXTRA_SLIDES = [];
+const BG_MAX_SLIDES = 8;
+const BG_INTERVAL_MS = 7000;
+const BG_FADE_MS = 1800;
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -79,47 +91,6 @@ const DEFAULT_FILTERS = {
   sort: "featured",
 };
 
-const BANNERS = [
-  {
-    id: "group",
-    eyebrow: "Travelling with friends?",
-    title: "Save more when you book as a group",
-    text: "Many tours drop the per-person price as your group grows.",
-    cta: "Show group deals",
-    apply: { groupDeals: true },
-    className: "from-green-200 to-emerald-100 text-green-950",
-  },
-  {
-    id: "family",
-    eyebrow: "Family friendly",
-    title: "Adventures the whole family can enjoy",
-    text: "Kids' activities, discounted child rates and relaxed itineraries.",
-    cta: "Show family tours",
-    apply: { childFriendly: true },
-    className: "from-sky-200 to-blue-100 text-blue-950",
-  },
-  {
-    id: "multi",
-    eyebrow: "Go further",
-    title: "Multi-day Garden Route journeys",
-    text: "Safaris, caves, forests and coastline with a private driver-guide.",
-    cta: "Show multi-day tours",
-    apply: { duration: "multi-day" },
-    className: "from-amber-200 to-orange-100 text-amber-950",
-  },
-  {
-    id: "custom",
-    eyebrow: "Something different?",
-    title: "Need a custom trip?",
-    text: "Tell us what you have in mind and we'll plan it around you.",
-    cta: "Contact us",
-    to: "#contact-details",
-    className: "from-fuchsia-200 to-pink-100 text-fuchsia-950",
-  },
-];
-
-const BANNER_EVERY = 6;
-
 // ─── Booking / checkout helpers ──────────────────────────────────────────────
 
 const getTourSlug = (tour) =>
@@ -131,6 +102,12 @@ const getTourSlug = (tour) =>
     .replace(/['’]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+
+// Always-unique, never-null identity for a tour. Used for React keys and for the
+// expanded-card state, so a tour with a missing/null id can never match the
+// initial "nothing expanded" state and open itself on page load.
+const getTourKey = (tour) =>
+  String(tour?.id ?? tour?.slug ?? getTourSlug(tour));
 
 const toMinorUnit = (amount, currency) => {
   const n = Number(amount);
@@ -163,7 +140,9 @@ const getPickupTime = (tour) => {
   });
   if (pickupStop?.time) return formatDisplayTime(pickupStop.time);
   const firstTimed = tour?.stops?.find((s) => s?.time);
-  return firstTimed?.time ? formatDisplayTime(firstTimed.time) : "To be confirmed";
+  return firstTimed?.time
+    ? formatDisplayTime(firstTimed.time)
+    : "To be confirmed";
 };
 
 const getCheckoutStops = (tour) =>
@@ -193,6 +172,98 @@ const getMinDate = (tour) => {
   return toLocalISODate(d);
 };
 
+// ─── Background slideshow ────────────────────────────────────────────────────
+// Fixed, full-screen, behind everything. Crossfades between slides with a slow
+// Ken Burns zoom. The dark overlay reads the --dim CSS variable (0 → 1) that the
+// page sets while scrolling, so the image dims as the tours slide over it.
+
+function BackgroundSlideshow({ slides }) {
+  const [index, setIndex] = useState(0);
+  const [prevIndex, setPrevIndex] = useState(null);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    setReduceMotion(Boolean(mq?.matches));
+  }, []);
+
+  // Pause while the tab is hidden
+  useEffect(() => {
+    const onVis = () => setPaused(document.hidden);
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
+  // Preload the next slide
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const img = new Image();
+    img.src = slides[(index + 1) % slides.length];
+  }, [index, slides]);
+
+  // Advance
+  useEffect(() => {
+    if (reduceMotion || paused || slides.length < 2) return undefined;
+    const id = window.setInterval(() => {
+      setIndex((current) => {
+        setPrevIndex(current);
+        return (current + 1) % slides.length;
+      });
+    }, BG_INTERVAL_MS);
+    return () => window.clearInterval(id);
+  }, [reduceMotion, paused, slides.length]);
+
+  // Unmount the previous slide once its fade-out is done
+  useEffect(() => {
+    if (prevIndex === null) return undefined;
+    const id = window.setTimeout(() => setPrevIndex(null), BG_FADE_MS + 200);
+    return () => window.clearTimeout(id);
+  }, [prevIndex]);
+
+  const visible = [prevIndex, index].filter(
+    (v, i, arr) => v !== null && arr.indexOf(v) === i,
+  );
+
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-blue-950"
+    >
+      {visible.map((i) => {
+        const active = i === index;
+        return (
+          <img
+            key={slides[i]}
+            src={slides[i]}
+            alt=""
+            decoding="async"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+            className="absolute inset-0 h-full w-full object-cover will-change-[opacity,transform]"
+            style={{
+              opacity: active ? 1 : 0,
+              transition: `opacity ${BG_FADE_MS}ms ease-in-out`,
+              animation: reduceMotion
+                ? "none"
+                : `tourKenBurns ${BG_INTERVAL_MS + BG_FADE_MS + 2000}ms ease-out forwards`,
+            }}
+          />
+        );
+      })}
+
+      {/* Static gradient: light, only keeps the navbar and hero text readable */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/20" />
+      {/* Scroll-driven dimming (0 at the top → 0.35 once the tours cover the hero) */}
+      <div
+        className="absolute inset-0 bg-blue-950"
+        style={{ opacity: "calc(var(--dim, 0) * 0.35)" }}
+      />
+    </div>
+  );
+}
+
 // ─── Small components ────────────────────────────────────────────────────────
 
 function Chip({ active, onClick, children, count }) {
@@ -211,7 +282,9 @@ function Chip({ active, onClick, children, count }) {
       {count !== undefined && (
         <span
           className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-            active ? "bg-white/25 text-white" : "bg-neutral-100 text-neutral-500"
+            active
+              ? "bg-white/25 text-white"
+              : "bg-neutral-100 text-neutral-500"
           }`}
         >
           {count}
@@ -232,38 +305,6 @@ function PromoBadge({ promo, className = "" }) {
   );
 }
 
-function Banner({ banner, onApply }) {
-  const btn =
-    "w-fit shrink-0 rounded-full bg-black px-5 py-2.5 text-sm font-bold text-white transition hover:scale-105 active:scale-95";
-  return (
-    <div className="col-span-full">
-      <div
-        className={`flex flex-col gap-3 rounded-3xl bg-gradient-to-r p-5 shadow-lg sm:flex-row sm:items-center sm:justify-between sm:p-6 ${banner.className}`}
-      >
-        <div className="max-w-xl">
-          <p className="text-[11px] font-black uppercase tracking-[0.2em] opacity-60">
-            {banner.eyebrow}
-          </p>
-          <h3 className="mt-1 font-frank text-xl font-bold leading-tight sm:text-2xl">
-            {banner.title}
-          </h3>
-          <p className="mt-1 font-bitter text-sm opacity-75">{banner.text}</p>
-        </div>
-
-        {banner.to ? (
-          <a href={banner.to} className={btn}>
-            {banner.cta} →
-          </a>
-        ) : (
-          <button type="button" onClick={() => onApply(banner.apply)} className={btn}>
-            {banner.cta} →
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
-
 const getItemText = (item) => {
   if (!item) return "";
   return typeof item === "string" ? item : item.text || item.name || "";
@@ -271,7 +312,9 @@ const getItemText = (item) => {
 
 // Compact per-category prices (Adult R1,200 · Child R900 …) + extras count
 function PriceChips({ tour }) {
-  const rows = (tour.pricing || []).filter((p) => Number(p.pricePerPerson) > 0).slice(0, 4);
+  const rows = (tour.pricing || [])
+    .filter((p) => Number(p.pricePerPerson) > 0)
+    .slice(0, 4);
   const extras = tour.additionalPricing?.length || 0;
   if (!rows.length && !extras) return null;
   return (
@@ -296,7 +339,9 @@ function PriceChips({ tour }) {
 function DetailBlock({ title, children }) {
   return (
     <section>
-      <h3 className="mb-3 font-frank text-xl font-bold leading-none text-neutral-950">{title}</h3>
+      <h3 className="mb-3 font-frank text-xl font-bold leading-none text-neutral-950">
+        {title}
+      </h3>
       {children}
     </section>
   );
@@ -312,7 +357,9 @@ function TickList({ items, plain = false, single = false }) {
         >
           <span
             className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
-              plain ? "bg-neutral-200 text-neutral-600" : "bg-green-200 text-green-950"
+              plain
+                ? "bg-neutral-200 text-neutral-600"
+                : "bg-green-200 text-green-950"
             }`}
           >
             {plain ? "—" : "✓"}
@@ -329,12 +376,19 @@ function ExpandedTourCard({ tour, onClose, onBook }) {
   const ref = useRef(null);
   const bodyRef = useRef(null);
   const closingRef = useRef(false);
+  // Only auto-scroll when the card was opened by a real click. Clicks can only
+  // happen after the layout has settled (App.jsx sets window.__layoutStable),
+  // so a card that mounts during page load can never hijack the scroll position.
+  const userOpenedRef = useRef(
+    typeof window !== "undefined" && window.__layoutStable === true,
+  );
   const promo = getTourPromo(tour);
   const { amount, note } = getPriceLabel(tour);
   const finalAmount = getPromoPrice(amount, promo);
   const discounted = promo?.discountPercent > 0;
 
-  const toList = (v) => (Array.isArray(v) ? v.map(getItemText).filter(Boolean) : []);
+  const toList = (v) =>
+    Array.isArray(v) ? v.map(getItemText).filter(Boolean) : [];
   const included = toList(tour.included);
   const excluded = toList(tour.excluded);
   const hasExtras = tour.additionalPricing?.length > 0;
@@ -344,7 +398,9 @@ function ExpandedTourCard({ tour, onClose, onBook }) {
     const body = bodyRef.current;
     if (!el || !body) return undefined;
 
-    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const reduce = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     const ctx = gsap.context(() => {
       if (reduce) {
         gsap.set(el, { opacity: 1 });
@@ -375,12 +431,14 @@ function ExpandedTourCard({ tour, onClose, onBook }) {
       );
     }, el);
 
-    const t = window.setTimeout(
-      () => el.scrollIntoView({ behavior: "smooth", block: "start" }),
-      120,
-    );
+    const t = userOpenedRef.current
+      ? window.setTimeout(
+          () => el.scrollIntoView({ behavior: "smooth", block: "start" }),
+          120,
+        )
+      : null;
     return () => {
-      window.clearTimeout(t);
+      if (t) window.clearTimeout(t);
       ctx.revert();
     };
   }, []);
@@ -427,7 +485,9 @@ function ExpandedTourCard({ tour, onClose, onBook }) {
           ✕
         </button>
         <div className="absolute inset-x-0 bottom-0 p-5 text-white sm:p-7">
-          <h2 className="font-frank text-3xl font-bold leading-[0.95] sm:text-4xl">{tour.title}</h2>
+          <h2 className="font-frank text-3xl font-bold leading-[0.95] sm:text-4xl">
+            {tour.title}
+          </h2>
           <p className="mt-2 text-xs font-semibold text-white/80">
             {[tour.duration, tour.location].filter(Boolean).join(" · ")}
           </p>
@@ -437,18 +497,28 @@ function ExpandedTourCard({ tour, onClose, onBook }) {
       {/* Pricing + inclusions only */}
       <div ref={bodyRef} className="space-y-7 p-5 sm:p-7">
         <div>
-          {promo?.headline && <p className="text-sm font-bold text-red-600">{promo.headline}</p>}
+          {promo?.headline && (
+            <p className="text-sm font-bold text-red-600">{promo.headline}</p>
+          )}
           <p className="font-frank text-lg font-bold text-blue-700">
             From{" "}
             {discounted && (
-              <s className="mr-1 text-sm font-semibold text-neutral-400">R{amount.toLocaleString()}</s>
+              <s className="mr-1 text-sm font-semibold text-neutral-400">
+                R{amount.toLocaleString()}
+              </s>
             )}
             R{finalAmount.toLocaleString()}
-            {note && <span className="ml-2 text-xs font-semibold text-neutral-400">{note}</span>}
+            {note && (
+              <span className="ml-2 text-xs font-semibold text-neutral-400">
+                {note}
+              </span>
+            )}
           </p>
         </div>
 
-        {(tour.pricing?.length > 0 || hasExtras || tour.groupPricing?.enabled) && (
+        {(tour.pricing?.length > 0 ||
+          hasExtras ||
+          tour.groupPricing?.enabled) && (
           <div className={`grid gap-7 ${hasExtras ? "lg:grid-cols-2" : ""}`}>
             <div className="min-w-0 space-y-7">
               {tour.pricing?.length > 0 && (
@@ -539,8 +609,12 @@ function TourCard({ tour, onBook, onExpand }) {
       </div>
 
       <div className="flex flex-1 flex-col gap-2.5 p-4 text-black">
-        <h2 className="font-frank text-xl font-bold leading-tight">{tour.title}</h2>
-        <p className="text-xs font-semibold text-neutral-400">{tour.duration}</p>
+        <h2 className="font-frank text-xl font-bold leading-tight">
+          {tour.title}
+        </h2>
+        <p className="text-xs font-semibold text-neutral-400">
+          {tour.duration}
+        </p>
         {promo?.headline && (
           <p className="text-xs font-bold text-red-600">{promo.headline}</p>
         )}
@@ -587,102 +661,70 @@ function TourCard({ tour, onBook, onExpand }) {
   );
 }
 
-// Large card, used when exactly one tour is featured
-function FeaturedPromoCard({ tour, promo, onBook }) {
-  const { amount, note } = getPriceLabel(tour);
+// Promo card shown in the hero (tour.onPromo === true).
+// No pill. Glowing ring, zoom-on-hover image, red headline, cut-off description,
+// savings line and a stronger CTA.
+function HeroPromoCard({ tour, onBook, className = "" }) {
+  const promo = getTourPromo(tour);
+  const { amount } = getPriceLabel(tour);
   const finalAmount = getPromoPrice(amount, promo);
-  const discounted = promo.discountPercent > 0;
+  const discounted = promo?.discountPercent > 0;
+  const saving = discounted ? Math.round(amount - finalAmount) : 0;
 
   return (
     <button
       type="button"
       onClick={() => onBook(tour)}
-      className="group block w-full overflow-hidden rounded-2xl border border-black/5 bg-white text-left text-black shadow-md transition hover:-translate-y-0.5 hover:shadow-xl"
+      style={{ animation: "tourDealGlow 2.8s ease-in-out infinite" }}
+      className={`group flex w-full gap-3 overflow-hidden rounded-2xl bg-white p-2.5 text-left text-black ring-2 ring-amber-300 transition duration-300 hover:-translate-y-1.5 hover:ring-orange-400 ${className}`}
     >
-      <div className="relative">
+      <div className="relative w-28 shrink-0 self-stretch overflow-hidden rounded-xl sm:w-36">
         <img
           src={resolveImage(tour.image)}
-          alt={tour.title}
+          alt=""
           loading="lazy"
-          className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-110"
           onError={(e) => {
             e.currentTarget.src = "/images/content/random/1.webp";
           }}
         />
-        <div className="absolute left-3 top-3">
-          <PromoBadge promo={promo} />
-        </div>
       </div>
 
-      <div className="p-4">
-        <h4 className="font-frank text-xl font-bold leading-tight">{tour.title}</h4>
-        <p className="mt-1 text-xs font-semibold text-neutral-400">{tour.duration}</p>
-        <p className="mt-2 text-sm font-bold text-red-600">{promo.headline}</p>
-        <p className="mt-2 line-clamp-3 font-bitter text-sm text-neutral-600">
-          {tour.description}
-        </p>
-
-        <div className="mt-3 flex items-end justify-between gap-2">
-          <span className="font-frank text-sm font-bold text-blue-700">
-            From{" "}
-            {discounted && (
-              <s className="mr-1 text-xs font-semibold text-neutral-400">
-                R{amount.toLocaleString()}
-              </s>
-            )}
-            R{finalAmount.toLocaleString()}
-            {note && (
-              <span className="block text-[10px] font-semibold text-neutral-400">
-                {note}
-              </span>
-            )}
-          </span>
-          <span className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition group-hover:bg-blue-700">
-            Book now
-          </span>
-        </div>
-      </div>
-    </button>
-  );
-}
-
-// Compact card used in the sidebar list and the mobile scroller (2+ promos)
-function PromoMiniCard({ tour, promo, onBook, className = "" }) {
-  const { amount } = getPriceLabel(tour);
-  const finalAmount = getPromoPrice(amount, promo);
-  const discounted = promo.discountPercent > 0;
-
-  return (
-    <button
-      type="button"
-      onClick={() => onBook(tour)}
-      className={`group flex w-full gap-3 rounded-2xl border border-black/5 bg-white p-2 text-left text-black shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${className}`}
-    >
-      <img
-        src={resolveImage(tour.image)}
-        alt=""
-        loading="lazy"
-        className="h-20 w-20 shrink-0 rounded-xl object-cover"
-        onError={(e) => {
-          e.currentTarget.src = "/images/content/random/1.webp";
-        }}
-      />
-      <div className="min-w-0 flex-1">
-        <PromoBadge promo={promo} className="!px-2 !py-0.5 !text-[9px]" />
-        <p className="mt-1 line-clamp-2 font-frank text-sm font-bold leading-tight">
+      <div className="flex min-w-0 flex-1 flex-col py-0.5">
+        <p className="line-clamp-2 font-frank text-lg font-bold leading-tight">
           {tour.title}
         </p>
-        <p className="mt-0.5 line-clamp-1 text-[11px] font-semibold text-red-600">
-          {promo.headline}
-        </p>
-        <p className="mt-0.5 text-xs font-bold text-blue-700">
-          {discounted && (
-            <s className="mr-1 font-semibold text-neutral-400">
-              R{amount.toLocaleString()}
-            </s>
-          )}
-          R{finalAmount.toLocaleString()}
-        </p>
+        {promo?.headline && (
+          <p className="mt-0.5 line-clamp-1 text-xs font-bold text-red-600">
+            {promo.headline}
+          </p>
+        )}
+        {tour.description && (
+          <p className="mt-1.5 line-clamp-2 font-bitter text-xs leading-relaxed text-neutral-600">
+            {tour.description}
+          </p>
+        )}
+
+        <div className="mt-auto flex items-end justify-between gap-2 pt-2">
+          <div>
+            {discounted && (
+              <p className="text-[11px] font-semibold text-neutral-400">
+                <s>R{amount.toLocaleString()}</s>
+                {saving > 0 && (
+                  <span className="ml-1.5 font-bold text-green-700">
+                    Save R{saving.toLocaleString()}
+                  </span>
+                )}
+              </p>
+            )}
+            <p className="font-frank text-xl font-bold leading-none text-blue-700">
+              R{finalAmount.toLocaleString()}
+            </p>
+          </div>
+          <span className="rounded-full bg-gradient-to-r from-orange-500 to-red-500 px-4 py-2 text-xs font-bold text-white shadow-md transition group-hover:from-orange-600 group-hover:to-red-600">
+            Book now →
+          </span>
+        </div>
       </div>
     </button>
   );
@@ -718,7 +760,9 @@ function Section({ n, title, sub, done, children }) {
           {done ? "✓" : n}
         </span>
         <div>
-          <h3 className="font-frank text-xl leading-none text-neutral-950">{title}</h3>
+          <h3 className="font-frank text-xl leading-none text-neutral-950">
+            {title}
+          </h3>
           {sub && <p className="mt-1 text-xs text-neutral-500">{sub}</p>}
         </div>
       </div>
@@ -751,7 +795,15 @@ function ToggleCard({ active, title, text, price, onClick }) {
   );
 }
 
-function Stepper({ label, hint, value, onMinus, onPlus, minusDisabled, plusDisabled }) {
+function Stepper({
+  label,
+  hint,
+  value,
+  onMinus,
+  onPlus,
+  minusDisabled,
+  plusDisabled,
+}) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-2xl border border-green-100 bg-white p-3">
       <div>
@@ -792,10 +844,17 @@ const CHILD_CATEGORIES = [
 ];
 
 const categoryOf = (age) =>
-  Number(age) <= 5 ? CHILD_CATEGORIES[0] : Number(age) <= 11 ? CHILD_CATEGORIES[1] : CHILD_CATEGORIES[2];
+  Number(age) <= 5
+    ? CHILD_CATEGORIES[0]
+    : Number(age) <= 11
+      ? CHILD_CATEGORIES[1]
+      : CHILD_CATEGORIES[2];
 
 function BookingDrawer({ tour, onClose }) {
-  const minPeople = Math.min(Math.max(Number(tour.minPeople) || 1, 1), MAX_PEOPLE);
+  const minPeople = Math.min(
+    Math.max(Number(tour.minPeople) || 1, 1),
+    MAX_PEOPLE,
+  );
   const supportedCurrencies =
     tour.supportedCurrencies?.length > 0
       ? tour.supportedCurrencies
@@ -862,14 +921,17 @@ function BookingDrawer({ tour, onClose }) {
   const children = childAges.filter((a) => a >= 6 && a <= 11).length;
   const teens = childAges.filter((a) => a >= 12 && a <= 17).length;
   const participantCount = adultCount + childAges.length;
-  const canAddChild = tour.childFriendly !== false && participantCount < MAX_PEOPLE;
+  const canAddChild =
+    tour.childFriendly !== false && participantCount < MAX_PEOPLE;
 
   const contactComplete = Boolean(
     form.fullName.trim() && form.mobile.trim() && form.email.trim(),
   );
   const dateComplete = Boolean(form.date);
   const pickupComplete = Boolean(form.pickupCoords);
-  const optionsOk = !(Array.isArray(tour.options) && tour.options.length > 0) || Boolean(form.selectedOption);
+  const optionsOk =
+    !(Array.isArray(tour.options) && tour.options.length > 0) ||
+    Boolean(form.selectedOption);
 
   // ── Pricing (single source of truth: pricingEngine) ───────────────
   const pricing = useMemo(
@@ -910,7 +972,10 @@ function BookingDrawer({ tour, onClose }) {
     }
 
     const ready =
-      contactComplete && dateComplete && pickupComplete && (!pricing.hasOptions || form.selectedOption);
+      contactComplete &&
+      dateComplete &&
+      pickupComplete &&
+      (!pricing.hasOptions || form.selectedOption);
 
     if (!ready) {
       setVerifyStatus("idle");
@@ -946,8 +1011,14 @@ function BookingDrawer({ tour, onClose }) {
         if (cancelled) return;
 
         const contentType = res.headers.get("content-type") || "";
-        if (res.status === 404 || res.status === 405 || contentType.includes("text/html")) {
-          console.warn("[Tours] /api/verify-price unavailable; using client-side price.");
+        if (
+          res.status === 404 ||
+          res.status === 405 ||
+          contentType.includes("text/html")
+        ) {
+          console.warn(
+            "[Tours] /api/verify-price unavailable; using client-side price.",
+          );
           setVerifyStatus("verified");
           setVerifiedToken(null);
           return;
@@ -1022,10 +1093,7 @@ function BookingDrawer({ tour, onClose }) {
     setForm((prev) => ({
       ...prev,
       childAges: prev.childAges.filter((_, i) => i !== index),
-      adults: Math.max(
-        prev.adults,
-        minPeople - (prev.childAges.length - 1),
-      ),
+      adults: Math.max(prev.adults, minPeople - (prev.childAges.length - 1)),
     }));
 
   // ── Pickup ────────────────────────────────────────────────────────
@@ -1114,7 +1182,9 @@ function BookingDrawer({ tour, onClose }) {
       return;
     }
     if (pricing.isCustomQuote) {
-      setPayError("This group size needs a custom quote. Please contact us to book.");
+      setPayError(
+        "This group size needs a custom quote. Please contact us to book.",
+      );
       return;
     }
     if (verifyStatus === "failed") {
@@ -1137,14 +1207,24 @@ function BookingDrawer({ tour, onClose }) {
       const find = (prefix) =>
         tour.pricing?.find((p) => p.category?.toLowerCase().startsWith(prefix));
       const optionObj = tour.options?.find((o) => o.id === form.selectedOption);
-      let adultBase = Number((find("adult") || tour.pricing?.[0])?.pricePerPerson) || 0;
+      let adultBase =
+        Number((find("adult") || tour.pricing?.[0])?.pricePerPerson) || 0;
       if (optionObj && typeof optionObj.pricePerPerson === "number") {
         adultBase = optionObj.pricePerPerson;
       }
       const adultPrice = convertPrice(adultBase, currency);
-      const teenPrice = convertPrice(Number(find("teen")?.pricePerPerson) || 0, currency);
-      const childPrice = convertPrice(Number(find("child")?.pricePerPerson) || 0, currency);
-      const toddlerPrice = convertPrice(Number(find("toddler")?.pricePerPerson) || 0, currency);
+      const teenPrice = convertPrice(
+        Number(find("teen")?.pricePerPerson) || 0,
+        currency,
+      );
+      const childPrice = convertPrice(
+        Number(find("child")?.pricePerPerson) || 0,
+        currency,
+      );
+      const toddlerPrice = convertPrice(
+        Number(find("toddler")?.pricePerPerson) || 0,
+        currency,
+      );
 
       const pickupTimeLabel = getPickupTime(tour);
       const checkoutStops = getCheckoutStops(tour);
@@ -1301,7 +1381,8 @@ function BookingDrawer({ tour, onClose }) {
             : `Unexpected response from payment server (HTTP ${res.status}).`,
         );
       }
-      if (!res.ok) throw new Error(data.error || "Could not start Paystack checkout.");
+      if (!res.ok)
+        throw new Error(data.error || "Could not start Paystack checkout.");
       if (!data.authorization_url || !data.reference) {
         throw new Error("Paystack did not return a payment URL.");
       }
@@ -1339,7 +1420,8 @@ function BookingDrawer({ tour, onClose }) {
           ? "Retry price check"
           : `Pay ${totalAmountLabel} with Paystack`;
 
-  const payDisabled = paying || verifyStatus === "pending" || pricing.isCustomQuote;
+  const payDisabled =
+    paying || verifyStatus === "pending" || pricing.isCustomQuote;
 
   return createPortal(
     <div
@@ -1359,7 +1441,9 @@ function BookingDrawer({ tour, onClose }) {
 
       <div
         className="flex h-full max-h-[52rem] w-full max-w-3xl flex-col overflow-hidden rounded-t-[2rem] bg-stone-50 shadow-2xl"
-        style={{ animation: "tourDrawerIn 0.3s cubic-bezier(0.16,1,0.3,1) both" }}
+        style={{
+          animation: "tourDrawerIn 0.3s cubic-bezier(0.16,1,0.3,1) both",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -1487,7 +1571,9 @@ function BookingDrawer({ tour, onClose }) {
                 value={adultCount}
                 onMinus={() => changeAdults(-1)}
                 onPlus={() => changeAdults(1)}
-                minusDisabled={adultCount <= 1 || participantCount - 1 < minPeople}
+                minusDisabled={
+                  adultCount <= 1 || participantCount - 1 < minPeople
+                }
                 plusDisabled={participantCount >= MAX_PEOPLE}
               />
 
@@ -1498,7 +1584,9 @@ function BookingDrawer({ tour, onClose }) {
               ) : (
                 <div className="rounded-2xl border border-black/5 bg-white p-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-bold text-neutral-950">Children</p>
+                    <p className="text-sm font-bold text-neutral-950">
+                      Children
+                    </p>
                     <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-bold text-blue-700">
                       {childAges.length}
                     </span>
@@ -1518,7 +1606,9 @@ function BookingDrawer({ tour, onClose }) {
                         <span className="mt-1 text-[10px] font-black uppercase tracking-wide text-blue-700">
                           {cat.label}
                         </span>
-                        <span className="text-[9px] font-bold text-blue-500">{cat.range}</span>
+                        <span className="text-[9px] font-bold text-blue-500">
+                          {cat.range}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -1535,9 +1625,18 @@ function BookingDrawer({ tour, onClose }) {
                             <span className="text-lg">{cat.icon}</span>
                             <div className="min-w-0 flex-1">
                               <p className="text-xs font-black text-neutral-900">
-                                {cat.label} {childAges.slice(0, i + 1).filter((a) => categoryOf(a).key === cat.key).length}
+                                {cat.label}{" "}
+                                {
+                                  childAges
+                                    .slice(0, i + 1)
+                                    .filter(
+                                      (a) => categoryOf(a).key === cat.key,
+                                    ).length
+                                }
                               </p>
-                              <p className="text-[10px] font-medium text-neutral-400">{cat.range} yrs</p>
+                              <p className="text-[10px] font-medium text-neutral-400">
+                                {cat.range} yrs
+                              </p>
                             </div>
                             <button
                               type="button"
@@ -1560,7 +1659,8 @@ function BookingDrawer({ tour, onClose }) {
               )}
 
               <p className="text-center text-xs font-semibold text-green-900">
-                {participantCount} guest{participantCount !== 1 ? "s" : ""} in total
+                {participantCount} guest{participantCount !== 1 ? "s" : ""} in
+                total
                 {hasGroupDeal(tour) && " · group rates apply automatically"}
               </p>
             </div>
@@ -1575,8 +1675,12 @@ function BookingDrawer({ tour, onClose }) {
             {pickupComplete ? (
               <div className="flex items-start gap-3 rounded-2xl border border-green-200 bg-green-50 p-3">
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-green-950">Pickup location saved</p>
-                  <p className="mt-1 text-sm leading-6 text-neutral-700">{form.pickupLocation}</p>
+                  <p className="text-sm font-bold text-green-950">
+                    Pickup location saved
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-neutral-700">
+                    {form.pickupLocation}
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -1596,16 +1700,26 @@ function BookingDrawer({ tour, onClose }) {
                     onChange={(e) => {
                       setPendingPickup(null);
                       setMarkerPosition(null);
-                      patch({ pickupLocation: e.target.value, pickupCoords: null });
+                      patch({
+                        pickupLocation: e.target.value,
+                        pickupCoords: null,
+                      });
                     }}
                   />
                   <button
                     type="button"
                     onClick={pendingPickup ? confirmPickup : handleFindAddress}
-                    disabled={locationLoading || (!pendingPickup && !form.pickupLocation.trim())}
+                    disabled={
+                      locationLoading ||
+                      (!pendingPickup && !form.pickupLocation.trim())
+                    }
                     className="rounded-2xl bg-blue-600 px-5 py-3.5 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {locationLoading ? "Searching…" : pendingPickup ? "Confirm pickup" : "Find on map"}
+                    {locationLoading
+                      ? "Searching…"
+                      : pendingPickup
+                        ? "Confirm pickup"
+                        : "Find on map"}
                   </button>
                 </div>
                 <div className="overflow-hidden rounded-2xl">
@@ -1626,7 +1740,9 @@ function BookingDrawer({ tour, onClose }) {
                   </ClientOnly>
                 </div>
                 {locationError && (
-                  <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-600">{locationError}</p>
+                  <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-600">
+                    {locationError}
+                  </p>
                 )}
               </div>
             )}
@@ -1660,13 +1776,14 @@ function BookingDrawer({ tour, onClose }) {
               />
             )}
 
-            {Array.isArray(tour.additionalPricing) && tour.additionalPricing.length > 0 && (
-              <AdditionalPricing
-                additionalPricing={tour.additionalPricing}
-                selectedExtras={form.selectedExtras}
-                onExtrasChange={(extras) => patch({ selectedExtras: extras })}
-              />
-            )}
+            {Array.isArray(tour.additionalPricing) &&
+              tour.additionalPricing.length > 0 && (
+                <AdditionalPricing
+                  additionalPricing={tour.additionalPricing}
+                  selectedExtras={form.selectedExtras}
+                  onExtrasChange={(extras) => patch({ selectedExtras: extras })}
+                />
+              )}
 
             <KidsActivities
               childFriendly={tour.childFriendly === true}
@@ -1700,9 +1817,13 @@ function BookingDrawer({ tour, onClose }) {
           />
 
           <p className="px-2 pb-2 text-center text-[11px] leading-5 text-neutral-500">
-            Cancellation within 24 hours of booking gets a full refund. 2–3 days before the trip has a
-            20% penalty; within 24 hours there is no refund.{" "}
-            <Link to="/policies" className="font-semibold text-blue-700 underline">
+            Cancellation within 24 hours of booking gets a full refund. 2–3 days
+            before the trip has a 20% penalty; within 24 hours there is no
+            refund.{" "}
+            <Link
+              to="/policies"
+              className="font-semibold text-blue-700 underline"
+            >
               Read policies
             </Link>
             . Pickup and vehicle details are confirmed after payment.
@@ -1713,11 +1834,15 @@ function BookingDrawer({ tour, onClose }) {
         <div className="shrink-0 border-t border-black/5 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-4">
           {pricing.isCustomQuote && (
             <p className="mb-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
-              This group size needs a custom quote. Email {CONTACT_EMAIL} or call {CONTACT_NUMBER}.
+              This group size needs a custom quote. Email {CONTACT_EMAIL} or
+              call {CONTACT_NUMBER}.
             </p>
           )}
           {payError && (
-            <p className="mb-2 rounded-xl bg-red-500 px-3 py-2 text-sm text-white" role="alert">
+            <p
+              className="mb-2 rounded-xl bg-red-500 px-3 py-2 text-sm text-white"
+              role="alert"
+            >
               {payError}
             </p>
           )}
@@ -1741,7 +1866,12 @@ function BookingDrawer({ tour, onClose }) {
             {payLabel}
           </button>
           <div className="mt-2 flex items-center justify-center gap-2">
-            <img src="/icons/paystack-logo.svg" alt="Paystack" className="h-5" loading="lazy" />
+            <img
+              src="/icons/paystack-logo.svg"
+              alt="Paystack"
+              className="h-5"
+              loading="lazy"
+            />
             <span className="text-[11px] font-semibold text-neutral-400">
               Secure payment · your bank may ask for 3D Secure
             </span>
@@ -1773,28 +1903,39 @@ function Tours() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [bookingTour, setBookingTour] = useState(null);
-  const [expandedId, setExpandedId] = useState(null);
+  const [expandedKey, setExpandedKey] = useState(null);
 
-  const sidebarPanelRef = useRef(null);
-  const resultsSectionRef = useRef(null);
+  const pageRef = useRef(null);
 
   const setFilter = (patch) => setFilters((prev) => ({ ...prev, ...patch }));
   const resetFilters = () => setFilters(DEFAULT_FILTERS);
   const openBooking = (tour) => setBookingTour(tour);
   const closeBooking = () => setBookingTour(null);
 
-  // Navbar white panel: in after scrolling, out at the top
+  // Scroll: navbar white panel + background dimming (--dim goes 0 → 1)
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 60);
+      const range = Math.max(window.innerHeight * 0.7, 1);
+      const p = Math.min(Math.max(y / range, 0), 1);
+      pageRef.current?.style.setProperty("--dim", p.toFixed(3));
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
   // ── Derived data ────────────────────────────────────────────────────────
   const priceCeiling = useMemo(
-    () => Math.ceil(Math.max(...tours.map((t) => Number(t.priceBase) || 0)) / 500) * 500,
-    []
+    () =>
+      Math.ceil(Math.max(...tours.map((t) => Number(t.priceBase) || 0)) / 500) *
+      500,
+    [],
   );
 
   const typeCounts = useMemo(() => {
@@ -1807,17 +1948,28 @@ function Tours() {
 
   const typeOptions = useMemo(
     () => Object.keys(typeCounts).filter((t) => TYPE_LABELS[t]),
-    [typeCounts]
+    [typeCounts],
   );
 
-  const promoTours = useMemo(
-    () =>
-      tours
-        .map((tour) => ({ tour, promo: getTourPromo(tour) }))
-        .filter((x) => x.promo),
-    []
-  );
-  const singlePromo = promoTours.length === 1;
+  // Tours flagged onPromo: true show in the hero
+  const promoTours = useMemo(() => tours.filter((t) => t.onPromo === true), []);
+
+  // Slideshow images: extras first, then promo tours, then every other tour
+  const bgSlides = useMemo(() => {
+    const seen = new Set();
+    const out = [];
+    const add = (src) => {
+      if (src && !seen.has(src)) {
+        seen.add(src);
+        out.push(src);
+      }
+    };
+    BG_EXTRA_SLIDES.forEach(add);
+    [...promoTours, ...tours].forEach((t) => {
+      if (t?.image) add(resolveImage(t.image));
+    });
+    return out.slice(0, BG_MAX_SLIDES);
+  }, [promoTours]);
 
   const filteredTours = useMemo(() => {
     const q = filters.query.trim().toLowerCase();
@@ -1825,14 +1977,22 @@ function Tours() {
 
     let list = tours.filter((tour) => {
       if (filters.type !== "all" && tour.type !== filters.type) return false;
-      if (filters.duration !== "all" && getDurationBucket(tour) !== filters.duration)
+      if (
+        filters.duration !== "all" &&
+        getDurationBucket(tour) !== filters.duration
+      )
         return false;
       if ((Number(tour.priceBase) || 0) > limit) return false;
       if (filters.childFriendly && tour.childFriendly !== true) return false;
       if (filters.groupDeals && !hasGroupDeal(tour)) return false;
-      if (filters.promoOnly && !getTourPromo(tour)) return false;
+      if (filters.promoOnly && tour.onPromo !== true) return false;
       if (q) {
-        const haystack = [tour.title, tour.description, tour.location, ...(tour.tags || [])]
+        const haystack = [
+          tour.title,
+          tour.description,
+          tour.location,
+          ...(tour.tags || []),
+        ]
           .join(" ")
           .toLowerCase();
         if (!haystack.includes(q)) return false;
@@ -1840,9 +2000,12 @@ function Tours() {
       return true;
     });
 
-    if (filters.sort === "price-asc") list = [...list].sort((a, b) => a.priceBase - b.priceBase);
-    if (filters.sort === "price-desc") list = [...list].sort((a, b) => b.priceBase - a.priceBase);
-    if (filters.sort === "az") list = [...list].sort((a, b) => a.title.localeCompare(b.title));
+    if (filters.sort === "price-asc")
+      list = [...list].sort((a, b) => a.priceBase - b.priceBase);
+    if (filters.sort === "price-desc")
+      list = [...list].sort((a, b) => b.priceBase - a.priceBase);
+    if (filters.sort === "az")
+      list = [...list].sort((a, b) => a.title.localeCompare(b.title));
     return list;
   }, [filters]);
 
@@ -1854,85 +2017,14 @@ function Tours() {
     (filters.promoOnly ? 1 : 0);
 
   const activeFilterCount =
-    panelFilterCount + (filters.query ? 1 : 0) + (filters.type !== "all" ? 1 : 0);
-
-  const applyBanner = (patch) => {
-    setFilters({ ...DEFAULT_FILTERS, ...patch });
-    setFiltersOpen(true);
-    document
-      .getElementById("tour-results")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  // ── Sidebar pin ─────────────────────────────────────────────────────────
-  useLayoutEffect(() => {
-    if (!sidebarPanelRef.current || !resultsSectionRef.current) return;
-
-    const mm = gsap.matchMedia();
-
-    mm.add("(min-width: 1024px)", () => {
-      const trigger = ScrollTrigger.create({
-        trigger: sidebarPanelRef.current,
-        start: `top ${PIN_TOP_OFFSET}px`,
-        endTrigger: resultsSectionRef.current,
-        end: () => {
-          const pinnedHeight = sidebarPanelRef.current?.offsetHeight || 0;
-          return `bottom ${PIN_TOP_OFFSET + pinnedHeight + 24}px`;
-        },
-        pin: true,
-        pinSpacing: false,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-      });
-
-      ScrollTrigger.refresh();
-      return () => trigger.kill();
-    });
-
-    return () => mm.revert();
-  }, []);
-
-  // Results height changes when filtering, so re-measure the pin range.
-  useEffect(() => {
-    const id = window.setTimeout(() => ScrollTrigger.refresh(), 60);
-    return () => window.clearTimeout(id);
-  }, [filteredTours.length, filtersOpen, expandedId]);
-
-  // ── Grid items with a banner after every BANNER_EVERY cards ─────────────
-  const gridItems = [];
-  let bannerIndex = 0;
-  filteredTours.forEach((tour, i) => {
-    gridItems.push(
-      expandedId === tour.id ? (
-        <ExpandedTourCard
-          key={tour.id}
-          tour={tour}
-          onClose={() => setExpandedId(null)}
-          onBook={openBooking}
-        />
-      ) : (
-        <TourCard
-          key={tour.id}
-          tour={tour}
-          onBook={openBooking}
-          onExpand={(t) => setExpandedId(t.id)}
-        />
-      ),
-    );
-    if ((i + 1) % BANNER_EVERY === 0 && i < filteredTours.length - 1) {
-      gridItems.push(
-        <Banner
-          key={`banner-${i}`}
-          banner={BANNERS[bannerIndex % BANNERS.length]}
-          onApply={applyBanner}
-        />
-      );
-      bannerIndex += 1;
-    }
-  });
+    panelFilterCount +
+    (filters.query ? 1 : 0) +
+    (filters.type !== "all" ? 1 : 0);
 
   const selectClass =
     "rounded-full border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-semibold outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100";
+
+  const textShadow = "[text-shadow:0_2px_14px_rgba(0,0,0,0.55)]";
 
   return (
     <>
@@ -1949,17 +2041,89 @@ function Tours() {
         }`}
       />
 
-      <div className="relative isolate flex min-h-screen w-full flex-col items-center gap-7 bg-blue-400/100 px-4">
-        {/* White backdrop behind the navbar / top of the page */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-56 bg-white"
-        />
+      <div
+        ref={pageRef}
+        className="relative isolate flex min-h-screen w-full flex-col items-center gap-5 px-4"
+      >
+        {/* Fixed full-screen slideshow; dims lightly as you scroll */}
+        <BackgroundSlideshow slides={bgSlides} />
+
+        {/* ── Hero (compact: title + hot deals, no description, no scroll button) ── */}
+        <header className="flex w-full max-w-7xl flex-col pt-28 sm:pt-36">
+          <div
+            className="flex flex-col gap-5"
+            style={{
+              opacity: "calc(1 - var(--dim, 0) * 1.1)",
+              transform: "translateY(calc(var(--dim, 0) * -28px))",
+            }}
+          >
+            <div className="max-w-2xl text-white">
+              <p
+                className={`text-[11px] font-black uppercase tracking-[0.25em] text-white/80 ${textShadow}`}
+              >
+                {/* Cape Frontier */}
+              </p>
+              <h1
+                className={`mt-2 font-frank text-4xl font-bold leading-[0.95] text-white sm:text-6xl ${textShadow}`}
+              >
+                Explore Cape Town your way
+              </h1>
+            </div>
+
+            {promoTours.length > 0 && (
+              <div>
+                <div className="mb-3 flex items-center gap-2.5">
+                  <span className="relative flex h-12 w-12 shrink-0 items-center justify-center">
+                    <span className="absolute inset-0 animate-ping rounded-full bg-red-400 opacity-75" />
+                    <img
+                      src="icons/savemore.png"
+                      className="relative z-10 h-full w-full object-contain"
+                      alt="Discount icon"
+                    />
+                  </span>
+                  <p
+                    className={`font-frank text-2xl font-bold text-white sm:text-3xl ${textShadow}`}
+                  >
+                    {promoTours.length === 1
+                      ? "Featured tour"
+                      : "Hot deals right now"}
+                  </p>
+                </div>
+                <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 pt-1 [scrollbar-width:thin] sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3">
+                  {promoTours.map((tour) => (
+                    <HeroPromoCard
+                      key={getTourKey(tour)}
+                      tour={tour}
+                      onBook={openBooking}
+                      className="w-[85vw] max-w-sm shrink-0 snap-center sm:w-full sm:max-w-none"
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </header>
+
+        {/* ── All tours ───────────────────────────────────────────────── */}
+        <div id="all-tours" className="w-full max-w-7xl scroll-mt-24 pt-12">
+
+          <h2
+            className={`mt-1 font-frank text-3xl font-bold leading-tight text-white sm:text-4xl  ${textShadow}`}
+          >
+            All tours
+          </h2>
+          <p
+            className={`mt-1 max-w-2xl font-frank text-sm text-white sm:text-base ${textShadow}`}
+          >
+            From half-day city escapes to multi-day Garden Route journeys.
+            Filter by category, duration, price or what suits your group.
+          </p>
+        </div>
 
         {/* ── Filter bar ──────────────────────────────────────────────── */}
         <section
           id="tour-results"
-          className="mt-32 w-full max-w-7xl scroll-mt-28 rounded-3xl border border-black/5 bg-white/90 p-3 text-black shadow-lg backdrop-blur"
+          className="-mt-3 w-full max-w-7xl scroll-mt-28 rounded-3xl border border-black/5 bg-white/90 p-3 text-black shadow-lg backdrop-blur"
         >
           <div className="flex flex-col gap-2 md:flex-row md:items-center">
             <div className="relative flex-1">
@@ -2035,7 +2199,9 @@ function Tours() {
           <div
             id="more-filters"
             className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
-              filtersOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+              filtersOpen
+                ? "grid-rows-[1fr] opacity-100"
+                : "grid-rows-[0fr] opacity-0"
             }`}
           >
             <div className="min-h-0 overflow-hidden">
@@ -2099,19 +2265,25 @@ function Tours() {
                   <div className="flex flex-wrap gap-1.5">
                     <Chip
                       active={filters.promoOnly}
-                      onClick={() => setFilter({ promoOnly: !filters.promoOnly })}
+                      onClick={() =>
+                        setFilter({ promoOnly: !filters.promoOnly })
+                      }
                     >
                       On promo
                     </Chip>
                     <Chip
                       active={filters.childFriendly}
-                      onClick={() => setFilter({ childFriendly: !filters.childFriendly })}
+                      onClick={() =>
+                        setFilter({ childFriendly: !filters.childFriendly })
+                      }
                     >
                       Family
                     </Chip>
                     <Chip
                       active={filters.groupDeals}
-                      onClick={() => setFilter({ groupDeals: !filters.groupDeals })}
+                      onClick={() =>
+                        setFilter({ groupDeals: !filters.groupDeals })
+                      }
                     >
                       Group deals
                     </Chip>
@@ -2123,7 +2295,8 @@ function Tours() {
 
           <div className="mt-3 flex items-center justify-between border-t border-black/5 pt-2.5">
             <p className="text-xs text-neutral-600" aria-live="polite">
-              <b className="text-neutral-950">{filteredTours.length}</b> of {tours.length} tours
+              <b className="text-neutral-950">{filteredTours.length}</b> of{" "}
+              {tours.length} tours
             </p>
             {activeFilterCount > 0 && (
               <button
@@ -2137,115 +2310,44 @@ function Tours() {
           </div>
         </section>
 
-        {/* Mobile / tablet featured promo (the sidebar is desktop only) */}
-        {promoTours.length > 0 && (
-          <div className="w-full max-w-7xl lg:hidden">
-            <p className="mb-2 px-1 font-frank text-lg font-bold">
-              {singlePromo ? "Featured tour" : "Hot deals"}
-            </p>
-
-            {singlePromo ? (
-              <FeaturedPromoCard
-                tour={promoTours[0].tour}
-                promo={promoTours[0].promo}
-                onBook={openBooking}
-              />
-            ) : (
-              <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:thin]">
-                {promoTours.map(({ tour, promo }) => (
-                  <PromoMiniCard
-                    key={tour.id}
+        {/* ── Results (no sidebar, no banners) ─────────────────────────── */}
+        <div className="w-full max-w-7xl">
+          {filteredTours.length > 0 ? (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {filteredTours.map((tour) => {
+                const key = getTourKey(tour);
+                return expandedKey !== null && expandedKey === key ? (
+                  <ExpandedTourCard
+                    key={key}
                     tour={tour}
-                    promo={promo}
+                    onClose={() => setExpandedKey(null)}
                     onBook={openBooking}
-                    className="w-[78vw] max-w-xs shrink-0 snap-center"
                   />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── Results + pinned promo sidebar ───────────────────────────── */}
-        <div className="grid w-full max-w-7xl grid-cols-1 gap-6 lg:grid-cols-[1fr_300px]">
-          <div ref={resultsSectionRef}>
-            {filteredTours.length > 0 ? (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {gridItems}
-              </div>
-            ) : (
-              <div className="mx-auto w-full max-w-3xl rounded-3xl bg-white p-10 text-center text-black shadow-lg">
-                <p className="font-frank text-3xl font-bold">No tours found</p>
-                <p className="mt-2 text-sm text-neutral-600">
-                  Try removing a filter or widening your price range.
-                </p>
-                <button
-                  type="button"
-                  onClick={resetFilters}
-                  className="mt-5 rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-700 active:scale-95"
-                >
-                  Clear all filters
-                </button>
-              </div>
-            )}
-          </div>
-
-          <aside className="hidden h-fit lg:block">
-            <div ref={sidebarPanelRef}>
-              <section className="rounded-3xl border border-black/5 bg-white/95 p-4 text-black shadow-lg backdrop-blur">
-                <div className="flex items-end justify-between">
-                  {!singlePromo && (
-                    <span className="text-xs font-semibold text-neutral-400">
-                      {promoTours.length}
-                    </span>
-                  )}
-                </div>
-
-                {promoTours.length === 0 && (
-                  <p className="mt-3 text-sm text-neutral-500">
-                    No promotions running right now. Check back soon.
-                  </p>
-                )}
-
-                {singlePromo && (
-                  <div className="mt-3">
-                    <FeaturedPromoCard
-                      tour={promoTours[0].tour}
-                      promo={promoTours[0].promo}
-                      onBook={openBooking}
-                    />
-                  </div>
-                )}
-
-                {promoTours.length > 1 && (
-                  <>
-                    <div
-                      className="mt-3 space-y-2 overflow-y-auto pr-1 [scrollbar-width:thin]"
-                      style={{ maxHeight: `calc(100vh - ${PIN_TOP_OFFSET + 190}px)` }}
-                      data-lenis-prevent
-                    >
-                      {promoTours.map(({ tour, promo }) => (
-                        <PromoMiniCard
-                          key={tour.id}
-                          tour={tour}
-                          promo={promo}
-                          onBook={openBooking}
-                        />
-                      ))}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => applyBanner({ promoOnly: true })}
-                      className="mt-3 w-full rounded-full bg-black px-4 py-2.5 text-sm font-bold text-white transition hover:scale-[1.02] active:scale-95"
-                    >
-                      Show all promo tours →
-                    </button>
-                  </>
-                )}
-              </section>
+                ) : (
+                  <TourCard
+                    key={key}
+                    tour={tour}
+                    onBook={openBooking}
+                    onExpand={(t) => setExpandedKey(getTourKey(t))}
+                  />
+                );
+              })}
             </div>
-          </aside>
+          ) : (
+            <div className="mx-auto w-full max-w-3xl rounded-3xl bg-white p-10 text-center text-black shadow-lg">
+              <p className="font-frank text-3xl font-bold">No tours found</p>
+              <p className="mt-2 text-sm text-neutral-600">
+                Try removing a filter or widening your price range.
+              </p>
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="mt-5 rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-700 active:scale-95"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
         </div>
 
         {/* ── Contact details ──────────────────────────────────────────── */}
@@ -2311,7 +2413,9 @@ function Tours() {
                 {CONTACT_NUMBER}
               </a>
 
-              <p className="mt-2 text-xs text-neutral-500">Booking and support</p>
+              <p className="mt-2 text-xs text-neutral-500">
+                Booking and support
+              </p>
             </div>
           </div>
         </section>
@@ -2319,8 +2423,27 @@ function Tours() {
 
       {/* In-page booking → Paystack (no /checkout hop). Keyed so state resets per tour. */}
       {bookingTour && typeof document !== "undefined" && (
-        <BookingDrawer key={bookingTour.id} tour={bookingTour} onClose={closeBooking} />
+        <BookingDrawer
+          key={getTourKey(bookingTour)}
+          tour={bookingTour}
+          onClose={closeBooking}
+        />
       )}
+
+      {/* Slideshow Ken Burns + hot-deal glow keyframes */}
+      <style>{`
+        @keyframes tourKenBurns {
+          from { transform: scale(1) translate3d(0, 0, 0); }
+          to   { transform: scale(1.12) translate3d(-1.5%, -1%, 0); }
+        }
+        @keyframes tourDealGlow {
+          0%, 100% { box-shadow: 0 10px 30px rgba(0,0,0,0.25), 0 0 0 0 rgba(251,191,36,0.0); }
+          50%      { box-shadow: 0 14px 38px rgba(0,0,0,0.30), 0 0 28px 4px rgba(251,191,36,0.55); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [style*="tourDealGlow"] { animation: none !important; }
+        }
+      `}</style>
     </>
   );
 }
