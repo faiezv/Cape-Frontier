@@ -4,28 +4,28 @@ import { useLocation } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-// import KidsActivities from '../components/TourDetails/k'
 import { KidsActivitiesNavbar } from '../components/KidsActivitiesNavbar.jsx';
 import { useLoadingNavigate } from "./useLoadingNavigate.jsx"
 import { resolveImage } from '../utils/ImageLoader.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
+// Updated to include a specific target path for Tours
 const navItems = [
-  { label: 'Home' },
-  { label: 'About' },
-  { label: 'Stories' },
-  { label: 'Gallery' },
-  { label: 'Tours' },
-  { label: 'FAQ' },
+  { label: 'Home', target: 'Home' },
+  { label: 'About', target: 'About' },
+  { label: 'Stories', target: 'Stories' },
+  { label: 'Gallery', target: 'Gallery' },
+  { label: 'Tours', target: '/tours' }, // Routes to /tours page
+  { label: 'FAQ', target: 'FAQ' },
 ]
 
 const sectionIdMap = {
   About: 'about',
   Stories: 'stories',
-  Tours: 'tours',
   Gallery: 'gallery',
   FAQ: 'faq',
+  // Removed Tours since it now routes to a new page
 }
 
 const megaMenus = {
@@ -43,7 +43,7 @@ const megaMenus = {
       {
         title: 'Popular tours',
         desc: 'Move straight into featured routes.',
-        target: 'Tours',
+        target: '/tours',
       },
       {
         title: 'Ask a question',
@@ -73,12 +73,12 @@ const megaMenus = {
       {
         title: 'Pickup support',
         desc: 'Customers can request pickup from their accommodation.',
-        target: 'Tours',
+        target: '/tours',
       },
       {
         title: 'Booking flow',
         desc: 'Choose a tour, request the trip, and complete checkout.',
-        target: 'Tours',
+        target: '/tours',
       },
     ],
   },
@@ -102,7 +102,7 @@ const megaMenus = {
       {
         title: 'Adventure notes',
         desc: 'See how the day feels from start to finish.',
-        target: 'Tours',
+        target: '/tours',
       },
       {
         title: 'Travel confidence',
@@ -117,30 +117,31 @@ const megaMenus = {
     title: 'Choose your Cape Town experience',
     desc: 'Explore routes by category. Each card opens the tours section where users can preview details and request a trip.',
     layout: 'cards',
+    ctaTarget: '/tours', // Ensures the "Open Tours" button at the bottom works
     cards: [
       {
         title: 'Adrenaline',
         desc: 'Shark cage diving, paragliding, snorkelling, and guided thrill experiences.',
         image: resolveImage('/src/assets/images/tours/adrenaline/shark-cage-diving/1.webp'),
-        target: 'Tours',
+        target: '/tours',
       },
       {
         title: 'Hiking',
         desc: 'Lion’s Head and Table Mountain routes with scenic viewpoints.',
         image: resolveImage('/src/assets/images/tours/hiking/lions-head/1.webp'),
-        target: 'Tours',
+        target: '/tours',
       },
       {
         title: 'Historical',
         desc: 'Robben Island and cultural routes with meaningful local context.',
         image: resolveImage('/src/assets/images/tours/historical/langa/2.webp'),
-        target: 'Tours',
+        target: '/tours',
       },
       {
         title: 'Packages',
         desc: 'Cape Peninsula and Stellenbosch wine farm full-day experiences.',
         image: resolveImage('/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp'),
-        target: 'Tours',
+        target: '/tours',
       },
     ],
   },
@@ -323,6 +324,7 @@ const Navbar = () => {
     setActiveMobileMega(null)
     setHoverIndex(null)
 
+    // Check for explicit path routes (like /tours)
     if (
       typeof label === 'string' &&
       label.startsWith('/')
@@ -892,10 +894,6 @@ const Navbar = () => {
 
             {/* =================================================
                 CAPE TOWN TOURISM AFFILIATION
-
-                MOVED HERE:
-                It now sits beside the navbar rather than
-                beside the main Cape Frontier logo.
             ================================================= */}
 
             <div
@@ -1074,7 +1072,7 @@ const Navbar = () => {
                     type="button"
                     onClick={(event) =>
                       handleNavClick(
-                        item.label,
+                        item.target,
                         event
                       )
                     }
@@ -1444,23 +1442,6 @@ const Navbar = () => {
                       activeMegaData.desc
                     }
                   </p>
-
-                  {/*
-                    UPDATED:
-                    This button used to always call
-                    handleNavClick(activeMega, event),
-                    which for the FAQ mega menu scrolled
-                    to the #faq section on the homepage.
-
-                    Now it uses ctaTarget/ctaLabel from
-                    the mega menu data when present, so
-                    the FAQ ("Before you book") panel
-                    navigates to the /policies page
-                    instead. Every other mega menu still
-                    falls back to its original behavior
-                    since ctaTarget/ctaLabel are
-                    undefined for them.
-                  */}
 
                   <button
                     type="button"
@@ -1932,7 +1913,7 @@ const Navbar = () => {
                         type="button"
                         onClick={(event) =>
                           handleNavClick(
-                            item.label,
+                            item.target,
                             event
                           )
                         }
