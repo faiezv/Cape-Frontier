@@ -187,25 +187,44 @@ export function Chip({ active, onClick, children, count }) {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition active:scale-95 ${
-        active
-          ? "border-blue-600 bg-blue-600 text-white shadow-sm"
-          : "border-neutral-200 bg-white text-neutral-700 hover:border-blue-300 hover:bg-blue-50"
-      }`}
+      className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition active:scale-95 ${active
+        ? "border-blue-600 bg-blue-600 text-white shadow-sm"
+        : "border-neutral-200 bg-white text-neutral-700 hover:border-blue-300 hover:bg-blue-50"
+        }`}
     >
       {children}
       {count !== undefined && (
         <span
-          className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-            active
-              ? "bg-white/25 text-white"
-              : "bg-neutral-100 text-neutral-500"
-          }`}
+          className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${active
+            ? "bg-white/25 text-white"
+            : "bg-neutral-100 text-neutral-500"
+            }`}
         >
           {count}
         </span>
       )}
     </button>
+  );
+}
+
+// ─── Centered card grid ──────────────────────────────────────────────────────
+// Same column counts as before (1 / 2 / 3 / 4), but built with flex-wrap +
+// justify-center, so an incomplete last row (or a filtered list of just 1–3
+// tours) is centered instead of hugging the left edge. Every card keeps the
+// exact width a full row would give it. gap-4 = 1rem, so the width of one card
+// is (100% - (columns - 1) gaps) / columns.
+
+export function TourGrid({ children, className = "" }) {
+  return (
+    <div className={`flex flex-wrap justify-center gap-4 ${className}`}>
+      {React.Children.map(children, (child) =>
+        child ? (
+          <div className="flex w-full sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] xl:w-[calc((100%-3rem)/4)]">
+            {child}
+          </div>
+        ) : null,
+      )}
+    </div>
   );
 }
 
@@ -364,13 +383,12 @@ function ReviewModal({ tour, onClose, onSubmitReview }) {
                 onChange={(e) => setReference(normalizeTourReference(e.target.value))}
                 placeholder={`TOUR-${"1A3B5C7D9E".slice(0, TOUR_REF_LENGTH)}`}
                 aria-invalid={touched && !refValid}
-                className={`${inputClass} font-mono tracking-wider ${
-                  reference && !refValid
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-100"
-                    : refValid
-                      ? "border-green-400 focus:border-green-500 focus:ring-green-100"
-                      : ""
-                }`}
+                className={`${inputClass} font-mono tracking-wider ${reference && !refValid
+                  ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                  : refValid
+                    ? "border-green-400 focus:border-green-500 focus:ring-green-100"
+                    : ""
+                  }`}
               />
               {refValid ? (
                 <p className="mt-1.5 flex items-center gap-1 text-xs font-semibold text-green-700">
@@ -378,9 +396,8 @@ function ReviewModal({ tour, onClose, onSubmitReview }) {
                 </p>
               ) : (
                 <p
-                  className={`mt-1.5 text-xs ${
-                    touched ? "font-semibold text-red-600" : "text-neutral-500"
-                  }`}
+                  className={`mt-1.5 text-xs ${touched ? "font-semibold text-red-600" : "text-neutral-500"
+                    }`}
                 >
                   Enter the reference from your booking: “TOUR-” followed by{" "}
                   {TOUR_REF_LENGTH} letters/numbers. Reviews without a valid
@@ -409,9 +426,8 @@ function ReviewModal({ tour, onClose, onSubmitReview }) {
                       aria-label={`${n} star${n > 1 ? "s" : ""}`}
                       onClick={() => setRating(n)}
                       onMouseEnter={() => setHoverRating(n)}
-                      className={`rounded-lg p-1 transition active:scale-90 ${
-                        on ? "text-amber-400" : "text-neutral-300"
-                      }`}
+                      className={`rounded-lg p-1 transition active:scale-90 ${on ? "text-amber-400" : "text-neutral-300"
+                        }`}
                     >
                       <StarIcon className="h-8 w-8" />
                     </button>
@@ -472,11 +488,10 @@ function ReviewModal({ tour, onClose, onSubmitReview }) {
                 className={`${inputClass} resize-none`}
               />
               <p
-                className={`mt-1 text-xs ${
-                  touched && !textValid
-                    ? "font-semibold text-red-600"
-                    : "text-neutral-500"
-                }`}
+                className={`mt-1 text-xs ${touched && !textValid
+                  ? "font-semibold text-red-600"
+                  : "text-neutral-500"
+                  }`}
               >
                 {textValid
                   ? "Thanks, that's plenty."
@@ -496,11 +511,10 @@ function ReviewModal({ tour, onClose, onSubmitReview }) {
             <button
               type="submit"
               disabled={status === "submitting"}
-              className={`w-full rounded-full px-6 py-3.5 text-sm font-bold text-white shadow-md transition active:scale-95 ${
-                canSubmit
-                  ? "bg-blue-600 shadow-blue-600/20 hover:bg-blue-700"
-                  : "cursor-not-allowed bg-neutral-300 shadow-none"
-              }`}
+              className={`w-full rounded-full px-6 py-3.5 text-sm font-bold text-white shadow-md transition active:scale-95 ${canSubmit
+                ? "bg-blue-600 shadow-blue-600/20 hover:bg-blue-700"
+                : "cursor-not-allowed bg-neutral-300 shadow-none"
+                }`}
             >
               {status === "submitting" ? "Sending…" : "Send review"}
             </button>
@@ -524,7 +538,7 @@ export function TourCard({ tour, onOpen, onSubmitReview }) {
   const [reviewOpen, setReviewOpen] = useState(false);
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-3xl border border-neutral-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-900/10">
+    <article className="group relative flex w-full flex-col overflow-hidden rounded-3xl border border-neutral-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-900/10">
       {/* ── Image ───────────────────────────────────────────── */}
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-neutral-100">
         <img
@@ -782,11 +796,10 @@ export function TourQuickView({ tour, onClose, onBook, onSubmitReview }) {
                   key={`${img}-${idx}`}
                   type="button"
                   onClick={() => setActiveImage(img)}
-                  className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
-                    activeImage === img
-                      ? "border-blue-600 opacity-100 ring-2 ring-blue-600/20"
-                      : "border-transparent opacity-60 hover:opacity-100 lg:opacity-50 lg:hover:opacity-100"
-                  }`}
+                  className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${activeImage === img
+                    ? "border-blue-600 opacity-100 ring-2 ring-blue-600/20"
+                    : "border-transparent opacity-60 hover:opacity-100 lg:opacity-50 lg:hover:opacity-100"
+                    }`}
                 >
                   <img
                     src={resolveImage(img)}
@@ -959,11 +972,10 @@ export function TourQuickView({ tour, onClose, onBook, onSubmitReview }) {
                 type="button"
                 onClick={toggleLike}
                 aria-pressed={liked}
-                className={`inline-flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm font-bold transition active:scale-95 ${
-                  liked
-                    ? "border-red-200 bg-red-50 text-red-600"
-                    : "border-neutral-200 text-neutral-700 hover:bg-neutral-50"
-                }`}
+                className={`inline-flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm font-bold transition active:scale-95 ${liked
+                  ? "border-red-200 bg-red-50 text-red-600"
+                  : "border-neutral-200 text-neutral-700 hover:bg-neutral-50"
+                  }`}
               >
                 <HeartIcon filled={liked} className="h-4 w-4" />
                 {liked ? "Liked" : "Like tour"}

@@ -15,6 +15,7 @@ import { hasGroupDeal, getDurationBucket } from "../utils/tourHelpers";
 import {
   Chip,
   TourCard,
+  TourGrid,
   TourQuickView,
 } from "../components/Tours/TourCards";
 import BookingDrawer, { getTourSlug } from "../components/Tours/BookingDrawer";
@@ -107,11 +108,10 @@ function FilterPanel({
                 type="button"
                 onClick={() => setFilter({ type: o.id })}
                 aria-pressed={active}
-                className={`flex items-center justify-between rounded-xl px-3 py-2 text-left text-sm transition ${
-                  active
-                    ? "bg-blue-50 font-bold text-blue-700"
-                    : "font-medium text-neutral-700 hover:bg-neutral-50"
-                }`}
+                className={`flex items-center justify-between rounded-xl px-3 py-2 text-left text-sm transition ${active
+                  ? "bg-blue-50 font-bold text-blue-700"
+                  : "font-medium text-neutral-700 hover:bg-neutral-50"
+                  }`}
               >
                 {o.label}
                 <span
@@ -634,9 +634,8 @@ function Tours() {
       {/* Navbar white panel (after scrolling) */}
       <div
         aria-hidden="true"
-        className={`pointer-events-none fixed inset-x-0 top-0 z-40 h-[73px] bg-white shadow-md sm:h-[81px] lg:h-[85px] transition-all duration-500 ease-out ${
-          scrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
-        }`}
+        className={`pointer-events-none fixed inset-x-0 top-0 z-40 h-[73px] bg-white shadow-md sm:h-[81px] lg:h-[85px] transition-all duration-500 ease-out ${scrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+          }`}
       />
 
       {/* ── PROMO BAR (fixed, 88px, flush under the navbar) ───────────
@@ -664,11 +663,10 @@ function Tours() {
             <button
               type="button"
               onClick={() => setFilter({ showPromos: !filters.showPromos })}
-              className={`inline-flex h-[18px] shrink-0 items-center whitespace-nowrap rounded-full px-3 text-[10px] font-bold leading-none transition active:scale-95 ${
-                filters.showPromos
-                  ? "bg-white text-emerald-700 hover:bg-neutral-50"
-                  : "bg-emerald-800/40 text-white hover:bg-emerald-800/60"
-              }`}
+              className={`inline-flex h-[18px] shrink-0 items-center whitespace-nowrap rounded-full px-3 text-[10px] font-bold leading-none transition active:scale-95 ${filters.showPromos
+                ? "bg-white text-emerald-700 hover:bg-neutral-50"
+                : "bg-emerald-800/40 text-white hover:bg-emerald-800/60"
+                }`}
             >
               {filters.showPromos ? "Show All Tours" : "View Promo Tours"}
             </button>
@@ -692,11 +690,10 @@ function Tours() {
         {/* Content wrapper: top padding = navbar height + promo bar height, so
             the search bar / grid always start BELOW the fixed promo bar. */}
         <div
-          className={`relative ${
-            hasPromos
-              ? "pt-[160px] sm:pt-[168px] lg:pt-[172px]"
-              : "pt-[116px] sm:pt-[124px] lg:pt-[128px]"
-          }`}
+          className={`relative ${hasPromos
+            ? "pt-[160px] sm:pt-[168px] lg:pt-[172px]"
+            : "pt-[116px] sm:pt-[124px] lg:pt-[128px]"
+            }`}
         >
           {/* ── MAIN CONTENT CONTAINER ──────────────────────────────── */}
           <div className="relative mx-auto w-full max-w-[1500px] px-4 pb-16 pt-6 sm:px-6 sm:pt-8">
@@ -811,7 +808,7 @@ function Tours() {
 
                 {/* Grid */}
                 {filteredTours.length > 0 ? (
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  <TourGrid>
                     {filteredTours.map((tour) => (
                       <TourCard
                         key={getTourKey(tour)}
@@ -819,7 +816,7 @@ function Tours() {
                         onOpen={openQuick}
                       />
                     ))}
-                  </div>
+                  </TourGrid>
                 ) : (
                   <div className="mx-auto w-full max-w-xl rounded-3xl border border-neutral-200 bg-white p-10 text-center">
                     <p className="font-frank text-2xl font-bold">
