@@ -3,8 +3,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import tours from "../../data/tours.js";
 import TourCard from "./TourCard.jsx";
 import FixedCategoryNav from "./FixedCategoryNav.jsx";
+import { resolveImage } from '../../utils/ImageLoader.js';
 
 const BREAKPOINT = 768;
+
+// Tour images are stored as source paths (e.g. "/src/assets/images/...").
+// Those only work in dev; in a production build Vite renames the files with a
+// hash, so the path has to go through resolveImage to get the built URL.
+// Already-built URLs (http, data:, /assets/...) are passed through untouched.
+const getImageSrc = (src) => {
+  if (!src) return null;
+  if (/^(https?:|data:|blob:|\/assets\/)/.test(src)) return src;
+  return resolveImage(src) || null;
+};
 
 export default function ToursBrowser() {
   const containerRef            = useRef(null);
@@ -191,6 +202,10 @@ export default function ToursBrowser() {
   const prevTour         = filteredTours[currentIndex - 1] || null;
   const nextTour         = filteredTours[currentIndex + 1] || null;
 
+  // Resolved (build-safe) URLs for the blurred backgrounds on the side buttons
+  const prevImage = useMemo(() => getImageSrc(prevTour?.image), [prevTour]);
+  const nextImage = useMemo(() => getImageSrc(nextTour?.image), [nextTour]);
+
   const trackTransform = () => {
     const base      = -currentIndex * 100;
     const dragOffset = isDragging
@@ -264,9 +279,9 @@ export default function ToursBrowser() {
                     style={{ width: 40, height: "100%" }}
                     aria-label="Previous tour"
                   >
-                    {prevTour?.image && (
+                    {prevImage && (
                       <img
-                        src={prevTour.image}
+                        src={prevImage}
                         alt=""
                         className="absolute inset-0 w-full h-full object-cover blur-lg scale-110 pointer-events-none"
                       />
@@ -337,9 +352,9 @@ export default function ToursBrowser() {
                     style={{ width: 40, height: "100%" }}
                     aria-label="Next tour"
                   >
-                    {nextTour?.image && (
+                    {nextImage && (
                       <img
-                        src={nextTour.image}
+                        src={nextImage}
                         alt=""
                         className="absolute inset-0 w-full h-full object-cover blur-lg scale-110 pointer-events-none"
                       />

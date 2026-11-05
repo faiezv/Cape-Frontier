@@ -6,10 +6,10 @@ import React, {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Seo from "../components/Seo";
+import SiteFooter from "../components/SiteFooter";
 import { tours } from "../data/tours";
 import { hasGroupDeal, getDurationBucket } from "../utils/tourHelpers";
 import {
@@ -17,19 +17,26 @@ import {
   TourCard,
   TourQuickView,
 } from "../components/Tours/TourCards";
-import BookingDrawer, {
-  CONTACT_EMAIL,
-  CONTACT_NUMBER,
-  CONTACT_TEL,
-  getTourSlug,
-} from "../components/Tours/BookingDrawer";
+import BookingDrawer, { getTourSlug } from "../components/Tours/BookingDrawer";
 
 gsap.registerPlugin(ScrollTrigger);
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
-// Increased from 96 to 112 to give the pinned panel some breathing room
-const PIN_TOP_OFFSET = 112;
+// Set to true to bring the filter sidebar / mobile filter sheet back.
+const SHOW_FILTERS = false;
+
+// Layout maths (px). Navbar height = logo + py-2:  72 (mobile) / 80 (sm) / 84 (lg).
+// The promo bar is PROMO_BAR_HEIGHT tall (88px) and sits flush under the navbar.
+// The blue band ends exactly in the middle of the bar (44px over blue, 44px below)
+// and the content starts below the bar:
+//   mobile: bar 72→160,  band 116px, content starts 160px
+//   sm:     bar 80→168,  band 124px, content starts 168px
+//   lg:     bar 84→172,  band 128px, content starts 172px
+// If you change the bar height, update: bar h-[..], band h-[..], wrapper pt-[..].
+const NAVBAR_HEIGHT_LG = 84;
+const PROMO_BAR_HEIGHT = 88;
+const PIN_GAP = 16;
 
 const TYPE_LABELS = {
   adrenaline: "Adrenaline",
@@ -275,6 +282,102 @@ function FilterSheet({ open, onClose, resultCount, onClear, canClear, children }
   );
 }
 
+// ─── Giant hollow tagline (matches the footer width) ─────────────────────────
+// SVG text with textLength stretches the glyphs to the exact container width.
+// To get a clean hollow outline (no inner lines where glyph contours overlap),
+// the text is stroked and then masked with a solid fill of itself, so only the
+// OUTER half of the stroke is visible. Visible thickness = strokeWidth / 2.
+const TAGLINE = "Explore beyond the ordinary.";
+const TAGLINE_COLOR = "#2563eb";
+
+const baseText = {
+  fontStyle: "italic",
+  fontWeight: 800,
+};
+
+function HollowLine({ id, x, y, size, width, stroke, children, viewW, viewH }) {
+  const maskId = `tagline-mask-${id}`;
+  return (
+    <>
+      <defs>
+        <mask
+          id={maskId}
+          maskUnits="userSpaceOnUse"
+          x="0"
+          y="0"
+          width={viewW}
+          height={viewH}
+        >
+          <rect x="0" y="0" width={viewW} height={viewH} fill="#fff" />
+          <text
+            x={x}
+            y={y}
+            textLength={width}
+            lengthAdjust="spacingAndGlyphs"
+            className="font-frank"
+            fontSize={size}
+            style={baseText}
+            fill="#000"
+          >
+            {children}
+          </text>
+        </mask>
+      </defs>
+      <text
+        x={x}
+        y={y}
+        textLength={width}
+        lengthAdjust="spacingAndGlyphs"
+        className="font-frank"
+        fontSize={size}
+        style={baseText}
+        fill="none"
+        stroke={TAGLINE_COLOR}
+        strokeWidth={stroke}
+        strokeLinejoin="round"
+        mask={`url(#${maskId})`}
+      >
+        {children}
+      </text>
+    </>
+  );
+}
+
+function BigTagline() {
+  return (
+    <div
+      className="w-full select-none overflow-hidden opacity-60"
+      role="img"
+      aria-label={TAGLINE}
+    >
+      {/* Mobile: two lines */}
+      <svg
+        viewBox="0 0 1000 310"
+        className="block h-auto w-full sm:hidden"
+        aria-hidden="true"
+      >
+        <HollowLine id="m1" x={16} y={135} size={140} width={960} stroke={14} viewW={1000} viewH={310}>
+          Explore beyond
+        </HollowLine>
+        <HollowLine id="m2" x={16} y={285} size={140} width={960} stroke={14} viewW={1000} viewH={310}>
+          the ordinary.
+        </HollowLine>
+      </svg>
+
+      {/* sm and up: one line */}
+      <svg
+        viewBox="0 0 1000 120"
+        className="hidden h-auto w-full sm:block"
+        aria-hidden="true"
+      >
+        <HollowLine id="d" x={10} y={92} size={92} width={976} stroke={7} viewW={1000} viewH={120}>
+          {TAGLINE}
+        </HollowLine>
+      </svg>
+    </div>
+  );
+}
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 function Tours() {
@@ -326,6 +429,10 @@ function Tours() {
   const promoList = useMemo(() => tours.filter((t) => t.onPromo), []);
   const hasPromos = promoList.length > 0;
 
+  // Where the pinned sidebar should stick (below navbar panel + promo bar)
+  const pinTopOffset =
+    NAVBAR_HEIGHT_LG + (hasPromos ? PROMO_BAR_HEIGHT : 0) + PIN_GAP;
+
   // Rotate promo text every 4 seconds
   useEffect(() => {
     if (promoList.length <= 1) return;
@@ -370,7 +477,7 @@ function Tours() {
       if (filters.childFriendly && tour.childFriendly !== true) return false;
       if (filters.groupDeals && !hasGroupDeal(tour)) return false;
       if (filters.showPromos && !tour.onPromo) return false;
-      
+
       if (q) {
         const haystack = [
           tour.title,
@@ -406,21 +513,23 @@ function Tours() {
 
   // ── Pinned filter sidebar (desktop only) ────────────────────────────────
   useLayoutEffect(() => {
+    if (!SHOW_FILTERS) return undefined;
+
     const panel = panelRef.current;
     const results = resultsRef.current;
 
-    if (!panel || !results) return;
+    if (!panel || !results) return undefined;
 
     const mm = gsap.matchMedia();
 
     mm.add("(min-width: 1024px)", () => {
       const trigger = ScrollTrigger.create({
         trigger: panel,
-        start: `top ${PIN_TOP_OFFSET}px`,
+        start: `top ${pinTopOffset}px`,
         endTrigger: results,
         end: () => {
           const pinnedHeight = panel.offsetHeight || 0;
-          return `bottom ${PIN_TOP_OFFSET + pinnedHeight + 24}px`;
+          return `bottom ${pinTopOffset + pinnedHeight + 24}px`;
         },
         pin: true,
         pinSpacing: false,
@@ -434,7 +543,7 @@ function Tours() {
     });
 
     return () => mm.revert();
-  }, []);
+  }, [pinTopOffset]);
 
   // ── Animated Background Gradient on Scroll ─────────────────────────────
   useLayoutEffect(() => {
@@ -525,95 +634,101 @@ function Tours() {
       {/* Navbar white panel (after scrolling) */}
       <div
         aria-hidden="true"
-        className={`pointer-events-none fixed inset-x-0 top-0 z-40 h-24 bg-white shadow-md transition-all duration-500 ease-out ${
+        className={`pointer-events-none fixed inset-x-0 top-0 z-40 h-[73px] bg-white shadow-md sm:h-[81px] lg:h-[85px] transition-all duration-500 ease-out ${
           scrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
         }`}
       />
 
+      {/* ── PROMO BAR (fixed, 88px, flush under the navbar) ───────────
+          Its vertical centre lines up with the bottom edge of the blue band
+          (50/50 split). */}
+      {hasPromos && (
+        <div className="fixed inset-x-0 top-[72px] z-30 h-[88px] overflow-hidden bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-600 text-white shadow-md sm:top-[80px] lg:top-[84px]">
+          <div className="mx-auto flex h-full w-full max-w-[1500px] items-center justify-between gap-3 px-4 sm:px-6">
+            <p className="h-6 min-w-0 overflow-hidden truncate font-bitter text-xl leading-6 text-white/95">
+              <span aria-hidden="true">✨ </span>
+              Special offer:{" "}
+              {promoList.length > 1 ? (
+                <span
+                  key={promoIndex}
+                  className="inline-block max-w-full animate-[promoRollIn_0.4s_ease-out_forwards] align-bottom font-bold text-white"
+                >
+                  {promoList[promoIndex]?.title}
+                </span>
+              ) : (
+                <span className="font-bold text-white">
+                  {promoList[0]?.title}
+                </span>
+              )}
+            </p>
+            <button
+              type="button"
+              onClick={() => setFilter({ showPromos: !filters.showPromos })}
+              className={`inline-flex h-[18px] shrink-0 items-center whitespace-nowrap rounded-full px-3 text-[10px] font-bold leading-none transition active:scale-95 ${
+                filters.showPromos
+                  ? "bg-white text-emerald-700 hover:bg-neutral-50"
+                  : "bg-emerald-800/40 text-white hover:bg-emerald-800/60"
+              }`}
+            >
+              {filters.showPromos ? "Show All Tours" : "View Promo Tours"}
+            </button>
+          </div>
+          <style>{`
+            @keyframes promoRollIn {
+              0% { transform: translateY(100%); opacity: 0; }
+              100% { transform: translateY(0); opacity: 1; }
+            }
+          `}</style>
+        </div>
+      )}
+
       <div className="relative min-h-screen w-full text-neutral-900">
-        {/* Brand band behind the navbar */}
+        {/* Brand band behind the navbar; ends mid-way through the promo bar */}
         <div
           aria-hidden="true"
-          className="hero-gradient-bl absolute inset-x-0 top-0 h-24 bg-blue-950 sm:h-32"
+          className="hero-gradient-bl absolute inset-x-0 top-0 h-[116px] bg-blue-950 sm:h-[124px] lg:h-[128px]"
         />
 
-        {/* Wrapper aligned to bottom of header */}
-        <div className="relative pt-24 sm:pt-32">
-          
-          {/* ── PROMO STRIP (Full Width) ───────────────────────────── */}
-          {hasPromos && (
-            <div className="relative z-20 w-full overflow-hidden bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-600 py-3 text-white shadow-md">
-              <div className="mx-auto flex max-w-[1500px] flex-col items-center justify-between gap-3 px-4 sm:flex-row sm:px-6">
-                <div className="flex items-center gap-3 text-center sm:text-left">
-                  <span className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/20 text-sm sm:flex">
-                    ✨
-                  </span>
-                  <p className="font-bitter text-sm text-white/95">
-                    Special offer:{" "}
-                    {promoList.length > 1 ? (
-                      <span className="relative inline-flex h-5 overflow-hidden align-bottom font-bold text-white">
-                        <span
-                          key={promoIndex}
-                          className="inline-block animate-[promoRollIn_0.4s_ease-out_forwards]"
-                        >
-                          {promoList[promoIndex]?.title}
-                        </span>
-                      </span>
-                    ) : (
-                      <span className="font-bold text-white">{promoList[0]?.title}</span>
-                    )}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setFilter({ showPromos: !filters.showPromos })}
-                  className={`shrink-0 rounded-full px-5 py-2 text-xs font-bold shadow-sm transition active:scale-95 ${
-                    filters.showPromos
-                      ? "bg-white text-emerald-700 hover:bg-neutral-50"
-                      : "bg-emerald-800/40 text-white hover:bg-emerald-800/60 backdrop-blur-sm"
-                  }`}
-                >
-                  {filters.showPromos ? "Show All Tours" : "View Promo Tours"}
-                </button>
-              </div>
-              <style>{`
-                @keyframes promoRollIn {
-                  0% { transform: translateY(100%); opacity: 0; }
-                  100% { transform: translateY(0); opacity: 1; }
-                }
-              `}</style>
-            </div>
-          )}
-
+        {/* Content wrapper: top padding = navbar height + promo bar height, so
+            the search bar / grid always start BELOW the fixed promo bar. */}
+        <div
+          className={`relative ${
+            hasPromos
+              ? "pt-[160px] sm:pt-[168px] lg:pt-[172px]"
+              : "pt-[116px] sm:pt-[124px] lg:pt-[128px]"
+          }`}
+        >
           {/* ── MAIN CONTENT CONTAINER ──────────────────────────────── */}
           <div className="relative mx-auto w-full max-w-[1500px] px-4 pb-16 pt-6 sm:px-6 sm:pt-8">
             <div className="lg:flex lg:items-start lg:gap-8">
               {/* ── Left filter panel (desktop) ── */}
-              <aside
-                ref={panelRef}
-                data-lenis-prevent
-                className="hidden max-h-[calc(100vh-9rem)] w-60 shrink-0 overflow-y-auto overscroll-contain rounded-3xl border border-neutral-200 bg-white p-5 lg:block xl:w-64"
-              >
-                <div className="mb-5 flex items-center justify-between">
-                  <p className="font-frank text-lg font-bold">Filters</p>
-                  {panelFilterCount > 0 && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setFilters((p) => ({
-                          ...DEFAULT_FILTERS,
-                          query: p.query,
-                          sort: p.sort,
-                        }))
-                      }
-                      className="rounded-full border border-red-200 px-3 py-1 text-xs font-bold text-red-600 transition hover:bg-red-50"
-                    >
-                      Clear ({panelFilterCount})
-                    </button>
-                  )}
-                </div>
-                {panel}
-              </aside>
+              {SHOW_FILTERS && (
+                <aside
+                  ref={panelRef}
+                  data-lenis-prevent
+                  className="hidden max-h-[calc(100vh-9rem)] w-60 shrink-0 overflow-y-auto overscroll-contain rounded-3xl border border-neutral-200 bg-white p-5 lg:block xl:w-64"
+                >
+                  <div className="mb-5 flex items-center justify-between">
+                    <p className="font-frank text-lg font-bold">Filters</p>
+                    {panelFilterCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFilters((p) => ({
+                            ...DEFAULT_FILTERS,
+                            query: p.query,
+                            sort: p.sort,
+                          }))
+                        }
+                        className="rounded-full border border-red-200 px-3 py-1 text-xs font-bold text-red-600 transition hover:bg-red-50"
+                      >
+                        Clear ({panelFilterCount})
+                      </button>
+                    )}
+                  </div>
+                  {panel}
+                </aside>
+              )}
 
               {/* ── Results ── */}
               <main ref={resultsRef} className="min-w-0 flex-1">
@@ -654,26 +769,33 @@ function Tours() {
                       ))}
                     </select>
 
-                    <button
-                      type="button"
-                      onClick={() => setSheetOpen(true)}
-                      className="inline-flex items-center justify-center gap-2 rounded-full border border-neutral-300 bg-white px-5 py-3 text-sm font-bold text-neutral-800 transition active:scale-95 lg:hidden"
-                    >
-                      Filters
-                      {panelFilterCount > 0 && (
-                        <span className="rounded-full bg-blue-600 px-1.5 py-0.5 text-[10px] text-white">
-                          {panelFilterCount}
-                        </span>
-                      )}
-                    </button>
+                    {SHOW_FILTERS && (
+                      <button
+                        type="button"
+                        onClick={() => setSheetOpen(true)}
+                        className="inline-flex items-center justify-center gap-2 rounded-full border border-neutral-300 bg-white px-5 py-3 text-sm font-bold text-neutral-800 transition active:scale-95 lg:hidden"
+                      >
+                        Filters
+                        {panelFilterCount > 0 && (
+                          <span className="rounded-full bg-blue-600 px-1.5 py-0.5 text-[10px] text-white">
+                            {panelFilterCount}
+                          </span>
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
 
                 {/* Count + clear */}
                 <div className="mb-5 mt-4 flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-neutral-800" aria-live="polite">
-                      Showing <b className="text-neutral-950">{filteredTours.length}</b> of {tours.length} tours. Use filters to narrow down.
+                    <p
+                      className="text-sm font-medium text-neutral-800"
+                      aria-live="polite"
+                    >
+                      Showing{" "}
+                      <b className="text-neutral-950">{filteredTours.length}</b>{" "}
+                      of {tours.length} tours. Use filters to narrow down.
                     </p>
                   </div>
                   {activeFilterCount > 0 && (
@@ -717,96 +839,34 @@ function Tours() {
                 )}
               </main>
             </div>
-
-            {/* ── Contact details ─────────────────── */}
-            <section
-              id="contact-details"
-              className="relative mt-20 w-full scroll-mt-28 overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#071f4f] via-blue-900 to-blue-700 text-white shadow-2xl"
-            >
-              <div
-                aria-hidden="true"
-                className="absolute -top-24 left-1/2 h-[300px] w-[500px] -translate-x-1/2 rounded-full bg-blue-400/20 blur-[80px]"
-              />
-
-              <div className="relative z-10 flex flex-col items-center justify-center px-6 py-16 text-center sm:px-12 sm:py-20">
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-300">
-                  Can't find what you're after?
-                </p>
-
-                <h3 className="mt-3 max-w-2xl font-frank text-3xl font-bold leading-tight text-white sm:text-4xl">
-                  Talk to us about a custom trip
-                </h3>
-
-                <p className="mt-4 max-w-xl font-bitter text-base leading-relaxed text-blue-100">
-                  Tours, pickup details, private trips, custom routes or booking
-                  support. We'll help you choose the right Cape Town experience.
-                </p>
-
-                <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                  <a
-                    href={`mailto:${CONTACT_EMAIL}`}
-                    className="inline-flex min-h-[52px] w-full items-center justify-center rounded-full bg-white px-8 text-sm font-bold text-blue-900 shadow-lg transition hover:-translate-y-0.5 hover:bg-blue-50 active:scale-95 sm:w-auto"
-                  >
-                    Email us
-                  </a>
-                  <a
-                    href={`tel:${CONTACT_TEL}`}
-                    className="inline-flex min-h-[52px] w-full items-center justify-center rounded-full border border-white/30 px-8 text-sm font-bold text-white backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/10 active:scale-95 sm:w-auto"
-                  >
-                    Call us
-                  </a>
-                  <Link
-                    to="/policies"
-                    className="inline-flex min-h-[52px] w-full items-center justify-center rounded-full px-6 text-sm font-semibold text-blue-200 underline-offset-4 transition hover:text-white hover:underline sm:w-auto"
-                  >
-                    View policies
-                  </Link>
-                </div>
-
-                <div className="mt-12 flex w-full flex-col items-center justify-center gap-6 sm:flex-row sm:gap-12">
-                  <div className="text-center">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-300">
-                      Email
-                    </p>
-                    <a
-                      href={`mailto:${CONTACT_EMAIL}`}
-                      className="mt-1 block break-words text-sm font-bold text-white transition-colors hover:text-blue-200 hover:underline"
-                    >
-                      {CONTACT_EMAIL}
-                    </a>
-                  </div>
-                  
-                  <div className="hidden h-10 w-px bg-white/20 sm:block" />
-
-                  <div className="text-center">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-300">
-                      Number
-                    </p>
-                    <a
-                      href={`tel:${CONTACT_TEL}`}
-                      className="mt-1 block text-sm font-bold text-white transition-colors hover:text-blue-200 hover:underline"
-                    >
-                      {CONTACT_NUMBER}
-                    </a>
-                  </div>
-                </div>
-
-              </div>
-            </section>
           </div>
         </div>
       </div>
 
-      {/* Mobile filter sheet */}
-      <FilterSheet
-        open={sheetOpen}
-        onClose={closeSheet}
-        resultCount={filteredTours.length}
-        onClear={resetFilters}
-        canClear={activeFilterCount > 0}
+      {/* Site footer + tagline share one container so their widths match.
+          The id keeps old #contact-details links working. */}
+      <div
+        id="contact-details"
+        className="mx-auto w-full max-w-7xl scroll-mt-40 px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8"
       >
-        {panel}
-      </FilterSheet>
+        <SiteFooter />
+        <div className="mt-6 sm:mt-8">
+          {/* <BigTagline /> */}
+        </div>
+      </div>
+
+      {/* Mobile filter sheet */}
+      {SHOW_FILTERS && (
+        <FilterSheet
+          open={sheetOpen}
+          onClose={closeSheet}
+          resultCount={filteredTours.length}
+          onClear={resetFilters}
+          canClear={activeFilterCount > 0}
+        >
+          {panel}
+        </FilterSheet>
+      )}
 
       {/* Mini details → See full page / Book now */}
       {quickTour && typeof document !== "undefined" && (

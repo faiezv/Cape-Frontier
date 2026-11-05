@@ -1,9 +1,26 @@
 import React, { useEffect, useLayoutEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { gsap } from 'gsap'
+import SiteFooter from '../components/SiteFooter'
+import { WhatsAppIcon, WHATSAPP_URL } from '../components/WhatsApp'
 
 const CONTACT_EMAIL = 'admin@cape-frontier.co.za'
 const CONTACT_NUMBER = '(+27)72 264 7284';
+
+// Gmail logo (multi-colour). Aspect ratio 256:193, so keep h/w roughly 3:4.
+const GmailIcon = ({ className = 'h-3.5 w-[18.5px]' }) => (
+  <svg
+    viewBox="0 0 256 193"
+    aria-hidden="true"
+    focusable="false"
+    className={className}
+  >
+    <path fill="#4285F4" d="M58.182 192.05V93.14L27.507 65.077 0 49.504v125.091c0 9.658 7.825 17.455 17.455 17.455h40.727Z" />
+    <path fill="#34A853" d="M197.818 192.05h40.727c9.659 0 17.455-7.826 17.455-17.455V49.505l-31.156 17.837-27.026 25.798v98.91Z" />
+    <path fill="#EA4335" d="m58.182 93.14-4.174-38.647 4.174-36.989L128 69.868l69.818-52.364 4.67 34.992-4.67 40.644L128 145.504 58.182 93.14Z" />
+    <path fill="#FBBC04" d="M197.818 17.504V93.14L256 49.504V26.231c0-21.585-24.64-33.89-41.89-20.945l-16.292 12.218Z" />
+    <path fill="#C5221F" d="m0 49.504 26.759 20.07L58.182 93.14V17.504L41.89 5.286C24.61-7.66 0 4.646 0 26.23v23.273Z" />
+  </svg>
+)
 
 const socialLinks = [
   {
@@ -26,17 +43,7 @@ const socialLinks = [
   },
 ]
 
-const informationLinks = [
-  { label: 'Privacy policy', path: '/policies' },
-  { label: 'Terms & conditions', path: '/policies' },
-  { label: 'Pickup information' },
-  { label: 'Tour availability' },
-  { label: 'Accessibility' },
-]
-
 const Contact = () => {
-  const navigate = useNavigate()
-
   const sectionRef = useRef(null)
   const logoRef = useRef(null)
   const contentRef = useRef(null)
@@ -244,10 +251,6 @@ const Contact = () => {
     })
   }
 
-  const openContact = () => {
-    window.location.href = `mailto:${CONTACT_EMAIL}`
-  }
-
   const handleSocialClick = async (item, event) => {
     if (item.type !== 'share') return
 
@@ -453,21 +456,36 @@ const Contact = () => {
                   className="relative w-full rounded-3xl border border-white/70 bg-white/72 p-4 text-left shadow-[0_10px_30px_rgba(7,31,79,0.06)] 
                   backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-white/88 hover:shadow-[0_18px_40px_rgba(7,31,79,0.10)] sm:p-5"
                 >
-                  <p className="text-[10px] font-black uppercase tracking-[0.22em] text-blue-500">
-                    Email
+                  <p className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.22em] text-blue-500">
+                    {/* <GmailIcon /> */}
+                    {/* Email */}
                   </p>
 
                   <p className="wrap-break-word text-sm font-bold leading-5 text-[#071f4f] sm:text-[15px]">
                     {CONTACT_EMAIL}
                   </p>
+
+                  <a
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700 transition hover:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+                  >
+                    <GmailIcon />
+                    Contact us via email
+                  </a>
                   <div className='my-3 w-full border border-blue-200/50'/>
                   <p className="mt-2 text-[10px] font-black uppercase tracking-[0.22em] text-blue-500">
-                    Number
+                    {/* WhatsApp &amp; calls */}
                   </p>
-                    
-                  <p className="wrap-break-word text-sm font-bold leading-5 text-[#071f4f] sm:text-[15px]">
+
+                  <a
+                    href={WHATSAPP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm font-bold leading-5 text-[#071f4f] hover:underline sm:text-[15px]"
+                  >
+                    <WhatsAppIcon className="h-4 w-4 shrink-0 text-[#25D366]" />
                     {CONTACT_NUMBER}
-                  </p>
+                  </a>
 
                   <p className="mt-1 text-xs leading-5 text-neutral-500">
                     Booking and support
@@ -475,113 +493,24 @@ const Contact = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="w-full flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <button
-                    type="button"
-                    onClick={openContact}
-                    className="hero-gradient-bl flex min-h-[52px] w-full items-center justify-center rounded-full px-6 text-sm font-bold text-white shadow-[0_16px_34px_rgba(7,31,79,0.20)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_42px_rgba(7,31,79,0.28)] sm:w-auto sm:px-8"
-                  >
-                    Email us
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => navigate('/policies')}
-                    className="flex min-h-[52px] w-full items-center justify-center rounded-full border border-blue-950/10 bg-white/82 px-6 text-sm font-bold text-[#071f4f] shadow-[0_8px_24px_rgba(0,0,0,0.04)] backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:bg-green-200 hover:text-green-950 sm:w-auto sm:px-8"
-                  >
-                    View policies
-                  </button>
-                </div>
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex min-h-[56px] w-full items-center justify-center gap-3 rounded-full bg-[#25D366] px-6 text-base font-bold text-[#06371d] shadow-[0_16px_34px_rgba(37,211,102,0.35)] transition duration-300 hover:-translate-y-1 hover:bg-[#1ebe5b] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-300"
+                >
+                  <WhatsAppIcon className="h-6 w-6" />
+                  Chat on WhatsApp
+                </a>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <footer
-          ref={footerRef}
-          className="shrink-0"
-        >
-          <div className="overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/82 shadow-[0_20px_60px_rgba(7,31,79,0.10)] backdrop-blur-xl">
-
-            {/* Information */}
-            <div className="px-4 py-4 sm:px-6">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500">
-                  {/* Information */}
-                </p>
-
-                <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs sm:justify-end sm:text-sm">
-                  {informationLinks.map((item, index) => (
-                    <React.Fragment key={item.label}>
-                      {index > 0 && (
-                        <span
-                          aria-hidden="true"
-                          className="hidden text-black/20 sm:inline"
-                        >
-                          |
-                        </span>
-                      )}
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          item.path && navigate(item.path)
-                        }
-                        className="text-neutral-600 transition hover:text-[#071f4f]"
-                      >
-                        {item.label}
-                      </button>
-                    </React.Fragment>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Copyright */}
-            <div className="border-t border-black/5 bg-blue-800 px-4 py-4 sm:px-6">
-              <div className="flex flex-col gap-4 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
-
-                <div className="flex items-center justify-center gap-3 sm:justify-start">
-                  <img
-                    src="/icons/ZAR.png"
-                    alt="South African Rand"
-                    className="h-9 w-9 shrink-0 rounded-full border border-white/10 object-cover shadow-[0_6px_18px_rgba(0,0,0,0.18)]"
-                  />
-
-                  <div>
-                    <p className="text-sm font-semibold text-white">
-                      © 2026 Cape Frontier Travel & Tours
-                    </p>
-
-                    <p className="mt-1 text-sm text-white/65">
-                      Designed and built with <b>{'<3'}</b> by{' '}
-                      <span className="font-semibold text-white/85">
-                        F. Viljoen & FO Creative 
-                      </span>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
-                  <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold text-green-200 backdrop-blur-md">
-                    Premium routes
-                  </span>
-
-                  <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold text-green-200 backdrop-blur-md">
-                    Secure booking
-                  </span>
-
-                  <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold text-green-200 backdrop-blur-md">
-                    Local experiences
-                  </span>
-                </div>
-
-              </div>
-            </div>
-          </div>
-        </footer>
+        {/* Footer (shared with the Tours page) */}
+        <div ref={footerRef} className="shrink-0">
+          <SiteFooter />
+        </div>
       </div>
     </section>
   )

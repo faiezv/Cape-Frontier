@@ -1,42 +1,42 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Link } from "react-router-dom";
 // TODO: adjust this path to wherever useLoadingNavigate lives
-import { useLoadingNavigate } from './useLoadingNavigate'
+import { useLoadingNavigate } from "./useLoadingNavigate";
 
-import ToursBrowser from './Tours/ToursBrowser'
+import ToursBrowser from "./Tours/ToursBrowser";
 
 // Adjust the relative path to wherever this file lives.
 // Filenames are case-sensitive on Vercel (Linux) - keep them exactly as on disk.
-import hero1 from '../assets/images/content/hero/1.webp'
-import hero2 from '../assets/images/tours/adrenaline/cobra/cobra-2hr/1.webp'
-import hero3 from '../assets/images/content/hero/2.webp'
-import hero4 from '../assets/images/content/hero/3.webp'
+import hero1 from "../assets/images/content/hero/1.webp";
+import hero2 from "../assets/images/tours/adrenaline/cobra/cobra-2hr/1.webp";
+import hero3 from "../assets/images/content/hero/2.webp";
+import hero4 from "../assets/images/content/hero/3.webp";
 // import hero5 from '../assets/images/content/hero/4.webp'
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger)
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
 }
 
 // useLayoutEffect warns during SSR; fall back to useEffect on the server.
 const useIsoLayoutEffect =
-  typeof window !== 'undefined' ? useLayoutEffect : useEffect
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 // Vite gives a string, Next.js gives { src, width, height } - support both.
-const toSrc = (img) => (typeof img === 'string' ? img : img.src)
+const toSrc = (img) => (typeof img === "string" ? img : img.src);
 
 // Reorder / relabel to match what 1-4.webp actually show.
 const slides = [
-  { image: hero1, location: 'Bo-Kaap, Cape Town' },
-  { image: hero2, location: 'Cobra Sundowner, Cape Town' },
+  { image: hero1, location: "Bo-Kaap, Cape Town" },
+  { image: hero2, location: "Cobra Sundowner, Cape Town" },
   { image: hero3, location: "Simon's Town, Cape Town" },
-  { image: hero4, location: 'Cape Town' },
+  { image: hero4, location: "Cape Town" },
   // { image: hero5, location: 'Cobra Sundowner, Cape Town' },
-]
+];
 
-const SLIDE_MS = 6500
-const PROMO_MS = 5000 // how long each promo stays visible
+const SLIDE_MS = 6500;
+const PROMO_MS = 5000; // how long each promo stays visible
 
 // -----------------------------------------------------------------------------
 // Promotions shown under the tour select block.
@@ -46,39 +46,41 @@ const PROMO_MS = 5000 // how long each promo stays visible
 // -----------------------------------------------------------------------------
 const promos = [
   {
-    key: 'peninsula',
-    tag: 'Limited-time offer',
-    title: 'Cape Peninsula Tour',
-    short: 'Entry fees included.',
-    text: 'All entry fees included. Discover Cape Town’s iconic coastline at a special price, for a limited time only.',
-    stamp: { big: 'All-in', small: 'entry fees' },
+    key: "peninsula",
+    tag: "Limited-time offer",
+    title: "Cape Peninsula Tour",
+    short: "Entry fees included.",
+    text: "All entry fees included. Discover Cape Town’s iconic coastline at a special price, for a limited time only.",
+    stamp: { big: "All-in", small: "entry fees" },
     image: hero3, // TODO: swap for the Cape Peninsula tour cover image
-    cta: 'View tour',
-    to: '/tours/peninsula-tour-2', // tour slug
+    cta: "View tour",
+    to: "/tours/peninsula-tour-2", // tour slug
     // colours
-    card: 'bg-[linear-gradient(135deg,#fde047_0%,#facc15_45%,#f59e0b_100%)] text-[#1c1400]',
-    tagClass: 'bg-[#1c1400]/10 text-[#5b4200]',
-    sealClass: 'border-[#eab308] text-[#a16207]',
-    ctaClass: 'bg-[#1c1400] text-white group-hover:bg-black',
-    ring: 'ring-white/80',
+    card: "bg-[linear-gradient(135deg,#fde047_0%,#facc15_45%,#f59e0b_100%)] text-[#1c1400]",
+    tagClass: "bg-[#1c1400]/10 text-[#5b4200]",
+    sealClass: "border-[#eab308] text-[#a16207]",
+    ctaClass: "bg-[#1c1400] text-white group-hover:bg-black",
+    ring: "ring-white/80",
   },
   {
-    key: 'heritage',
-    tag: 'Must experience',
-    title: 'Heritage Cape Flats Community Tour',
-    short: 'Groups of 7–10 save 20%.',
-    text: 'Groups of 7–10 guests save 20%. Go deeper into Cape Town and take a story home with you.',
-    stamp: { big: '20%', small: 'off' },
+    key: "heritage",
+    tag: "Must experience",
+    title: "Heritage Cape Flats Community Tour",
+    short: "Groups of 7–10 save 20%.",
+    text: "Groups of 7–10 guests save 20%. Go deeper into Cape Town and take a story home with you.",
+    stamp: { big: "20%", small: "off" },
     image: hero1, // TODO: swap for the Heritage Cape Flats tour cover image
-    cta: 'View tour',
-    to: '/tours/heritage-faith-cape-flats-community-tour', // TODO: replace with the real slug
-    card: 'bg-[linear-gradient(135deg,#fb923c_0%,#f97316_50%,#ea580c_100%)] text-white',
-    tagClass: 'bg-white/20 text-white',
-    sealClass: 'border-[#fb923c] text-[#c2410c]',
-    ctaClass: 'bg-white text-[#c2410c] group-hover:bg-orange-50',
-    ring: 'ring-white/80',
+    cta: "View tour",
+    to: "/tours/heritage-faith-cape-flats-community-tour", // TODO: replace with the real slug
+
+    // colours (was orange)
+    card: "bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-600 text-white",
+    tagClass: "bg-white/20 text-white",
+    sealClass: "border-emerald-500 text-emerald-700",
+    ctaClass: "bg-white text-emerald-700 group-hover:bg-emerald-50",
+    ring: "ring-white/80",
   },
-]
+];
 
 // All promo CSS lives in one constant, so the <style> node never changes.
 //
@@ -138,7 +140,7 @@ const PROMO_CSS = `
     .promo-shine { display: none; }
     .promo-fill { animation: none; transform: scaleX(1); }
   }
-`
+`;
 
 // -----------------------------------------------------------------------------
 // PromoBanner
@@ -164,7 +166,7 @@ const PromoBanner = ({
 
     <div className="grid">
       {promos.map((p, i) => {
-        const isActive = i === active
+        const isActive = i === active;
 
         return (
           <div
@@ -259,14 +261,14 @@ const PromoBanner = ({
               </span>
             </Link>
           </div>
-        )
+        );
       })}
     </div>
 
     {/* Progress bars: the active one fills over PROMO_MS, all are clickable */}
     <div className="mt-1 flex justify-center gap-2">
       {promos.map((p, i) => {
-        const isActive = i === active
+        const isActive = i === active;
 
         return (
           <button
@@ -281,19 +283,19 @@ const PromoBanner = ({
               {isActive && ready && (
                 <span
                   aria-hidden="true"
-                  style={{ animationPlayState: paused ? 'paused' : 'running' }}
+                  style={{ animationPlayState: paused ? "paused" : "running" }}
                   className="promo-fill absolute inset-0 rounded-full bg-white"
                 />
               )}
             </span>
           </button>
-        )
+        );
       })}
     </div>
   </div>
-)
+);
 
-const ArrowDown = ({ className = 'h-4 w-4' }) => (
+const ArrowDown = ({ className = "h-4 w-4" }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
@@ -304,34 +306,34 @@ const ArrowDown = ({ className = 'h-4 w-4' }) => (
   >
     <path d="m6 9 6 6 6-6" />
   </svg>
-)
+);
 
 const Hero = () => {
-  const [currentSlide, setCurrentSlide] = useState(0)
+  const [currentSlide, setCurrentSlide] = useState(0);
   // Only slide 1 is in the server HTML (it is the LCP image).
   // The rest mount after window load so they never compete with it.
-  const [extrasReady, setExtrasReady] = useState(false)
-  const [promoState, setPromoState] = useState({ active: 0 })
-  const [promoPaused, setPromoPaused] = useState(false)
+  const [extrasReady, setExtrasReady] = useState(false);
+  const [promoState, setPromoState] = useState({ active: 0 });
+  const [promoPaused, setPromoPaused] = useState(false);
   // True once the page has loaded and fonts are ready: starts the promo clock.
-  const [promoReady, setPromoReady] = useState(false)
+  const [promoReady, setPromoReady] = useState(false);
 
-  const heroRef = useRef(null)
-  const contentRef = useRef(null)
-  const tourSelectRef = useRef(null)
-  const promoRef = useRef(null)
-  const scrollRef = useRef(null)
-  const shineRef = useRef(null)
-  const arrowRef = useRef(null)
-  const bgRefs = useRef([])
-  const prevSlide = useRef(0)
+  const heroRef = useRef(null);
+  const contentRef = useRef(null);
+  const tourSelectRef = useRef(null);
+  const promoRef = useRef(null);
+  const scrollRef = useRef(null);
+  const shineRef = useRef(null);
+  const arrowRef = useRef(null);
+  const bgRefs = useRef([]);
+  const prevSlide = useRef(0);
   // Promo timer bookkeeping so hover pauses/resumes instead of restarting
-  const promoElapsed = useRef(0) // ms already shown for the current promo
-  const promoLastActive = useRef(0)
+  const promoElapsed = useRef(0); // ms already shown for the current promo
+  const promoLastActive = useRef(0);
 
   // Route changes go through the loading bar. A plain <Link> calls react-router's
   // navigate() directly, which never touches the bar.
-  const loadingNavigate = useLoadingNavigate()
+  const loadingNavigate = useLoadingNavigate();
   const goTo = (e, to) => {
     // let ctrl/cmd/shift/middle-click open a new tab as usual
     if (
@@ -342,97 +344,97 @@ const Hero = () => {
       e.shiftKey ||
       e.altKey
     )
-      return
-    e.preventDefault()
-    loadingNavigate(to)
-  }
+      return;
+    e.preventDefault();
+    loadingNavigate(to);
+  };
 
   const safeScroll = (id) => {
-    const el = document.getElementById(id)
+    const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      return
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
     }
-    window.scrollBy({ top: window.innerHeight * 0.9, behavior: 'smooth' })
-  }
+    window.scrollBy({ top: window.innerHeight * 0.9, behavior: "smooth" });
+  };
 
   // Load slides 2+ once the page has finished loading
   useEffect(() => {
-    if (document.readyState === 'complete') {
-      setExtrasReady(true)
-      return
+    if (document.readyState === "complete") {
+      setExtrasReady(true);
+      return;
     }
-    const onLoad = () => setExtrasReady(true)
-    window.addEventListener('load', onLoad)
-    return () => window.removeEventListener('load', onLoad)
-  }, [])
+    const onLoad = () => setExtrasReady(true);
+    window.addEventListener("load", onLoad);
+    return () => window.removeEventListener("load", onLoad);
+  }, []);
 
   // Wait for page load + web fonts before starting the promo rotation, so the
   // first rotation never happens while text is still being swapped in.
   useEffect(() => {
-    let cancelled = false
+    let cancelled = false;
 
     const loaded = new Promise((resolve) => {
-      if (document.readyState === 'complete') resolve()
-      else window.addEventListener('load', resolve, { once: true })
-    })
-    const fonts = document.fonts?.ready ?? Promise.resolve()
+      if (document.readyState === "complete") resolve();
+      else window.addEventListener("load", resolve, { once: true });
+    });
+    const fonts = document.fonts?.ready ?? Promise.resolve();
 
     Promise.all([loaded, fonts]).then(() => {
-      if (cancelled) return
+      if (cancelled) return;
       requestAnimationFrame(() =>
         requestAnimationFrame(() => {
-          if (!cancelled) setPromoReady(true)
-        })
-      )
-    })
+          if (!cancelled) setPromoReady(true);
+        }),
+      );
+    });
 
     return () => {
-      cancelled = true
-    }
-  }, [])
+      cancelled = true;
+    };
+  }, []);
 
   // Pin TourSelect while the hero scrolls away (desktop only)
   useEffect(() => {
-    const mm = gsap.matchMedia()
+    const mm = gsap.matchMedia();
 
-    mm.add('(min-width: 768px)', () => {
-      if (!heroRef.current || !tourSelectRef.current) return
+    mm.add("(min-width: 768px)", () => {
+      if (!heroRef.current || !tourSelectRef.current) return;
 
       const st = ScrollTrigger.create({
         trigger: heroRef.current,
-        start: 'top top',
-        end: 'bottom top',
+        start: "top top",
+        end: "bottom top",
         pin: tourSelectRef.current,
         pinSpacing: false,
-      })
+      });
 
-      return () => st.kill()
-    })
+      return () => st.kill();
+    });
 
-    return () => mm.revert()
-  }, [])
+    return () => mm.revert();
+  }, []);
 
   // Intro + looping animations
   useIsoLayoutEffect(() => {
     const reduceMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    ).matches
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     const ctx = gsap.context(() => {
-      const first = bgRefs.current[0]
+      const first = bgRefs.current[0];
 
       // Slide 1 is the only <img> in the server HTML. React does not repair a
       // mismatched `src` during hydration, so if the server build emitted a
       // different asset URL than the client bundle, the browser keeps the
       // broken one. Re-assert the client URL and retry if it failed to decode.
       if (first) {
-        const want = toSrc(slides[0].image)
+        const want = toSrc(slides[0].image);
         if (
-          first.getAttribute('src') !== want ||
+          first.getAttribute("src") !== want ||
           (first.complete && first.naturalWidth === 0)
         ) {
-          first.setAttribute('src', want)
+          first.setAttribute("src", want);
         }
       }
 
@@ -440,16 +442,16 @@ const Hero = () => {
         gsap.fromTo(
           first,
           { scale: 1.02 },
-          { scale: 1.08, duration: 7, ease: 'power1.out' }
-        )
+          { scale: 1.08, duration: 7, ease: "power1.out" },
+        );
       }
 
-      if (reduceMotion) return
+      if (reduceMotion) return;
 
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
       if (tourSelectRef.current) {
-        tl.from(tourSelectRef.current, { y: -10, opacity: 0, duration: 0.75 })
+        tl.from(tourSelectRef.current, { y: -10, opacity: 0, duration: 0.75 });
       }
 
       // NOTE: the promo banner is NOT animated with GSAP. It animates with CSS
@@ -459,8 +461,8 @@ const Hero = () => {
         tl.from(
           scrollRef.current,
           { y: 60, opacity: 0, duration: 0.55 },
-          '-=0.25'
-        )
+          "-=0.25",
+        );
       }
 
       if (arrowRef.current) {
@@ -469,8 +471,8 @@ const Hero = () => {
           duration: 0.95,
           repeat: -1,
           yoyo: true,
-          ease: 'sine.inOut',
-        })
+          ease: "sine.inOut",
+        });
       }
 
       if (shineRef.current) {
@@ -482,89 +484,89 @@ const Hero = () => {
             duration: 2.3,
             repeat: -1,
             repeatDelay: 1.1,
-            ease: 'none',
-          }
-        )
+            ease: "none",
+          },
+        );
       }
-    }, heroRef)
+    }, heroRef);
 
-    return () => ctx.revert()
-  }, [])
+    return () => ctx.revert();
+  }, []);
 
   // Automatic slideshow (pauses in background tabs, off for reduced motion)
   useEffect(() => {
-    if (!extrasReady || slides.length <= 1) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (!extrasReady || slides.length <= 1) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const interval = setInterval(() => {
-      if (document.hidden) return
-      setCurrentSlide((prev) => (prev + 1) % slides.length)
-    }, SLIDE_MS)
+      if (document.hidden) return;
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, SLIDE_MS);
 
-    return () => clearInterval(interval)
-  }, [extrasReady])
+    return () => clearInterval(interval);
+  }, [extrasReady]);
 
   // Rotate promos (one visible at a time; pauses on hover / hidden tab)
   const selectPromo = (next) =>
-    setPromoState((s) => (s.active === next ? s : { active: next }))
+    setPromoState((s) => (s.active === next ? s : { active: next }));
 
   useEffect(() => {
     // Don't start the clock until the page is settled
-    if (!promoReady || promos.length <= 1) return
+    if (!promoReady || promos.length <= 1) return;
 
     // A different promo is showing (auto or click): start its clock over
     if (promoLastActive.current !== promoState.active) {
-      promoLastActive.current = promoState.active
-      promoElapsed.current = 0
+      promoLastActive.current = promoState.active;
+      promoElapsed.current = 0;
     }
 
     // Hovering: keep the elapsed time, run nothing
-    if (promoPaused) return
+    if (promoPaused) return;
 
-    const startedAt = Date.now()
-    let id
+    const startedAt = Date.now();
+    let id;
 
     const advance = () => {
       // Don't rotate in a background tab; check again shortly
       if (document.hidden) {
-        id = setTimeout(advance, 500)
-        return
+        id = setTimeout(advance, 500);
+        return;
       }
-      setPromoState((s) => ({ active: (s.active + 1) % promos.length }))
-    }
+      setPromoState((s) => ({ active: (s.active + 1) % promos.length }));
+    };
 
-    id = setTimeout(advance, Math.max(0, PROMO_MS - promoElapsed.current))
+    id = setTimeout(advance, Math.max(0, PROMO_MS - promoElapsed.current));
 
     return () => {
-      clearTimeout(id)
+      clearTimeout(id);
       // Remember how long this promo has been visible so resuming continues
-      promoElapsed.current += Date.now() - startedAt
-    }
-  }, [promoReady, promoPaused, promoState.active])
+      promoElapsed.current += Date.now() - startedAt;
+    };
+  }, [promoReady, promoPaused, promoState.active]);
 
   // Slide cross-fade
   useEffect(() => {
-    const prev = prevSlide.current
-    const next = currentSlide
-    if (prev === next) return
+    const prev = prevSlide.current;
+    const next = currentSlide;
+    if (prev === next) return;
 
-    const prevBg = bgRefs.current[prev]
-    const nextBg = bgRefs.current[next]
-    if (!prevBg || !nextBg) return
+    const prevBg = bgRefs.current[prev];
+    const nextBg = bgRefs.current[next];
+    if (!prevBg || !nextBg) return;
 
-    gsap.killTweensOf([prevBg, nextBg])
-    gsap.set(nextBg, { opacity: 0, scale: 1.02 })
+    gsap.killTweensOf([prevBg, nextBg]);
+    gsap.set(nextBg, { opacity: 0, scale: 1.02 });
 
     gsap
       .timeline()
-      .to(prevBg, { opacity: 0, duration: 1.2, ease: 'power2.inOut' }, 0)
-      .to(nextBg, { opacity: 1, duration: 1.2, ease: 'power2.inOut' }, 0)
-      .to(nextBg, { scale: 1.08, duration: 6.5, ease: 'power1.out' }, 0)
+      .to(prevBg, { opacity: 0, duration: 1.2, ease: "power2.inOut" }, 0)
+      .to(nextBg, { opacity: 1, duration: 1.2, ease: "power2.inOut" }, 0)
+      .to(nextBg, { scale: 1.08, duration: 6.5, ease: "power1.out" }, 0);
 
-    prevSlide.current = next
-  }, [currentSlide])
+    prevSlide.current = next;
+  }, [currentSlide]);
 
-  const visibleSlides = extrasReady ? slides : slides.slice(0, 1)
+  const visibleSlides = extrasReady ? slides : slides.slice(0, 1);
 
   return (
     <section
@@ -578,20 +580,20 @@ const Hero = () => {
         <img
           key={slide.location + index}
           ref={(el) => {
-            bgRefs.current[index] = el
+            bgRefs.current[index] = el;
           }}
           src={toSrc(slide.image)}
           alt={slide.location}
           aria-hidden={index !== currentSlide}
-          loading={index === 0 ? 'eager' : 'lazy'}
-          fetchPriority={index === 0 ? 'high' : 'auto'}
-          decoding={index === 0 ? 'sync' : 'async'}
+          loading={index === 0 ? "eager" : "lazy"}
+          fetchPriority={index === 0 ? "high" : "auto"}
+          decoding={index === 0 ? "sync" : "async"}
           draggable={false}
           onError={(e) =>
-            console.error('[Hero] image failed to load:', e.currentTarget.src)
+            console.error("[Hero] image failed to load:", e.currentTarget.src)
           }
           className={`absolute inset-0 h-full w-full object-cover will-change-transform ${
-            index === 0 ? 'opacity-100' : 'opacity-0'
+            index === 0 ? "opacity-100" : "opacity-0"
           }`}
         />
       ))}
@@ -633,8 +635,8 @@ const Hero = () => {
           ref={scrollRef}
           href="#featured-tours"
           onClick={(e) => {
-            e.preventDefault()
-            safeScroll('featured-tours')
+            e.preventDefault();
+            safeScroll("featured-tours");
           }}
           className="absolute bottom-0 left-0 z-30 flex w-full max-w-full items-center justify-center overflow-hidden border-t border-white/10 bg-[linear-gradient(90deg,#002dcb_0%,#0938ef_50%,#002dcb_100%)] px-4 py-3 text-sm font-medium text-white/95 shadow-[0_-8px_30px_rgba(0,0,0,0.16)] backdrop-blur-md sm:py-4 sm:text-base md:text-lg"
         >
@@ -655,7 +657,7 @@ const Hero = () => {
         </a>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;

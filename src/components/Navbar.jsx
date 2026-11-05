@@ -201,6 +201,11 @@ const Navbar = () => {
   const isBooking = location.pathname === '/booking'
   const isSuccess = location.pathname === '/success'
 
+  // On the tours page only the logo and the kids button are visible
+  const isTours =
+    location.pathname === '/tours' ||
+    location.pathname.startsWith('/tours/')
+
   const [language, setLanguage] = useState('EN')
   const [menuOpen, setMenuOpen] = useState(false)
   const [hoverIndex, setHoverIndex] = useState(null)
@@ -855,6 +860,7 @@ const Navbar = () => {
             "
           >
             <img
+              ref={mainLogoRef}
               src="/assets/brand/logo-cf.webp"
               alt="Cape Frontier Travel & Tours"
               fetchPriority="high"
@@ -878,423 +884,435 @@ const Navbar = () => {
 
           {/* =====================================================
               DESKTOP NAV
+              (on /tours this wrapper stays visible on every screen
+               size, but only the kids button is rendered inside it)
           ===================================================== */}
 
           <div
-            className="
+            className={`
               ml-auto
-              hidden
               min-w-0
               items-center
               gap-2
-              md:flex
               lg:gap-3
-            "
+              ${
+                isTours
+                  ? 'flex'
+                  : 'hidden md:flex'
+              }
+            `}
           >
 
-            {/* =================================================
-                CAPE TOWN TOURISM AFFILIATION
-            ================================================= */}
+            {!isTours && (
+              <>
+                {/* =================================================
+                    CAPE TOWN TOURISM AFFILIATION
+                ================================================= */}
 
-            <div
-              ref={affiliationRef}
-              className="
-                group
-                relative
-                hidden
-                shrink-0
-                items-center
-                sm:flex
-                hover:bg-white
-                rounded-full
-                duration-300
-              "
-              onMouseEnter={
-                animateAffiliationIn
-              }
-              onMouseLeave={
-                animateAffiliationOut
-              }
-            >
-              {/* Divider */}
-
-              <div
-                className="
-                  mr-1
-                  h-8
-                  w-px
-                  shrink-0
-                  bg-gradient-to-b
-                  from-transparent
-                  via-white/30
-                  to-transparent
-                "
-              />
-
-              <a
-                href="https://www.capetown.travel"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Cape Town Tourism"
-                className="
-                  relative
-                  flex
-                  items-center
-                  gap-2
-                  overflow-hidden
-                  rounded-full
-                  border
-                  border-white/10
-                  bg-white/[0.055]
-                  px-2.5
-                  py-1
-                  backdrop-blur-xl
-                  shadow-[0_8px_30px_rgba(0,0,0,0.12)]
-                  transition-colors
-                  duration-300
-                  hover:border-white/25
-                  hover:bg-white/[0.10]
-                "
-              >
-
-                {/* Animated light sweep */}
-
-                <span
-                  ref={affiliationGlowRef}
+                <div
+                  ref={affiliationRef}
                   className="
-                    pointer-events-none
-                    absolute
-                    -inset-y-4
-                    left-0
-                    w-8
-                    -skew-x-12
-                    bg-white/30
-                    blur-md
-                    opacity-0
-                  "
-                />
-
-                {/* In affiliation with */}
-
-                <span
-                  ref={affiliationTextRef}
-                  className="
+                    group
                     relative
-                    z-10
-                    block
-                    shrink-0
-                    overflow-hidden
-                    whitespace-nowrap
-                    font-frank
-                    text-md
-                    text-blue-600
-                    font-bold
-                  "
-                  style={{
-                    width: 0,
-                    opacity: 0,
-                  }}
-                >
-                  Affiliation  {'"Love Cape Town"'}
-                </span>
-
-                {/* Handshake */}
-
-                <span
-                  ref={
-                    affiliationHandshakeRef
-                  }
-                  className="
-                    relative
-                    z-10
-                    flex
-                    h-7
-                    w-7
+                    hidden
                     shrink-0
                     items-center
-                    justify-center
+                    sm:flex
+                    hover:bg-white
                     rounded-full
-                    bg-white/[0.08]
+                    duration-300
                   "
+                  onMouseEnter={
+                    animateAffiliationIn
+                  }
+                  onMouseLeave={
+                    animateAffiliationOut
+                  }
                 >
-                  <img
-                    src="/icons/handshake.webp"
+                  {/* Divider */}
+
+                  <div
                     className="
-                      h-4.5
-                      w-4.5
-                      object-contain
+                      mr-1
+                      h-8
+                      w-px
+                      shrink-0
+                      bg-gradient-to-b
+                      from-transparent
+                      via-white/30
+                      to-transparent
                     "
-                    alt=""
-                    aria-hidden="true"
                   />
-                </span>
 
-                {/* Love Cape Town */}
-
-                <img
-                  ref={affiliationLogoRef}
-                  src="/assets/brand/logo-love-ct-blue.webp"
-                  className="
-                    relative
-                    z-10
-                    h-8
-                    w-auto
-                    shrink-0
-                    object-contain
-                    opacity-90
-                  "
-                  alt="Love Cape Town"
-                />
-
-              </a>
-            </div>
-
-
-            <nav
-              className="
-                flex
-                items-center
-                gap-1
-                rounded-full
-                bg-blue-600
-                px-4
-                shadow-[0_8px_30px_rgba(0,0,0,0.16)]
-                lg:gap-2
-                lg:px-8
-              "
-              aria-label="Desktop navigation"
-            >
-
-              {navItems.map(
-                (item, index) => (
-                  <button
-                    key={item.label}
-                    type="button"
-                    onClick={(event) =>
-                      handleNavClick(
-                        item.target,
-                        event
-                      )
-                    }
-                    onMouseEnter={(event) =>
-                      openMega(
-                        item.label,
-                        index,
-                        event
-                      )
-                    }
-                    onMouseLeave={
-                      scheduleCloseMega
-                    }
+                  <a
+                    href="https://www.capetown.travel"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Cape Town Tourism"
                     className="
+                      relative
+                      flex
+                      items-center
+                      gap-2
+                      overflow-hidden
                       rounded-full
+                      border
+                      border-white/10
+                      bg-white/[0.055]
                       px-2.5
-                      py-2
-                      text-sm
-                      font-bold
-                      text-white
-                      transition-all
+                      py-1
+                      backdrop-blur-xl
+                      shadow-[0_8px_30px_rgba(0,0,0,0.12)]
+                      transition-colors
                       duration-300
-                      hover:bg-white/20
-                      hover:text-white
-                      lg:px-4
+                      hover:border-white/25
+                      hover:bg-white/[0.10]
                     "
                   >
+
+                    {/* Animated light sweep */}
+
                     <span
+                      ref={affiliationGlowRef}
+                      className="
+                        pointer-events-none
+                        absolute
+                        -inset-y-4
+                        left-0
+                        w-8
+                        -skew-x-12
+                        bg-white/30
+                        blur-md
+                        opacity-0
+                      "
+                    />
+
+                    {/* In affiliation with */}
+
+                    <span
+                      ref={affiliationTextRef}
                       className="
                         relative
-                        inline-flex
+                        z-10
+                        block
+                        shrink-0
+                        overflow-hidden
+                        whitespace-nowrap
+                        font-frank
+                        text-md
+                        text-blue-600
+                        font-bold
+                      "
+                      style={{
+                        width: 0,
+                        opacity: 0,
+                      }}
+                    >
+                      Affiliation  {'"Love Cape Town"'}
+                    </span>
+
+                    {/* Handshake */}
+
+                    <span
+                      ref={
+                        affiliationHandshakeRef
+                      }
+                      className="
+                        relative
+                        z-10
+                        flex
+                        h-7
+                        w-7
+                        shrink-0
                         items-center
+                        justify-center
+                        rounded-full
+                        bg-white/[0.08]
                       "
                     >
-                      {item.label}
-
-                      <span
-                        className={`
-                          absolute
-                          -bottom-1
-                          left-0
-                          h-[2px]
-                          rounded-full
-                          bg-white
-                          transition-all
-                          duration-300
-                          ${
-                            hoverIndex === index
-                              ? 'w-full opacity-100'
-                              : 'w-0 opacity-0'
-                          }
-                        `}
+                      <img
+                        src="/icons/handshake.webp"
+                        className="
+                          h-4.5
+                          w-4.5
+                          object-contain
+                        "
+                        alt=""
+                        aria-hidden="true"
                       />
                     </span>
-                  </button>
-                )
-              )}
-            </nav>
 
-            {/* KIDS ACTIVITIES */}
+                    {/* Love Cape Town */}
+
+                    <img
+                      ref={affiliationLogoRef}
+                      src="/assets/brand/logo-love-ct-blue.webp"
+                      className="
+                        relative
+                        z-10
+                        h-8
+                        w-auto
+                        shrink-0
+                        object-contain
+                        opacity-90
+                      "
+                      alt="Love Cape Town"
+                    />
+
+                  </a>
+                </div>
+
+                <nav
+                  className="
+                    flex
+                    items-center
+                    gap-1
+                    rounded-full
+                    bg-blue-600
+                    px-4
+                    shadow-[0_8px_30px_rgba(0,0,0,0.16)]
+                    lg:gap-2
+                    lg:px-8
+                  "
+                  aria-label="Desktop navigation"
+                >
+
+                  {navItems.map(
+                    (item, index) => (
+                      <button
+                        key={item.label}
+                        type="button"
+                        onClick={(event) =>
+                          handleNavClick(
+                            item.target,
+                            event
+                          )
+                        }
+                        onMouseEnter={(event) =>
+                          openMega(
+                            item.label,
+                            index,
+                            event
+                          )
+                        }
+                        onMouseLeave={
+                          scheduleCloseMega
+                        }
+                        className="
+                          rounded-full
+                          px-2.5
+                          py-2
+                          text-sm
+                          font-bold
+                          text-white
+                          transition-all
+                          duration-300
+                          hover:bg-white/20
+                          hover:text-white
+                          lg:px-4
+                        "
+                      >
+                        <span
+                          className="
+                            relative
+                            inline-flex
+                            items-center
+                          "
+                        >
+                          {item.label}
+
+                          <span
+                            className={`
+                              absolute
+                              -bottom-1
+                              left-0
+                              h-[2px]
+                              rounded-full
+                              bg-white
+                              transition-all
+                              duration-300
+                              ${
+                                hoverIndex === index
+                                  ? 'w-full opacity-100'
+                                  : 'w-0 opacity-0'
+                              }
+                            `}
+                          />
+                        </span>
+                      </button>
+                    )
+                  )}
+                </nav>
+              </>
+            )}
+
+            {/* KIDS ACTIVITIES (always visible, including /tours) */}
             <KidsActivitiesNavbar />
 
             {/* =================================================
                 CONTACT
             ================================================= */}
 
-            <button
-              type="button"
-              onClick={() => {
-                const contact =
-                  document.querySelector(
-                    '#contact'
-                  )
+            {!isTours && (
+              <button
+                type="button"
+                onClick={() => {
+                  const contact =
+                    document.querySelector(
+                      '#contact'
+                    )
 
-                if (!contact) return
+                  if (!contact) return
 
-                contact.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
-                })
-              }}
-              className="
-                flex
-                shrink-0
-                items-center
-                gap-2
-                rounded-full
-                border
-                border-white/14
-                bg-white
-                px-3
-                py-1
-                text-xs
-                font-extrabold
-                text-blue-600
-                shadow-[0_8px_30px_rgba(0,0,0,0.16)]
-                transition
-                duration-300
-                hover:-translate-y-0.5
-                hover:bg-green
-              "
-            >
-              <img
-                src="/icons/faqBlue.png"
+                  contact.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                  })
+                }}
                 className="
-                  h-4
-                  w-4
-                  sm:h-5
-                  sm:w-5
+                  flex
+                  shrink-0
+                  items-center
+                  gap-2
+                  rounded-full
+                  border
+                  border-white/14
+                  bg-white
+                  px-3
+                  py-1
+                  text-xs
+                  font-extrabold
+                  text-blue-600
+                  shadow-[0_8px_30px_rgba(0,0,0,0.16)]
+                  transition
+                  duration-300
+                  hover:-translate-y-0.5
+                  hover:bg-green
                 "
-                alt="CONTACT"
-              />
+              >
+                <img
+                  src="/icons/faqBlue.png"
+                  className="
+                    h-4
+                    w-4
+                    sm:h-5
+                    sm:w-5
+                  "
+                  alt="CONTACT"
+                />
 
-              <span>
-                Contact
-              </span>
-            </button>
+                <span>
+                  Contact
+                </span>
+              </button>
+            )}
 
           </div>
 
           {/* =====================================================
-              MOBILE MENU BUTTON
+              MOBILE MENU BUTTON (hidden on /tours)
           ===================================================== */}
 
-          <div
-            className="
-              ml-auto
-              flex
-              shrink-0
-              items-center
-              gap-1.5
-              sm:hidden
-            "
-          >
-            <button
-              type="button"
-              aria-label="Toggle menu"
-              aria-expanded={menuOpen}
-              onClick={(event) => {
-                event.preventDefault()
-                event.stopPropagation()
-                setMenuOpen(
-                  (prev) => !prev
-                )
-              }}
+          {!isTours && (
+            <div
               className="
+                ml-auto
                 flex
-                h-9
-                w-9
                 shrink-0
                 items-center
-                justify-center
-                rounded-full
-                border
-                border-white/14
-                bg-white/8
-                backdrop-blur-sm
+                gap-1.5
+                sm:hidden
               "
             >
-              <div
+              <button
+                type="button"
+                aria-label="Toggle menu"
+                aria-expanded={menuOpen}
+                onClick={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  setMenuOpen(
+                    (prev) => !prev
+                  )
+                }}
                 className="
-                  relative
                   flex
-                  h-4
-                  w-5
-                  flex-col
-                  justify-between
+                  h-9
+                  w-9
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-full
+                  border
+                  border-white/14
+                  bg-white/8
+                  backdrop-blur-sm
                 "
               >
-                <span
-                  className={`
-                    block
-                    h-[2px]
-                    w-full
-                    rounded-full
-                    bg-white
-                    transition-all
-                    duration-300
-                    ${
-                      menuOpen
-                        ? 'translate-y-[7px] rotate-45'
-                        : ''
-                    }
-                  `}
-                />
+                <div
+                  className="
+                    relative
+                    flex
+                    h-4
+                    w-5
+                    flex-col
+                    justify-between
+                  "
+                >
+                  <span
+                    className={`
+                      block
+                      h-[2px]
+                      w-full
+                      rounded-full
+                      bg-white
+                      transition-all
+                      duration-300
+                      ${
+                        menuOpen
+                          ? 'translate-y-[7px] rotate-45'
+                          : ''
+                      }
+                    `}
+                  />
 
-                <span
-                  className={`
-                    block
-                    h-[2px]
-                    w-full
-                    rounded-full
-                    bg-white
-                    transition-all
-                    duration-300
-                    ${
-                      menuOpen
-                        ? 'opacity-0'
-                        : 'opacity-100'
-                    }
-                  `}
-                />
+                  <span
+                    className={`
+                      block
+                      h-[2px]
+                      w-full
+                      rounded-full
+                      bg-white
+                      transition-all
+                      duration-300
+                      ${
+                        menuOpen
+                          ? 'opacity-0'
+                          : 'opacity-100'
+                      }
+                    `}
+                  />
 
-                <span
-                  className={`
-                    block
-                    h-[2px]
-                    w-full
-                    rounded-full
-                    bg-white
-                    transition-all
-                    duration-300
-                    ${
-                      menuOpen
-                        ? '-translate-y-[7px] -rotate-45'
-                        : ''
-                    }
-                  `}
-                />
-              </div>
-            </button>
-          </div>
+                  <span
+                    className={`
+                      block
+                      h-[2px]
+                      w-full
+                      rounded-full
+                      bg-white
+                      transition-all
+                      duration-300
+                      ${
+                        menuOpen
+                          ? '-translate-y-[7px] -rotate-45'
+                          : ''
+                      }
+                    `}
+                  />
+                </div>
+              </button>
+            </div>
+          )}
 
         </div>
       </header>
@@ -1303,7 +1321,8 @@ const Navbar = () => {
           DESKTOP BACKDROP
       ========================================================= */}
 
-      {activeMegaData &&
+      {!isTours &&
+        activeMegaData &&
         typeof document !== 'undefined' &&
         createPortal(
           <div
@@ -1324,7 +1343,8 @@ const Navbar = () => {
           DESKTOP MEGA PANEL
       ========================================================= */}
 
-      {activeMegaData &&
+      {!isTours &&
+        activeMegaData &&
         typeof document !== 'undefined' &&
         createPortal(
           <div
@@ -1678,7 +1698,8 @@ const Navbar = () => {
           MOBILE MENU
       ========================================================= */}
 
-      {menuOpen &&
+      {!isTours &&
+        menuOpen &&
         typeof document !== 'undefined' &&
         createPortal(
           <div

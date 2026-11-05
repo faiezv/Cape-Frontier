@@ -506,7 +506,7 @@ export const tours = [
     duration: "2 - 3 hours",
 
     priceBase: 2000,
-    minPeople: 1,
+    minPeople: 2,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
@@ -838,7 +838,7 @@ export const tours = [
     location: "Signal Hill or Lion's Head, Cape Town (weather dependent)",
     duration: "1 - 2 hours",
 
-    priceBase: 3200,
+    priceBase: 3000,
     minPeople: 1,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
@@ -846,12 +846,12 @@ export const tours = [
     pricing: [
       {
         category: "1 Adult",
-        pricePerPerson: 3200,
+        pricePerPerson: 3000,
         note: "All-inclusive per person",
       },
       {
         category: "Children (5–17 years)",
-        pricePerPerson: 2900,
+        pricePerPerson: 2600,
         note: "All-inclusive per child",
       },
     ],
@@ -873,7 +873,7 @@ export const tours = [
       tiers: [
         {
           minPeople: 2,
-          perPerson: 3000,
+          perPerson: 2800,
           label: "2+ Guests",
           note: "All-inclusive",
         },
@@ -2619,7 +2619,7 @@ export const tours = [
     duration: "3 - 4 hours",
 
     priceBase: 1900,
-    minPeople: 1,
+    minPeople: 2,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
@@ -2780,7 +2780,7 @@ export const tours = [
     duration: "4 - 5 hours",
 
     priceBase: 1900,
-    minPeople: 1,
+    minPeople: 2,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
@@ -3315,7 +3315,7 @@ export const tours = [
     duration: "4 - 5 hours",
 
     priceBase: 1990,
-    minPeople: 1,
+    minPeople: 2,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
@@ -3578,7 +3578,7 @@ export const tours = [
     duration: "7 hours (09:00 – 16:00)",
 
     priceBase: 2500, // Price not specified in the brief
-    minPeople: 2,
+    minPeople: 4,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
@@ -4024,7 +4024,7 @@ export const tours = [
     duration: "Full Day / Approximately 9 Hours",
 
     priceBase: 1950,
-    minPeople: 1,
+    minPeople: 2,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
@@ -4065,10 +4065,10 @@ export const tours = [
 
       tiers: [
         {
-          minPeople: 1,
+          minPeople: 2,
           maxPeople: 3,
           perPerson: 1950,
-          label: "1–3 Guests",
+          label: "2–3 Guests",
           note: "Includes ALL adult/child entry fees.",
         },
         {
@@ -4857,7 +4857,7 @@ export const tours = [
       enabled: true,
       icon: "/icons/savemore.png",
       rules: [
-        { minPeople: 4, discountPercent: 10 },
+        { minPeople: 5, discountPercent: 10 },
         { minPeople: 7, discountPercent: 15 },
       ],
     },
@@ -8038,7 +8038,7 @@ export const tours = [
     duration: "Full Day",
 
     priceBase: 1865,
-    minPeople: 1,
+    minPeople: 2,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
@@ -9354,7 +9354,7 @@ export const tours = [
     duration: "7–8 hours",
 
     priceBase: 1950,
-    minPeople: 1,
+    minPeople: 2,
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
@@ -10310,7 +10310,7 @@ export const tours = [
     duration: "4 Days / 3 Nights",
 
     priceBase: 39500, // only known price; lower it if group discounts are confirmed
-    minPeople: 1, // QUERY CLIENT
+    minPeople: 2, // QUERY CLIENT
     baseCurrency: "ZAR",
     supportedCurrencies: SUPPORTED_CURRENCIES,
 
