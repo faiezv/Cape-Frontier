@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { resolveImage } from "../../utils/ImageLoader";
 import { getPriceLabel, hasGroupDeal } from "../../utils/tourHelpers";
+import { useCurrency } from "../../utils/currency";
 
 const FALLBACK_IMG = "/images/content/random/1.webp";
 
@@ -530,6 +531,7 @@ function ReviewModal({ tour, onClose, onSubmitReview }) {
 
 export function TourCard({ tour, onOpen, onSubmitReview }) {
   const { amount, note } = getPriceLabel(tour);
+  const { format } = useCurrency();
 
   const rating = getRating(tour);
   const reviewCount = getReviewCount(tour);
@@ -617,7 +619,7 @@ export function TourCard({ tour, onOpen, onSubmitReview }) {
               </span>
               <div className="flex items-baseline gap-1.5">
                 <span className="font-frank text-2xl font-bold leading-none text-neutral-950">
-                  R{Number(amount).toLocaleString()}
+                  {format(amount)}
                 </span>
                 {note && (
                   <span className="truncate text-[11px] font-medium text-neutral-500">
@@ -667,6 +669,7 @@ export function TourCard({ tour, onOpen, onSubmitReview }) {
 
 export function TourQuickView({ tour, onClose, onBook, onSubmitReview }) {
   const { amount, note } = getPriceLabel(tour);
+  const { format, isBase } = useCurrency();
 
   const rating = getRating(tour);
   const reviewCount = getReviewCount(tour);
@@ -939,15 +942,21 @@ export function TourQuickView({ tour, onClose, onBook, onSubmitReview }) {
 
           {/* Fixed Footer — one price only */}
           <div className="shrink-0 border-t border-neutral-100 bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-8 sm:py-6">
-            <div className="mb-4 flex items-baseline gap-2">
+            <div className="mb-4 flex flex-wrap items-baseline gap-x-2">
               <span className="text-sm font-medium text-neutral-500">From</span>
               <span className="font-frank text-3xl font-bold text-neutral-950">
-                R{Number(amount).toLocaleString()}
+                {format(amount)}
               </span>
               {note && (
                 <span className="text-sm font-medium text-neutral-500">
                   {note}
                 </span>
+              )}
+              {!isBase && (
+                <p className="mt-1 w-full text-xs font-medium text-neutral-500">
+                  Approximate price. You are charged in South African rand
+                  (ZAR) at checkout.
+                </p>
               )}
             </div>
             <div className="grid grid-cols-2 gap-3">

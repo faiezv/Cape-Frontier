@@ -10,6 +10,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Seo from "../components/Seo";
 import SiteFooter from "../components/SiteFooter";
+import { site } from "../utils/siteConfig.js";
 import { tours } from "../data/tours";
 import { hasGroupDeal, getDurationBucket } from "../utils/tourHelpers";
 import {
@@ -18,6 +19,7 @@ import {
   TourGrid,
   TourQuickView,
 } from "../components/Tours/TourCards";
+import CurrencySelector from "../components/Tours/CurrencySelector";
 import BookingDrawer, { getTourSlug } from "../components/Tours/BookingDrawer";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -38,6 +40,15 @@ const SHOW_FILTERS = false;
 const NAVBAR_HEIGHT_LG = 84;
 const PROMO_BAR_HEIGHT = 88;
 const PIN_GAP = 16;
+
+// Per-site SEO copy for this page
+const isZA = site.key === "coza";
+const TOURS_TITLE = isZA
+  ? "Cape Town Tours | Book in Rand | Cape Frontier"
+  : "Cape Town & Western Cape Tours | Cape Frontier";
+const TOURS_DESCRIPTION = isZA
+  ? "Browse small-group and private Cape Town tours with local rand pricing, from wine routes and hiking to adrenaline experiences."
+  : "Browse small-group and private tours across Cape Town and the Western Cape, planned from abroad, from wine routes to hiking and adrenaline.";
 
 const TYPE_LABELS = {
   adrenaline: "Adrenaline",
@@ -619,9 +630,12 @@ function Tours() {
         }
       `}</style>
 
+      {/* path is required: without it the canonical becomes `${origin}undefined` */}
       <Seo
-        title="Tours - Cape Frontier"
-        description="Explore our variety tours tailored specifically for you."
+        title={TOURS_TITLE}
+        description={TOURS_DESCRIPTION}
+        path="/tours"
+        regionalTag={false}
       />
 
       {/* Animated Main Background Layer */}
@@ -731,6 +745,8 @@ function Tours() {
               <main ref={resultsRef} className="min-w-0 flex-1">
                 {/* Toolbar */}
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <CurrencySelector />
+
                   <div className="relative flex-1">
                     <svg
                       className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400"

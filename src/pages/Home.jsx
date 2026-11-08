@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { site } from "../utils/siteConfig.js";
 
 // SEO
 import Seo from "../components/Seo.jsx";
@@ -82,7 +83,8 @@ const Home = () => {
       const pastHero = window.scrollY > hero.offsetHeight * 0.5;
 
       const toursVisible =
-        HIDE_BUTTON_OVER_TOURS && isInViewport(document.getElementById("tours"));
+        HIDE_BUTTON_OVER_TOURS &&
+        isInViewport(document.getElementById("tours"));
       const contactVisible = isInViewport(contactSectionRef.current);
 
       setShowButton(pastHero && !toursVisible && !contactVisible);
@@ -352,9 +354,10 @@ const Home = () => {
   return (
     <>
       <Seo
-        title="Cape Frontier Travel & Tours | Guided Tours in South Africa"
-        description="Small-group and custom tours across the Western Cape."
+        title={site.homeTitle}
+        description={site.homeDescription}
         path="/"
+        regionalTag={false}
       />
       <div
         ref={pageRef}

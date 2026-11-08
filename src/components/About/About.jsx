@@ -4,13 +4,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import PopularTours from "./PopularTours.jsx";
 import StripeSponsored from "./StripeSponsored.jsx";
-import CurrentPopularTour from "./CurrentPopularTour.jsx";
-import ReviewsShowcase from "./ReviewsShowcase.jsx";
 import WhatMakesUsDifferent from "./WhatMakesUsDifferent.jsx";
 import FeaturedTours from "./FeaturedTours.jsx";
 import SeeAllTours from "./SeeAllTours.jsx";
 import Tours from "../Tours/Tours.jsx";
-import reviews from "../../data/reviews.js";
+import { site } from "../../utils/siteConfig.js";
 
 // -----------------------------------------------------------------------------
 // Import images (now inside src/assets/images/)
@@ -26,36 +24,85 @@ import faqBlueIcon from "../../../public/icons/faqBlue.png";
 gsap.registerPlugin(ScrollTrigger);
 
 // -----------------------------------------------------------------------------
-// intro slides (now using imported images)
+// Per-site copy
 // -----------------------------------------------------------------------------
-const exploreSlides = [
-  {
-    img: slide1,
-    eyebrow: "Cape Town experiences",
-    title: "Explore beyond the ordinary.",
-    desc: "From iconic viewpoints to hidden local gems, our guided routes are designed to feel immersive, personal, and unforgettable.",
+// The .co.za and .com builds share one codebase, so without this their visible
+// text is identical and Google merges them as duplicates. Edit the wording so
+// every claim is true for your business.
+//
+// Only the FIRST slide is in the pre-rendered HTML (the rotation runs in the
+// browser), so slide 0 (eyebrow, title, description), mobileDesc and the stats
+// carry the per-site wording.
+const COPY = {
+  coza: {
+    slides: [
+      {
+        eyebrow: "Cape Town tours in rand",
+        title: "Cape Town tours, priced in rand.",
+        desc: "Small-group and private Cape Town tours with local pricing in rand, from iconic viewpoints to hidden local gems.",
+      },
+      {
+        eyebrow: "Scenic routes",
+        title: "Discover routes worth remembering.",
+        desc: "Coastlines, mountains, Winelands and culture-rich stops, with local pickup support and easy online booking.",
+      },
+      {
+        eyebrow: "Trusted local guides",
+        title: "See Cape Town with real local insight.",
+        desc: "Every journey is led with care and local knowledge, by a Cape Town team you can reach on WhatsApp, phone or email.",
+      },
+    ],
+    mobileDesc:
+      "Guided Cape Town routes with local insight, scenic stops and prices in rand.",
+    stats: [
+      { value: "100%", label: "Personalised Service" },
+      { value: "Local", label: "Travel Expertise" },
+      { value: "Tailored", label: "Tour Experiences" },
+    ],
   },
-  {
-    img: slide5,
-    eyebrow: "Scenic routes",
-    title: "Discover routes worth remembering.",
-    desc: "Travel through coastlines, mountains, and culture-rich stops with tours that balance comfort, storytelling, and adventure.",
+  com: {
+    slides: [
+      {
+        eyebrow: "Plan your South Africa trip",
+        title: "Your South Africa trip, planned from abroad.",
+        desc: "Guided Cape Town and Western Cape tours for international visitors, planned with our local team before you arrive.",
+      },
+      {
+        eyebrow: "Scenic routes",
+        title: "Discover routes worth remembering.",
+        desc: "Travel through coastlines, mountains and Winelands with tours that balance comfort, storytelling and adventure.",
+      },
+      {
+        eyebrow: "Trusted local guides",
+        title: "See Cape Town with real local insight.",
+        desc: "Every journey is led with local knowledge, and our Cape Town team is on hand before and during your trip.",
+      },
+    ],
+    mobileDesc:
+      "Guided Cape Town routes with local insight, planned before you arrive.",
+    stats: [
+      { value: "Pre-trip", label: "Planning Support" },
+      { value: "Local", label: "Travel Expertise" },
+      { value: "Global", label: "Cards Accepted" },
+    ],
   },
-  {
-    img: slide6,
-    eyebrow: "Trusted local guides",
-    title: "See Cape Town with real local insight.",
-    desc: "Every journey is led with care, local knowledge, and a focus on giving travellers a premium experience from start to finish.",
-  },
-];
+};
+
+// Same switch as Tours.jsx: decided per build, so each domain's pre-rendered
+// HTML ships its own wording.
+const isZA = site.key === "coza";
+const copy = isZA ? COPY.coza : COPY.com;
+
+const slideImages = [slide1, slide5, slide6];
+
+const exploreSlides = copy.slides.map((item, index) => ({
+  ...item,
+  img: slideImages[index],
+}));
 
 // The linkCards array is commented out – we keep it as is.
 
-const stats = [
-  { value: "100%", label: "Personalised Service" },
-  { value: "Local", label: "Travel Expertise" },
-  { value: "Tailored", label: "Tour Experiences" },
-];
+const stats = copy.stats;
 
 const WORD_HOLD_TIME = 12.4;
 
@@ -259,7 +306,7 @@ const About = () => {
 
                 <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-2xl border border-white/20 bg-white/14 px-4 py-3 text-white backdrop-blur-md">
                   <div className="min-w-0">
-                    <p className="font-bitter text-[10px] font- uppercase tracking-[0.2em] text-white/75 sm:text-xs">
+                    <p className="font-bitter text-[10px] uppercase tracking-[0.2em] text-white/75 sm:text-xs">
                       {slide.eyebrow}
                     </p>
                     <p className="mt-1 truncate font-frank text-sm font-semibold sm:text-base">
@@ -299,7 +346,7 @@ const About = () => {
                   </p>
                 </div>
 
-                <div className="flex justify-center overflow-hidden text-center md:justify-center mdtext-left">
+                <div className="flex justify-center overflow-hidden text-center">
                   <h1
                     ref={(el) => {
                       textRefs.current[1] = el;
@@ -317,10 +364,7 @@ const About = () => {
                     }}
                     className="max-w-xl font-mont text-sm leading-6 text-black/60 sm:text-base sm:leading-7"
                   >
-                    <span className="md:hidden">
-                      Guided Cape Town routes with local insight, scenic stops,
-                      and easy booking.
-                    </span>
+                    <span className="md:hidden">{copy.mobileDesc}</span>
                     <span className="hidden md:inline">{slide.desc}</span>
                   </p>
                 </div>
@@ -369,16 +413,15 @@ const About = () => {
         </div>
       </section>
 
-
-        <section id="tours" ref={toursSectionRef} className="relative z-26">
-          <Tours />
-        </section>
+      <section id="tours" ref={toursSectionRef} className="relative z-26">
+        <Tours />
+      </section>
 
       {/* ---------------------------------------------------------------------
           journey area – link strip still commented out
       --------------------------------------------------------------------- */}
       <section className="relative z-20 w-full">
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 my sm:gap-8 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 sm:gap-8 sm:px-6 lg:px-8">
           {/* <div className="md:block">
             <CurrentPopularTour />
           </div> */}
@@ -389,7 +432,6 @@ const About = () => {
           </div>
 
           {/* <ReviewsShowcase reviews={reviews} NumberBadge={NumberBadge} /> */}
-
         </div>
       </section>
 

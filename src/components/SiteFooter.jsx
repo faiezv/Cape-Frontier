@@ -1,115 +1,146 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { WhatsAppIcon, WHATSAPP_URL } from './WhatsApp'
-import { resolveImage } from '../utils/ImageLoader.js'
+import React, { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { WhatsAppIcon, WHATSAPP_URL } from "./WhatsApp";
+import { resolveImage } from "../utils/ImageLoader.js";
+import { site } from "../utils/siteConfig.js";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
-const SITE_URL = 'https://cape-frontier.co.za'
-const SITEMAP_URL = `${SITE_URL}/sitemap.xml`
+const isZA = site.key === "coza";
 
-const CONTACT_EMAIL = 'admin@cape-frontier.co.za'
-const CONTACT_NUMBER = '(+27)72 264 7284'
-const CONTACT_TEL = '+27722647284'
-const INSTAGRAM_URL = 'https://www.instagram.com/'
-const INSTAGRAM_QR = '/assets/brand/instagram.png'
+const SITE_URL = site.origin;
+const SITEMAP_URL = `${SITE_URL}/sitemap.xml`;
+
+const CONTACT_EMAIL = "admin@cape-frontier.co.za";
+// Local format for .co.za, international format for .com
+const CONTACT_NUMBER = isZA ? "072 264 7284" : "+27 72 264 7284";
+const CONTACT_TEL = "+27722647284";
+
+// Per-site footer copy
+const BLURB_SHORT = isZA
+  ? "Guided Cape Town routes with local pickup. Prices in rand."
+  : "Guided Cape Town routes with local pickup, planned before you arrive.";
+const BLURB_LONG = isZA
+  ? "Guided Cape Town routes with local pickup support. Prices are in rand, and you pay online once your booking is confirmed."
+  : "Guided Cape Town routes with local pickup support and manual booking confirmation. Plan from abroad, pay online, then receive confirmation by email.";
+const CURRENCY_ALT = isZA
+  ? "South African Rand"
+  : "Prices shown in South African Rand";
+
+const INSTAGRAM_URL = "https://www.instagram.com/";
+const INSTAGRAM_QR = "/assets/brand/instagram.png";
 
 const footerBgImage = resolveImage(
-  '/src/assets/images/content/random/siteFooter.webp'
-)
+  "/src/assets/images/content/random/siteFooter.webp",
+);
 
 const sectionIdMap = {
-  About: 'about',
-  Stories: 'stories',
-  Gallery: 'gallery',
-  FAQ: 'faq',
-}
+  About: "about",
+  Stories: "stories",
+  Gallery: "gallery",
+  FAQ: "faq",
+};
 
 const exploreLinks = [
-  { label: 'Home', target: 'Home' },
-  { label: 'About', target: 'About' },
-  { label: 'Stories', target: 'Stories' },
-  { label: 'Gallery', target: 'Gallery' },
-  { label: 'Tours', target: '/tours' },
-  { label: 'FAQ', target: 'FAQ' },
-]
+  { label: "Home", target: "Home" },
+  { label: "About", target: "About" },
+  { label: "Stories", target: "Stories" },
+  { label: "Gallery", target: "Gallery" },
+  { label: "Tours", target: "/tours" },
+  { label: "FAQ", target: "FAQ" },
+];
 
 const tourLinks = [
-  { label: 'Adrenaline', target: '/tours' },
-  { label: 'Hiking', target: '/tours' },
-  { label: 'Historical', target: '/tours' },
-  { label: 'Packages', target: '/tours' },
-  { label: 'All tours', target: '/tours' },
-]
+  { label: "Adrenaline", target: "/tours" },
+  { label: "Hiking", target: "/tours" },
+  { label: "Historical", target: "/tours" },
+  { label: "Packages", target: "/tours" },
+  { label: "All tours", target: "/tours" },
+];
 
 const policyLinks = [
-  { label: 'Booking policy', target: '/policies#booking-policy' },
-  { label: 'Pickup policy', target: '/policies#pickup-policy' },
-  { label: 'Payment flow', target: '/policies#payment-policy' },
-  { label: 'Cancellations', target: '/policies#cancellation-policy' },
-  { label: 'Rescheduling', mobileHidden: true, target: '/policies#reschedule-policy' },
-  { label: 'Private tours', mobileHidden: true, target: '/policies#private-tour-policy' },
-  { label: 'Vehicles', mobileHidden: true, target: '/policies#vehicle-policy' },
-]
+  { label: "Booking policy", target: "/policies#booking-policy" },
+  { label: "Pickup policy", target: "/policies#pickup-policy" },
+  { label: "Payment flow", target: "/policies#payment-policy" },
+  { label: "Cancellations", target: "/policies#cancellation-policy" },
+  {
+    label: "Rescheduling",
+    mobileHidden: true,
+    target: "/policies#reschedule-policy",
+  },
+  {
+    label: "Private tours",
+    mobileHidden: true,
+    target: "/policies#private-tour-policy",
+  },
+  { label: "Vehicles", mobileHidden: true, target: "/policies#vehicle-policy" },
+];
 
 const informationLinks = [
-  { label: 'Privacy policy', target: '/policies' },
-  { label: 'Terms & conditions', target: '/policies' },
-  { label: 'Pickup information', target: '/policies#pickup-policy' },
-  { label: 'Tour availability', target: '/tours' },
+  { label: "Privacy policy", target: "/policies" },
+  { label: "Terms & conditions", target: "/policies" },
+  { label: "Pickup information", target: "/policies#pickup-policy" },
+  { label: "Tour availability", target: "/tours" },
   {
-    label: 'Accessibility',
+    label: "Accessibility",
     href: `mailto:${CONTACT_EMAIL}?subject=Accessibility%20request`,
   },
-  { label: 'Sitemap', href: SITEMAP_URL, external: true },
-]
+  { label: "Sitemap", href: SITEMAP_URL, external: true },
+];
 
 const affiliations = [
   {
-    label: 'The Capetonian',
-    logo: '/assets/brand/logo-the-capetonian.webp',
+    label: "The Capetonian",
+    logo: "/assets/brand/logo-the-capetonian.webp",
     href: null,
   },
   {
-    label: 'Love Cape Town',
-    logo: '/assets/brand/logo-love-ct-blue.webp',
+    label: "Love Cape Town",
+    logo: "/assets/brand/logo-love-ct-blue.webp",
     href: null,
   },
-]
+];
 
 const paymentMethods = [
-  { label: 'Visa', glyph: 'visa', icon: null, enabled: true },
-  { label: 'Mastercard', glyph: 'mastercard', icon: null, enabled: true },
-  { label: 'Apple Pay', glyph: 'applepay', icon: null, enabled: true },
-  { label: 'Google Pay', glyph: 'googlepay', icon: null, enabled: true },
-  { label: 'QR', glyph: 'qr', icon: null, enabled: true },
-  { label: 'EFT', glyph: 'bank', icon: null, enabled: false },
-  { label: 'Capitec Pay', glyph: null, icon: null, enabled: false },
-]
+  { label: "Visa", glyph: "visa", icon: null, enabled: true },
+  { label: "Mastercard", glyph: "mastercard", icon: null, enabled: true },
+  { label: "Apple Pay", glyph: "applepay", icon: null, enabled: true },
+  { label: "Google Pay", glyph: "googlepay", icon: null, enabled: true },
+  { label: "QR", glyph: "qr", icon: null, enabled: true },
+  { label: "EFT", glyph: "bank", icon: null, enabled: false },
+  { label: "Capitec Pay", glyph: null, icon: null, enabled: false },
+];
 
 // ─── Small pieces ────────────────────────────────────────────────────────────
 
 const glyphProps = {
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor',
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
   strokeWidth: 1.8,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-  'aria-hidden': true,
-  className: 'h-4 w-4 shrink-0',
-}
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  "aria-hidden": true,
+  className: "h-4 w-4 shrink-0",
+};
 
 function Glyph({ name }) {
   switch (name) {
-    case 'mastercard':
+    case "mastercard":
       return (
-        <svg viewBox="0 0 32 20" aria-hidden="true" className="h-4 w-auto shrink-0">
+        <svg
+          viewBox="0 0 32 20"
+          aria-hidden="true"
+          className="h-4 w-auto shrink-0"
+        >
           <circle cx="11" cy="10" r="9" fill="#EB001B" />
           <circle cx="21" cy="10" r="9" fill="#F79E1B" />
-          <path d="M16 2.52A9 9 0 0 1 16 17.48A9 9 0 0 1 16 2.52z" fill="#FF5F00" />
+          <path
+            d="M16 2.52A9 9 0 0 1 16 17.48A9 9 0 0 1 16 2.52z"
+            fill="#FF5F00"
+          />
         </svg>
-      )
-    case 'qr':
+      );
+    case "qr":
       return (
         <svg {...glyphProps}>
           <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -117,29 +148,29 @@ function Glyph({ name }) {
           <rect x="3" y="14" width="7" height="7" rx="1" />
           <path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" />
         </svg>
-      )
-    case 'bank':
+      );
+    case "bank":
       return (
         <svg {...glyphProps}>
           <path d="M3 9l9-5 9 5M5 10v8M10 10v8M14 10v8M19 10v8M3 20h18" />
         </svg>
-      )
+      );
     default:
-      return null
+      return null;
   }
 }
 
 function PaymentBadge({ label, glyph, icon }) {
-  const imgRef = useRef(null)
-  const [failed, setFailed] = useState(!icon)
+  const imgRef = useRef(null);
+  const [failed, setFailed] = useState(!icon);
 
   useEffect(() => {
-    const img = imgRef.current
-    if (img && img.complete && img.naturalWidth === 0) setFailed(true)
-  }, [])
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth === 0) setFailed(true);
+  }, []);
 
   if (failed || !icon) {
-    if (glyph === 'applepay') {
+    if (glyph === "applepay") {
       return (
         <li
           aria-label="Apple Pay"
@@ -158,10 +189,10 @@ function PaymentBadge({ label, glyph, icon }) {
             Pay
           </span>
         </li>
-      )
+      );
     }
 
-    if (glyph === 'googlepay') {
+    if (glyph === "googlepay") {
       return (
         <li
           aria-label="Google Pay"
@@ -175,16 +206,18 @@ function PaymentBadge({ label, glyph, icon }) {
             <span className="text-[#34A853]">l</span>
             <span className="text-[#EA4335]">e</span>
           </span>
-          <span className="text-[12px] font-semibold text-neutral-600">Pay</span>
+          <span className="text-[12px] font-semibold text-neutral-600">
+            Pay
+          </span>
         </li>
-      )
+      );
     }
   }
 
   const textClass =
-    glyph === 'visa'
-      ? 'text-[12px] font-extrabold italic tracking-tight text-[#1A1F71]'
-      : 'text-[11px] font-bold text-neutral-700'
+    glyph === "visa"
+      ? "text-[12px] font-extrabold italic tracking-tight text-[#1A1F71]"
+      : "text-[11px] font-bold text-neutral-700";
 
   return (
     <li className="flex h-8 items-center justify-center gap-1.5 rounded-md border border-black/10 bg-white px-2.5 text-neutral-700">
@@ -201,31 +234,46 @@ function PaymentBadge({ label, glyph, icon }) {
         <>
           <Glyph name={glyph} />
           <span className={`whitespace-nowrap ${textClass}`}>
-            {glyph === 'visa' ? 'VISA' : label}
+            {glyph === "visa" ? "VISA" : label}
           </span>
         </>
       )}
     </li>
-  )
+  );
 }
 
-const GmailIcon = ({ className = 'h-4 w-5 shrink-0' }) => (
+const GmailIcon = ({ className = "h-4 w-5 shrink-0" }) => (
   <svg
     viewBox="0 0 256 193"
     aria-hidden="true"
     focusable="false"
     className={className}
   >
-    <path fill="#4285F4" d="M58.182 192.05V93.14L27.507 65.077 0 49.504v125.091c0 9.658 7.825 17.455 17.455 17.455h40.727Z" />
-    <path fill="#34A853" d="M197.818 192.05h40.727c9.659 0 17.455-7.826 17.455-17.455V49.505l-31.156 17.837-27.026 25.798v98.91Z" />
-    <path fill="#EA4335" d="m58.182 93.14-4.174-38.647 4.174-36.989L128 69.868l69.818-52.364 4.67 34.992-4.67 40.644L128 145.504 58.182 93.14Z" />
-    <path fill="#FBBC04" d="M197.818 17.504V93.14L256 49.504V26.231c0-21.585-24.64-33.89-41.89-20.945l-16.292 12.218Z" />
-    <path fill="#C5221F" d="m0 49.504 26.759 20.07L58.182 93.14V17.504L41.89 5.286C24.61-7.66 0 4.646 0 26.23v23.273Z" />
+    <path
+      fill="#4285F4"
+      d="M58.182 192.05V93.14L27.507 65.077 0 49.504v125.091c0 9.658 7.825 17.455 17.455 17.455h40.727Z"
+    />
+    <path
+      fill="#34A853"
+      d="M197.818 192.05h40.727c9.659 0 17.455-7.826 17.455-17.455V49.505l-31.156 17.837-27.026 25.798v98.91Z"
+    />
+    <path
+      fill="#EA4335"
+      d="m58.182 93.14-4.174-38.647 4.174-36.989L128 69.868l69.818-52.364 4.67 34.992-4.67 40.644L128 145.504 58.182 93.14Z"
+    />
+    <path
+      fill="#FBBC04"
+      d="M197.818 17.504V93.14L256 49.504V26.231c0-21.585-24.64-33.89-41.89-20.945l-16.292 12.218Z"
+    />
+    <path
+      fill="#C5221F"
+      d="m0 49.504 26.759 20.07L58.182 93.14V17.504L41.89 5.286C24.61-7.66 0 4.646 0 26.23v23.273Z"
+    />
   </svg>
-)
+);
 
 const linkClass =
-  'text-neutral-600 underline-offset-4 decoration-blue-600/70 transition hover:text-[#071f4f] hover:underline focus-visible:underline focus-visible:outline-none'
+  "text-neutral-600 underline-offset-4 decoration-blue-600/70 transition hover:text-[#071f4f] hover:underline focus-visible:underline focus-visible:outline-none";
 
 function ColumnHeading({ children }) {
   return (
@@ -238,61 +286,62 @@ function ColumnHeading({ children }) {
         className="mt-2 block h-0.5 w-6 rounded-full bg-blue-500/40"
       />
     </div>
-  )
+  );
 }
 
 // ─── Footer ──────────────────────────────────────────────────────────────────
 
 function SiteFooter({ showDetails = true, showBackToTop }) {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [showQrPopup, setShowQrPopup] = useState(false)
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [showQrPopup, setShowQrPopup] = useState(false);
 
-  const isTours = location.pathname.includes('/tours')
-  const backToTopVisible = showBackToTop ?? true
+  const isTours = location.pathname.includes("/tours");
+  const backToTopVisible = showBackToTop ?? true;
 
-  const showNav = showDetails && !isTours
+  const showNav = showDetails && !isTours;
   const legalLinks = showNav
     ? informationLinks.filter(
-      (item) => !['Pickup information', 'Tour availability'].includes(item.label)
-    )
-    : informationLinks
+        (item) =>
+          !["Pickup information", "Tour availability"].includes(item.label),
+      )
+    : informationLinks;
 
   const scrollWindowTo = (y) => {
     if (window.lenis) {
-      window.lenis.scrollTo(Math.max(0, y), { duration: 1, force: true })
-      return
+      window.lenis.scrollTo(Math.max(0, y), { duration: 1, force: true });
+      return;
     }
-    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
-  }
+    window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+  };
 
-  const scrollToTop = () => scrollWindowTo(0)
+  const scrollToTop = () => scrollWindowTo(0);
 
   const goTo = (target, event) => {
-    event?.preventDefault?.()
-    if (!target) return
+    event?.preventDefault?.();
+    if (!target) return;
 
-    if (target.startsWith('/')) {
-      navigate(target)
-      return
+    if (target.startsWith("/")) {
+      navigate(target);
+      return;
     }
 
-    const sectionId = target === 'Home' ? 'top' : sectionIdMap[target]
-    if (!sectionId) return
+    const sectionId = target === "Home" ? "top" : sectionIdMap[target];
+    if (!sectionId) return;
 
-    if (location.pathname !== '/') {
-      navigate('/', { state: { scrollTo: sectionId } })
-      return
+    if (location.pathname !== "/") {
+      navigate("/", { state: { scrollTo: sectionId } });
+      return;
     }
 
-    if (sectionId === 'top') {
-      scrollToTop()
-      return
+    if (sectionId === "top") {
+      scrollToTop();
+      return;
     }
 
-    const el = document.getElementById(sectionId)
-    if (el) scrollWindowTo(el.getBoundingClientRect().top + window.scrollY)
-  }
+    const el = document.getElementById(sectionId);
+    if (el) scrollWindowTo(el.getBoundingClientRect().top + window.scrollY);
+  };
 
   const renderLink = (item) => {
     if (item.href) {
@@ -300,13 +349,13 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
         <a
           href={item.href}
           {...(item.external
-            ? { target: '_blank', rel: 'noopener noreferrer' }
+            ? { target: "_blank", rel: "noopener noreferrer" }
             : {})}
           className={`${linkClass} break-words`}
         >
           {item.label}
         </a>
-      )
+      );
     }
 
     return (
@@ -317,11 +366,11 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
       >
         {item.label}
       </button>
-    )
-  }
+    );
+  };
 
   const actionBtn =
-    'flex min-w-0 min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-black/10 bg-white px-2 text-xs font-bold text-[#071f4f] transition active:scale-95'
+    "flex min-w-0 min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-black/10 bg-white px-2 text-xs font-bold text-[#071f4f] transition active:scale-95";
 
   return (
     <>
@@ -339,14 +388,8 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
                       className="h-12 w-auto shrink-0 object-contain object-left sm:h-20"
                     />
                     <p className="font-bitter text-xs leading-5 text-neutral-600 sm:mt-3 sm:max-w-xs sm:text-sm sm:leading-6">
-                      <span className="sm:hidden">
-                        Guided Cape Town routes with local pickup support.
-                      </span>
-                      <span className="hidden sm:inline">
-                        Guided Cape Town routes, local pickup support and manual
-                        booking confirmation. Choose your tour, confirm your
-                        group, pay online, then receive confirmation.
-                      </span>
+                      <span className="sm:hidden">{BLURB_SHORT}</span>
+                      <span className="hidden sm:inline">{BLURB_LONG}</span>
                     </p>
                   </div>
                 )}
@@ -375,7 +418,9 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
                     {policyLinks.map((item) => (
                       <li
                         key={item.label}
-                        className={item.mobileHidden ? 'hidden sm:block' : undefined}
+                        className={
+                          item.mobileHidden ? "hidden sm:block" : undefined
+                        }
                       >
                         {renderLink(item)}
                       </li>
@@ -383,7 +428,7 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
                     <li className="sm:hidden">
                       <button
                         type="button"
-                        onClick={() => navigate('/policies')}
+                        onClick={() => navigate("/policies")}
                         className="text-sm font-semibold text-blue-600 underline-offset-4 hover:underline"
                       >
                         All policies →
@@ -442,11 +487,10 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
                     </div>
 
                     <div className="hidden min-w-0 sm:block">
-                     <a
+                      <a
                         href={`mailto:${CONTACT_EMAIL}`}
                         className={`${linkClass} inline-flex max-w-full items-center gap-2 break-all text-sm font-semibold text-[#071f4f]`}
                       >
-                        {/* 2. Added strict sizing here */}
                         <GmailIcon className="h-4 w-5 shrink-0" />
                         <span className="truncate">{CONTACT_EMAIL}</span>
                       </a>
@@ -502,8 +546,9 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
           )}
 
           <div
-            className={`w-full min-w-0 px-5 py-5 sm:px-8 sm:py-6 ${showDetails && isTours ? 'border-t border-black/5' : ''
-              }`}
+            className={`w-full min-w-0 px-5 py-5 sm:px-8 sm:py-6 ${
+              showDetails && isTours ? "border-t border-black/5" : ""
+            }`}
           >
             <div className="flex w-full min-w-0 flex-col items-center gap-4 lg:flex-row lg:justify-between">
               {showNav && (
@@ -519,8 +564,9 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
 
               <ul
                 aria-label="Legal"
-                className={`flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[11px] sm:text-xs ${showNav ? 'lg:justify-end' : 'w-full sm:justify-end'
-                  }`}
+                className={`flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[11px] sm:text-xs ${
+                  showNav ? "lg:justify-end" : "w-full sm:justify-end"
+                }`}
               >
                 {legalLinks.map((item) => (
                   <li key={item.label}>{renderLink(item)}</li>
@@ -549,7 +595,7 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
                         loading="lazy"
                         className="h-8 w-auto max-w-[100px] object-contain sm:h-11 sm:max-w-[140px]"
                       />
-                    )
+                    );
 
                     return (
                       <li key={label}>
@@ -567,7 +613,7 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
                           img
                         )}
                       </li>
-                    )
+                    );
                   })}
                 </ul>
               </div>
@@ -609,7 +655,7 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
               <div className="flex min-w-0 items-center gap-3">
                 <img
                   src="/icons/ZAR.png"
-                  alt="South African Rand"
+                  alt={CURRENCY_ALT}
                   className="h-8 w-8 shrink-0 rounded-full border border-white/10 object-cover shadow-[0_6px_18px_rgba(0,0,0,0.18)] sm:h-9 sm:w-9"
                 />
 
@@ -619,7 +665,7 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
                   </p>
 
                   <p className="mt-0.5 break-words text-[11px] text-white/80 sm:mt-1 sm:text-sm">
-                    Designed and built with <b>{'<3'}</b> by{' '}
+                    Designed and built with <b>{"<3"}</b> by{" "}
                     <span className="font-semibold text-white/90">
                       F. Viljoen & FO Creative
                     </span>
@@ -656,11 +702,11 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
 
       {/* QR Code Modal Popup */}
       {showQrPopup && (
-        <div 
+        <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
           onClick={() => setShowQrPopup(false)}
         >
-          <div 
+          <div
             className="relative w-full max-w-sm animate-in fade-in zoom-in-95 flex flex-col items-center rounded-[2rem] bg-white p-6 shadow-2xl duration-200"
             onClick={(e) => e.stopPropagation()}
           >
@@ -669,21 +715,41 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
               aria-label="Close popup"
               className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition hover:bg-neutral-200"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="h-4 w-4">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                className="h-4 w-4"
+              >
                 <path d="M18 6 6 18M6 6l12 12" />
               </svg>
             </button>
 
             <div className="mt-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white shadow-lg">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-7 w-7">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-7 w-7"
+              >
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                 <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
               </svg>
             </div>
 
-            <h3 className="mt-4 font-frank text-2xl font-bold text-neutral-950">Follow us on Instagram</h3>
-            <p className="mt-1 text-center text-sm text-neutral-500">Scan the QR code with your phone camera to follow our latest adventures.</p>
+            <h3 className="mt-4 font-frank text-2xl font-bold text-neutral-950">
+              Follow us on Instagram
+            </h3>
+            <p className="mt-1 text-center text-sm text-neutral-500">
+              Scan the QR code with your phone camera to follow our latest
+              adventures.
+            </p>
 
             <div className="mt-6 w-full max-w-[240px] overflow-hidden rounded-2xl border border-neutral-100 bg-neutral-50 p-4 shadow-inner">
               <img
@@ -700,7 +766,15 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
               className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 font-bitter text-sm font-bold text-white shadow-[0_8px_20px_rgba(37,99,235,0.24)] transition hover:bg-blue-700 active:scale-95"
             >
               Go to Instagram
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+              >
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                 <polyline points="15 3 21 3 21 9"></polyline>
                 <line x1="10" y1="14" x2="21" y2="3"></line>
@@ -710,7 +784,7 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
         </div>
       )}
     </>
-  )
+  );
 }
 
-export default SiteFooter
+export default SiteFooter;
