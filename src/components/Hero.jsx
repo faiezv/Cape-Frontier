@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 // TODO: adjust this path to wherever useLoadingNavigate lives
 import { useLoadingNavigate } from "./useLoadingNavigate";
 
-import ToursBrowser from "./Tours/ToursBrowser";
+import { site } from "../utils/siteConfig.js";
 
 // Adjust the relative path to wherever this file lives.
 // Filenames are case-sensitive on Vercel (Linux) - keep them exactly as on disk.
@@ -607,9 +607,10 @@ const Hero = () => {
           className="flex flex-1 flex-col items-center px-4 pb-24 pt-24 sm:px-6 sm:pb-12 sm:pt-12 md:px-8 md:pb-24 md:pt-28 lg:px-10 lg:pt-32"
         >
           {/* SEO: the page needs exactly one <h1>. Edit the copy to match your brand. */}
-          <h1 className="sr-only">
+          {/* <h1 className="sr-only">
             Cape Frontier - Guided tours and experiences in Cape Town
-          </h1>
+          </h1> */}
+          <h1 className="sr-only">{site.heroH1}</h1>
 
           {/* Placeholder used for the desktop TourSelect pinning.
               Adjust the min heights if the banner overlaps the search box. */}

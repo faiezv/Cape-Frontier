@@ -17,12 +17,14 @@ import SiteFooter from "/src/components/SiteFooter.jsx";
 import { useLoadingNavigate } from "/src/components/useLoadingNavigate.jsx";
 import { resolveTourImage as resolveImage } from "../utils/ImageLoader";
 
-import { formatMoney } from '../components/Tours/Helpers.jsx';
+import { formatMoney } from "../components/Tours/Helpers.jsx";
 
 // SEO
 import Seo from "../components/Seo.jsx";
 import { buildTourSchema } from "../utils/tourSchema.js";
-import reviews from '../data/reviews.js';
+import reviews from "../data/reviews.js";
+import { site } from "../utils/siteConfig.js";
+import { getTourSeo } from "../utils/tourSeo.js";
 
 // Shared
 import TourHero from "../components/TourDetails/TourHero";
@@ -54,7 +56,8 @@ const PIN_TOP_OFFSET = 96;
 
 const PHOTO_INBOX_EMAIL = "admin@cape-frontier.co.za";
 
-const formatCompactMoney = (amount, currencyCode = "ZAR") => formatMoney(amount, currencyCode);
+const formatCompactMoney = (amount, currencyCode = "ZAR") =>
+  formatMoney(amount, currencyCode);
 
 const getItemText = (item) => {
   if (!item) return "";
@@ -822,20 +825,27 @@ export default function TourDetails() {
 
   if (!tour) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center bg-white px-6 text-center">
-        <h1 className="font-frank text-4xl font-bold">Tour not found</h1>
+      <>
+        <Seo
+          title="Tour not found | Cape Frontier"
+          path={`/tours/${slug}`}
+          noindex
+        />
+        <main className="flex min-h-screen flex-col items-center justify-center bg-white px-6 text-center">
+          <h1 className="font-frank text-4xl font-bold">Tour not found</h1>
 
-        <p className="mt-3 font-bitter text-neutral-500">
-          This tour may have been moved or renamed.
-        </p>
+          <p className="mt-3 font-bitter text-neutral-500">
+            This tour may have been moved or renamed.
+          </p>
 
-        <button
-          onClick={() => navigate("/")}
-          className="hero-gradient mt-6 rounded-full px-6 py-3 font-bitter font-semibold text-white"
-        >
-          Back Home
-        </button>
-      </main>
+          <button
+            onClick={() => navigate("/")}
+            className="hero-gradient mt-6 rounded-full px-6 py-3 font-bitter font-semibold text-white"
+          >
+            Back Home
+          </button>
+        </main>
+      </>
     );
   }
 
@@ -902,14 +912,17 @@ export default function TourDetails() {
     }, 260);
   };
 
+  const { title: seoTitle, description: seoDescription } = getTourSeo(tour);
+
   return (
     <>
       <Seo
-        title={tour.seo?.title || `${tour.title} | Cape Frontier Travel`}
-        description={tour.seo?.description || tour.description}
+        title={seoTitle}
+        description={seoDescription}
         path={`/tours/${slug}`}
         image={tour.image}
         jsonLd={buildTourSchema(tour, reviews)}
+        regionalTag={false}
       />
 
       <main className="bg-white text-black">
@@ -951,11 +964,7 @@ export default function TourDetails() {
         >
           <div ref={contentColumnRef} className="space-y-9">
             {/* PRICING */}
-            <ContentBlock
-              eyebrow="Pricing"
-              title="Tour Pricing"
-              icon="pricing"
-            >
+            <ContentBlock eyebrow="Pricing" title="Tour Pricing" icon="pricing">
               <TourPricing pricing={tour.pricing} />
 
               {tour.additionalPricing?.length > 0 && (
@@ -975,6 +984,9 @@ export default function TourDetails() {
             >
               <p className="font-bitter text-lg text-black p-4">
                 {tour.description}
+              </p>
+              <p className="px-4 pb-4 font-bitter text-sm text-neutral-500">
+                {site.tourIntro}
               </p>
             </ContentBlock>
 
@@ -1202,8 +1214,8 @@ export default function TourDetails() {
                   </h3>
 
                   <p className="mt-3 font-bitter text-sm leading-relaxed text-white/90">
-                    Secure your spot on this experience. Fill in a quick
-                    request and we'll confirm availability.
+                    Secure your spot on this experience. Fill in a quick request
+                    and we'll confirm availability.
                   </p>
 
                   <button
@@ -1270,9 +1282,10 @@ export default function TourDetails() {
               className="mx-auto max-w-6xl px-4 py-10 lg:px-5 lg:py-10"
             >
               {/* Header with Skip Button moved here */}
-              <div className="relative z-30 flex flex-col gap-5 rounded-[1.25rem] bg-blue-50/85 p-4 text-center lg:flex-row 
-              lg:items-center lg:justify-between lg:gap-6 lg:p-15 lg:text-left">
-
+              <div
+                className="relative z-30 flex flex-col gap-5 rounded-[1.25rem] bg-blue-50/85 p-4 text-center lg:flex-row 
+              lg:items-center lg:justify-between lg:gap-6 lg:p-15 lg:text-left"
+              >
                 <div className="max-w-2xl">
                   <span className="font-bitter text-[11px] uppercase tracking-[0.24em] text-blue-600">
                     Full Itinerary
@@ -1301,8 +1314,11 @@ export default function TourDetails() {
                     className="group relative inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-6 py-3 font-bitter text-sm font-semibold text-white shadow-[0_8px_24px_rgba(37,99,235,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-700 active:scale-95"
                   >
                     {/* Pulse ring */}
-                    <span className="absolute inset-0 rounded-full bg-blue-500 opacity-40 animate-ping group-hover:animate-none pointer-events-none" style={{ animationDuration: '2s' }} />
-                    
+                    <span
+                      className="absolute inset-0 rounded-full bg-blue-500 opacity-40 animate-ping group-hover:animate-none pointer-events-none"
+                      style={{ animationDuration: "2s" }}
+                    />
+
                     <span className="relative z-10 flex items-center gap-2">
                       Skip to booking
                       <svg
@@ -1421,7 +1437,6 @@ export default function TourDetails() {
         <section className="max-w-5xl mx-auto flex justify-center border border-black/5 py-10 lg:py-12">
           <SiteFooter />
         </section>
-
       </main>
     </>
   );
@@ -1516,12 +1531,11 @@ function TickCard({ text }) {
   );
 }
 
-
 function MobileRequestCard({ tour, relatedTours, scrollToBooking, navigate }) {
   return (
     <div className="rounded-[1.25rem] border border-blue-100 bg-white p-4 shadow-[0_14px_36px_rgba(37,99,235,0.08)]">
       {/* Removed the redundant title and "read to book" text */}
-      
+
       <button
         type="button"
         onClick={scrollToBooking}

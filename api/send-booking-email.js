@@ -1,14 +1,11 @@
 import { Resend } from "resend";
+import { getSite } from "./_lib/site.js";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const BRAND = {
   name: "Cape Frontier",
   fullName: "Cape Frontier Travel & Tours",
-  website: process.env.BRAND_WEBSITE_URL || "https://preview.cape-frontier.co.za",
-  logoUrl:
-    process.env.BRAND_LOGO_URL ||
-    "https://preview.cape-frontier.co.za/assets/brand/logo-cf.webp",
   primary: "#071f4f",
   greenSoft: "#dcfce7",
   greenBorder: "#bbf7d0",
@@ -20,6 +17,16 @@ const BRAND = {
   text: "#111827",
   muted: "#64748b",
   border: "#e5e7eb",
+};
+
+// Website and logo depend on which domain the customer booked on, so they are
+// worked out per request (not once at startup) and passed down as `site`.
+const siteBrand = (req) => {
+  const { origin } = getSite(req);
+  return {
+    website: origin,
+    logoUrl: `${origin}/assets/brand/logo-cf.webp`,
+  };
 };
 
 const WHATSAPP_NUMBER =
@@ -178,7 +185,7 @@ const stopsList = (stops) => {
   `;
 };
 
-const customerLayout = ({ preheader, children }) => `
+const customerLayout = ({ preheader, children, site }) => `
 <!doctype html>
 <html>
   <head>
@@ -294,7 +301,7 @@ const customerLayout = ({ preheader, children }) => `
               <td class="cf-mobile-header" style="padding:18px 22px 16px;border-bottom:1px solid ${BRAND.border};">
                 <img
                   class="cf-mobile-logo"
-                  src="${BRAND.logoUrl}"
+                  src="${site.logoUrl}"
                   alt="${BRAND.name}"
                   width="150"
                   style="display:block;margin:0 auto 11px;max-width:150px;width:150px;height:auto;"
@@ -323,7 +330,7 @@ const customerLayout = ({ preheader, children }) => `
                 <p class="cf-mobile-muted" style="margin:8px 0 0;color:${BRAND.muted};font-size:12px;line-height:1.6;">
                   Email: ${CONTACT_EMAIL}<br />
                   WhatsApp: ${WHATSAPP_NUMBER}<br />
-                  ${BRAND.fullName} · ${BRAND.website.replace("https://", "")}
+                  ${BRAND.fullName} · ${site.website.replace("https://", "")}
                 </p>
               </td>
             </tr>
@@ -339,7 +346,7 @@ const customerLayout = ({ preheader, children }) => `
 </html>
 `;
 
-const adminLayout = ({ preheader, badge, title, intro, children }) => `
+const adminLayout = ({ preheader, badge, title, intro, children, site }) => `
 <!doctype html>
 <html>
   <head>
@@ -360,7 +367,7 @@ const adminLayout = ({ preheader, badge, title, intro, children }) => `
             <tr>
               <td style="background:${BRAND.primary};padding:30px 26px 26px;text-align:center;">
                 <img
-                  src="${BRAND.logoUrl}"
+                  src="${site.logoUrl}"
                   alt="${BRAND.name}"
                   width="240"
                   style="display:block;margin:0 auto 18px;max-width:240px;width:75%;height:auto;"
@@ -397,8 +404,8 @@ const adminLayout = ({ preheader, badge, title, intro, children }) => `
                 </p>
 
                 <p style="margin:14px 0 0;">
-                  <a href="${BRAND.website}" style="color:${BRAND.primary};font-size:12px;font-weight:800;text-decoration:none;">
-                    ${BRAND.website.replace("https://", "")}
+                  <a href="${site.website}" style="color:${BRAND.primary};font-size:12px;font-weight:800;text-decoration:none;">
+                    ${site.website.replace("https://", "")}
                   </a>
                 </p>
               </td>
@@ -549,6 +556,7 @@ const buildCustomerHtml = (data) => {
   const tourStops = getTourStops(data);
 
   return customerLayout({
+    site: data.site,
     preheader: `Booking confirmation pending for ${tourTitle}. Booking reference: ${bookingReference}.`,
     children: `
       ${customerReferenceBlock(data)}
@@ -679,6 +687,7 @@ const buildAdminHtml = (data) => {
   const bookingReference = getBookingReference(data);
 
   return adminLayout({
+    site: data.site,
     preheader: `New paid booking: ${tourTitle}. Booking reference: ${bookingReference}. Payment ID: ${paymentId || "not supplied"}.`,
     badge: "Admin notification",
     title: "New booking received",
@@ -1023,6 +1032,9 @@ export default async function handler(req, res) {
       tripStops,
 
       policyAcknowledgement,
+
+      // Website + logo for the domain this booking came from
+      site: siteBrand(req),
     };
 
     const finalBookingReference = getBookingReference(data);
@@ -1035,8 +1047,8 @@ export default async function handler(req, res) {
       paymentId,
       tourId,
       tourSlug,
-      logoUrl: BRAND.logoUrl,
-      website: BRAND.website,
+      logoUrl: data.site.logoUrl,
+      website: data.site.website,
       whatsapp: WHATSAPP_NUMBER,
     });
 

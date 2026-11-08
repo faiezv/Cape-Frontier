@@ -1030,10 +1030,10 @@ const TourItinerary = ({ itinerary }) => {
                     </p>
 
                     <p className="mt-0.5 truncate font-bitter text-xs font-semibold text-white/90 sm:text-sm">
-                      (+27) 00 000 0000
+                      (+27) 72 264 7284
                       <span className="hidden sm:inline">
                         {" "}
-                        · support@cape-frontier.co.za
+                        · admin@cape-frontier.co.za
                       </span>
                     </p>
                   </div>

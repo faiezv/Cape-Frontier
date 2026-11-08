@@ -2,20 +2,31 @@ import { site } from './siteConfig.js'
 
 const SITE_URL = site.origin
 
+// Schema needs absolute URLs; tour data often stores relative paths.
+const abs = (src) =>
+  !src
+    ? undefined
+    : /^https?:\/\//.test(src)
+      ? src
+      : `${SITE_URL}/${src.replace(/^\//, '')}`
+
 /**
  * Builds Product + AggregateRating + Review JSON-LD for a single tour,
  * computed from the reviews.js array (matched via tourSlug) rather than
- * hand-set fields on the tour object — single source of truth, and the
- * rating/count can never drift out of sync with what's actually shown.
+ * hand-set fields on the tour object, so the rating/count can never drift
+ * out of sync with what's actually shown.
  *
  * @param {object} tour - a tour from tours.js
  * @param {object[]} allReviews - the full reviews array from reviews.js
  */
 export function buildTourSchema(tour, allReviews = []) {
-  const url = `${SITE_URL}${tour.canonicalPath}`
-  const image = tour.images?.length ? tour.images : [tour.image].filter(Boolean)
+  // Same path the page canonical and the sitemap use
+  const url = `${SITE_URL}/tours/${tour.slug}`
+  const image = (tour.images?.length ? tour.images : [tour.image])
+    .filter(Boolean)
+    .map(abs)
 
-  // Only verified reviews for this tour feed the schema — never mix in
+  // Only verified reviews for this tour feed the schema, never mix in
   // unmoderated submissions.
   const tourReviews = allReviews.filter(
     (r) => r.tourSlug === tour.slug && r.verified
@@ -53,9 +64,7 @@ export function buildTourSchema(tour, allReviews = []) {
       reviewCount: tourReviews.length,
     }
 
-    // Google recommends not dumping every review into the page schema —
-    // a handful of the most recent/representative is fine and avoids an
-    // enormous JSON-LD payload as review volume grows.
+    // A handful of reviews is enough and keeps the JSON-LD payload small.
     schema.review = tourReviews.slice(0, 10).map((r) => ({
       '@type': 'Review',
       reviewRating: {
@@ -75,21 +84,24 @@ export function buildTourSchema(tour, allReviews = []) {
   return schema
 }
 
-// reviews.js stores dates like "May 2026" — convert to ISO for schema.org.
+// reviews.js stores dates like "May 2026", converted to ISO for schema.org.
 function parseReviewDate(dateStr) {
   const parsed = new Date(`1 ${dateStr}`)
   return isNaN(parsed) ? undefined : parsed.toISOString().slice(0, 10)
 }
 
 /**
- * Site-wide Organization schema — include once, e.g. in App.jsx's <Seo>
- * or a top-level Helmet, not per-page.
+ * Site-wide Organization schema, rendered once from App.jsx.
+ * Each domain gets its own entity (own url, @id and logo).
  */
 export function buildOrganizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'TravelAgency',
+    '@id': `${SITE_URL}/#organization`,
     name: 'Cape Frontier',
     url: SITE_URL,
+    logo: `${SITE_URL}/assets/brand/logo-cf.webp`,
+    areaServed: 'Western Cape, South Africa',
   }
 }
