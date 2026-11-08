@@ -32,13 +32,6 @@ const routes = [
   { path: '*', element: <PageNotFound /> }
 ]
 
-// The plugin handles everything else (no manual render needed)
-// export const createRoot = ViteReactSSG(
-//   { routes },
-//   ({ router, isClient }) => {}, // optional callback
-//   ({ children }) => <HelmetProvider>{children}</HelmetProvider>
-// )
-
 export const createRoot = ViteReactSSG(
   { routes },
   ({ router, isClient }) => {

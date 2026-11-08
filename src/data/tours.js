@@ -58,7 +58,6 @@ const getTourImages = (folder, imageIndexes = 3) =>
     (imageNumber) => `/src/assets/images/tours/${folder}/${imageNumber}.webp`,
   );
 
-const PICKUP_IMAGES = getTourImages("shared/pickup", 3);
 const getCoverImage = (folder) => `/src/assets/images/tours/${folder}/1.webp`;
 
 const getDestinationImages = (
@@ -116,8 +115,8 @@ const defaultWorkflow = {
 };
 
 const ADRENALINE_BASE = "adrenaline";
-const PENINSULA_PACKAGE_ONE_BASE = "packages/peninsula-tour-1";
-const PENINSULA_PACKAGE_TWO_BASE = "packages/peninsula-tour-2";
+const PENINSULA_PACKAGE_ONE_BASE = "packages/cape-town-city-tour";
+const PENINSULA_PACKAGE_TWO_BASE = "packages/peninsula-tour";
 const STELLENBOSCH_WINE_BASE = "packages/wine-farms";
 const PENINSULA_1_DESTINATIONS = [
   "boulders-beach",
@@ -4006,13 +4005,13 @@ export const tours = [
     workflow: defaultWorkflow,
 
     image: getCoverImage(`${PENINSULA_PACKAGE_ONE_BASE}`),
-    // image: 'src/assets/images/tours/packages/peninsula-tour-1/3.webp',
+    // image: 'src/assets/images/tours/packages/cape-town-city-tour/3.webp',
     images: packageGallery(
       PENINSULA_PACKAGE_ONE_BASE,
       PENINSULA_1_DESTINATIONS,
       3,
     ),
-    imageFolder: "packages/peninsula-tour-1",
+    imageFolder: "packages/cape-town-city-tour",
     destinationGalleries: packageDestinationGalleries(
       PENINSULA_PACKAGE_ONE_BASE,
       PENINSULA_1_DESTINATIONS,
@@ -4270,6 +4269,22 @@ export const tours = [
     },
 
     stops: [
+      {
+        id: "pickup",
+        name: "Hotel Pickup",
+        time: "Flexible",
+        duration: "30 minutes",
+        note: "Air‑conditioned transfer",
+        description:
+          "Enjoy convenient hotel pickup from Cape Town CBD, Green Point, or Sea Point before travelling to Langa Township.",
+        exactLocation: mapLocation({
+          label: "Cape Town Pickup Area",
+          address: "Cape Town, South Africa",
+          query: "Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
       {
         id: "Truth Coffee",
         name: "Truth Coffee Stop",

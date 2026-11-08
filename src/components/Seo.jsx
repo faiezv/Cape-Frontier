@@ -1,5 +1,7 @@
 import { Helmet } from 'react-helmet-async'
 import { site, ORIGINS } from '../utils/siteConfig.js'
+import { Head } from 'vite-react-ssg'
+
 
 const SITE_URL = site.origin // www.cape-frontier.co.za or www.cape-frontier.com, per build
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg` // swap for your real default share image
@@ -20,7 +22,7 @@ export default function Seo({
   const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []
 
   return (
-    <Helmet>
+    <Head>
       <title>{title}</title>
       {description && <meta name="description" content={description} />}
 
@@ -55,6 +57,6 @@ export default function Seo({
           {JSON.stringify(item)}
         </script>
       ))}
-    </Helmet>
+    </Head>
   )
 }

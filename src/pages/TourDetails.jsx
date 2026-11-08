@@ -11,8 +11,9 @@ import { gsap } from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { tours } from "../data/tours";
-import Booking from "./Booking";
+import Booking from "../components/Booking/Booking.jsx";
 import ContactPlatforms from "/src/components/ContactPlatforms.jsx";
+import SiteFooter from "/src/components/SiteFooter.jsx";
 import { useLoadingNavigate } from "/src/components/useLoadingNavigate.jsx";
 import { resolveTourImage as resolveImage } from "../utils/ImageLoader";
 
@@ -22,7 +23,6 @@ import { formatMoney } from '../components/Tours/Helpers.jsx';
 import Seo from "../components/Seo.jsx";
 import { buildTourSchema } from "../utils/tourSchema.js";
 import reviews from '../data/reviews.js';
-
 
 // Shared
 import TourHero from "../components/TourDetails/TourHero";
@@ -201,11 +201,6 @@ const RouteIcon = ({ className = "h-4 w-4" }) => (
   </svg>
 );
 
-/* =========================================================
-   SECTION ICONS
-   Used inside the badge on the left of every content block title.
-   Pass icon="name" to ContentBlock / CollapsibleBlock.
-   ========================================================= */
 const SECTION_ICONS = {
   pricing: (
     <>
@@ -351,23 +346,6 @@ function PlusIcon({ className = "h-4 w-4" }) {
   );
 }
 
-/* =========================================================
-   COLLAPSIBLE BLOCK
-   One combined badge on the left: the section icon with a small
-   corner chip holding a plus that rotates into an X when open.
-   If no icon is passed, the badge itself shows the plus / X.
-
-   The whole header row gets a very light hover highlight.
-
-   hideInnerHeading: hides the first heading inside the child
-   (and a small eyebrow label above it) so the title only shows
-   once, in the collapsible header.
-
-   hideTexts: array of exact strings. Any inner element whose
-   text matches one of them is hidden.
-
-   Tip: move this to components/CollapsibleBlock.jsx and export.
-   ========================================================= */
 export function CollapsibleBlock({
   eyebrow,
   title,
@@ -382,7 +360,6 @@ export function CollapsibleBlock({
   const contentRef = useRef(null);
   const hideTextsKey = hideTexts.join("|");
 
-  // Hide the wrapped component's own title / labels so they aren't duplicated.
   useLayoutEffect(() => {
     if (!hideInnerHeading && !hideTextsKey) return undefined;
 
@@ -428,15 +405,12 @@ export function CollapsibleBlock({
 
     applyHiding();
 
-    // Child content may render a moment later, or re-render.
     const observer = new MutationObserver(applyHiding);
     observer.observe(root, { childList: true, subtree: true });
 
     return () => observer.disconnect();
   }, [hideInnerHeading, hideTextsKey]);
 
-  // Height changes shift every pinned ScrollTrigger on the page,
-  // so recalc once the transition has finished.
   const handleTransitionEnd = (event) => {
     if (event.target !== event.currentTarget) return;
     ScrollTrigger.refresh();
@@ -458,7 +432,6 @@ export function CollapsibleBlock({
           aria-controls={panelId}
           className="group -mx-2 flex w-[calc(100%+1rem)] items-center gap-3 rounded-[1rem] px-2 py-1.5 text-left transition-colors duration-200 hover:bg-blue-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 md:gap-4"
         >
-          {/* COMBINED BADGE: section icon + open/close chip */}
           <span
             aria-hidden="true"
             className="relative flex h-9 w-9 shrink-0 items-center justify-center md:h-10 md:w-10"
@@ -619,10 +592,6 @@ export default function TourDetails() {
     setActiveItineraryIndex(0);
   }, [slug]);
 
-  /*
-    KEEP: desktop booking card pin logic.
-    Only styling around the pinned card changed.
-  */
   useLayoutEffect(() => {
     if (!tour || !readyCardRef.current || !desktopContentSectionRef.current)
       return;
@@ -652,10 +621,6 @@ export default function TourDetails() {
     return () => mm.revert();
   }, [tour]);
 
-  /*
-    KEEP: stop-by-stop desktop pin logic.
-    Visual sizes were tightened, but ScrollTrigger pin/snap behavior is preserved.
-  */
   useLayoutEffect(() => {
     if (!tour || !itineraryPinRef.current || !itinerarySectionRef.current) {
       return;
@@ -838,7 +803,6 @@ export default function TourDetails() {
     }, 200);
   }, [location.hash, isCompactLayout]);
 
-  // Kept above the `if (!tour)` early return so hooks run in a stable order.
   useEffect(() => {
     if (!location.hash) return;
 
@@ -964,6 +928,7 @@ export default function TourDetails() {
           }
         }
       `}</style>
+
         {/* HERO */}
         <TourHero tour={tour} />
 
@@ -991,15 +956,12 @@ export default function TourDetails() {
               title="Tour Pricing"
               icon="pricing"
             >
-              {/* BASE PRICE */}
               <TourPricing pricing={tour.pricing} />
 
-              {/* ADDIOTNAL PRICING */}
               {tour.additionalPricing?.length > 0 && (
                 <AdditionalPricing pricing={tour.additionalPricing} />
               )}
 
-              {/* GROUP PRICE */}
               {tour.groupPricing?.enabled && (
                 <TourGroupPricing groupPricing={tour.groupPricing} />
               )}
@@ -1011,7 +973,7 @@ export default function TourDetails() {
               title="About this experience"
               icon="overview"
             >
-              <p className="font-bitter text-lg text-black">
+              <p className="font-bitter text-lg text-black p-4">
                 {tour.description}
               </p>
             </ContentBlock>
@@ -1025,7 +987,6 @@ export default function TourDetails() {
             >
               <TourGallery tour={tour} imageFolder={tour.imageFolder} />
 
-              {/* SHARE YOUR PHOTOS BANNER */}
               <div className="mt-5 flex flex-col gap-4 rounded-[1.1rem] border border-blue-100 bg-blue-50/70 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-3">
                   <span
@@ -1156,7 +1117,6 @@ export default function TourDetails() {
             )}
 
             {/* ----------------- COBRA ------------------ */}
-            {/* COBRA SPECIFIC */}
             {tour.vehicle && (
               <ContentBlock
                 eyebrow="The ride"
@@ -1169,7 +1129,6 @@ export default function TourDetails() {
               </ContentBlock>
             )}
 
-            {/* COBRA SPECIFIC */}
             {tour.routeInformation && (
               <ContentBlock
                 eyebrow="Route"
@@ -1182,7 +1141,6 @@ export default function TourDetails() {
               </ContentBlock>
             )}
 
-            {/* COBRA SPECIFIC */}
             {tour.securityAndLiability && (
               <ContentBlock
                 eyebrow="Legal"
@@ -1197,7 +1155,7 @@ export default function TourDetails() {
             {/* ------------------------------------------- */}
 
             {/* NEED TO KNOW + FAQ */}
-            <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 py-12 lg:py-14 lg:grid-cols-2">
+            <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 14 lg:grid-cols-2">
               <ContentBlock
                 eyebrow="Before you book..."
                 title="Need to know"
@@ -1223,26 +1181,50 @@ export default function TourDetails() {
             </section>
           </div>
 
-          {/* ================================================================================================== */}
           {/* SIDEBAR */}
           <aside className="hidden h-fit lg:block">
             <div ref={readyCardRef} className="space-y-6">
-              {/* BACK */}
-              <button
-                type="button"
-                onClick={goBackToPreviousScroll}
-                className="group inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white px-4 py-2 font-bitter text-xs font-bold text-blue-700 transition-all duration-200 hover:border-blue-200 hover:bg-blue-50"
-              >
-                <span
+              <section className="relative overflow-hidden rounded-[1.35rem] border border-blue-100 shadow-[0_18px_50px_rgba(37,99,235,0.12)]">
+                <img
+                  src={resolveImage(tour.image)}
+                  alt=""
                   aria-hidden="true"
-                  className="transition-transform duration-200 group-hover:-translate-x-0.5"
-                >
-                  ←
-                </span>
-                Back to tours
-              </button>
+                  loading="lazy"
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
 
-              {/* RELATED TOURS */}
+                <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/80 via-neutral-950/70 to-blue-900/55" />
+
+                <div className="relative p-5">
+                  <h3 className="font-frank text-3xl font-bold leading-[1.05] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)]">
+                    Ready to book your tour?
+                  </h3>
+
+                  <p className="mt-3 font-bitter text-sm leading-relaxed text-white/90">
+                    Secure your spot on this experience. Fill in a quick
+                    request and we'll confirm availability.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={scrollToBooking}
+                    className="bg-white border-blue-500 border group mt-5 flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 font-bitter text-sm font-semibold text-black/90 shadow-[0_8px_24px_rgba(37,99,235,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(37,99,235,0.24)]"
+                  >
+                    <BookingIcon />
+
+                    <span>Book now</span>
+
+                    <span
+                      aria-hidden="true"
+                      className="text-base transition-transform duration-200 group-hover:translate-x-0.5"
+                    >
+                      →
+                    </span>
+                  </button>
+                </div>
+              </section>
+
               {relatedTours.length > 0 && (
                 <section className="border-t border-neutral-200 pt-5">
                   <div className="flex items-end justify-between">
@@ -1272,68 +1254,12 @@ export default function TourDetails() {
                   </div>
                 </section>
               )}
-
-              {/* REQUEST CURRENT TOUR */}
-              <section
-                className="relative overflow-hidden rounded-[1.35rem] border 
-            border-blue-100 text-white
-            hero-gradient-bl p-5 shadow-[0_18px_50px_rgba(37,99,235,0.08)]"
-              >
-                {/* subtle accent */}
-                <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-blue-200/30 blur-2xl" />
-
-                <div className="relative">
-                  <div className="flex items-center justify-between">
-                    {/* image */}
-                    <img
-                      src={resolveImage(tour.image)}
-                      alt="current-tour"
-                      className="top-0 h-24 w-24 object-cover rounded-full border-white border-2"
-                    />
-
-                    <div className="flex flex-col p-2">
-                      <h3 className="font-frank text-2xl font-bold leading-[0.95] text-white">
-                        {tour.title}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <p className="mt-3 font-bitter text-sm leading-relaxed text-white">
-                    Ready to go? Start your request for{" "}
-                    <strong className="text-white font-bold">
-                      {tour.title}
-                    </strong>
-                    .
-                  </p>
-
-                  <button
-                    type="button"
-                    onClick={scrollToBooking}
-                    className="bg-white border-blue-500 border group mt-5 flex w-full items-center justify-center gap-2 
-                  rounded-full px-6 py-3.5 font-bitter text-sm font-semibold text-black/90 shadow-[0_8px_24px_rgba(37,99,235,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(37,99,235,0.24)]"
-                  >
-                    <BookingIcon />
-
-                    <span>Request this tour</span>
-
-                    <span
-                      aria-hidden="true"
-                      className="text-base transition-transform duration-200 group-hover:translate-x-0.5"
-                    >
-                      →
-                    </span>
-                  </button>
-                </div>
-              </section>
             </div>
           </aside>
         </section>
 
         {/* STOPS / ITINERARY */}
         {tour.stops?.length > 0 ? (
-          /* =========================================================
-          STANDARD TOUR — STOP-BY-STOP ITINERARY
-          ========================================================= */
           <section
             ref={itinerarySectionRef}
             id="itinerary"
@@ -1343,7 +1269,10 @@ export default function TourDetails() {
               ref={itineraryPinRef}
               className="mx-auto max-w-6xl px-4 py-10 lg:px-5 lg:py-10"
             >
-              <div className="relative z-30 flex flex-col gap-5 rounded-[1.25rem] bg-blue-50/85 p-4 lg:flex-row lg:items-end lg:justify-between lg:gap-6 lg:p-5">
+              {/* Header with Skip Button moved here */}
+              <div className="relative z-30 flex flex-col gap-5 rounded-[1.25rem] bg-blue-50/85 p-4 text-center lg:flex-row 
+              lg:items-center lg:justify-between lg:gap-6 lg:p-15 lg:text-left">
+
                 <div className="max-w-2xl">
                   <span className="font-bitter text-[11px] uppercase tracking-[0.24em] text-blue-600">
                     Full Itinerary
@@ -1358,14 +1287,38 @@ export default function TourDetails() {
                     detail.
                   </p>
 
-                  <p className="mt-4 hidden font-bitter leading-relaxed text-neutral-600 lg:block">
+                  {/* <p className="mt-4 hidden font-bitter leading-relaxed text-neutral-600 lg:block">
                     Scroll through the route while each stop detail and image
                     snaps into the same focused frame.
-                  </p>
+                  </p> */}
                 </div>
 
-                <div className="hidden rounded-full border border-blue-100 bg-white px-4 py-2 font-bitter text-xs font-semibold text-neutral-500 shadow-[0_12px_30px_rgba(37,99,235,0.06)] lg:block">
-                  snap through {tour.stops.length} stops
+                {/* Skip button moved to top right with pulse */}
+                <div className="flex items-center justify-center lg:justify-end">
+                  <button
+                    type="button"
+                    onClick={scrollToBooking}
+                    className="group relative inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-6 py-3 font-bitter text-sm font-semibold text-white shadow-[0_8px_24px_rgba(37,99,235,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-700 active:scale-95"
+                  >
+                    {/* Pulse ring */}
+                    <span className="absolute inset-0 rounded-full bg-blue-500 opacity-40 animate-ping group-hover:animate-none pointer-events-none" style={{ animationDuration: '2s' }} />
+                    
+                    <span className="relative z-10 flex items-center gap-2">
+                      Skip to booking
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                      >
+                        <path d="M5 12h14" />
+                        <path d="m12 5 7 7-7 7" />
+                      </svg>
+                    </span>
+                  </button>
                 </div>
               </div>
 
@@ -1391,7 +1344,7 @@ export default function TourDetails() {
                 </div>
 
                 {/* STOP IMAGES */}
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div className="relative min-h-[460px] overflow-hidden rounded-[1.5rem] lg:min-h-[500px]">
                     {tour.stops.map((stop, index) => (
                       <div
@@ -1399,7 +1352,7 @@ export default function TourDetails() {
                         ref={(el) => {
                           itineraryImageRefs.current[index] = el;
                         }}
-                        className="relative"
+                        className="relative h-full"
                       >
                         <ItineraryImageFrame
                           tour={tour}
@@ -1409,28 +1362,7 @@ export default function TourDetails() {
                       </div>
                     ))}
                   </div>
-
-                  <div className="short-screen-route-skip justify-center">
-                    <button
-                      type="button"
-                      onClick={scrollToBooking}
-                      className="hero-gradient inline-flex items-center justify-center rounded-full px-7 py-3 font-bitter text-sm font-semibold text-white shadow-[0_14px_34px_rgba(0,0,0,0.14)] transition hover:-translate-y-0.5 active:scale-95"
-                    >
-                      Skip to booking form
-                    </button>
-                  </div>
                 </div>
-              </div>
-
-              {/* DESKTOP BOOKING BUTTON */}
-              <div className="normal-route-skip relative z-40 mt-6 hidden justify-center lg:flex">
-                <button
-                  type="button"
-                  onClick={scrollToBooking}
-                  className="hero-gradient inline-flex items-center justify-center rounded-full px-7 py-3 font-bitter text-sm font-semibold text-white shadow-[0_14px_34px_rgba(0,0,0,0.14)] transition hover:-translate-y-0.5 active:scale-95"
-                >
-                  Skip to booking form
-                </button>
               </div>
 
               {/* MOBILE / TABLET */}
@@ -1449,9 +1381,6 @@ export default function TourDetails() {
             </div>
           </section>
         ) : tour.itinerary ? (
-          /* =========================================================
-          MULTI-DAY TOUR — FULL ITINERARY
-          ========================================================= */
           <TourItinerary itinerary={tour.itinerary} />
         ) : null}
 
@@ -1462,18 +1391,37 @@ export default function TourDetails() {
             desktopBookingRef.current = el;
           }}
           id="booking"
-          className="py-12 text-white sm:py-14 lg:py-16"
+          className="relative overflow-hidden py-12 text-neutral-900 sm:py-14 lg:py-16"
         >
-          <Booking
-            embeddedTour={tour}
-            bookingData={location.state?.bookingData}
-          />
+          {/* Background Image Layer */}
+          <div className="pointer-events-none absolute inset-0 z-0 bg-white">
+            {/* Fallback to tour.image if tour.images is undefined or empty */}
+            <img
+              src={resolveImage(tour.image || (tour.images && tour.images[0]))}
+              alt=""
+              className="h-full w-full object-cover object-center opacity-100"
+            />
+            {/* Dark overlay to ensure the white form card stands out */}
+            <div className="absolute inset-0 bg-white/70 backdrop-blur-md" />
+          </div>
+
+          <div className="relative z-10">
+            <Booking
+              embeddedTour={tour}
+              bookingData={location.state?.bookingData}
+            />
+          </div>
         </section>
 
         {/* CONTACT OPTIONS */}
-        <section className="max-w-5xl mx-auto flex justify-center border border-black/5 px-4 py-10 sm:px-5 lg:py-12">
+        <section className="max-w-5xl mx-auto flex justify-center border border-black/5 px-4 sm:px-5">
           <ContactPlatforms />
         </section>
+
+        <section className="max-w-5xl mx-auto flex justify-center border border-black/5 py-10 lg:py-12">
+          <SiteFooter />
+        </section>
+
       </main>
     </>
   );
@@ -1530,205 +1478,6 @@ function RatingIcon() {
   );
 }
 
-function MobileTripEssentials({ tour, galleryImages, scrollToBooking }) {
-  const visibleGallery = galleryImages.slice(0, 4);
-
-  return (
-    <section className="mx-auto max-w-6xl px-4 py-7 sm:px-5 lg:hidden">
-      <div className="rounded-[1.25rem] border border-blue-100 bg-blue-50/70 p-3 shadow-[0_14px_40px_rgba(37,99,235,0.08)] sm:p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <span className="font-bitter text-[10px] uppercase tracking-[0.22em] text-blue-600">
-              Essentials
-            </span>
-
-            <h2 className="mt-1 truncate font-frank text-2xl font-bold leading-none sm:text-3xl">
-              Trip info
-            </h2>
-          </div>
-
-          <button
-            type="button"
-            onClick={scrollToBooking}
-            className="hero-gradient flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 font-bitter text-xs font-semibold text-white"
-          >
-            <BookingIcon />
-            Book
-          </button>
-        </div>
-
-        <div className="mt-4 grid grid-cols-4 gap-2">
-          <MiniFact icon="P" label="Pickup" value="Included" />
-          <MiniFact icon="C" label="Confirm" value="Manual" />
-          <MiniFact icon="S" label="Secure" value="Checkout" />
-          <MiniFact icon="G" label="Group" value="Rates" />
-        </div>
-
-        <div className="mt-4 space-y-2">
-          {tour.included?.length > 0 && (
-            <MobileAccordion
-              title="Included"
-              count={tour.included.length}
-              defaultOpen
-            >
-              <div className="grid gap-2 sm:grid-cols-2">
-                {tour.included.slice(0, 6).map((item, index) => (
-                  <CompactLineItem key={index} text={getItemText(item)} />
-                ))}
-              </div>
-            </MobileAccordion>
-          )}
-
-          {tour.excluded?.length > 0 && (
-            <MobileAccordion title="Not included" count={tour.excluded.length}>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {tour.excluded.slice(0, 6).map((item, index) => (
-                  <CompactLineItem
-                    key={index}
-                    text={getItemText(item)}
-                    variant="plain"
-                  />
-                ))}
-              </div>
-            </MobileAccordion>
-          )}
-
-          {tour.highlights?.length > 0 && (
-            <MobileAccordion title="Highlights" count={tour.highlights.length}>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {tour.highlights.slice(0, 4).map((item, index) => (
-                  <CompactLineItem key={index} text={getItemText(item)} />
-                ))}
-              </div>
-            </MobileAccordion>
-          )}
-
-          {visibleGallery.length > 0 && (
-            <MobileAccordion title="Photos" count={galleryImages.length}>
-              <div className="grid grid-cols-4 gap-2">
-                {visibleGallery.map((image, index) => (
-                  <img
-                    key={`${image}-${index}`}
-                    src={image}
-                    alt={`${tour.title} preview ${index + 1}`}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-16 w-full rounded-[0.9rem] object-cover sm:h-24"
-                  />
-                ))}
-              </div>
-            </MobileAccordion>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function MobileAfterBookingInfo({ tour }) {
-  return (
-    <section className="mx-auto max-w-6xl px-4 py-7 sm:px-5 lg:hidden">
-      <div className="space-y-2">
-        {tour.needToKnow?.length > 0 && (
-          <MobileAccordion title="Need to know" count={tour.needToKnow.length}>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {tour.needToKnow.slice(0, 6).map((item, index) => (
-                <CompactLineItem key={index} text={getItemText(item)} />
-              ))}
-            </div>
-          </MobileAccordion>
-        )}
-
-        {tour.faqs?.length > 0 && (
-          <MobileAccordion title="FAQ" count={tour.faqs.length}>
-            <div className="space-y-2">
-              {tour.faqs.slice(0, 5).map((faq, index) => (
-                <div
-                  key={index}
-                  className="rounded-[1rem] border border-blue-100 bg-white p-4"
-                >
-                  <p className="font-bitter text-sm font-semibold text-neutral-900">
-                    {faq.question}
-                  </p>
-
-                  <p className="mt-2 font-bitter text-xs leading-relaxed text-neutral-600">
-                    {faq.answer}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </MobileAccordion>
-        )}
-      </div>
-    </section>
-  );
-}
-
-function MobileAccordion({ title, count, defaultOpen = false, children }) {
-  return (
-    <details
-      open={defaultOpen}
-      className="group rounded-[1rem] border border-blue-100 bg-white shadow-[0_8px_24px_rgba(37,99,235,0.05)]"
-    >
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-3 font-bitter [&::-webkit-details-marker]:hidden">
-        <span className="text-sm font-semibold text-neutral-900">{title}</span>
-
-        <span className="flex items-center gap-2">
-          {typeof count === "number" && (
-            <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-500">
-              {count}
-            </span>
-          )}
-
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-50 text-sm font-bold text-blue-700 transition-transform group-open:rotate-45">
-            +
-          </span>
-        </span>
-      </summary>
-
-      <div className="px-3 pb-3">{children}</div>
-    </details>
-  );
-}
-
-function MiniFact({ icon, label, value }) {
-  return (
-    <div className="rounded-[0.9rem] border border-blue-100 bg-white p-2 text-center">
-      <span className="mx-auto flex h-7 w-7 items-center justify-center rounded-full bg-blue-50 font-bitter text-[10px] font-bold text-blue-700 shadow-sm">
-        {icon}
-      </span>
-
-      <p className="mt-1.5 truncate font-bitter text-[10px] font-semibold leading-tight text-neutral-900 sm:text-xs">
-        {value}
-      </p>
-
-      <p className="mt-0.5 hidden font-bitter text-[9px] uppercase tracking-[0.14em] text-blue-400 sm:block">
-        {label}
-      </p>
-    </div>
-  );
-}
-
-function CompactLineItem({ text, variant = "tick" }) {
-  return (
-    <div className="flex gap-2 rounded-[0.9rem] border border-blue-100 bg-white p-3">
-      <span
-        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-bitter text-xs font-bold ${
-          variant === "plain"
-            ? "bg-blue-50 text-blue-500"
-            : "bg-green-200 text-green-950"
-        }`}
-      >
-        {variant === "plain" ? "—" : "✓"}
-      </span>
-
-      <p className="font-bitter text-xs leading-relaxed text-neutral-600 sm:text-sm">
-        {text}
-      </p>
-    </div>
-  );
-}
-
 /* Thin wrapper around the collapsible block */
 function ContentBlock({
   eyebrow,
@@ -1767,29 +1516,19 @@ function TickCard({ text }) {
   );
 }
 
+
 function MobileRequestCard({ tour, relatedTours, scrollToBooking, navigate }) {
   return (
     <div className="rounded-[1.25rem] border border-blue-100 bg-white p-4 shadow-[0_14px_36px_rgba(37,99,235,0.08)]">
-      <span className="inline-flex rounded-full bg-green-200 px-3 py-1 font-bitter text-[10px] font-bold uppercase tracking-[0.14em] text-green-950">
-        current tour
-      </span>
-
-      <h3 className="mt-3 font-frank text-3xl font-bold leading-none">
-        Request {tour.title}
-      </h3>
-
-      <p className="mt-3 font-bitter text-sm leading-relaxed text-neutral-600">
-        This opens the booking form with <strong>{tour.title}</strong> already
-        attached.
-      </p>
-
+      {/* Removed the redundant title and "read to book" text */}
+      
       <button
         type="button"
         onClick={scrollToBooking}
-        className="hero-gradient mt-5 flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 font-bitter text-sm font-semibold text-white"
+        className="hero-gradient flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 font-bitter text-sm font-semibold text-white"
       >
         <BookingIcon />
-        Request this tour
+        Book now
       </button>
 
       {relatedTours.length > 0 && (
@@ -2104,16 +1843,20 @@ function ItineraryImageFrame({ tour, stop, index }) {
       </div>
 
       {mainImage ? (
-        <img
-          src={resolveImage(mainImage)}
-          alt={`${stop.name} main`}
-          loading="lazy"
-          decoding="async"
-          onLoad={() => ScrollTrigger.refresh()}
-          className={`w-full rounded-[1.35rem] border border-blue-100 bg-neutral-100 object-cover shadow-[0_18px_45px_rgba(0,0,0,0.10)] ${
+        <div
+          className={`w-full overflow-hidden rounded-[1.35rem] border border-blue-100 bg-neutral-100 shadow-[0_18px_45px_rgba(0,0,0,0.10)] ${
             isPickupStop ? "h-[338px]" : "h-[224px]"
           }`}
-        />
+        >
+          <img
+            src={resolveImage(mainImage)}
+            alt={`${stop.name} main`}
+            loading="lazy"
+            decoding="async"
+            onLoad={() => ScrollTrigger.refresh()}
+            className="h-full w-full object-cover"
+          />
+        </div>
       ) : (
         <div
           className={`flex items-center justify-center rounded-[1.35rem] border border-blue-100 bg-neutral-100 font-bitter text-sm text-neutral-400 shadow-[0_18px_45px_rgba(0,0,0,0.10)] ${
@@ -2127,15 +1870,19 @@ function ItineraryImageFrame({ tour, stop, index }) {
       {!isPickupStop && stopImages.length > 1 && (
         <div className="mt-3 grid grid-cols-3 gap-3">
           {stopImages.slice(1, 4).map((image, imageIndex) => (
-            <img
+            <div
               key={`${stop.name}-${image}-${imageIndex}`}
-              src={resolveImage(image)}
-              alt={`${stop.name} ${imageIndex + 2}`}
-              loading="lazy"
-              decoding="async"
-              onLoad={() => ScrollTrigger.refresh()}
-              className="h-24 w-full rounded-[1rem] border border-blue-100 bg-neutral-100 object-cover shadow-[0_12px_28px_rgba(0,0,0,0.08)]"
-            />
+              className="aspect-[4/3] w-full overflow-hidden rounded-[1rem] border border-blue-100 bg-neutral-100 shadow-[0_12px_28px_rgba(0,0,0,0.08)]"
+            >
+              <img
+                src={resolveImage(image)}
+                alt={`${stop.name} ${imageIndex + 2}`}
+                loading="lazy"
+                decoding="async"
+                onLoad={() => ScrollTrigger.refresh()}
+                className="h-full w-full object-cover"
+              />
+            </div>
           ))}
         </div>
       )}

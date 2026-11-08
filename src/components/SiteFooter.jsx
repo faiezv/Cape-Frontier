@@ -4,23 +4,19 @@ import { WhatsAppIcon, WHATSAPP_URL } from './WhatsApp'
 import { resolveImage } from '../utils/ImageLoader.js'
 
 // ─── Config ──────────────────────────────────────────────────────────────────
-
-const SITE_URL = 'https://cape-frontier.co.za' // swap to .com if that is the live domain
+const SITE_URL = 'https://cape-frontier.co.za'
 const SITEMAP_URL = `${SITE_URL}/sitemap.xml`
 
 const CONTACT_EMAIL = 'admin@cape-frontier.co.za'
 const CONTACT_NUMBER = '(+27)72 264 7284'
 const CONTACT_TEL = '+27722647284'
-// Point this at the real Instagram profile; the QR image is the one the Contact page used.
 const INSTAGRAM_URL = 'https://www.instagram.com/'
 const INSTAGRAM_QR = '/assets/brand/instagram.png'
 
-// Background photo for the blue copyright bar (dimmed by an overlay below).
 const footerBgImage = resolveImage(
   '/src/assets/images/content/random/siteFooter.webp'
 )
 
-// Same section ids the Navbar scrolls to on the home page.
 const sectionIdMap = {
   About: 'about',
   Stories: 'stories',
@@ -55,7 +51,6 @@ const policyLinks = [
   { label: 'Vehicles', mobileHidden: true, target: '/policies#vehicle-policy' },
 ]
 
-// `target` navigates inside the app, `href` opens a normal link.
 const informationLinks = [
   { label: 'Privacy policy', target: '/policies' },
   { label: 'Terms & conditions', target: '/policies' },
@@ -68,7 +63,6 @@ const informationLinks = [
   { label: 'Sitemap', href: SITEMAP_URL, external: true },
 ]
 
-// Set `href` to link a logo through to the partner's site.
 const affiliations = [
   {
     label: 'The Capetonian',
@@ -82,14 +76,6 @@ const affiliations = [
   },
 ]
 
-// Only methods with enabled: true are shown.
-// EFT and Capitec Pay need extra KYC review on Paystack before they work,
-// so flip them to true once Paystack has activated them.
-//
-// Every badge renders on its own (inline glyph + text), so nothing depends on
-// image files. To use an official logo instead, set `icon` to its path
-// (e.g. '/icons/payments/visa.svg'); if that file is missing, the badge
-// falls back to the inline version automatically.
 const paymentMethods = [
   { label: 'Visa', glyph: 'visa', icon: null, enabled: true },
   { label: 'Mastercard', glyph: 'mastercard', icon: null, enabled: true },
@@ -147,8 +133,6 @@ function PaymentBadge({ label, glyph, icon }) {
   const imgRef = useRef(null)
   const [failed, setFailed] = useState(!icon)
 
-  // With prerendered pages the image can fail before React attaches onError,
-  // so also check once on mount.
   useEffect(() => {
     const img = imgRef.current
     if (img && img.complete && img.naturalWidth === 0) setFailed(true)
@@ -225,8 +209,7 @@ function PaymentBadge({ label, glyph, icon }) {
   )
 }
 
-// Gmail logo (multi-colour). Aspect ratio 256:193.
-const GmailIcon = ({ className = 'h-3.5 w-[18.5px]' }) => (
+const GmailIcon = ({ className = 'h-4 w-5 shrink-0' }) => (
   <svg
     viewBox="0 0 256 193"
     aria-hidden="true"
@@ -241,7 +224,6 @@ const GmailIcon = ({ className = 'h-3.5 w-[18.5px]' }) => (
   </svg>
 )
 
-// Shared look for every footer link: grey, blue + underline on hover.
 const linkClass =
   'text-neutral-600 underline-offset-4 decoration-blue-600/70 transition hover:text-[#071f4f] hover:underline focus-visible:underline focus-visible:outline-none'
 
@@ -261,22 +243,14 @@ function ColumnHeading({ children }) {
 
 // ─── Footer ──────────────────────────────────────────────────────────────────
 
-/**
- * showDetails: the big top section (brand, navigation, tours, policies,
- * contact). Pass `showDetails={false}` on pages that already show their own
- * contact block (e.g. the Contact page) to keep only the bottom bars.
- */
 function SiteFooter({ showDetails = true, showBackToTop }) {
   const navigate = useNavigate()
   const location = useLocation()
+  const [showQrPopup, setShowQrPopup] = useState(false)
 
-  // Brand block, contact details and the Instagram QR only show on /tours.
-  const isTours = /^\/tours\/?$/.test(location.pathname)
-
-  // Back-to-top is visible on every page. Pass showBackToTop={false} to hide it.
+  const isTours = location.pathname.includes('/tours')
   const backToTopVisible = showBackToTop ?? true
 
-  // Lean footer everywhere except /tours: one navigation row, no columns.
   const showNav = showDetails && !isTours
   const legalLinks = showNav
     ? informationLinks.filter(
@@ -294,8 +268,6 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
 
   const scrollToTop = () => scrollWindowTo(0)
 
-  // Same rules as the Navbar: paths navigate, section names scroll on the
-  // home page (or go home first and ask it to scroll via router state).
   const goTo = (target, event) => {
     event?.preventDefault?.()
     if (!target) return
@@ -330,7 +302,7 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
           {...(item.external
             ? { target: '_blank', rel: 'noopener noreferrer' }
             : {})}
-          className={linkClass}
+          className={`${linkClass} break-words`}
         >
           {item.label}
         </a>
@@ -341,363 +313,403 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
       <button
         type="button"
         onClick={(event) => goTo(item.target, event)}
-        className={`${linkClass} text-left`}
+        className={`${linkClass} text-left whitespace-normal`}
       >
         {item.label}
       </button>
     )
   }
 
-  // Compact action button used in the mobile contact row
   const actionBtn =
-    'flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-black/10 bg-white px-2 text-xs font-bold text-[#071f4f] transition active:scale-95'
+    'flex min-w-0 min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-black/10 bg-white px-2 text-xs font-bold text-[#071f4f] transition active:scale-95'
 
   return (
-    <footer className="shrink-0">
-      <div className="overflow-hidden rounded-3xl border border-white/70 bg-white/85 shadow-[0_20px_60px_rgba(7,31,79,0.10)] backdrop-blur-xl sm:rounded-[1.75rem]">
-        {/* Navigation columns (+ brand, contact and QR on /tours only) */}
-        {showDetails && isTours && (
-          <div className="px-5 pb-6 pt-6 sm:px-8 sm:py-10">
-            <div
-              className="grid grid-cols-2 gap-x-6 gap-y-7 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-9 lg:grid-cols-[1.2fr_0.7fr_0.8fr_0.9fr_1.6fr] lg:gap-x-12"
-            >
-              {/* Brand: logo + one line on mobile, full block on larger screens */}
-              {isTours && (
-                <div className="col-span-2 flex items-center gap-3 sm:col-span-3 sm:block lg:col-span-1">
-                  <img
-                    src="/assets/brand/logo-cf.webp"
-                    alt="Cape Frontier Travel & Tours"
-                    loading="lazy"
-                    className="h-12 w-auto shrink-0 object-contain object-left sm:h-20"
-                  />
+    <>
+      <footer className="w-full max-w-full shrink-0">
+        <div className="w-full max-w-full overflow-hidden rounded-3xl border border-white/70 bg-white/85 shadow-[0_20px_60px_rgba(7,31,79,0.10)] backdrop-blur-xl sm:rounded-[1.75rem]">
+          {showDetails && isTours && (
+            <div className="w-full min-w-0 px-5 pb-6 pt-6 sm:px-8 sm:py-10">
+              <div className="grid w-full min-w-0 grid-cols-2 gap-x-6 gap-y-7 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-9 lg:grid-cols-[1.2fr_0.7fr_0.8fr_0.9fr_1.6fr] lg:gap-x-12">
+                {isTours && (
+                  <div className="col-span-2 flex min-w-0 items-center gap-3 sm:col-span-3 sm:block lg:col-span-1">
+                    <img
+                      src="/assets/brand/logo-cf.webp"
+                      alt="Cape Frontier Travel & Tours"
+                      loading="lazy"
+                      className="h-12 w-auto shrink-0 object-contain object-left sm:h-20"
+                    />
+                    <p className="font-bitter text-xs leading-5 text-neutral-600 sm:mt-3 sm:max-w-xs sm:text-sm sm:leading-6">
+                      <span className="sm:hidden">
+                        Guided Cape Town routes with local pickup support.
+                      </span>
+                      <span className="hidden sm:inline">
+                        Guided Cape Town routes, local pickup support and manual
+                        booking confirmation. Choose your tour, confirm your
+                        group, pay online, then receive confirmation.
+                      </span>
+                    </p>
+                  </div>
+                )}
 
-                  <p className="font-bitter text-xs leading-5 text-neutral-600 sm:mt-3 sm:max-w-xs sm:text-sm sm:leading-6">
-                    <span className="sm:hidden">
-                      Guided Cape Town routes with local pickup support.
-                    </span>
-                    <span className="hidden sm:inline">
-                      Guided Cape Town routes, local pickup support and manual
-                      booking confirmation. Choose your tour, confirm your
-                      group, pay online, then receive confirmation.
-                    </span>
-                  </p>
-                </div>
-              )}
+                <nav aria-label="Explore" className="min-w-0">
+                  <ColumnHeading>Explore</ColumnHeading>
+                  <ul className="space-y-2 text-sm">
+                    {exploreLinks.map((item) => (
+                      <li key={item.label}>{renderLink(item)}</li>
+                    ))}
+                  </ul>
+                </nav>
 
-              {/* Explore */}
-              <nav aria-label="Explore">
-                <ColumnHeading>Explore</ColumnHeading>
-                <ul className="space-y-2 text-sm">
+                <nav aria-label="Tours" className="hidden min-w-0 sm:block">
+                  <ColumnHeading>Tours</ColumnHeading>
+                  <ul className="space-y-2 text-sm">
+                    {tourLinks.map((item) => (
+                      <li key={item.label}>{renderLink(item)}</li>
+                    ))}
+                  </ul>
+                </nav>
+
+                <nav aria-label="Policies" className="min-w-0">
+                  <ColumnHeading>Before you book</ColumnHeading>
+                  <ul className="space-y-2 text-sm">
+                    {policyLinks.map((item) => (
+                      <li
+                        key={item.label}
+                        className={item.mobileHidden ? 'hidden sm:block' : undefined}
+                      >
+                        {renderLink(item)}
+                      </li>
+                    ))}
+                    <li className="sm:hidden">
+                      <button
+                        type="button"
+                        onClick={() => navigate('/policies')}
+                        className="text-sm font-semibold text-blue-600 underline-offset-4 hover:underline"
+                      >
+                        All policies →
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+
+                {isTours && (
+                  <div className="col-span-2 min-w-0 sm:col-span-3 lg:col-span-1">
+                    <ColumnHeading>Contact</ColumnHeading>
+
+                    <div className="grid w-full min-w-0 grid-cols-3 gap-2 sm:hidden">
+                      <a href={`mailto:${CONTACT_EMAIL}`} className={actionBtn}>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                          className="h-4 w-4 shrink-0 text-blue-600"
+                        >
+                          <rect x="3" y="5" width="18" height="14" rx="2" />
+                          <path d="m3 7 9 6 9-6" />
+                        </svg>
+                        <span className="truncate">Email</span>
+                      </a>
+
+                      <a href={`tel:${CONTACT_TEL}`} className={actionBtn}>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                          className="h-4 w-4 shrink-0 text-blue-600"
+                        >
+                          <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z" />
+                        </svg>
+                        <span className="truncate">Call</span>
+                      </a>
+
+                      <a
+                        href={WHATSAPP_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex min-w-0 min-h-[44px] items-center justify-center gap-1.5 rounded-xl bg-[#25D366] px-2 text-xs font-bold text-[#06371d] transition active:scale-95"
+                      >
+                        <WhatsAppIcon className="h-4 w-4 shrink-0 text-white" />
+                        <span className="truncate">WhatsApp</span>
+                      </a>
+                    </div>
+
+                    <div className="hidden min-w-0 sm:block">
+                     <a
+                        href={`mailto:${CONTACT_EMAIL}`}
+                        className={`${linkClass} inline-flex max-w-full items-center gap-2 break-all text-sm font-semibold text-[#071f4f]`}
+                      >
+                        {/* 2. Added strict sizing here */}
+                        <GmailIcon className="h-4 w-5 shrink-0" />
+                        <span className="truncate">{CONTACT_EMAIL}</span>
+                      </a>
+
+                      <a
+                        href={WHATSAPP_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Chat on WhatsApp"
+                        className="group mt-4 flex min-h-[44px] w-fit items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 text-sm font-bold text-[#06371d] shadow-[0_10px_24px_rgba(37,211,102,0.30)] transition hover:-translate-y-0.5 hover:bg-[#1ebe5b] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-300"
+                      >
+                        <WhatsAppIcon className="h-5 w-5 shrink-0 text-white" />
+                        <span className="inline-grid overflow-hidden">
+                          <span className="col-start-1 row-start-1 transition-all duration-300 ease-out group-hover:-translate-y-full group-hover:opacity-0 group-focus-visible:-translate-y-full group-focus-visible:opacity-0">
+                            Chat on WhatsApp
+                          </span>
+                          <span
+                            aria-hidden="true"
+                            className="col-start-1 row-start-1 translate-y-full whitespace-nowrap opacity-0 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100"
+                          >
+                            {CONTACT_NUMBER}
+                          </span>
+                        </span>
+                      </a>
+                    </div>
+
+                    {/* Converted to a button to open the modal */}
+                    <button
+                      type="button"
+                      onClick={() => setShowQrPopup(true)}
+                      aria-label="View Instagram QR code"
+                      className="mt-4 flex w-full max-w-full items-center gap-4 overflow-hidden rounded-2xl border border-black/5 bg-white/70 p-3 shadow-[0_8px_24px_rgba(7,31,79,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_32px_rgba(7,31,79,0.12)] sm:w-fit sm:text-left"
+                    >
+                      <img
+                        src={INSTAGRAM_QR}
+                        alt="Scan to follow Cape Frontier on Instagram"
+                        loading="lazy"
+                        className="h-28 w-28 shrink-0 rounded-lg object-contain sm:h-36 sm:w-36 lg:h-40 lg:w-40"
+                      />
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500">
+                          Instagram
+                        </p>
+                        <p className="mt-1 text-xs font-semibold leading-4 text-[#071f4f]">
+                          Tap to scan or follow us
+                        </p>
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div
+            className={`w-full min-w-0 px-5 py-5 sm:px-8 sm:py-6 ${showDetails && isTours ? 'border-t border-black/5' : ''
+              }`}
+          >
+            <div className="flex w-full min-w-0 flex-col items-center gap-4 lg:flex-row lg:justify-between">
+              {showNav && (
+                <ul
+                  aria-label="Site navigation"
+                  className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-semibold"
+                >
                   {exploreLinks.map((item) => (
                     <li key={item.label}>{renderLink(item)}</li>
                   ))}
                 </ul>
-              </nav>
-
-              {/* Tours (hidden on mobile: "Tours" in Explore covers it) */}
-              <nav aria-label="Tours" className="hidden sm:block">
-                <ColumnHeading>Tours</ColumnHeading>
-                <ul className="space-y-2 text-sm">
-                  {tourLinks.map((item) => (
-                    <li key={item.label}>{renderLink(item)}</li>
-                  ))}
-                </ul>
-              </nav>
-
-              {/* Policies (shortened on mobile) */}
-              <nav aria-label="Policies">
-                <ColumnHeading>Before you book</ColumnHeading>
-                <ul className="space-y-2 text-sm">
-                  {policyLinks.map((item) => (
-                    <li
-                      key={item.label}
-                      className={item.mobileHidden ? 'hidden sm:block' : undefined}
-                    >
-                      {renderLink(item)}
-                    </li>
-                  ))}
-                  <li className="sm:hidden">
-                    <button
-                      type="button"
-                      onClick={() => navigate('/policies')}
-                      className="text-sm font-semibold text-blue-600 underline-offset-4 hover:underline"
-                    >
-                      All policies →
-                    </button>
-                  </li>
-                </ul>
-              </nav>
-
-              {/* Contact + Instagram QR (/tours only) */}
-              {isTours && (
-                <div className="col-span-2 sm:col-span-3 lg:col-span-1">
-                  <ColumnHeading>Contact</ColumnHeading>
-
-                  {/* Mobile: three compact actions in one row */}
-                  <div className="grid grid-cols-3 gap-2 sm:hidden">
-                    <a href={`mailto:${CONTACT_EMAIL}`} className={actionBtn}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                        className="h-4 w-4 text-blue-600"
-                      >
-                        <rect x="3" y="5" width="18" height="14" rx="2" />
-                        <path d="m3 7 9 6 9-6" />
-                      </svg>
-                      Email
-                    </a>
-
-                    <a href={`tel:${CONTACT_TEL}`} className={actionBtn}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                        className="h-4 w-4 text-blue-600"
-                      >
-                        <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z" />
-                      </svg>
-                      Call
-                    </a>
-
-                    <a
-                      href={WHATSAPP_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl bg-[#25D366] px-2 text-xs font-bold text-[#06371d] transition active:scale-95"
-                    >
-                      <WhatsAppIcon className="h-4 w-4 text-white" />
-                      WhatsApp
-                    </a>
-                  </div>
-
-                  {/* sm and up */}
-                  <div className="hidden sm:block">
-                    <a
-                      href={`mailto:${CONTACT_EMAIL}`}
-                      className={`${linkClass} inline-flex items-center gap-2 break-words text-sm font-semibold text-[#071f4f]`}
-                    >
-                      <GmailIcon />
-                      {CONTACT_EMAIL}
-                    </a>
-
-                    {/* Label swaps to the number on hover; the link still opens WhatsApp */}
-                    <a
-                      href={WHATSAPP_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Chat on WhatsApp"
-                      className="group mt-4 flex min-h-[44px] w-fit items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 text-sm font-bold text-[#06371d] shadow-[0_10px_24px_rgba(37,211,102,0.30)] transition hover:-translate-y-0.5 hover:bg-[#1ebe5b] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-300"
-                    >
-                      <WhatsAppIcon className="h-5 w-5 shrink-0 text-white" />
-                      <span className="inline-grid overflow-hidden">
-                        <span className="col-start-1 row-start-1 transition-all duration-300 ease-out group-hover:-translate-y-full group-hover:opacity-0 group-focus-visible:-translate-y-full group-focus-visible:opacity-0">
-                          Chat on WhatsApp
-                        </span>
-                        <span
-                          aria-hidden="true"
-                          className="col-start-1 row-start-1 translate-y-full whitespace-nowrap opacity-0 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100"
-                        >
-                          {CONTACT_NUMBER}
-                        </span>
-                      </span>
-                    </a>
-                  </div>
-
-                  {/* Instagram QR */}
-                  <a
-                    href={INSTAGRAM_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Follow Cape Frontier on Instagram"
-                    className="mt-4 flex w-full items-center gap-4 rounded-2xl border border-black/5 bg-white/70 p-3 shadow-[0_8px_24px_rgba(7,31,79,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_32px_rgba(7,31,79,0.12)] sm:w-fit"
-                  >
-                    <img
-                      src={INSTAGRAM_QR}
-                      alt="Scan to follow Cape Frontier on Instagram"
-                      loading="lazy"
-                      className="h-28 w-28 shrink-0 rounded-lg object-contain sm:h-36 sm:w-36 lg:h-40 lg:w-40"
-                    />
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500">
-                        Instagram
-                      </p>
-                      <p className="mt-1 text-xs font-semibold leading-4 text-[#071f4f]">
-                        Scan to follow us
-                      </p>
-                    </div>
-                  </a>
-                </div>
               )}
-            </div>
-          </div>
-        )}
 
-        {/* Links: on /tours the columns above carry navigation, so this row is
-            only the legal links. Everywhere else it is one clean row: site
-            navigation on the left, legal links + sitemap on the right. */}
-        <div
-          className={`px-5 py-5 sm:px-8 sm:py-6 ${showDetails && isTours ? 'border-t border-black/5' : ''
-            }`}
-        >
-          <div className="flex flex-col items-center gap-4 lg:flex-row lg:justify-between">
-            {showNav && (
               <ul
-                aria-label="Site navigation"
-                className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-semibold"
+                aria-label="Legal"
+                className={`flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[11px] sm:text-xs ${showNav ? 'lg:justify-end' : 'w-full sm:justify-end'
+                  }`}
               >
-                {exploreLinks.map((item) => (
+                {legalLinks.map((item) => (
                   <li key={item.label}>{renderLink(item)}</li>
                 ))}
               </ul>
-            )}
-
-            <ul
-              aria-label="Legal"
-              className={`flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[11px] sm:text-xs ${showNav ? 'lg:justify-end' : 'w-full sm:justify-end'
-                }`}
-            >
-              {legalLinks.map((item) => (
-                <li key={item.label}>{renderLink(item)}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Affiliations + accepted payments */}
-        <div className="border-t border-black/5 px-5 py-4 sm:px-8 sm:py-5">
-          <div className="flex flex-col items-center gap-4 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-5">
-              <p className="text-[11px] font-semibold text-neutral-500 sm:text-xs">
-                Proudly affiliated with
-              </p>
-
-              <ul
-                aria-label="Affiliations"
-                className="flex items-center justify-center gap-5 sm:gap-6"
-              >
-                {affiliations.map(({ label, logo, href }) => {
-                  const img = (
-                    <img
-                      src={logo}
-                      alt={label}
-                      loading="lazy"
-                      className="h-8 w-auto object-contain sm:h-11"
-                    />
-                  )
-
-                  return (
-                    <li key={label}>
-                      {href ? (
-                        <a
-                          href={href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={label}
-                          className="block transition hover:opacity-80"
-                        >
-                          {img}
-                        </a>
-                      ) : (
-                        img
-                      )}
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-
-            <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-4">
-              <p className="text-[11px] font-semibold text-neutral-500 sm:text-xs">
-                We accept
-              </p>
-
-              <ul
-                aria-label="Accepted payment methods"
-                className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2"
-              >
-                {paymentMethods
-                  .filter((method) => method.enabled)
-                  .map((method) => (
-                    <PaymentBadge key={method.label} {...method} />
-                  ))}
-              </ul>
             </div>
           </div>
-        </div>
 
-        {/* Copyright */}
-        <div className="relative isolate overflow-hidden border-t border-black/5 bg-blue-900 px-5 py-3 sm:px-8 sm:py-4">
-          {/* Dimmed background image */}
-          <img
-            src={footerBgImage}
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-            className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 -z-10 bg-blue-950/15"
-          />
-
-          {/* One row on every screen size: text left, back-to-top right */}
-          <div className="relative flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <img
-                src="/icons/ZAR.png"
-                alt="South African Rand"
-                className="h-8 w-8 shrink-0 rounded-full border border-white/10 object-cover shadow-[0_6px_18px_rgba(0,0,0,0.18)] sm:h-9 sm:w-9"
-              />
-
-              <div className="min-w-0">
-                <p className="text-xs font-semibold text-white sm:text-sm">
-                  © {new Date().getFullYear()} Cape Frontier Travel & Tours
+          {/* Affiliations + accepted payments */}
+          <div className="w-full min-w-0 border-t border-black/5 px-5 py-4 sm:px-8 sm:py-5">
+            <div className="flex w-full min-w-0 flex-col items-center gap-4 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex w-full min-w-0 flex-col items-center justify-center gap-2 sm:w-auto sm:flex-row sm:gap-5">
+                <p className="shrink-0 text-[11px] font-semibold text-neutral-500 sm:text-xs">
+                  Proudly affiliated with
                 </p>
 
-                <p className="mt-0.5 text-[11px] text-white/80 sm:mt-1 sm:text-sm">
-                  Designed and built with <b>{'<3'}</b> by{' '}
-                  <span className="font-semibold text-white/90">
-                    F. Viljoen & FO Creative
-                  </span>
+                <ul
+                  aria-label="Affiliations"
+                  className="flex flex-wrap items-center justify-center gap-5 sm:gap-6"
+                >
+                  {affiliations.map(({ label, logo, href }) => {
+                    const img = (
+                      <img
+                        src={logo}
+                        alt={label}
+                        loading="lazy"
+                        className="h-8 w-auto max-w-[100px] object-contain sm:h-11 sm:max-w-[140px]"
+                      />
+                    )
+
+                    return (
+                      <li key={label}>
+                        {href ? (
+                          <a
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={label}
+                            className="block transition hover:opacity-80"
+                          >
+                            {img}
+                          </a>
+                        ) : (
+                          img
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+
+              <div className="flex w-full min-w-0 flex-col items-center gap-2 sm:w-auto sm:flex-row sm:gap-4">
+                <p className="shrink-0 text-[11px] font-semibold text-neutral-500 sm:text-xs">
+                  We accept
                 </p>
+
+                <ul
+                  aria-label="Accepted payment methods"
+                  className="flex w-full flex-wrap items-center justify-center gap-1.5 sm:w-auto sm:gap-2"
+                >
+                  {paymentMethods
+                    .filter((method) => method.enabled)
+                    .map((method) => (
+                      <PaymentBadge key={method.label} {...method} />
+                    ))}
+                </ul>
               </div>
             </div>
+          </div>
 
-            {backToTopVisible && (
-              <button
-                type="button"
-                onClick={scrollToTop}
-                aria-label="Back to top"
-                className="group inline-flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full border border-white/25 text-xs font-bold text-white/90 transition hover:-translate-y-0.5 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 sm:h-auto sm:w-auto sm:px-4 sm:py-2"
-              >
-                <span className="hidden sm:inline">Back to top</span>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                  className="h-4 w-4 transition group-hover:-translate-y-0.5 sm:h-3.5 sm:w-3.5"
+          {/* Copyright */}
+          <div className="relative isolate w-full min-w-0 overflow-hidden border-t border-black/5 bg-blue-900 px-5 py-3 sm:px-8 sm:py-4">
+            <img
+              src={footerBgImage}
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 -z-10 bg-blue-950/15"
+            />
+
+            <div className="relative flex w-full min-w-0 items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <img
+                  src="/icons/ZAR.png"
+                  alt="South African Rand"
+                  className="h-8 w-8 shrink-0 rounded-full border border-white/10 object-cover shadow-[0_6px_18px_rgba(0,0,0,0.18)] sm:h-9 sm:w-9"
+                />
+
+                <div className="min-w-0">
+                  <p className="break-words text-xs font-semibold text-white sm:text-sm">
+                    © {new Date().getFullYear()} Cape Frontier Travel & Tours
+                  </p>
+
+                  <p className="mt-0.5 break-words text-[11px] text-white/80 sm:mt-1 sm:text-sm">
+                    Designed and built with <b>{'<3'}</b> by{' '}
+                    <span className="font-semibold text-white/90">
+                      F. Viljoen & FO Creative
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              {backToTopVisible && (
+                <button
+                  type="button"
+                  onClick={scrollToTop}
+                  aria-label="Back to top"
+                  className="group inline-flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full border border-white/25 text-xs font-bold text-white/90 transition hover:-translate-y-0.5 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 sm:h-auto sm:w-auto sm:px-4 sm:py-2"
                 >
-                  <path d="M12 19V5M5 12l7-7 7 7" />
-                </svg>
-              </button>
-            )}
+                  <span className="hidden sm:inline">Back to top</span>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    className="h-4 w-4 transition group-hover:-translate-y-0.5 sm:h-3.5 sm:w-3.5"
+                  >
+                    <path d="M12 19V5M5 12l7-7 7 7" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+
+      {/* QR Code Modal Popup */}
+      {showQrPopup && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          onClick={() => setShowQrPopup(false)}
+        >
+          <div 
+            className="relative w-full max-w-sm animate-in fade-in zoom-in-95 flex flex-col items-center rounded-[2rem] bg-white p-6 shadow-2xl duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowQrPopup(false)}
+              aria-label="Close popup"
+              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition hover:bg-neutral-200"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="h-4 w-4">
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="mt-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white shadow-lg">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-7 w-7">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+            </div>
+
+            <h3 className="mt-4 font-frank text-2xl font-bold text-neutral-950">Follow us on Instagram</h3>
+            <p className="mt-1 text-center text-sm text-neutral-500">Scan the QR code with your phone camera to follow our latest adventures.</p>
+
+            <div className="mt-6 w-full max-w-[240px] overflow-hidden rounded-2xl border border-neutral-100 bg-neutral-50 p-4 shadow-inner">
+              <img
+                src={INSTAGRAM_QR}
+                alt="Instagram QR Code"
+                className="h-full w-full object-contain mix-blend-multiply"
+              />
+            </div>
+
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 font-bitter text-sm font-bold text-white shadow-[0_8px_20px_rgba(37,99,235,0.24)] transition hover:bg-blue-700 active:scale-95"
+            >
+              Go to Instagram
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </a>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

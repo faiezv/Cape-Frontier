@@ -9,7 +9,7 @@ import React, {
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import ClientOnly from "../ClientOnly";
-import CheckoutSummary from "../CheckoutSummary";
+import CheckoutSummary from "../Booking/CheckoutSummary";
 import TourOptions from "../TourDetails/TourOptions.jsx";
 import AdditionalPricing from "../TourDetails/AdditionalPricing";
 import KidsActivities from "../TourDetails/KidsActivities.jsx";

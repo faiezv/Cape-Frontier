@@ -9,58 +9,24 @@ const TourHero = ({ tour }) => {
   const navigate = useNavigate();
   if (!tour) return null;
 
-  /*
-   * ------------------------------------------------------------
-   * HERO IMAGE
-   * ------------------------------------------------------------
-   *
-   * Tour data may contain:
-   *
-   * "/src/assets/images/tours/..."
-   *
-   * "/images/..."
-   *
-   * "tours/..."
-   *
-   * resolveTourImage() converts all of these into the
-   * Vite-generated production asset URL.
-   */
   const heroImage = resolveImage(
     tour?.image ||
       tour?.images?.[0] ||
       tour?.imageFolder
   );
 
-  /*
-   * ------------------------------------------------------------
-   * VIDEOS
-   * ------------------------------------------------------------
-   */
   const videos = Array.isArray(tour?.videos)
     ? tour.videos.filter(Boolean)
     : [];
 
   const hasVideos = videos.length > 0;
 
-  /*
-   * ------------------------------------------------------------
-   * TAGS
-   * ------------------------------------------------------------
-   */
   const tags = [
     tour?.type,
     tour?.category,
     tour?.experienceType,
   ].filter(Boolean);
 
-  /*
-   * ------------------------------------------------------------
-   * DESCRIPTION
-   * ------------------------------------------------------------
-   *
-   * Prefer SEO description when available,
-   * otherwise use the normal tour description.
-   */
   const heroDescription =
     tour?.seo?.description ||
     tour?.description ||
@@ -68,17 +34,12 @@ const TourHero = ({ tour }) => {
 
   return (
     <section className="relative">
-
       {/* ====================================================== */}
       {/* HERO                                                    */}
       {/* ====================================================== */}
 
       <div className="relative min-h-[720px] overflow-hidden bg-neutral-950 sm:min-h-[780px] lg:min-h-[820px]">
-
-        {/* ---------------------------------------------------- */}
-        {/* COVER IMAGE                                           */}
-        {/* ---------------------------------------------------- */}
-
+        {/* COVER IMAGE */}
         <img
           src={heroImage}
           alt={tour?.title || "Cape Frontier tour"}
@@ -86,44 +47,27 @@ const TourHero = ({ tour }) => {
           decoding="async"
           className="absolute inset-0 h-full w-full object-cover"
           onError={(event) => {
-            /*
-             * If something unexpected happens with the resolved
-             * image, hide the broken image rather than showing
-             * the browser's broken-image icon.
-             */
             event.currentTarget.style.display = "none";
           }}
         />
 
-        {/* ---------------------------------------------------- */}
-        {/* GENERAL IMAGE OVERLAY                                  */}
-        {/* ---------------------------------------------------- */}
-
+        {/* GENERAL IMAGE OVERLAY */}
         <div className="absolute inset-0 bg-neutral-950/25" />
 
-        {/* ---------------------------------------------------- */}
-        {/* BOTTOM TEXT CONTRAST                                   */}
-        {/* ---------------------------------------------------- */}
-
+        {/* BOTTOM TEXT CONTRAST */}
         <div className="absolute inset-x-0 bottom-0 h-[78%] bg-gradient-to-t from-black/90 via-black/65 to-transparent" />
 
-        {/* ---------------------------------------------------- */}
-        {/* SIDE CONTRAST                                         */}
-        {/* ---------------------------------------------------- */}
-
+        {/* SIDE CONTRAST */}
         <div className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-black/40 via-transparent to-black/20" />
 
-        {/* ---------------------------------------------------- */}
-        {/* TOP CONTRAST                                          */}
-        {/* ---------------------------------------------------- */}
-
+        {/* TOP CONTRAST */}
         <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-black/55 to-transparent" />
 
         {/* ==================================================== */}
-        {/* BACK BUTTON                                           */}
+        {/* BACK BUTTON — FIXED TO VIEWPORT                      */}
         {/* ==================================================== */}
 
-        <div className="absolute left-4 top-24 z-30 sm:left-6 sm:top-28 lg:left-8 lg:top-32">
+        <div className="fixed left-4 top-24 z-50 sm:left-6 sm:top-28 lg:left-8 lg:top-32">
           <button
             type="button"
             onClick={() => navigate(-1)}
@@ -172,15 +116,8 @@ const TourHero = ({ tour }) => {
         {/* ==================================================== */}
 
         <div className="relative z-10 mx-auto flex min-h-[720px] max-w-6xl items-end justify-center px-4 pb-24 text-center sm:min-h-[780px] sm:px-6 sm:pb-28 lg:min-h-[820px] lg:pb-32">
-
           <div className="flex w-full max-w-4xl flex-col items-center">
-
-
-
-            {/* ------------------------------------------------ */}
-            {/* TITLE                                              */}
-            {/* ------------------------------------------------ */}
-
+            {/* TITLE */}
             <h1
               className="
                 max-w-5xl
@@ -195,10 +132,8 @@ const TourHero = ({ tour }) => {
             >
               {tour?.title || "Cape Frontier Tour"}
             </h1>
-            {/* ------------------------------------------------ */}
-            {/* TAGS                                              */}
-            {/* ------------------------------------------------ */}
 
+            {/* TAGS */}
             {tags.length > 0 && (
               <div className="mt-8 flex flex-wrap justify-center gap-2">
                 {tags.map((tag, index) => (
@@ -223,10 +158,7 @@ const TourHero = ({ tour }) => {
               </div>
             )}
 
-            {/* ------------------------------------------------ */}
-            {/* DESCRIPTION                                       */}
-            {/* ------------------------------------------------ */}
-
+            {/* DESCRIPTION */}
             {heroDescription && (
               <p
                 className="
@@ -245,22 +177,13 @@ const TourHero = ({ tour }) => {
         </div>
       </div>
 
-      {/* ====================================================== */}
-      {/* VIDEO STRIP                                             */}
-      {/* ====================================================== */}
-
+      {/* VIDEO STRIP */}
       {hasVideos && (
         <TourVideoStrip videos={videos} />
       )}
     </section>
   );
 };
-
-
-
-/* ============================================================ */
-/* TAG FORMATTING                                                */
-/* ============================================================ */
 
 function formatTag(value) {
   if (!value) return "";
@@ -269,6 +192,5 @@ function formatTag(value) {
     .replace(/[_-]+/g, " ")
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
-
 
 export default TourHero;
