@@ -4,5 +4,3 @@ Disallow: /checkout
 Disallow: /success
  
 Sitemap: {{ORIGIN}}/sitemap.xml
- 
-Sitemap: {{ORIGIN}}/sitemap.xml
