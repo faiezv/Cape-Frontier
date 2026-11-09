@@ -89,6 +89,11 @@ const informationLinks = [
 
 const affiliations = [
   {
+    label: "Cape Town Tourism",
+    logo: "/assets/brand/logo-ct-tourism.webp",
+    href: null,
+  },
+  {
     label: "The Capetonian",
     logo: "/assets/brand/logo-the-capetonian.webp",
     href: null,
