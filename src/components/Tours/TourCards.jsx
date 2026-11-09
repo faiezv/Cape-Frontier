@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { resolveImage } from "../../utils/ImageLoader";
@@ -6,6 +6,9 @@ import { getPriceLabel, hasGroupDeal } from "../../utils/tourHelpers";
 import { useCurrency } from "../../utils/currency";
 
 const FALLBACK_IMG = "/images/content/random/1.webp";
+
+// Quick view: how long each gallery image stays up (also the length of its slow left→right pan)
+const AUTO_ADVANCE_MS = 6000;
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -177,6 +180,24 @@ const HeartIcon = ({ filled = false, className = "h-[18px] w-[18px]" }) => (
 const ArrowIcon = ({ className = "h-3.5 w-3.5" }) => (
   <svg {...iconProps} strokeWidth={2.5} className={className}>
     <path d="M5 12h14M13 6l6 6-6 6" />
+  </svg>
+);
+
+const ExpandIcon = ({ className = "h-4 w-4" }) => (
+  <svg {...iconProps} className={className}>
+    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+  </svg>
+);
+
+const CollapseIcon = ({ className = "h-4 w-4" }) => (
+  <svg {...iconProps} className={className}>
+    <path d="M14 10h6V4M10 14H4v6M20 4l-6 6M4 20l6-6" />
+  </svg>
+);
+
+const ChevronIcon = ({ dir = "right", className = "h-5 w-5" }) => (
+  <svg {...iconProps} strokeWidth={2.5} className={className}>
+    <path d={dir === "left" ? "m15 5-7 7 7 7" : "m9 5 7 7-7 7"} />
   </svg>
 );
 
@@ -713,9 +734,51 @@ export function TourQuickView({ tour, onClose, onBook, onSubmitReview }) {
     return [...new Set(imgs)].slice(0, 6); // Ensure unique, limit to 6
   }, [tour]);
 
-  const [activeImage, setActiveImage] = useState(galleryImages[0] || FALLBACK_IMG);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeImage = galleryImages[activeIndex] || FALLBACK_IMG;
+  const [expanded, setExpanded] = useState(false);
+  const expandedRef = useRef(false);
+  expandedRef.current = expanded;
+  const galleryLenRef = useRef(galleryImages.length);
+  galleryLenRef.current = galleryImages.length;
+  const stripRef = useRef(null);
+
+  const goNext = () => setActiveIndex((i) => (i + 1) % galleryImages.length);
+  const goPrev = () =>
+    setActiveIndex((i) => (i - 1 + galleryImages.length) % galleryImages.length);
   const [liked, toggleLike] = useTourLike(tour);
   const [reviewOpen, setReviewOpen] = useState(false);
+
+  // Auto-skip to the next image every AUTO_ADVANCE_MS. Changing image (auto or
+  // manual) restarts the timer. Paused while the review form is open.
+  useEffect(() => {
+    if (galleryImages.length < 2 || reviewOpen) return undefined;
+    const t = setTimeout(
+      () => setActiveIndex((i) => (i + 1) % galleryImages.length),
+      AUTO_ADVANCE_MS,
+    );
+    return () => clearTimeout(t);
+  }, [activeIndex, galleryImages.length, reviewOpen]);
+
+  // Preload the next image so the swap is instant
+  useEffect(() => {
+    if (galleryImages.length < 2) return;
+    const next = galleryImages[(activeIndex + 1) % galleryImages.length];
+    const im = new Image();
+    im.src = resolveImage(next);
+  }, [activeIndex, galleryImages]);
+
+  // Keep the active thumbnail in view
+  useEffect(() => {
+    const c = stripRef.current;
+    const el = c?.children?.[activeIndex];
+    if (c && el) {
+      c.scrollTo({
+        left: el.offsetLeft - c.clientWidth / 2 + el.clientWidth / 2,
+        behavior: "smooth",
+      });
+    }
+  }, [activeIndex]);
 
   // Lock page scroll + Escape to close
   useEffect(() => {
@@ -725,9 +788,25 @@ export function TourQuickView({ tour, onClose, onBook, onSubmitReview }) {
     document.body.style.overflow = "hidden";
     window.lenis?.stop?.();
     const onKey = (e) => {
-      if (e.key !== "Escape") return;
-      // The review form (if open) handles its own Escape first.
+      // The review form (if open) handles its own keys first.
       if (document.querySelector('[aria-label^="Leave a review for"]')) return;
+      // ← / → change image while the image is expanded
+      if (
+        expandedRef.current &&
+        galleryLenRef.current > 1 &&
+        (e.key === "ArrowLeft" || e.key === "ArrowRight")
+      ) {
+        e.preventDefault();
+        const n = galleryLenRef.current;
+        setActiveIndex((i) => (e.key === "ArrowRight" ? (i + 1) % n : (i - 1 + n) % n));
+        return;
+      }
+      if (e.key !== "Escape") return;
+      // Expanded image view closes first, then the modal.
+      if (expandedRef.current) {
+        setExpanded(false);
+        return;
+      }
       onClose();
     };
     window.addEventListener("keydown", onKey);
@@ -752,7 +831,7 @@ export function TourQuickView({ tour, onClose, onBook, onSubmitReview }) {
       aria-label={tour.title}
     >
       <div
-        className="relative flex max-h-[95dvh] w-full max-w-5xl flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:max-h-[85dvh] sm:flex-row sm:rounded-3xl"
+        className="relative flex max-h-[95dvh] w-full max-w-5xl flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:h-[85dvh] sm:max-h-[85dvh] sm:flex-row sm:rounded-3xl"
         style={{ animation: "tourQvIn 0.32s cubic-bezier(0.16,1,0.3,1) both" }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -767,39 +846,178 @@ export function TourQuickView({ tour, onClose, onBook, onSubmitReview }) {
         </button>
 
         {/* ── LEFT COLUMN: IMAGE & GALLERY ─────────────────────────── */}
-        <div className="relative flex w-full shrink-0 flex-col bg-neutral-100 sm:w-[45%] lg:w-1/2">
+        {/* Click the image to expand it across the whole modal (details collapse
+            away); click again to bring them back. */}
+        <div
+          className={`relative flex w-full shrink-0 flex-col bg-neutral-100 transition-[width] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${expanded ? "sm:w-full lg:w-full" : "sm:w-[45%] lg:w-1/2"
+            }`}
+        >
           {/* Main Image */}
-          <div className="relative h-64 w-full sm:h-80 md:h-96 lg:h-full lg:min-h-[500px]">
+          <div
+            className={`relative w-full overflow-hidden bg-neutral-900 transition-[height] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:h-auto sm:min-h-0 sm:flex-1 ${expanded ? "h-[70dvh]" : "h-64"
+              }`}
+          >
+            {/* Blurred backdrop (shows around the full image when expanded) */}
             <img
+              key={`bg-${activeIndex}`}
               src={resolveImage(activeImage)}
-              alt={tour.title}
-              className="absolute inset-0 h-full w-full object-cover transition-opacity duration-300"
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full scale-125 object-cover opacity-70 blur-2xl"
+              style={{ animation: "tourQvFade 0.6s ease-out" }}
               onError={(e) => {
                 e.currentTarget.src = FALLBACK_IMG;
               }}
             />
+
+            {/* Expanded: the full, uncropped image */}
+            <img
+              key={`full-${activeIndex}`}
+              src={resolveImage(activeImage)}
+              alt=""
+              aria-hidden="true"
+              className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-500 ${expanded ? "opacity-100" : "opacity-0"
+                }`}
+              style={expanded ? { animation: "tourQvFade 0.6s ease-out" } : undefined}
+              onError={(e) => {
+                e.currentTarget.src = FALLBACK_IMG;
+              }}
+            />
+
+            {/* Collapsed: fills the box and slowly pans across the photo, left → right */}
+            <img
+              key={`pan-${activeIndex}`}
+              src={resolveImage(activeImage)}
+              alt={tour.title}
+              className={`qv-pan absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${expanded ? "opacity-0" : "opacity-100"
+                }`}
+              style={{
+                objectPosition: "0% 0%",
+                animation: expanded
+                  ? "none"
+                  : `tourQvPan ${AUTO_ADVANCE_MS}ms linear ${galleryImages.length > 1 ? "forwards" : "infinite alternate"
+                  }, tourQvFade 0.6s ease-out`,
+              }}
+              onError={(e) => {
+                e.currentTarget.src = FALLBACK_IMG;
+              }}
+            />
+
             <div
               aria-hidden="true"
-              className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10"
             />
-            {tour.onPromo && (
-              <div className="absolute left-4 top-4">
+
+            {/* The whole image is the expand / collapse button */}
+            <button
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
+              aria-expanded={expanded}
+              aria-label={expanded ? "Collapse image and show tour details" : "Expand image"}
+              className={`absolute inset-0 z-10 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-white ${expanded ? "cursor-zoom-out" : "cursor-zoom-in"
+                }`}
+            />
+
+            {/* Top-left: state hint (not a button) + promo */}
+            <div className="pointer-events-none absolute left-3 top-3 z-20 flex items-center gap-2 sm:left-4 sm:top-4">
+              <span
+                aria-hidden="true"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-neutral-800 shadow-md"
+              >
+                {expanded ? <CollapseIcon /> : <ExpandIcon />}
+              </span>
+              {tour.onPromo && (
                 <span className="rounded-full bg-gradient-to-r from-orange-500 to-red-600 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-white shadow-md">
                   Promo
                 </span>
-              </div>
+              )}
+            </div>
+
+            {/* Back / forward — slide in when the image is expanded */}
+            {galleryImages.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={goPrev}
+                  aria-label="Previous image"
+                  tabIndex={expanded ? 0 : -1}
+                  className={`absolute left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-neutral-800 shadow-lg ring-1 ring-black/10 transition-[opacity,transform,visibility,background-color] duration-500 hover:bg-white active:scale-90 sm:left-5 sm:h-12 sm:w-12 ${expanded
+                    ? "visible translate-x-0 opacity-100"
+                    : "invisible -translate-x-4 opacity-0"
+                    }`}
+                >
+                  <ChevronIcon dir="left" />
+                </button>
+                <button
+                  type="button"
+                  onClick={goNext}
+                  aria-label="Next image"
+                  tabIndex={expanded ? 0 : -1}
+                  className={`absolute right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-neutral-800 shadow-lg ring-1 ring-black/10 transition-[opacity,transform,visibility,background-color] duration-500 hover:bg-white active:scale-90 sm:right-5 sm:h-12 sm:w-12 ${expanded
+                    ? "visible translate-x-0 opacity-100"
+                    : "invisible translate-x-4 opacity-0"
+                    }`}
+                >
+                  <ChevronIcon dir="right" />
+                </button>
+              </>
             )}
+
+            {/* Expanded view: price + actions stay available over the photo */}
+            <div
+              aria-hidden={!expanded}
+              className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pt-14 transition-[opacity,transform,visibility] duration-500 sm:p-6 sm:pt-16 ${expanded
+                ? "visible translate-y-0 opacity-100"
+                : "invisible translate-y-4 opacity-0"
+                }`}
+            >
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div className="min-w-0 text-white">
+                  <p className="line-clamp-1 font-frank text-lg font-bold sm:text-xl">
+                    {tour.title}
+                  </p>
+                  <p className="mt-0.5 flex flex-wrap items-baseline gap-x-2">
+                    <span className="text-xs font-medium text-white/80">From</span>
+                    <span className="font-frank text-2xl font-bold">{format(amount)}</span>
+                    {note && (
+                      <span className="text-xs font-medium text-white/80">{note}</span>
+                    )}
+                  </p>
+                </div>
+                <div className="pointer-events-auto grid grid-cols-2 gap-2 sm:flex sm:shrink-0">
+                  <Link
+                    to={`/tours/${tour.slug}`}
+                    state={{ tour }}
+                    tabIndex={expanded ? 0 : -1}
+                    className="flex items-center justify-center rounded-full bg-white px-6 py-3 text-center text-sm font-bold text-neutral-800 transition hover:bg-neutral-100"
+                  >
+                    See full page
+                  </Link>
+                  <button
+                    type="button"
+                    tabIndex={expanded ? 0 : -1}
+                    onClick={() => onBook(tour)}
+                    className="rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-blue-600/30 transition hover:bg-blue-700 active:scale-95"
+                  >
+                    Book now
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Thumbnail Strip */}
           {galleryImages.length > 1 && (
-            <div className="flex w-full gap-2 overflow-x-auto bg-white/95 p-3 backdrop-blur-md lg:bg-neutral-900/60 lg:p-4">
+            <div
+              ref={stripRef}
+              className="relative flex w-full gap-2 overflow-x-auto bg-white/95 p-3 backdrop-blur-md lg:bg-neutral-900/60 lg:p-4"
+            >
               {galleryImages.map((img, idx) => (
                 <button
                   key={`${img}-${idx}`}
                   type="button"
-                  onClick={() => setActiveImage(img)}
-                  className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${activeImage === img
+                  onClick={() => setActiveIndex(idx)}
+                  className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${activeIndex === idx
                     ? "border-blue-600 opacity-100 ring-2 ring-blue-600/20"
                     : "border-transparent opacity-60 hover:opacity-100 lg:opacity-50 lg:hover:opacity-100"
                     }`}
@@ -819,11 +1037,17 @@ export function TourQuickView({ tour, onClose, onBook, onSubmitReview }) {
         </div>
 
         {/* ── RIGHT COLUMN: DETAILS ────────────────────────────────── */}
-        <div className="flex w-full flex-col overflow-hidden sm:w-[55%] lg:w-1/2">
+        <div
+          aria-hidden={expanded}
+          className={`flex w-full min-w-0 flex-col overflow-hidden transition-[max-height,opacity] duration-500 sm:flex-1 sm:basis-0 sm:max-h-none ${expanded
+            ? "pointer-events-none max-h-0 opacity-0"
+            : "max-h-[100dvh] opacity-100"
+            }`}
+        >
           {/* Scrollable Content */}
           <div
             data-lenis-prevent
-            className="flex-1 space-y-6 overflow-y-auto overscroll-contain p-6 sm:p-8"
+            className="flex-1 space-y-6 overflow-y-auto overscroll-contain p-6 sm:min-w-[26rem] sm:p-8"
           >
             <div>
               <div className="mb-2 flex flex-wrap items-center gap-2 pr-10">
@@ -941,7 +1165,7 @@ export function TourQuickView({ tour, onClose, onBook, onSubmitReview }) {
           </div>
 
           {/* Fixed Footer — one price only */}
-          <div className="shrink-0 border-t border-neutral-100 bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-8 sm:py-6">
+          <div className="shrink-0 border-t border-neutral-100 bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:min-w-[26rem] sm:px-8 sm:py-6">
             <div className="mb-4 flex flex-wrap items-baseline gap-x-2">
               <span className="text-sm font-medium text-neutral-500">From</span>
               <span className="font-frank text-3xl font-bold text-neutral-950">
@@ -1014,6 +1238,17 @@ export function TourQuickView({ tour, onClose, onBook, onSubmitReview }) {
         @keyframes tourQvIn {
           from { opacity: 0; transform: translateY(32px) scale(0.98); }
           to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes tourQvPan {
+          from { object-position: 0% 0%; }
+          to   { object-position: 100% 100%; }
+        }
+        @keyframes tourQvFade {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .qv-pan { animation: none !important; }
         }
       `}</style>
     </div>,

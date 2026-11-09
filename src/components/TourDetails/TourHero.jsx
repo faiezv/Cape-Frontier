@@ -1,19 +1,96 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import TourVideoStrip from "./TourVideoStrip.jsx";
 import { resolveImage } from "/src/utils/ImageLoader.js";
 
+const FALLBACK_BG = "#3b5b7a";
+
+/**
+ * Narrow feather on all four edges: just enough to hide the seam
+ * between the sharp image and the backdrop.
+ */
+const FEATHER_MASK = {
+  WebkitMaskImage:
+    "linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 4%, black 94%, transparent 100%)",
+  maskImage:
+    "linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 4%, black 94%, transparent 100%)",
+  WebkitMaskComposite: "source-in",
+  maskComposite: "intersect",
+};
+
+/**
+ * Samples the image down to a tiny canvas and returns its average
+ * colour (only visible while the image loads). Fails silently.
+ */
+function sampleImageColor(src, onColor) {
+  if (!src || typeof window === "undefined") return () => {};
+
+  let cancelled = false;
+  const img = new window.Image();
+  img.crossOrigin = "anonymous";
+
+  img.onload = () => {
+    if (cancelled) return;
+
+    try {
+      const size = 24;
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(img, 0, 0, size, size);
+
+      const { data } = ctx.getImageData(0, 0, size, size);
+
+      let r = 0;
+      let g = 0;
+      let b = 0;
+      let count = 0;
+
+      for (let i = 0; i < data.length; i += 4) {
+        if (data[i + 3] < 128) continue;
+        r += data[i];
+        g += data[i + 1];
+        b += data[i + 2];
+        count += 1;
+      }
+
+      if (!count) return;
+
+      const lighten = 0.85;
+      const rr = Math.round((r / count) * lighten);
+      const gg = Math.round((g / count) * lighten);
+      const bb = Math.round((b / count) * lighten);
+
+      onColor(`rgb(${rr}, ${gg}, ${bb})`);
+    } catch {
+      // Canvas tainted or unavailable: keep fallback colour
+    }
+  };
+
+  img.src = src;
+
+  return () => {
+    cancelled = true;
+  };
+}
+
 const TourHero = ({ tour }) => {
   const navigate = useNavigate();
-  if (!tour) return null;
+  const [bgColor, setBgColor] = useState(FALLBACK_BG);
 
-  const heroImage = resolveImage(
-    tour?.image ||
-      tour?.images?.[0] ||
-      tour?.imageFolder
-  );
+  const heroImage = tour
+    ? resolveImage(tour?.image || tour?.images?.[0] || tour?.imageFolder)
+    : null;
+
+  useEffect(() => {
+    if (!heroImage) return undefined;
+    return sampleImageColor(heroImage, setBgColor);
+  }, [heroImage]);
+
+  if (!tour) return null;
 
   const videos = Array.isArray(tour?.videos)
     ? tour.videos.filter(Boolean)
@@ -21,16 +98,11 @@ const TourHero = ({ tour }) => {
 
   const hasVideos = videos.length > 0;
 
-  const tags = [
-    tour?.type,
-    tour?.category,
-    tour?.experienceType,
-  ].filter(Boolean);
+  const tags = [tour?.type, tour?.category, tour?.experienceType].filter(
+    Boolean
+  );
 
-  const heroDescription =
-    tour?.seo?.description ||
-    tour?.description ||
-    "";
+  const heroDescription = tour?.seo?.description || tour?.description || "";
 
   return (
     <section className="relative">
@@ -38,30 +110,40 @@ const TourHero = ({ tour }) => {
       {/* HERO                                                    */}
       {/* ====================================================== */}
 
-      <div className="relative min-h-[720px] overflow-hidden bg-neutral-950 sm:min-h-[780px] lg:min-h-[820px]">
-        {/* COVER IMAGE */}
+      <div
+        className="relative min-h-[720px] overflow-hidden sm:min-h-[780px] lg:min-h-[820px]"
+        style={{ backgroundColor: bgColor }}
+      >
+        {/* BACKDROP: same photo, lightly blurred so it still reads as the photo */}
         <img
           src={heroImage}
-          alt={tour?.title || "Cape Frontier tour"}
-          fetchPriority="high"
+          alt=""
+          aria-hidden="true"
           decoding="async"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full scale-110 object-cover blur-md brightness-105 saturate-125"
           onError={(event) => {
             event.currentTarget.style.display = "none";
           }}
         />
 
-        {/* GENERAL IMAGE OVERLAY */}
-        <div className="absolute inset-0 bg-neutral-950/25" />
+        {/* SHARP COVER IMAGE: real width, narrow feathered edges */}
+        <img
+          src={heroImage}
+          alt={tour?.title || "Cape Frontier tour"}
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-y-0 left-1/2 h-full w-auto max-w-full -translate-x-1/2 object-contain"
+          style={FEATHER_MASK}
+          onError={(event) => {
+            event.currentTarget.style.display = "none";
+          }}
+        />
 
-        {/* BOTTOM TEXT CONTRAST */}
-        <div className="absolute inset-x-0 bottom-0 h-[78%] bg-gradient-to-t from-black/90 via-black/65 to-transparent" />
+        {/* SOFT BOTTOM CONTRAST (text only) */}
+        <div className="absolute inset-x-0 bottom-0 h-[65%] bg-gradient-to-t from-black/70 via-black/35 to-transparent" />
 
-        {/* SIDE CONTRAST */}
-        <div className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-black/40 via-transparent to-black/20" />
-
-        {/* TOP CONTRAST */}
-        <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-black/55 to-transparent" />
+        {/* LIGHT TOP CONTRAST (nav / back button) */}
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/30 to-transparent" />
 
         {/* ==================================================== */}
         {/* BACK BUTTON — FIXED TO VIEWPORT                      */}
@@ -94,12 +176,7 @@ const TourHero = ({ tour }) => {
               className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5"
               aria-hidden="true"
             >
-              <path
-                d="M19 12H5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-
+              <path d="M19 12H5" strokeLinecap="round" strokeLinejoin="round" />
               <path
                 d="M12 19l-7-7 7-7"
                 strokeLinecap="round"
@@ -178,9 +255,7 @@ const TourHero = ({ tour }) => {
       </div>
 
       {/* VIDEO STRIP */}
-      {hasVideos && (
-        <TourVideoStrip videos={videos} />
-      )}
+      {hasVideos && <TourVideoStrip videos={videos} />}
     </section>
   );
 };

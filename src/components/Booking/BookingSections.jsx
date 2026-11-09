@@ -584,16 +584,6 @@ export function GroupSizeSection({
         )}
 
         <div className="mb-3">
-          <div className="mb-1.5 flex items-center justify-between gap-2">
-            <span className="shrink-0 text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-500">
-              Age brush
-            </span>
-            <span className="min-w-0 truncate text-right text-[10px] font-semibold text-neutral-400">
-              {activeBrush
-                ? `${activeName} active`
-                : "Off — seats default to Adult"}
-            </span>
-          </div>
 
           <div className="mx-auto flex w-full min-w-0 max-w-md flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-2">
             {GUEST_BANDS.map((band) => {

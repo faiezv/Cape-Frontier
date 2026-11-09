@@ -1,36 +1,73 @@
-import React, {
-  lazy,
-  Suspense,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
-import ClientOnly from "../ClientOnly";
 import CheckoutSummary from "../Booking/CheckoutSummary";
 import TourOptions from "../TourDetails/TourOptions.jsx";
-import AdditionalPricing from "../TourDetails/AdditionalPricing";
 import KidsActivities from "../TourDetails/KidsActivities.jsx";
 import { KIDS_ACTIVITIES } from "../../data/kidsActivities.js";
 import { resolveImage } from "../../utils/ImageLoader";
-import { hasGroupDeal } from "../../utils/tourHelpers";
+import { useCurrency } from "../../utils/currency";
+import CurrencySelector from "./CurrencySelector";
 import {
   computePricing,
   convertPrice,
   formatMoney,
 } from "../../utils/pricingEngine.js";
 
-// Leaflet only runs in the browser (same fix as Booking.jsx)
-const Map = lazy(() => import("../Map"));
+// Same building blocks + seat logic as the full Booking page
+import {
+  BAND_AGE,
+  MAX_GUESTS,
+} from "../Booking/BookingConstants.js";
+import {
+  TravellerDetailsSection,
+  GroupSizeSection,
+  PickupLocationSection,
+} from "../Booking/BookingSections.jsx";
 
-const MAX_PEOPLE = 8;
 const DEFAULT_CENTER = { lat: -33.9249, lng: 18.4241 };
+const BAR_HEIGHT = 56; // px, must match the sticky bar's h-14
 
 export const CONTACT_EMAIL = "admin@cape-frontier.co.za";
 export const CONTACT_NUMBER = "(+27)72 264 7284";
 export const CONTACT_TEL = "+27722647284";
+
+// ─── Reading the selected currency from the shared currency context ──────────
+// useCurrency() can name the selected code differently depending on how the
+// provider was written, so check the usual names, then fall back to the first
+// 3-letter code found on the context.
+const CODE_RE = /^[A-Z]{3}$/;
+const toCode = (v) => {
+  if (!v) return null;
+  if (typeof v === "string") {
+    const u = v.trim().toUpperCase();
+    return CODE_RE.test(u) ? u : null;
+  }
+  if (typeof v === "object") return toCode(v.code ?? v.currency ?? v.id ?? v.value);
+  return null;
+};
+const getContextCurrency = (ctx) => {
+  if (!ctx) return "ZAR";
+  for (const k of [
+    "currency",
+    "code",
+    "currencyCode",
+    "selected",
+    "selectedCurrency",
+    "current",
+    "active",
+  ]) {
+    const c = toCode(ctx[k]);
+    if (c) return c;
+  }
+  for (const v of Object.values(ctx)) {
+    if (typeof v === "string") {
+      const c = toCode(v);
+      if (c) return c;
+    }
+  }
+  return "ZAR";
+};
 
 // ─── Booking / checkout helpers ──────────────────────────────────────────────
 
@@ -92,61 +129,53 @@ const getCheckoutStops = (tour) =>
         .filter((s) => s.name)
     : [];
 
-const toLocalISODate = (d) => {
-  const pad = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+// ─── Seat helpers (same logic as Booking.jsx) ────────────────────────────────
+
+const deriveSeatState = (assignments) => {
+  const bandCounts = { adult: 0, teen: 0, child: 0, toddler: 0 };
+  const childAgesArr = [];
+  let participantCount = 0;
+  for (const band of assignments || []) {
+    if (!band) continue;
+    bandCounts[band] = (bandCounts[band] || 0) + 1;
+    participantCount++;
+    const age = BAND_AGE[band];
+    if (age !== undefined) childAgesArr.push(age);
+  }
+  return {
+    bandCounts,
+    adults: Math.max(bandCounts.adult, 1),
+    childAges: childAgesArr,
+    children: bandCounts.child,
+    teens: bandCounts.teen,
+    toddlers: bandCounts.toddler,
+    participantCount,
+  };
 };
 
-const getMinDate = (tour) => {
-  const d = new Date();
-  const days =
-    typeof tour?.daysInAdvance === "number" && tour.daysInAdvance >= 0
-      ? tour.daysInAdvance
-      : 1;
-  d.setDate(d.getDate() + days);
-  return toLocalISODate(d);
+const syncSeatDerived = (prev, assignments) => {
+  const d = deriveSeatState(assignments);
+  const maxEmails = Math.max(d.participantCount - 1, 0);
+  return {
+    ...prev,
+    seatAssignments: assignments,
+    adults: String(d.adults),
+    children: String(d.children),
+    childAges: d.childAges,
+    participants: String(d.participantCount),
+    participantEmails: (prev.participantEmails || []).slice(0, maxEmails),
+    ccParticipants: maxEmails === 0 ? false : prev.ccParticipants,
+  };
 };
 
-// ─── Form building blocks ────────────────────────────────────────────────────
+const startingSeats = (minPeople) => {
+  const start = Math.max(1, Math.min(minPeople, MAX_GUESTS));
+  const assignments = Array(MAX_GUESTS).fill(null);
+  for (let i = 0; i < start; i++) assignments[i] = "adult";
+  return assignments;
+};
 
-const inputClass =
-  "w-full rounded-2xl border border-neutral-200 bg-white p-3.5 text-base outline-none transition focus:border-green-400 focus:ring-4 focus:ring-green-100";
-
-function Field({ label, children }) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-500">
-        {label}
-      </span>
-      {children}
-    </label>
-  );
-}
-
-function Section({ n, title, sub, done, children }) {
-  return (
-    <section className="rounded-[1.5rem] border border-black/5 bg-white p-4 shadow-[0_10px_28px_rgba(0,0,0,0.04)] sm:p-5">
-      <div className="mb-4 flex items-center gap-3">
-        <span
-          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl text-sm font-bold ring-1 ${
-            done
-              ? "bg-green-500 text-white ring-green-500"
-              : "bg-green-100 text-green-950 ring-green-200"
-          }`}
-        >
-          {done ? "✓" : n}
-        </span>
-        <div>
-          <h3 className="font-frank text-xl leading-none text-neutral-950">
-            {title}
-          </h3>
-          {sub && <p className="mt-1 text-xs text-neutral-500">{sub}</p>}
-        </div>
-      </div>
-      {children}
-    </section>
-  );
-}
+// ─── Small UI piece (private / custom toggles) ───────────────────────────────
 
 function ToggleCard({ active, title, text, price, onClick }) {
   return (
@@ -172,91 +201,58 @@ function ToggleCard({ active, title, text, price, onClick }) {
   );
 }
 
-function Stepper({
-  label,
-  hint,
-  value,
-  onMinus,
-  onPlus,
-  minusDisabled,
-  plusDisabled,
-}) {
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl border border-green-100 bg-white p-3">
-      <div>
-        <p className="font-bold text-black">{label}</p>
-        {hint && <p className="mt-0.5 text-xs text-neutral-500">{hint}</p>}
-      </div>
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={onMinus}
-          disabled={minusDisabled}
-          aria-label={`Fewer ${label.toLowerCase()}`}
-          className="flex h-10 w-10 items-center justify-center rounded-2xl border border-black/10 bg-white text-xl font-bold text-neutral-700 transition hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-35"
-        >
-          −
-        </button>
-        <span className="flex h-10 min-w-12 items-center justify-center rounded-2xl border border-green-200 px-4 font-frank text-2xl font-bold text-green-950">
-          {value}
-        </span>
-        <button
-          type="button"
-          onClick={onPlus}
-          disabled={plusDisabled}
-          aria-label={`More ${label.toLowerCase()}`}
-          className="flex h-10 w-10 items-center justify-center rounded-2xl border border-green-200 bg-white text-xl font-bold text-green-950 transition hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-35"
-        >
-          +
-        </button>
-      </div>
-    </div>
-  );
-}
-
-const CHILD_CATEGORIES = [
-  { key: "toddler", icon: "🧒", label: "Toddler", range: "0–5", age: 3 },
-  { key: "child", icon: "👦", label: "Child", range: "6–11", age: 8 },
-  { key: "teen", icon: "🧑", label: "Teen", range: "12–17", age: 14 },
-];
-
-const categoryOf = (age) =>
-  Number(age) <= 5
-    ? CHILD_CATEGORIES[0]
-    : Number(age) <= 11
-      ? CHILD_CATEGORIES[1]
-      : CHILD_CATEGORIES[2];
-
 // ─── Booking drawer: everything up to Paystack on one screen ────────────────
 
 export default function BookingDrawer({ tour, onClose }) {
-  const minPeople = Math.min(
-    Math.max(Number(tour.minPeople) || 1, 1),
-    MAX_PEOPLE,
-  );
+  const minPeople = tour?.minPeople ?? 1;
+  const childFriendly = tour?.childFriendly !== false;
   const supportedCurrencies =
     tour.supportedCurrencies?.length > 0
       ? tour.supportedCurrencies
       : ["ZAR", "USD", "EUR", "GBP"];
 
-  const [currency, setCurrency] = useState("ZAR");
-  const [form, setForm] = useState({
-    fullName: "",
-    mobile: "",
-    email: "",
-    date: "",
-    adults: minPeople,
-    childAges: [],
-    pickupLocation: "",
-    pickupCoords: null,
-    isPrivate: false,
-    isCustom: false,
-    selectedOption: null,
-    selectedExtras: {},
-    selectedKidsActivity: null,
-    notes: "",
-  });
-  const patch = (p) => setForm((prev) => ({ ...prev, ...p }));
+  // Currency comes from the same selector as the Tours page (shared context).
+  // If the tour doesn't support the chosen currency, price in ZAR instead.
+  const currencyCtx = useCurrency();
+  const chosenCurrency = getContextCurrency(currencyCtx);
+  const currency = supportedCurrencies.includes(chosenCurrency)
+    ? chosenCurrency
+    : "ZAR";
+  const [formData, setFormData] = useState(() =>
+    syncSeatDerived(
+      {
+        fullName: "",
+        mobile: "",
+        email: "",
+        date: "",
+        selectedExtras: {},
+        seatAssignments: Array(MAX_GUESTS).fill(null),
+        adults: "1",
+        children: "0",
+        childAges: [],
+        participants: "0",
+        pickupLocation: "",
+        pickupCoords: null,
+        isPrivate: false,
+        isCustom: false,
+        ccParticipants: false,
+        participantEmails: [],
+        selectedKidsActivity: null,
+        selectedOption: null,
+        notes: "",
+      },
+      startingSeats(minPeople),
+    ),
+  );
+  const patch = (p) => setFormData((prev) => ({ ...prev, ...p }));
+
+  const [activeBrush, setActiveBrush] = useState("adult");
+
+  // Section editors (same behaviour as the Booking page)
+  const [travellerSnapshot, setTravellerSnapshot] = useState(null);
+  const [groupSnapshot, setGroupSnapshot] = useState(null);
+  const [showTravellerEditor, setShowTravellerEditor] = useState(true);
+  const [showGroupEditor, setShowGroupEditor] = useState(true);
 
   // Pickup / map
   const [mapCenter, setMapCenter] = useState(DEFAULT_CENTER);
@@ -264,6 +260,8 @@ export default function BookingDrawer({ tour, onClose }) {
   const [pendingPickup, setPendingPickup] = useState(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState("");
+  const [showPickupPicker, setShowPickupPicker] = useState(true);
+  const pickupFeedbackRef = useRef(null);
 
   // Price verification + payment
   const [verifyStatus, setVerifyStatus] = useState("idle"); // idle | pending | verified | failed
@@ -275,6 +273,7 @@ export default function BookingDrawer({ tour, onClose }) {
   const [fadeOut, setFadeOut] = useState(false);
 
   const scrollRef = useRef(null);
+  const heroRef = useRef(null);
 
   // Lock page scroll while the drawer is open
   useEffect(() => {
@@ -293,24 +292,181 @@ export default function BookingDrawer({ tour, onClose }) {
     };
   }, [onClose, paying]);
 
-  // ── Derived counts ────────────────────────────────────────────────
-  const adultCount = Math.max(Number(form.adults) || 1, 1);
-  const childAges = form.childAges;
-  const toddlers = childAges.filter((a) => a <= 5).length;
-  const children = childAges.filter((a) => a >= 6 && a <= 11).length;
-  const teens = childAges.filter((a) => a >= 12 && a <= 17).length;
-  const participantCount = adultCount + childAges.length;
-  const canAddChild =
-    tour.childFriendly !== false && participantCount < MAX_PEOPLE;
+  // Scroll-linked header: the hero (image + title) lives inside the scroll
+  // area so it scrolls away natively, and a compact sticky bar takes over.
+  // --p (0 → 1) is written straight to the DOM in a rAF, and only drives
+  // opacity / transform, so nothing re-renders or re-lays-out while scrolling.
+  useEffect(() => {
+    const el = scrollRef.current;
+    const hero = heroRef.current;
+    if (!el || !hero) return undefined;
 
-  const contactComplete = Boolean(
-    form.fullName.trim() && form.mobile.trim() && form.email.trim(),
+    let range = 1;
+    let raf = 0;
+
+    function update() {
+      raf = 0;
+      const p = Math.min(Math.max(el.scrollTop / range, 0), 1);
+      el.style.setProperty("--p", p.toFixed(4));
+    }
+    function measure() {
+      range = Math.max(hero.offsetHeight - BAR_HEIGHT, 1);
+      update();
+    }
+    function onScroll() {
+      if (!raf) raf = requestAnimationFrame(update);
+    }
+
+    measure();
+    el.addEventListener("scroll", onScroll, { passive: true });
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
+    ro?.observe(hero);
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      ro?.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // ── Derived seat state ────────────────────────────────────────────
+  const seatDerived = useMemo(
+    () => deriveSeatState(formData.seatAssignments),
+    [formData.seatAssignments],
   );
-  const dateComplete = Boolean(form.date);
-  const pickupComplete = Boolean(form.pickupCoords);
+  const adultCount = seatDerived.adults;
+  const childAges = seatDerived.childAges;
+  const bandCounts = seatDerived.bandCounts;
+  const participantCount = seatDerived.participantCount;
+  const toddlers = seatDerived.toddlers;
+  const children = seatDerived.children;
+  const teens = seatDerived.teens;
+
+  // ── Seat handlers ─────────────────────────────────────────────────
+  const handleSeatTap = (seatIndex) => {
+    if (seatIndex < 0 || seatIndex >= MAX_GUESTS) return;
+
+    const assignments =
+      formData.seatAssignments || Array(MAX_GUESTS).fill(null);
+    const current = assignments[seatIndex];
+
+    if (current) {
+      if (participantCount - 1 < Math.max(minPeople, 1)) return;
+      if (current === "adult") {
+        const adultSeats = assignments.filter((a) => a === "adult").length;
+        if (adultSeats <= 1) return;
+      }
+      setFormData((prev) => {
+        const p = prev.seatAssignments || Array(MAX_GUESTS).fill(null);
+        const next = [...p];
+        next[seatIndex] = null;
+        return syncSeatDerived(prev, next);
+      });
+      return;
+    }
+
+    const band =
+      activeBrush === "adult" || (activeBrush && childFriendly)
+        ? activeBrush
+        : "adult";
+
+    setFormData((prev) => {
+      const p = prev.seatAssignments || Array(MAX_GUESTS).fill(null);
+      const next = [...p];
+      next[seatIndex] = band;
+      return syncSeatDerived(prev, next);
+    });
+  };
+
+  const handleBrushToggle = (bandKey) => {
+    if (bandKey !== "adult" && !childFriendly) return;
+    setActiveBrush((prev) => (prev === bandKey ? null : bandKey));
+  };
+
+  const handleResetSeats = () => {
+    setFormData((prev) => syncSeatDerived(prev, startingSeats(minPeople)));
+    setActiveBrush("adult");
+  };
+
+  useEffect(() => {
+    if (!childFriendly && activeBrush && activeBrush !== "adult") {
+      setActiveBrush("adult");
+    }
+  }, [childFriendly, activeBrush]);
+
+  const openGroupEditor = () => {
+    setGroupSnapshot({
+      seatAssignments: [...(formData.seatAssignments || [])],
+      adults: formData.adults,
+      children: formData.children,
+      childAges: [...(formData.childAges || [])],
+      participants: formData.participants,
+      participantEmails: [...(formData.participantEmails || [])],
+      ccParticipants: formData.ccParticipants,
+    });
+    setShowGroupEditor(true);
+  };
+
+  const cancelGroupEdit = () => {
+    if (groupSnapshot) setFormData((prev) => ({ ...prev, ...groupSnapshot }));
+    setGroupSnapshot(null);
+    setShowGroupEditor(false);
+  };
+
+  const confirmGroup = () => {
+    setGroupSnapshot(null);
+    setShowGroupEditor(false);
+  };
+
+  // ── Traveller handlers ────────────────────────────────────────────
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleTravellerEdit = () => {
+    setTravellerSnapshot({
+      fullName: formData.fullName,
+      mobile: formData.mobile,
+      email: formData.email,
+      date: formData.date,
+    });
+    setShowTravellerEditor(true);
+  };
+
+  const handleTravellerSave = () => {
+    setTravellerSnapshot(null);
+    setShowTravellerEditor(false);
+  };
+
+  const handleTravellerCancel = () => {
+    if (travellerSnapshot) {
+      setFormData((prev) => ({ ...prev, ...travellerSnapshot }));
+    }
+    setTravellerSnapshot(null);
+    setShowTravellerEditor(false);
+  };
+
+  const handleResetTraveller = () => {
+    setFormData((prev) => ({
+      ...prev,
+      fullName: "",
+      mobile: "",
+      email: "",
+      date: "",
+    }));
+  };
+
+  // ── Completion flags ──────────────────────────────────────────────
+  const contactDetailsComplete = Boolean(
+    formData.fullName.trim() && formData.mobile.trim() && formData.email.trim(),
+  );
+  const dateDetailsComplete = Boolean(formData.date);
+  const travellerDetailsComplete =
+    contactDetailsComplete && dateDetailsComplete;
+  const pickupDetailsComplete = Boolean(formData.pickupCoords);
   const optionsOk =
     !(Array.isArray(tour.options) && tour.options.length > 0) ||
-    Boolean(form.selectedOption);
+    Boolean(formData.selectedOption);
 
   // ── Pricing (single source of truth: pricingEngine) ───────────────
   const pricing = useMemo(
@@ -320,9 +476,9 @@ export default function BookingDrawer({ tour, onClose }) {
         childAges,
         adultCount,
         currency,
-        selectedOption: form.selectedOption,
-        selectedExtras: form.selectedExtras || {},
-        formData: { ...form, adults: String(adultCount) },
+        selectedOption: formData.selectedOption,
+        selectedExtras: formData.selectedExtras || {},
+        formData,
         kidsActivities: KIDS_ACTIVITIES,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -331,11 +487,11 @@ export default function BookingDrawer({ tour, onClose }) {
       JSON.stringify(childAges),
       adultCount,
       currency,
-      form.selectedOption,
-      JSON.stringify(form.selectedExtras),
-      form.isPrivate,
-      form.isCustom,
-      form.selectedKidsActivity,
+      formData.selectedOption,
+      JSON.stringify(formData.selectedExtras),
+      formData.isPrivate,
+      formData.isCustom,
+      formData.selectedKidsActivity,
     ],
   );
 
@@ -351,10 +507,10 @@ export default function BookingDrawer({ tour, onClose }) {
     }
 
     const ready =
-      contactComplete &&
-      dateComplete &&
-      pickupComplete &&
-      (!pricing.hasOptions || form.selectedOption);
+      contactDetailsComplete &&
+      dateDetailsComplete &&
+      pickupDetailsComplete &&
+      (!pricing.hasOptions || formData.selectedOption);
 
     if (!ready) {
       setVerifyStatus("idle");
@@ -380,11 +536,11 @@ export default function BookingDrawer({ tour, onClose }) {
             adultCount,
             childAges,
             currency,
-            selectedOption: form.selectedOption,
-            selectedExtras: form.selectedExtras || {},
-            isPrivate: form.isPrivate,
-            isCustom: form.isCustom,
-            selectedKidsActivity: form.selectedKidsActivity,
+            selectedOption: formData.selectedOption,
+            selectedExtras: formData.selectedExtras || {},
+            isPrivate: formData.isPrivate,
+            isCustom: formData.isCustom,
+            selectedKidsActivity: formData.selectedKidsActivity,
           }),
         });
         if (cancelled) return;
@@ -439,64 +595,69 @@ export default function BookingDrawer({ tour, onClose }) {
     adultCount,
     JSON.stringify(childAges),
     currency,
-    form.selectedOption,
-    JSON.stringify(form.selectedExtras),
-    form.isPrivate,
-    form.isCustom,
-    form.selectedKidsActivity,
-    contactComplete,
-    dateComplete,
-    pickupComplete,
+    formData.selectedOption,
+    JSON.stringify(formData.selectedExtras),
+    formData.isPrivate,
+    formData.isCustom,
+    formData.selectedKidsActivity,
+    contactDetailsComplete,
+    dateDetailsComplete,
+    pickupDetailsComplete,
     pricing.isCustomQuote,
     pricing.hasOptions,
     verifyRetry,
   ]);
 
-  // ── Guests ────────────────────────────────────────────────────────
-  const changeAdults = (delta) =>
-    setForm((prev) => {
-      const next = Math.min(
-        Math.max((Number(prev.adults) || 1) + delta, 1),
-        MAX_PEOPLE - prev.childAges.length,
-      );
-      if (next + prev.childAges.length < minPeople) return prev;
-      return { ...prev, adults: next };
-    });
-
-  const addChild = (age) => {
-    if (!canAddChild) return;
-    setForm((prev) => ({ ...prev, childAges: [...prev.childAges, age] }));
+  // ── Pickup handlers (same as Booking.jsx) ─────────────────────────
+  const handlePickupInputChange = (e) => {
+    const { value } = e.target;
+    setPendingPickup(null);
+    setMarkerPosition(null);
+    setShowPickupPicker(true);
+    setFormData((prev) => ({
+      ...prev,
+      pickupLocation: value,
+      pickupCoords: null,
+    }));
   };
 
-  const removeChild = (index) =>
-    setForm((prev) => ({
+  const handleConfirmPickupLocation = () => {
+    if (!pendingPickup?.coords) return;
+    setFormData((prev) => ({
       ...prev,
-      childAges: prev.childAges.filter((_, i) => i !== index),
-      adults: Math.max(prev.adults, minPeople - (prev.childAges.length - 1)),
+      pickupLocation: pendingPickup.location,
+      pickupCoords: pendingPickup.coords,
     }));
+    setPendingPickup(null);
+    setShowPickupPicker(false);
+  };
 
-  // ── Pickup ────────────────────────────────────────────────────────
   const handleMapPick = async (coords) => {
     setMarkerPosition(coords);
     setMapCenter(coords);
     setLocationError("");
-    const fallback = `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${coords.lat}&lon=${coords.lng}`,
       );
       const data = await res.json();
-      setPendingPickup({ location: data?.display_name || fallback, coords });
-      patch({ pickupLocation: data?.display_name || fallback });
+      setPendingPickup({
+        location:
+          data?.display_name ||
+          `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`,
+        coords,
+      });
     } catch {
-      setPendingPickup({ location: fallback, coords });
-      patch({ pickupLocation: fallback });
+      setPendingPickup({
+        location: `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`,
+        coords,
+      });
     }
   };
 
   const handleFindAddress = async () => {
-    const q = form.pickupLocation.trim();
-    if (!q) {
+    const query = formData.pickupLocation.trim();
+    if (!query) {
       setLocationError("Enter a pickup address first.");
       return;
     }
@@ -504,7 +665,7 @@ export default function BookingDrawer({ tour, onClose }) {
       setLocationLoading(true);
       setLocationError("");
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(q)}`,
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`,
       );
       if (!res.ok) throw new Error("Search failed");
       const data = await res.json();
@@ -512,10 +673,14 @@ export default function BookingDrawer({ tour, onClose }) {
         setLocationError("No matching location found.");
         return;
       }
-      const coords = { lat: Number(data[0].lat), lng: Number(data[0].lon) };
+      const result = data[0];
+      const coords = { lat: Number(result.lat), lng: Number(result.lon) };
       setMarkerPosition(coords);
       setMapCenter(coords);
-      setPendingPickup({ location: data[0].display_name || q, coords });
+      setPendingPickup({
+        location: result.display_name || formData.pickupLocation,
+        coords,
+      });
     } catch {
       setLocationError("Could not find that address.");
     } finally {
@@ -523,19 +688,26 @@ export default function BookingDrawer({ tour, onClose }) {
     }
   };
 
-  const confirmPickup = () => {
-    if (!pendingPickup?.coords) return;
-    patch({
-      pickupLocation: pendingPickup.location,
-      pickupCoords: pendingPickup.coords,
-    });
-    setPendingPickup(null);
-  };
-
-  const changePickup = () => {
+  const handlePickupReset = () => {
     setPendingPickup(null);
     setMarkerPosition(null);
-    patch({ pickupLocation: "", pickupCoords: null });
+    setFormData((prev) => ({
+      ...prev,
+      pickupLocation: "",
+      pickupCoords: null,
+    }));
+    setLocationError("");
+  };
+
+  const handlePickupChange = () => {
+    setPendingPickup(null);
+    setMarkerPosition(null);
+    setShowPickupPicker(true);
+    setFormData((prev) => ({
+      ...prev,
+      pickupLocation: "",
+      pickupCoords: null,
+    }));
   };
 
   // ── Pay: straight to Paystack, no /checkout page ──────────────────
@@ -544,15 +716,15 @@ export default function BookingDrawer({ tour, onClose }) {
     if (paying) return;
     setPayError("");
 
-    if (!contactComplete || !dateComplete) {
+    if (!contactDetailsComplete || !dateDetailsComplete) {
       setPayError("Please add your name, mobile, email and a tour date.");
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       setPayError("Please check your email address.");
       return;
     }
-    if (!pickupComplete) {
+    if (!pickupDetailsComplete) {
       setPayError("Please confirm your pickup point on the map.");
       return;
     }
@@ -585,7 +757,9 @@ export default function BookingDrawer({ tour, onClose }) {
       // Per-person display prices (for the confirmation email / success page)
       const find = (prefix) =>
         tour.pricing?.find((p) => p.category?.toLowerCase().startsWith(prefix));
-      const optionObj = tour.options?.find((o) => o.id === form.selectedOption);
+      const optionObj = tour.options?.find(
+        (o) => o.id === formData.selectedOption,
+      );
       let adultBase =
         Number((find("adult") || tour.pricing?.[0])?.pricePerPerson) || 0;
       if (optionObj && typeof optionObj.pricePerPerson === "number") {
@@ -608,7 +782,10 @@ export default function BookingDrawer({ tour, onClose }) {
       const pickupTimeLabel = getPickupTime(tour);
       const checkoutStops = getCheckoutStops(tour);
       const bookingReference = generateBookingReference();
-      const notes = form.isCustom ? form.notes : "";
+      const notes = formData.isCustom ? formData.notes : "";
+      const participantEmails = (formData.participantEmails || [])
+        .map((x) => x.trim())
+        .filter(Boolean);
 
       const pricingSummary = {
         currency,
@@ -627,9 +804,9 @@ export default function BookingDrawer({ tour, onClose }) {
         discountedTourSubtotal: pricing.discountedSubtotal,
         extrasTotal: pricing.extrasTotal,
         kidsActivityFee: pricing.kidsActivityTotal,
-        isPrivate: form.isPrivate,
+        isPrivate: formData.isPrivate,
         privateFee: pricing.privateFee,
-        isCustom: form.isCustom,
+        isCustom: formData.isCustom,
         customFee: pricing.customFee,
         totalPrice: pricing.finalTotal,
         totalMinorUnit,
@@ -637,27 +814,28 @@ export default function BookingDrawer({ tour, onClose }) {
       };
 
       const bookingDetails = {
-        fullName: form.fullName.trim(),
-        mobile: form.mobile.trim(),
-        email: form.email.trim(),
-        date: form.date,
+        fullName: formData.fullName.trim(),
+        mobile: formData.mobile.trim(),
+        email: formData.email.trim(),
+        date: formData.date,
         adults: adultCount,
         children,
         toddlers,
         teens,
         childAges,
         participants: String(participantCount),
-        participantEmails: [],
-        ccParticipantEmails: [],
-        ccParticipants: false,
-        pickupLocation: form.pickupLocation,
-        pickupCoords: form.pickupCoords,
+        participantEmails,
+        ccParticipantEmails: formData.ccParticipants ? participantEmails : [],
+        ccParticipants: Boolean(formData.ccParticipants),
+        seatAssignments: formData.seatAssignments,
+        pickupLocation: formData.pickupLocation,
+        pickupCoords: formData.pickupCoords,
         pickupTimeLabel,
-        isPrivate: form.isPrivate,
-        isCustom: form.isCustom,
-        selectedOption: form.selectedOption,
-        selectedExtras: form.selectedExtras || {},
-        selectedKidsActivity: form.selectedKidsActivity,
+        isPrivate: formData.isPrivate,
+        isCustom: formData.isCustom,
+        selectedOption: formData.selectedOption,
+        selectedExtras: formData.selectedExtras || {},
+        selectedKidsActivity: formData.selectedKidsActivity,
         kidsActivityFee: pricing.kidsActivityTotal,
         customerNotes: notes,
         pricingOptions: {
@@ -683,9 +861,9 @@ export default function BookingDrawer({ tour, onClose }) {
         date: bookingDetails.date,
         pickupTime: pickupTimeLabel,
         participants: bookingDetails.participants,
-        participantEmails: [],
-        ccParticipantEmails: [],
-        ccParticipants: false,
+        participantEmails: bookingDetails.participantEmails,
+        ccParticipantEmails: bookingDetails.ccParticipantEmails,
+        ccParticipants: bookingDetails.ccParticipants,
         isPrivate: bookingDetails.isPrivate,
         isCustom: bookingDetails.isCustom,
         pricingOptions: bookingDetails.pricingOptions,
@@ -818,26 +996,69 @@ export default function BookingDrawer({ tour, onClose }) {
         />
       )}
 
+      {/* Wrapper does NOT clip, so the currency dropdown can open past the
+          panel's rounded/overflow-hidden edge. */}
       <div
-        className="flex h-full max-h-[52rem] w-full max-w-3xl flex-col overflow-hidden rounded-t-[2rem] bg-stone-50 shadow-2xl"
+        className="relative flex h-full max-h-[52rem] w-full max-w-3xl"
         style={{
           animation: "tourDrawerIn 0.3s cubic-bezier(0.16,1,0.3,1) both",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="relative shrink-0 overflow-hidden">
-          <img
-            src={resolveImage(tour.image)}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-            onError={(e) => {
-              e.currentTarget.src = "/images/content/random/1.webp";
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
-          <div className="relative flex items-end justify-between gap-3 p-4 pt-8 text-white sm:p-5 sm:pt-10">
-            <div className="min-w-0">
+      <div className="flex h-full w-full flex-col overflow-hidden rounded-t-[2rem] bg-stone-50 shadow-2xl">
+        {/* Scroll area: sticky bar + hero (image & title) + form */}
+        <div
+          ref={scrollRef}
+          data-lenis-prevent
+          className="flex-1 overflow-y-auto overscroll-contain"
+          style={{ "--p": 0 }}
+        >
+          {/* Sticky compact bar: always shows close + currency; the title and a
+              solid background fade in as the hero scrolls away. */}
+          <div className="sticky top-0 z-30 h-14">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 border-b border-black/5 bg-white/90 backdrop-blur-md"
+              style={{ opacity: "clamp(0, calc((var(--p) - 0.55) * 2.5), 1)" }}
+            />
+            {/* Left/right padding leaves room for the currency selector and close button */}
+            <div className="relative flex h-full items-center pl-40 pr-16">
+              <p
+                className="min-w-0 truncate font-frank text-base font-bold text-neutral-950"
+                style={{
+                  opacity: "clamp(0, calc((var(--p) - 0.7) * 3.4), 1)",
+                  transform: "translate3d(0, calc((1 - var(--p)) * 6px), 0)",
+                }}
+              >
+                {tour.title}
+              </p>
+            </div>
+          </div>
+
+          {/* Hero: slides up under the bar as you scroll */}
+          <div
+            ref={heroRef}
+            className="relative -mt-14 h-48 overflow-hidden bg-neutral-900 sm:h-56"
+          >
+            <img
+              src={resolveImage(tour.image)}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover will-change-transform"
+              style={{
+                transform: "translate3d(0, calc(var(--p) * 36px), 0) scale(1.12)",
+              }}
+              onError={(e) => {
+                e.currentTarget.src = "/images/content/random/1.webp";
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/25" />
+            <div
+              className="absolute inset-x-0 bottom-0 p-4 text-white will-change-transform sm:p-5"
+              style={{
+                opacity: "max(0, calc(1 - var(--p) * 1.6))",
+                transform: "translate3d(0, calc(var(--p) * -14px), 0)",
+              }}
+            >
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/70">
                 Book this tour
               </p>
@@ -848,330 +1069,109 @@ export default function BookingDrawer({ tour, onClose }) {
                 {[tour.duration, tour.location].filter(Boolean).join(" · ")}
               </p>
             </div>
-            <div className="flex shrink-0 flex-col items-end gap-2">
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={paying}
-                aria-label="Close booking"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-lg backdrop-blur transition hover:bg-white/35 disabled:opacity-40"
-              >
-                ✕
-              </button>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                aria-label="Select currency"
-                className="rounded-xl border border-white/30 bg-white/90 px-3 py-1.5 text-sm font-black text-neutral-900 outline-none"
-              >
-                {supportedCurrencies.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
-        </div>
 
-        {/* Scrollable form */}
-        <div
-          ref={scrollRef}
-          data-lenis-prevent
-          className="flex-1 space-y-4 overflow-y-auto overscroll-contain p-3 sm:p-4"
-        >
+          <div className="space-y-4 p-3 sm:p-4">
           {Array.isArray(tour.options) && tour.options.length > 0 && (
             <TourOptions
               tour={tour}
-              selectedOption={form.selectedOption}
+              selectedOption={formData.selectedOption}
               onOptionChange={(id) => patch({ selectedOption: id })}
+              currency={currency}
             />
           )}
 
-          <Section
-            n={1}
-            title="Traveller details"
-            sub="Who is booking, and when?"
-            done={contactComplete && dateComplete}
+          {/* Same sections as the Booking page */}
+          <form
+            id="booking-drawer-form"
+            onSubmit={(e) => e.preventDefault()}
+            className="grid min-w-0 grid-cols-1 gap-5"
           >
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Full name">
-                <input
-                  className={inputClass}
-                  value={form.fullName}
-                  onChange={(e) => patch({ fullName: e.target.value })}
-                  placeholder="Faiez Viljoen"
-                  autoComplete="name"
-                />
-              </Field>
-              <Field label="Mobile number">
-                <input
-                  className={inputClass}
-                  value={form.mobile}
-                  onChange={(e) => patch({ mobile: e.target.value })}
-                  placeholder="081 000 0000"
-                  autoComplete="tel"
-                  inputMode="tel"
-                />
-              </Field>
-              <Field label="Email address">
-                <input
-                  className={inputClass}
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => patch({ email: e.target.value })}
-                  placeholder="name@email.com"
-                  autoComplete="email"
-                />
-              </Field>
-              <Field label="Preferred date">
-                <input
-                  className={`${inputClass} cursor-pointer`}
-                  type="date"
-                  min={getMinDate(tour)}
-                  value={form.date}
-                  onClick={(e) => e.currentTarget.showPicker?.()}
-                  onChange={(e) => patch({ date: e.target.value })}
-                />
-              </Field>
-            </div>
-          </Section>
+            <TravellerDetailsSection
+              formData={formData}
+              onChange={handleChange}
+              complete={travellerDetailsComplete}
+              isEditing={showTravellerEditor}
+              hasSnapshot={Boolean(travellerSnapshot)}
+              onRequestEdit={handleTravellerEdit}
+              onSaveEdit={handleTravellerSave}
+              onCancelEdit={handleTravellerCancel}
+              onResetTraveller={handleResetTraveller}
+            />
 
-          <Section
-            n={2}
-            title="Group size"
-            sub={`Up to ${MAX_PEOPLE} guests per booking.`}
-            done
-          >
-            <div className="space-y-3 rounded-2xl border border-green-200 bg-green-50/60 p-3">
-              <Stepper
-                label="Adults"
-                hint="Aged 18+."
-                value={adultCount}
-                onMinus={() => changeAdults(-1)}
-                onPlus={() => changeAdults(1)}
-                minusDisabled={
-                  adultCount <= 1 || participantCount - 1 < minPeople
-                }
-                plusDisabled={participantCount >= MAX_PEOPLE}
-              />
+            <GroupSizeSection
+              tour={tour}
+              seatAssignments={formData.seatAssignments}
+              activeBrush={activeBrush}
+              bandCounts={bandCounts}
+              participantCount={participantCount}
+              minPeople={minPeople}
+              maxGuests={MAX_GUESTS}
+              childFriendly={childFriendly}
+              isEditing={showGroupEditor}
+              hasSnapshot={Boolean(groupSnapshot)}
+              onSeatTap={handleSeatTap}
+              onBrushToggle={handleBrushToggle}
+              onResetSeats={handleResetSeats}
+              onOpenEditor={openGroupEditor}
+              onCancelEdit={cancelGroupEdit}
+              onConfirm={confirmGroup}
+            />
 
-              {tour.childFriendly === false ? (
-                <div className="rounded-lg border border-amber-200/80 bg-amber-50/70 px-3 py-2 text-xs text-amber-800">
-                  ⚠️ This tour is not child-friendly.
-                </div>
-              ) : (
-                <div className="rounded-2xl border border-black/5 bg-white p-3">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-bold text-neutral-950">
-                      Children
-                    </p>
-                    <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-bold text-blue-700">
-                      {childAges.length}
-                    </span>
-                  </div>
-
-                  <div className="mt-3 grid grid-cols-3 gap-2">
-                    {CHILD_CATEGORIES.map((cat) => (
-                      <button
-                        key={cat.key}
-                        type="button"
-                        disabled={!canAddChild}
-                        onClick={() => addChild(cat.age)}
-                        aria-label={`Add ${cat.label} (${cat.range} years)`}
-                        className="flex flex-col items-center gap-0.5 rounded-xl border border-blue-100 bg-blue-50/70 px-1.5 py-2.5 transition hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
-                      >
-                        <span className="text-lg leading-none">{cat.icon}</span>
-                        <span className="mt-1 text-[10px] font-black uppercase tracking-wide text-blue-700">
-                          {cat.label}
-                        </span>
-                        <span className="text-[9px] font-bold text-blue-500">
-                          {cat.range}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {childAges.length > 0 ? (
-                    <div className="mt-3 space-y-2">
-                      {childAges.map((age, i) => {
-                        const cat = categoryOf(age);
-                        return (
-                          <div
-                            key={`${i}-${age}`}
-                            className="flex items-center gap-3 rounded-xl border border-black/5 bg-neutral-50 px-3 py-2"
-                          >
-                            <span className="text-lg">{cat.icon}</span>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs font-black text-neutral-900">
-                                {cat.label}{" "}
-                                {
-                                  childAges
-                                    .slice(0, i + 1)
-                                    .filter(
-                                      (a) => categoryOf(a).key === cat.key,
-                                    ).length
-                                }
-                              </p>
-                              <p className="text-[10px] font-medium text-neutral-400">
-                                {cat.range} yrs
-                              </p>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => removeChild(i)}
-                              aria-label={`Remove ${cat.label}`}
-                              className="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-[11px] font-bold text-red-600 transition hover:bg-red-500 hover:text-white"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <p className="mt-3 rounded-xl border border-dashed border-black/10 bg-neutral-50 px-4 py-3 text-center text-[11px] font-bold text-neutral-500">
-                      Tap a category above to add a child.
-                    </p>
-                  )}
-                </div>
-              )}
-
-              <p className="text-center text-xs font-semibold text-green-900">
-                {participantCount} guest{participantCount !== 1 ? "s" : ""} in
-                total
-                {hasGroupDeal(tour) && " · group rates apply automatically"}
-              </p>
-            </div>
-          </Section>
-
-          <Section
-            n={3}
-            title="Pickup location"
-            sub="Search an address, or tap the map."
-            done={pickupComplete}
-          >
-            {pickupComplete ? (
-              <div className="flex items-start gap-3 rounded-2xl border border-green-200 bg-green-50 p-3">
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-green-950">
-                    Pickup location saved
-                  </p>
-                  <p className="mt-1 text-sm leading-6 text-neutral-700">
-                    {form.pickupLocation}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={changePickup}
-                  className="shrink-0 rounded-full border border-green-200 bg-white px-3 py-1.5 text-xs font-bold text-green-800 transition hover:bg-green-100"
-                >
-                  Change
-                </button>
-              </div>
-            ) : (
-              <div>
-                <div className="mb-3 flex flex-col gap-2 sm:flex-row">
-                  <input
-                    className={`${inputClass} flex-1`}
-                    placeholder="Hotel, guesthouse, Airbnb or pickup point"
-                    value={form.pickupLocation}
-                    onChange={(e) => {
-                      setPendingPickup(null);
-                      setMarkerPosition(null);
-                      patch({
-                        pickupLocation: e.target.value,
-                        pickupCoords: null,
-                      });
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={pendingPickup ? confirmPickup : handleFindAddress}
-                    disabled={
-                      locationLoading ||
-                      (!pendingPickup && !form.pickupLocation.trim())
-                    }
-                    className="rounded-2xl bg-blue-600 px-5 py-3.5 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {locationLoading
-                      ? "Searching…"
-                      : pendingPickup
-                        ? "Confirm pickup"
-                        : "Find on map"}
-                  </button>
-                </div>
-                <div className="overflow-hidden rounded-2xl">
-                  <ClientOnly
-                    fallback={
-                      <div className="flex h-[260px] items-center justify-center rounded-2xl bg-neutral-100 text-sm text-neutral-500">
-                        Loading map…
-                      </div>
-                    }
-                  >
-                    <Suspense fallback={<div style={{ height: 260 }} />}>
-                      <Map
-                        center={[mapCenter.lat, mapCenter.lng]}
-                        markerPosition={markerPosition}
-                        onPick={handleMapPick}
-                      />
-                    </Suspense>
-                  </ClientOnly>
-                </div>
-                {locationError && (
-                  <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-600">
-                    {locationError}
-                  </p>
-                )}
-              </div>
-            )}
-          </Section>
-
-          <div className="space-y-3">
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <ToggleCard
-                active={form.isPrivate}
-                title="Private tour"
-                text="Book this as a private vehicle-based experience."
-                price={`+ ${privateFeeLabel}`}
-                onClick={() => patch({ isPrivate: !form.isPrivate })}
-              />
-              <ToggleCard
-                active={form.isCustom}
-                title="Custom trip"
-                text="Custom planning, route timing or special adjustments."
-                price={`+ ${customFeeLabel}`}
-                onClick={() => patch({ isCustom: !form.isCustom })}
-              />
-            </div>
-
-            {form.isCustom && (
-              <textarea
-                rows={3}
-                value={form.notes}
-                onChange={(e) => patch({ notes: e.target.value })}
-                className="w-full resize-none rounded-2xl border border-neutral-200 bg-white p-3 text-sm outline-none focus:border-green-400 focus:ring-4 focus:ring-green-100"
-                placeholder="Custom route requests, pickup timing, accessibility needs, dietary restrictions…"
-              />
-            )}
-
-            {Array.isArray(tour.additionalPricing) &&
-              tour.additionalPricing.length > 0 && (
-                <AdditionalPricing
-                  additionalPricing={tour.additionalPricing}
-                  selectedExtras={form.selectedExtras}
-                  onExtrasChange={(extras) => patch({ selectedExtras: extras })}
-                />
-              )}
+            <PickupLocationSection
+              formData={formData}
+              onInputChange={handlePickupInputChange}
+              showPicker={showPickupPicker}
+              pendingPickup={pendingPickup}
+              markerPosition={markerPosition}
+              mapCenter={mapCenter}
+              locationLoading={locationLoading}
+              locationError={locationError}
+              onConfirm={handleConfirmPickupLocation}
+              onFind={handleFindAddress}
+              onMapPick={handleMapPick}
+              onReset={handlePickupReset}
+              onChangeClick={handlePickupChange}
+              pickupFeedbackRef={pickupFeedbackRef}
+            />
 
             <KidsActivities
               childFriendly={tour.childFriendly === true}
               adultCount={adultCount}
               childCount={children}
               toddlerCount={toddlers}
-              selectedActivity={form.selectedKidsActivity}
+              selectedActivity={formData.selectedKidsActivity}
               onActivityChange={(id) => patch({ selectedKidsActivity: id })}
             />
+          </form>
+
+          <div className="space-y-3">
+            {/* <div className="flex flex-col gap-3 sm:flex-row">
+              <ToggleCard
+                active={formData.isPrivate}
+                title="Private tour"
+                text="Book this as a private vehicle-based experience."
+                price={`+ ${privateFeeLabel}`}
+                onClick={() => patch({ isPrivate: !formData.isPrivate })}
+              />
+              <ToggleCard
+                active={formData.isCustom}
+                title="Custom trip"
+                text="Custom planning, route timing or special adjustments."
+                price={`+ ${customFeeLabel}`}
+                onClick={() => patch({ isCustom: !formData.isCustom })}
+              />
+            </div> */}
+
+            {formData.isCustom && (
+              <textarea
+                rows={3}
+                value={formData.notes}
+                onChange={(e) => patch({ notes: e.target.value })}
+                className="w-full resize-none rounded-2xl border border-neutral-200 bg-white p-3 text-sm outline-none focus:border-green-400 focus:ring-4 focus:ring-green-100"
+                placeholder="Custom route requests, pickup timing, accessibility needs, dietary restrictions…"
+              />
+            )}
           </div>
 
           {/* Checkout summary (pay button lives in the sticky bar below) */}
@@ -1181,18 +1181,19 @@ export default function BookingDrawer({ tour, onClose }) {
             childCount={children}
             toddlerCount={toddlers}
             currency={currency}
-            selectedOption={form.selectedOption}
-            selectedExtras={form.selectedExtras}
-            formData={{ ...form, adults: String(adultCount), childAges }}
-            contactDetailsComplete={contactComplete}
-            dateDetailsComplete={dateComplete}
-            pickupDetailsComplete={pickupComplete}
+            selectedOption={formData.selectedOption}
+            selectedExtras={formData.selectedExtras}
+            formData={formData}
+            contactDetailsComplete={contactDetailsComplete}
+            dateDetailsComplete={dateDetailsComplete}
+            pickupDetailsComplete={pickupDetailsComplete}
             isEmbedded
             stacked
             hideSubmit
             submitting={paying}
             verifyStatus={verifyStatus}
             verifyError={verifyError}
+            onExtrasChange={(extras) => patch({ selectedExtras: extras })}
           />
 
           <p className="px-2 pb-2 text-center text-[11px] leading-5 text-neutral-500">
@@ -1207,6 +1208,7 @@ export default function BookingDrawer({ tour, onClose }) {
             </Link>
             . Pickup and vehicle details are confirmed after payment.
           </p>
+          </div>
         </div>
 
         {/* Sticky pay bar */}
@@ -1225,11 +1227,20 @@ export default function BookingDrawer({ tour, onClose }) {
               {payError}
             </p>
           )}
+          {currency !== chosenCurrency && (
+            <p className="mb-2 text-center text-[11px] font-semibold text-amber-700">
+              {chosenCurrency} isn’t available for this tour, so it’s priced in{" "}
+              {currency}.
+              {currency === "ZAR" && currencyCtx?.format
+                ? ` (about ${currencyCtx.format(pricing.finalTotal)})`
+                : ""}
+            </p>
+          )}
           {!payError && !pricing.isCustomQuote && verifyStatus === "idle" && (
             <p className="mb-2 text-center text-[11px] font-semibold text-neutral-400">
-              {!contactComplete || !dateComplete
+              {!contactDetailsComplete || !dateDetailsComplete
                 ? "Add your details and date to continue."
-                : !pickupComplete
+                : !pickupDetailsComplete
                   ? "Confirm your pickup point to continue."
                   : !optionsOk
                     ? "Choose a tour option to continue."
@@ -1256,6 +1267,24 @@ export default function BookingDrawer({ tour, onClose }) {
             </span>
           </div>
         </div>
+      </div>
+
+      {/* Currency + close live outside the clipped panel. The selector sits on
+          the LEFT so its dropdown (which opens rightwards) stays on screen. */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-[45] flex h-14 items-center justify-between px-4">
+        <div className="pointer-events-auto">
+          <CurrencySelector />
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={paying}
+          aria-label="Close booking"
+          className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-lg text-neutral-800 shadow ring-1 ring-black/10 transition hover:bg-white disabled:opacity-40"
+        >
+          ✕
+        </button>
+      </div>
       </div>
 
       <style>{`

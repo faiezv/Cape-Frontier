@@ -1,101 +1,103 @@
-// src/utils/imageLoader.js
+// src/utils/ImageLoader.js
 
-// Include both general images and tour images
+// All general images plus everything under tours/ (images, packages, etc.)
 const allImageModules = import.meta.glob(
   [
-    '/src/assets/images/**/*.{webp,png,jpeg,jpg,svg}',
-    '/src/assets/tours/images/**/*.{webp,png,jpeg,jpg,svg}',
+    "/src/assets/images/**/*.{webp,png,jpeg,jpg,svg,avif}",
+    "/src/assets/tours/**/*.{webp,png,jpeg,jpg,svg,avif}",
   ],
-  { eager: true }
+  { eager: true },
 );
 
 const imageMap = {};
 
 for (const fullPath in allImageModules) {
-  let key = fullPath;
-
-  // Remove '/src/assets/' prefix → gives 'images/...' or 'tours/images/...'
-  if (key.startsWith('/src/assets/')) {
-    key = key.replace('/src/assets/', '');
-  }
-
-  imageMap[key] = allImageModules[fullPath].default;
+  // '/src/assets/images/tours/x/1.webp' -> 'images/tours/x/1.webp'
+  const key = fullPath.replace(/^\/src\/assets\//, "");
+  const mod = allImageModules[fullPath];
+  imageMap[key] = mod?.default ?? mod;
 }
 
+const IMAGE_EXT = /\.(webp|png|jpe?g|svg|avif)$/i;
 
 function normalisePath(path) {
-  if (!path) return '';
+  if (!path) return "";
 
-  let key = path;
+  let key = String(path).trim();
 
-  // Remove common prefixes used in the codebase
-  if (key.startsWith('/images/tours/')) {
-    key = key.replace('/images/tours/', 'tours/images/');
-  } else if (key.startsWith('/images/')) {
-    key = key.replace('/images/', 'images/');
-  } else if (key.startsWith('/src/assets/tours/images/')) {
-    key = key.replace('/src/assets/tours/images/', 'tours/images/');
-  } else if (key.startsWith('/src/assets/images/')) {
-    key = key.replace('/src/assets/images/', 'images/');
-  } else if (key.startsWith('./')) {
-    key = key.replace('./', '');
+  // Legacy prefixes used elsewhere in the codebase
+  if (key.startsWith("/images/tours/")) {
+    key = key.replace("/images/tours/", "tours/images/");
+  } else if (key.startsWith("/images/")) {
+    key = key.replace("/images/", "images/");
   }
 
-  // Remove any leading slash if still present
-  if (key.startsWith('/')) key = key.slice(1);
+  // Full source paths, with or without a leading slash
+  key = key.replace(/^\/?src\/assets\//, "");
 
-  // Decode URI components (e.g., %20 → space) to match actual filenames in glob
+  // './x' -> 'x', then drop any remaining leading slash
+  key = key.replace(/^\.\//, "").replace(/^\//, "");
+
+  // %20 -> space, to match real filenames in the glob
   try {
     key = decodeURIComponent(key);
-  } catch (e) {
-    // Ignore decoding errors
+  } catch {
+    // ignore decoding errors
   }
 
   return key;
 }
 
-// export function resolveImage(path) {
-//   if (!path) return fallbackImg;
+// First image inside a folder (direct children first, then nested).
+// Numbered files sort first and in numeric order, the rest alphabetically.
+export function resolveFolderImage(folder) {
+  if (!folder) return null;
 
-//   const key = normalisePath(path);
-//   if (imageMap[key]) return imageMap[key];
+  const prefix = normalisePath(folder).replace(/\/+$/, "") + "/";
 
-//   // Fallback: try to match by filename (last part) – useful if folder structure differs
-//   const parts = key.split('/');
-//   const filename = parts[parts.length - 1];
+  const matches = Object.keys(imageMap)
+    .filter((key) => key.startsWith(prefix))
+    .sort((a, b) => {
+      const depthA = a.slice(prefix.length).split("/").length;
+      const depthB = b.slice(prefix.length).split("/").length;
+      if (depthA !== depthB) return depthA - depthB; // direct children first
+      return a.localeCompare(b, undefined, { numeric: true });
+    });
 
-//   for (const mapKey in imageMap) {
-//     if (mapKey.endsWith(filename)) {
-//       return imageMap[mapKey];
-//     }
-//   }
+  if (matches.length === 0) {
+    console.warn("[resolveFolderImage] No images found in:", folder);
+    return null;
+  }
 
-//   return fallbackImg;
-// }
+  return imageMap[matches[0]];
+}
 
+// Accepts an exact file path OR a folder path (no extension).
 export function resolveImage(path) {
   if (!path) return null;
 
-  const key = normalisePath(path);
-
-  if (imageMap[key]) {
-    return imageMap[key];
+  // No image extension means it's a folder: grab its first image
+  if (!IMAGE_EXT.test(String(path).trim())) {
+    return resolveFolderImage(path);
   }
 
-  // Fallback: try to match by filename
-  const parts = key.split('/');
-  const filename = parts[parts.length - 1];
+  const key = normalisePath(path);
 
-  for (const mapKey in imageMap) {
-    if (mapKey.endsWith(filename)) {
-      return imageMap[mapKey];
+  if (imageMap[key]) return imageMap[key];
+
+  // Fallback: match on the last TWO segments (folder/filename), so '1.webp'
+  // can never match some other folder's '1.webp'.
+  const parts = key.split("/");
+  const tail = parts.slice(-2).join("/");
+
+  if (parts.length >= 2) {
+    for (const mapKey in imageMap) {
+      if (mapKey.endsWith(`/${tail}`)) return imageMap[mapKey];
     }
   }
 
-  console.warn('[resolveImage] Image not found:', path);
-
+  console.warn("[resolveImage] Image not found:", path);
   return null;
 }
-
 
 export const resolveTourImage = resolveImage;

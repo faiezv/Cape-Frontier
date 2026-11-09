@@ -11,7 +11,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Seo from "../components/Seo";
 import SiteFooter from "../components/SiteFooter";
 import { site } from "../utils/siteConfig.js";
-import { tours } from "../data/tours";
+import { tours, TOUR_TYPES } from "../data/tours";
 import { hasGroupDeal, getDurationBucket } from "../utils/tourHelpers";
 import {
   Chip,
@@ -21,6 +21,7 @@ import {
 } from "../components/Tours/TourCards";
 import CurrencySelector from "../components/Tours/CurrencySelector";
 import BookingDrawer, { getTourSlug } from "../components/Tours/BookingDrawer";
+import { resolveImage } from "../utils/ImageLoader.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -58,6 +59,16 @@ const TYPE_LABELS = {
   "wine-routes": "Wine routes",
 };
 
+// "wine-routes" → "Wine routes" (fallback for types without a TYPE_LABELS entry)
+const labelForType = (type) => {
+  if (TYPE_LABELS[type]) return TYPE_LABELS[type];
+  const spaced = String(type).replace(/[-_]+/g, " ").trim().toLowerCase();
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+};
+
+// The category buttons follow TOUR_TYPES (adrenaline, hiking, packages, historical)
+const CATEGORY_TYPES = Object.values(TOUR_TYPES || {});
+
 const DURATION_OPTIONS = [
   { id: "half-day", label: "Half day" },
   { id: "full-day", label: "Full day" },
@@ -89,6 +100,106 @@ const getTourKey = (tour) =>
 const labelClass =
   "mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-neutral-400";
 
+// ─── Category dropdown (select tours by TOUR_TYPES) ──────────────────────────
+
+function CategoryDropdown({ options, active, onSelect }) {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef(null);
+
+  // Close on outside click / Escape
+  useEffect(() => {
+    if (!open) return undefined;
+    const onDown = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target))
+        setOpen(false);
+    };
+    const onKey = (e) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  const current = options.find((o) => o.id === active) || options[0];
+  const isFiltered = active !== "all";
+
+  return (
+    <div ref={wrapRef} className="relative min-w-0 flex-1 sm:flex-none">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label="Filter by tour type"
+        className={`flex w-full items-center justify-between gap-2 whitespace-nowrap rounded-full border px-4 py-3 text-sm font-semibold outline-none transition focus-visible:ring-4 focus-visible:ring-blue-100 ${
+          isFiltered
+            ? "border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-600/20"
+            : "border-neutral-300 bg-white text-neutral-900 hover:border-blue-300 focus-visible:border-blue-500"
+        }`}
+      >
+        <span className="truncate">{current?.label}</span>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+          className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+
+      {open && (
+        <ul
+          role="listbox"
+          aria-label="Tour type"
+          className="absolute left-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-neutral-200 bg-white p-1.5 shadow-xl shadow-black/10 sm:left-auto sm:right-0"
+          style={{ animation: "catMenuIn 0.16s ease-out both" }}
+        >
+          {options.map((o) => {
+            const selected = active === o.id;
+            return (
+              <li key={o.id} role="option" aria-selected={selected}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSelect(o.id);
+                    setOpen(false);
+                  }}
+                  className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition ${
+                    selected
+                      ? "bg-blue-50 font-bold text-blue-700"
+                      : "font-medium text-neutral-700 hover:bg-neutral-50"
+                  }`}
+                >
+                  {o.label}
+                  <span
+                    className={`text-xs ${selected ? "text-blue-500" : "text-neutral-400"}`}
+                  >
+                    {o.count}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      <style>{`
+        @keyframes catMenuIn {
+          from { opacity: 0; transform: translateY(-6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 // ─── Filter panel (shared by desktop sidebar + mobile sheet) ─────────────────
 
 function FilterPanel({
@@ -108,7 +219,7 @@ function FilterPanel({
             { id: "all", label: "All categories", count: totalCount },
             ...typeOptions.map((t) => ({
               id: t,
-              label: TYPE_LABELS[t],
+              label: labelForType(t),
               count: typeCounts[t],
             })),
           ].map((o) => {
@@ -119,10 +230,11 @@ function FilterPanel({
                 type="button"
                 onClick={() => setFilter({ type: o.id })}
                 aria-pressed={active}
-                className={`flex items-center justify-between rounded-xl px-3 py-2 text-left text-sm transition ${active
-                  ? "bg-blue-50 font-bold text-blue-700"
-                  : "font-medium text-neutral-700 hover:bg-neutral-50"
-                  }`}
+                className={`flex items-center justify-between rounded-xl px-3 py-2 text-left text-sm transition ${
+                  active
+                    ? "bg-blue-50 font-bold text-blue-700"
+                    : "font-medium text-neutral-700 hover:bg-neutral-50"
+                }`}
               >
                 {o.label}
                 <span
@@ -211,7 +323,14 @@ function FilterPanel({
 }
 
 // Mobile bottom sheet
-function FilterSheet({ open, onClose, resultCount, onClear, canClear, children }) {
+function FilterSheet({
+  open,
+  onClose,
+  resultCount,
+  onClear,
+  canClear,
+  children,
+}) {
   useEffect(() => {
     if (!open) return undefined;
     const html = document.documentElement.style.overflow;
@@ -241,7 +360,9 @@ function FilterSheet({ open, onClose, resultCount, onClear, canClear, children }
     >
       <div
         className="flex max-h-[85vh] w-full flex-col rounded-t-3xl bg-white shadow-2xl"
-        style={{ animation: "tourSheetIn 0.26s cubic-bezier(0.16,1,0.3,1) both" }}
+        style={{
+          animation: "tourSheetIn 0.26s cubic-bezier(0.16,1,0.3,1) both",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-neutral-100 px-5 py-4">
@@ -267,7 +388,10 @@ function FilterSheet({ open, onClose, resultCount, onClear, canClear, children }
           </div>
         </div>
 
-        <div data-lenis-prevent className="flex-1 overflow-y-auto overscroll-contain p-5">
+        <div
+          data-lenis-prevent
+          className="flex-1 overflow-y-auto overscroll-contain p-5"
+        >
           {children}
         </div>
 
@@ -367,10 +491,28 @@ function BigTagline() {
         className="block h-auto w-full sm:hidden"
         aria-hidden="true"
       >
-        <HollowLine id="m1" x={16} y={135} size={140} width={960} stroke={14} viewW={1000} viewH={310}>
+        <HollowLine
+          id="m1"
+          x={16}
+          y={135}
+          size={140}
+          width={960}
+          stroke={14}
+          viewW={1000}
+          viewH={310}
+        >
           Explore beyond
         </HollowLine>
-        <HollowLine id="m2" x={16} y={285} size={140} width={960} stroke={14} viewW={1000} viewH={310}>
+        <HollowLine
+          id="m2"
+          x={16}
+          y={285}
+          size={140}
+          width={960}
+          stroke={14}
+          viewW={1000}
+          viewH={310}
+        >
           the ordinary.
         </HollowLine>
       </svg>
@@ -381,7 +523,16 @@ function BigTagline() {
         className="hidden h-auto w-full sm:block"
         aria-hidden="true"
       >
-        <HollowLine id="d" x={10} y={92} size={92} width={976} stroke={7} viewW={1000} viewH={120}>
+        <HollowLine
+          id="d"
+          x={10}
+          y={92}
+          size={92}
+          width={976}
+          stroke={7}
+          viewW={1000}
+          viewH={120}
+        >
           {TAGLINE}
         </HollowLine>
       </svg>
@@ -470,6 +621,19 @@ function Tours() {
 
   const typeOptions = useMemo(
     () => Object.keys(typeCounts).filter((t) => TYPE_LABELS[t]),
+    [typeCounts],
+  );
+
+  // Category buttons: "All" + every TOUR_TYPES value that has at least one tour
+  const categoryOptions = useMemo(
+    () => [
+      { id: "all", label: "All tours", count: tours.length },
+      ...CATEGORY_TYPES.filter((t) => typeCounts[t] > 0).map((t) => ({
+        id: t,
+        label: labelForType(t),
+        count: typeCounts[t],
+      })),
+    ],
     [typeCounts],
   );
 
@@ -648,43 +812,97 @@ function Tours() {
       {/* Navbar white panel (after scrolling) */}
       <div
         aria-hidden="true"
-        className={`pointer-events-none fixed inset-x-0 top-0 z-40 h-[73px] bg-white shadow-md sm:h-[81px] lg:h-[85px] transition-all duration-500 ease-out ${scrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
-          }`}
+        className={`pointer-events-none fixed inset-x-0 top-0 z-40 h-[73px] bg-white shadow-md sm:h-[81px] lg:h-[85px] transition-all duration-500 ease-out ${
+          scrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+        }`}
       />
 
       {/* ── PROMO BAR (fixed, 88px, flush under the navbar) ───────────
           Its vertical centre lines up with the bottom edge of the blue band
           (50/50 split). */}
       {hasPromos && (
-        <div className="fixed inset-x-0 top-[72px] z-30 h-[88px] overflow-hidden bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-600 text-white shadow-md sm:top-[80px] lg:top-[84px]">
-          <div className="mx-auto flex h-full w-full max-w-[1500px] items-center justify-between gap-3 px-4 sm:px-6">
-            <p className="h-6 min-w-0 overflow-hidden truncate font-bitter text-xl leading-6 text-white/95">
-              <span aria-hidden="true">✨ </span>
-              Special offer:{" "}
-              {promoList.length > 1 ? (
-                <span
-                  key={promoIndex}
-                  className="inline-block max-w-full animate-[promoRollIn_0.4s_ease-out_forwards] align-bottom font-bold text-white"
-                >
-                  {promoList[promoIndex]?.title}
+        <div className="fixed inset-x-0 top-[72px] z-30 h-[88px] overflow-hidden bg-gradient-to-r from-emerald-700 via-emerald-500 to-teal-600 text-white shadow-md sm:top-[80px] lg:top-[84px]">
+          {/* soft highlights for depth */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -left-10 -top-16 h-40 w-40 rounded-full bg-white/10 blur-2xl"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-20 right-1/3 h-44 w-44 rounded-full bg-teal-300/20 blur-3xl"
+          />
+
+          <div className="relative mx-auto flex h-full w-full max-w-[1500px] items-center justify-between gap-3 px-4 sm:gap-6 sm:px-6">
+            {/* Offer: label + rotating title */}
+            <div className="min-w-0">
+              {/* <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-white ring-1 ring-white/25 backdrop-blur">
+                  <span aria-hidden="true">✨</span>
+                  Special offer
                 </span>
-              ) : (
-                <span className="font-bold text-white">
-                  {promoList[0]?.title}
-                </span>
-              )}
-            </p>
+                {promoList.length > 1 && (
+                  <span className="text-[11px] font-bold tabular-nums text-white/75">
+                    {promoIndex + 1} / {promoList.length}
+                  </span>
+                )}
+              </div> */}
+              <div className="flex items-center">
+                <img className="h-12 mx-4" src="/icons/savemore.png" alt="" />
+                <p className="text-lg font-bold font-bitter leading-7 text-white sm:text-2xl sm:leading-7">
+                  Special offer:&nbsp;
+                </p>
+                <div className="h-7 overflow-hidden">
+                  <p
+                    key={promoIndex}
+                    className="animate-[promoRollIn_0.4s_ease-out_forwards] truncate font-bitter text-lg
+                    leading-7 text-white sm:text-2xl sm:leading-7"
+                  >
+                    {promoList[promoIndex]?.title}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action */}
             <button
               type="button"
               onClick={() => setFilter({ showPromos: !filters.showPromos })}
-              className={`inline-flex h-[18px] shrink-0 items-center whitespace-nowrap rounded-full px-3 text-[10px] font-bold leading-none transition active:scale-95 ${filters.showPromos
-                ? "bg-white text-emerald-700 hover:bg-neutral-50"
-                : "bg-emerald-800/40 text-white hover:bg-emerald-800/60"
-                }`}
+              aria-pressed={filters.showPromos}
+              className={`group inline-flex h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-4 text-sm font-bold shadow-lg transition active:scale-95 sm:h-12 sm:px-6 sm:text-base ${
+                filters.showPromos
+                  ? "bg-emerald-950/40 text-white ring-1 ring-white/40 hover:bg-emerald-950/60"
+                  : "bg-white text-emerald-800 shadow-emerald-950/20 hover:bg-emerald-50"
+              }`}
             >
-              {filters.showPromos ? "Show All Tours" : "View Promo Tours"}
+              {filters.showPromos ? (
+                <>
+                  <span className="sm:hidden">All tours</span>
+                  <span className="hidden sm:inline">Show all tours</span>
+                  <span aria-hidden="true">✕</span>
+                </>
+              ) : (
+                <>
+                  <span className="sm:hidden">Promos</span>
+                  <span className="hidden sm:inline">
+                    View promo tours ({promoList.length})
+                  </span>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                  >
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </>
+              )}
             </button>
           </div>
+
           <style>{`
             @keyframes promoRollIn {
               0% { transform: translateY(100%); opacity: 0; }
@@ -704,10 +922,11 @@ function Tours() {
         {/* Content wrapper: top padding = navbar height + promo bar height, so
             the search bar / grid always start BELOW the fixed promo bar. */}
         <div
-          className={`relative ${hasPromos
-            ? "pt-[160px] sm:pt-[168px] lg:pt-[172px]"
-            : "pt-[116px] sm:pt-[124px] lg:pt-[128px]"
-            }`}
+          className={`relative ${
+            hasPromos
+              ? "pt-[160px] sm:pt-[168px] lg:pt-[172px]"
+              : "pt-[116px] sm:pt-[124px] lg:pt-[128px]"
+          }`}
         >
           {/* ── MAIN CONTENT CONTAINER ──────────────────────────────── */}
           <div className="relative mx-auto w-full max-w-[1500px] px-4 pb-16 pt-6 sm:px-6 sm:pt-8">
@@ -769,6 +988,12 @@ function Tours() {
                   </div>
 
                   <div className="flex gap-2">
+                    <CategoryDropdown
+                      options={categoryOptions}
+                      active={filters.type}
+                      onSelect={(type) => setFilter({ type })}
+                    />
+
                     <select
                       value={filters.sort}
                       onChange={(e) => setFilter({ sort: e.target.value })}
@@ -808,7 +1033,7 @@ function Tours() {
                     >
                       Showing{" "}
                       <b className="text-neutral-950">{filteredTours.length}</b>{" "}
-                      of {tours.length} tours. Use filters to narrow down.
+                      of {tours.length} tours.
                     </p>
                   </div>
                   {activeFilterCount > 0 && (
@@ -863,9 +1088,7 @@ function Tours() {
         className="mx-auto w-full max-w-7xl scroll-mt-40 px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8"
       >
         <SiteFooter />
-        <div className="mt-6 sm:mt-8">
-          {/* <BigTagline /> */}
-        </div>
+        <div className="mt-6 sm:mt-8">{/* <BigTagline /> */}</div>
       </div>
 
       {/* Mobile filter sheet */}

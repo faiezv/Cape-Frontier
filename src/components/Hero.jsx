@@ -4,16 +4,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link } from "react-router-dom";
 // TODO: adjust this path to wherever useLoadingNavigate lives
 import { useLoadingNavigate } from "./useLoadingNavigate";
+import { resolveImage } from "../utils/ImageLoader.js";
 
 import { site } from "../utils/siteConfig.js";
-
-// Adjust the relative path to wherever this file lives.
-// Filenames are case-sensitive on Vercel (Linux) - keep them exactly as on disk.
-import hero1 from "../assets/images/content/hero/1.webp";
-import hero2 from "../assets/images/tours/adrenaline/cobra/cobra-2hr/1.webp";
-import hero3 from "../assets/images/content/hero/2.webp";
-import hero4 from "../assets/images/content/hero/3.webp";
-// import hero5 from '../assets/images/content/hero/4.webp'
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -26,14 +19,50 @@ const useIsoLayoutEffect =
 // Vite gives a string, Next.js gives { src, width, height } - support both.
 const toSrc = (img) => (typeof img === "string" ? img : img.src);
 
-// Reorder / relabel to match what 1-4.webp actually show.
-const slides = [
-  { image: hero1, location: "Bo-Kaap, Cape Town" },
-  { image: hero2, location: "Cobra Sundowner, Cape Town" },
-  { image: hero3, location: "Simon's Town, Cape Town" },
-  { image: hero4, location: "Cape Town" },
-  // { image: hero5, location: 'Cobra Sundowner, Cape Town' },
-];
+// -----------------------------------------------------------------------------
+// Hero images: every .webp in src/assets/images/content/hero/ is picked up
+// automatically at build time. Other formats (the .png screenshots) are ignored
+// on purpose, so stray files never end up in the slideshow.
+//
+// Order: numbered files first by number (1.webp, 2.webp, ... 10.webp), then any
+// non-numbered files alphabetically. 1.webp is always the first slide (and the
+// LCP image), so give it the best photo.
+//
+// Filenames are case-sensitive on Vercel (Linux).
+// -----------------------------------------------------------------------------
+const heroModules = import.meta.glob("/src/assets/images/content/hero/*.webp", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+
+const fileName = (path) => path.split("/").pop();
+
+const leadingNumber = (path) => {
+  const match = fileName(path).match(/^(\d+)/);
+  return match ? parseInt(match[1], 10) : Infinity;
+};
+
+const slides = Object.entries(heroModules)
+  .sort(([a], [b]) => {
+    const diff = leadingNumber(a) - leadingNumber(b);
+    if (diff !== 0 && !Number.isNaN(diff)) return diff;
+    return fileName(a).localeCompare(fileName(b), undefined, { numeric: true });
+  })
+  .map(([path, image], index) => ({
+    key: path,
+    image,
+    alt: `Cape Frontier tours in Cape Town, photo ${index + 1}`,
+  }));
+
+if (import.meta.env?.DEV && slides.length === 0) {
+  console.warn(
+    "[Hero] No .webp files found in src/assets/images/content/hero/",
+  );
+}
+
+// Look up a hero image by filename (used by the promo cards). Falls back to the
+// first slide if that file doesn't exist, so a missing file never breaks a card.
 
 const SLIDE_MS = 6500;
 const PROMO_MS = 5000; // how long each promo stays visible
@@ -52,14 +81,16 @@ const promos = [
     short: "Entry fees included.",
     text: "All entry fees included. Discover Cape Town’s iconic coastline at a special price, for a limited time only.",
     stamp: { big: "All-in", small: "entry fees" },
-    image: hero3, // TODO: swap for the Cape Peninsula tour cover image
     cta: "View tour",
     to: "/tours/peninsula-tour-2", // tour slug
+    image: resolveImage(
+      "src/assets/images/tours/packages/peninsula-tour/1.webp",
+    ),
     // colours
-    card: "bg-[linear-gradient(135deg,#fde047_0%,#facc15_45%,#f59e0b_100%)] text-[#1c1400]",
-    tagClass: "bg-[#1c1400]/10 text-[#5b4200]",
-    sealClass: "border-[#eab308] text-[#a16207]",
-    ctaClass: "bg-[#1c1400] text-white group-hover:bg-black",
+    card: "bg-[linear-gradient(135deg,#e0f2fe_0%,#bae6fd_50%,#93c5fd_100%)] text-[#0a1f5c]",
+    tagClass: "bg-[#0938ef]/10 text-[#0938ef]",
+    sealClass: "border-[#0938ef] text-[#0938ef]",
+    ctaClass: "bg-[#0938ef] text-white group-hover:bg-[#002dcb]",
     ring: "ring-white/80",
   },
   {
@@ -69,11 +100,13 @@ const promos = [
     short: "Groups of 7–10 save 20%.",
     text: "Groups of 7–10 guests save 20%. Go deeper into Cape Town and take a story home with you.",
     stamp: { big: "20%", small: "off" },
-    image: hero1, // TODO: swap for the Heritage Cape Flats tour cover image
+    image: resolveImage(
+      "src/assets/images/tours/historical/cape-flats-heritage-faith/1.webp",
+    ),
     cta: "View tour",
     to: "/tours/heritage-faith-cape-flats-community-tour", // TODO: replace with the real slug
 
-    // colours (was orange)
+    // colours
     card: "bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-600 text-white",
     tagClass: "bg-white/20 text-white",
     sealClass: "border-emerald-500 text-emerald-700",
@@ -198,14 +231,16 @@ const PromoBanner = ({
                 aria-hidden="true"
                 className={`hidden h-full w-28 shrink-0 overflow-hidden rounded-xl bg-black/10 ring-2 sm:block md:w-40 ${p.ring}`}
               >
-                <img
-                  src={toSrc(p.image)}
-                  alt=""
-                  loading="eager"
-                  decoding="async"
-                  draggable={false}
-                  className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                />
+                {p.image && (
+                  <img
+                    src={toSrc(p.image)}
+                    alt=""
+                    loading="eager"
+                    decoding="async"
+                    draggable={false}
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                )}
               </span>
 
               {/* Copy */}
@@ -428,7 +463,7 @@ const Hero = () => {
       // mismatched `src` during hydration, so if the server build emitted a
       // different asset URL than the client bundle, the browser keeps the
       // broken one. Re-assert the client URL and retry if it failed to decode.
-      if (first) {
+      if (first && slides[0]) {
         const want = toSrc(slides[0].image);
         if (
           first.getAttribute("src") !== want ||
@@ -578,12 +613,12 @@ const Hero = () => {
           Slide 1 is eager + high priority; the rest are added after load. */}
       {visibleSlides.map((slide, index) => (
         <img
-          key={slide.location + index}
+          key={slide.key}
           ref={(el) => {
             bgRefs.current[index] = el;
           }}
           src={toSrc(slide.image)}
-          alt={slide.location}
+          alt={slide.alt}
           aria-hidden={index !== currentSlide}
           loading={index === 0 ? "eager" : "lazy"}
           fetchPriority={index === 0 ? "high" : "auto"}
@@ -606,10 +641,7 @@ const Hero = () => {
           ref={contentRef}
           className="flex flex-1 flex-col items-center px-4 pb-24 pt-24 sm:px-6 sm:pb-12 sm:pt-12 md:px-8 md:pb-24 md:pt-28 lg:px-10 lg:pt-32"
         >
-          {/* SEO: the page needs exactly one <h1>. Edit the copy to match your brand. */}
-          {/* <h1 className="sr-only">
-            Cape Frontier - Guided tours and experiences in Cape Town
-          </h1> */}
+          {/* SEO: the page needs exactly one <h1>. */}
           <h1 className="sr-only">{site.heroH1}</h1>
 
           {/* Placeholder used for the desktop TourSelect pinning.

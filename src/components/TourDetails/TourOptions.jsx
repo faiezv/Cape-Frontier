@@ -1,11 +1,23 @@
-// src/components/TourOptions.jsx
+// src/components/TourDetails/TourOptions.jsx
 
-import { useEffect } from "react";
+import { convertPrice, formatMoney } from "../../utils/pricingEngine.js";
+
+// Option prices are stored in ZAR. When a `currency` is passed (e.g. "USD") the
+// price is converted with the same pricing engine the checkout uses, so the
+// option cards always match the total. Without it, prices show in rand as before.
+const formatOptionPrice = (amountZar, currency) => {
+  const amount = Number(amountZar || 0);
+  if (!currency || currency === "ZAR") {
+    return `R${amount.toLocaleString("en-ZA")}`;
+  }
+  return formatMoney(convertPrice(amount, currency), currency);
+};
 
 const TourOptions = ({
   tour,
   selectedOption,
   onOptionChange,
+  currency,
 }) => {
   const options = Array.isArray(tour?.options)
     ? tour.options
@@ -15,8 +27,6 @@ const TourOptions = ({
   if (options.length === 0) {
     return null;
   }
-
-  console.log('TourOptions component is rendering!', { options, selectedOption });
 
   return (
     <section className="mx-auto w-full max-w-6xl px-4 sm:px-6">
@@ -67,7 +77,7 @@ const TourOptions = ({
                   transition-all duration-300 ease-out
                   ${
                     isSelected
-                      ? "border-blue-950 bg-blue-950 text-white shadow-lg"
+                      ? "border-green-750 bg-green-600 text-white shadow-lg"
                       : "border-black/10 bg-white text-neutral-950 hover:-translate-y-0.5 hover:border-black/20 hover:shadow-md"
                   }
                 `}
@@ -127,7 +137,7 @@ const TourOptions = ({
                   </div>
 
                   {/* ------------------------------------------
-                      PRICE
+                      PRICE (in the selected currency)
                   ------------------------------------------ */}
 
                   <div className="mt-4">
@@ -143,10 +153,7 @@ const TourOptions = ({
                         }
                       `}
                     >
-                      R
-                      {Number(
-                        option.pricePerPerson || 0
-                      ).toLocaleString("en-ZA")}
+                      {formatOptionPrice(option.pricePerPerson, currency)}
                     </span>
 
                     <span
