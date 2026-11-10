@@ -987,6 +987,7 @@ export function TourQuickView({ tour, onClose, onBook, onSubmitReview }) {
                 <div className="pointer-events-auto grid grid-cols-2 gap-2 sm:flex sm:shrink-0">
                   <Link
                     to={`/tours/${tour.slug}`}
+                    onClick={onClose}
                     state={{ tour }}
                     tabIndex={expanded ? 0 : -1}
                     className="flex items-center justify-center rounded-full bg-white px-6 py-3 text-center text-sm font-bold text-neutral-800 transition hover:bg-neutral-100"
@@ -1186,6 +1187,7 @@ export function TourQuickView({ tour, onClose, onBook, onSubmitReview }) {
             <div className="grid grid-cols-2 gap-3">
               <Link
                 to={`/tours/${tour.slug}`}
+                    onClick={onClose}
                 state={{ tour }}
                 className="flex items-center justify-center rounded-full border border-neutral-200 px-6 py-3.5 text-center text-sm font-bold text-neutral-700 transition hover:bg-neutral-50 hover:text-neutral-900"
               >

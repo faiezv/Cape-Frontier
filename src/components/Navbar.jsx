@@ -1,484 +1,537 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
-import { useLocation } from 'react-router-dom'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useLocation } from "react-router-dom";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-import { KidsActivitiesNavbar } from '../components/KidsActivitiesNavbar.jsx';
-import { useLoadingNavigate } from "./useLoadingNavigate.jsx"
-import { resolveImage } from '../utils/ImageLoader.js'
+import { useReducedMotion } from "framer-motion";
+import { useTransitionMode } from "../utils/transitionMode.js";
+import { LOGO_WHITE_DELAY, FALLBACK_TRANSITION } from "../transitions/index.js";
 
-gsap.registerPlugin(ScrollTrigger)
+import { KidsActivitiesNavbar } from "../components/KidsActivitiesNavbar.jsx";
+import { useLoadingNavigate } from "./useLoadingNavigate.jsx";
+import { resolveImage } from "../utils/ImageLoader.js";
+
+gsap.registerPlugin(ScrollTrigger);
 
 // Updated to include a specific target path for Tours
 const navItems = [
-  { label: 'Home', target: 'Home' },
-  { label: 'About', target: 'About' },
-  { label: 'Stories', target: 'Stories' },
-  { label: 'Gallery', target: 'Gallery' },
-  { label: 'Tours', target: '/tours' }, // Routes to /tours page
-  { label: 'FAQ', target: 'FAQ' },
-]
+  { label: "Home", target: "Home" },
+  { label: "About", target: "About" },
+  { label: "Stories", target: "Stories" },
+  { label: "Gallery", target: "Gallery" },
+  { label: "Tours", target: "/tours" }, // Routes to /tours page
+  { label: "FAQ", target: "/policies" },
+];
+
+const LOGO_WHITE_MAX_SCROLL = 40; // px: past this the logo goes back to its normal colour
+const LOGO_WHITE_MAX_DELAY = 0.15; // s: longest wait before the logo turns white
+const LOGO_FADE_MS = 120; // logo colour transition (was 200ms)
 
 const sectionIdMap = {
-  About: 'about',
-  Stories: 'stories',
-  Gallery: 'gallery',
-  FAQ: 'faq',
-  // Removed Tours since it now routes to a new page
-}
+  About: "about",
+  Stories: "stories",
+  Gallery: "gallery",
+  FAQ: "faq",
+};
 
 const megaMenus = {
   Home: {
-    eyebrow: 'Start here',
-    title: 'Cape Frontier Travel & Tours',
-    desc: 'Jump back to the main landing area, then explore stories, tours, and contact options from one place.',
-    layout: 'links',
+    eyebrow: "Start here",
+    title: "Cape Frontier Travel & Tours",
+    desc: "Jump back to the main landing area, then explore stories, tours, and contact options from one place.",
+    layout: "links",
     links: [
       {
-        title: 'Back to top',
-        desc: 'Return to the hero section.',
-        target: 'Home',
+        title: "Back to top",
+        desc: "Return to the hero section.",
+        target: "Home",
       },
       {
-        title: 'Popular tours',
-        desc: 'Move straight into featured routes.',
-        target: '/tours',
+        title: "Popular tours",
+        desc: "Move straight into featured routes.",
+        target: "/tours",
       },
       {
-        title: 'Ask a question',
-        desc: 'Open the contact section for help.',
-        target: 'Contact',
+        title: "Ask a question",
+        desc: "Open the contact section for help.",
+        target: "Contact",
       },
     ],
   },
 
   About: {
-    eyebrow: 'About Cape Frontier',
-    title: 'What makes the journey feel premium',
-    desc: 'A quick guide to the sections that explain the travel experience, local support, pickup flow, and booking process.',
-    logo: '/assets/brand/logo-cf.webp',
-    layout: 'links',
+    eyebrow: "About Cape Frontier",
+    title: "What makes the journey feel premium",
+    desc: "A quick guide to the sections that explain the travel experience, local support, pickup flow, and booking process.",
+    logo: "/assets/brand/logo-cf.webp",
+    layout: "links",
     links: [
       {
-        title: 'Why Cape Frontier',
-        desc: 'Local insight, curated routes, and flexible planning.',
-        target: 'About',
+        title: "Why Cape Frontier",
+        desc: "Local insight, curated routes, and flexible planning.",
+        target: "About",
       },
       {
-        title: 'Guided experience',
-        desc: 'Tours built around comfort, pacing, and storytelling.',
-        target: 'About',
+        title: "Guided experience",
+        desc: "Tours built around comfort, pacing, and storytelling.",
+        target: "About",
       },
       {
-        title: 'Pickup support',
-        desc: 'Customers can request pickup from their accommodation.',
-        target: '/tours',
+        title: "Pickup support",
+        desc: "Customers can request pickup from their accommodation.",
+        target: "/tours",
       },
       {
-        title: 'Booking flow',
-        desc: 'Choose a tour, request the trip, and complete checkout.',
-        target: '/tours',
+        title: "Booking flow",
+        desc: "Choose a tour, request the trip, and complete checkout.",
+        target: "/tours",
       },
     ],
   },
 
   Stories: {
-    eyebrow: 'Traveller stories',
-    title: 'Reviews, moments, and route highlights',
-    desc: 'See what guests enjoyed, from scenic stops and wine farms to guided adventure experiences.',
-    layout: 'links',
+    eyebrow: "Traveller stories",
+    title: "Reviews, moments, and route highlights",
+    desc: "See what guests enjoyed, from scenic stops and wine farms to guided adventure experiences.",
+    layout: "links",
     links: [
       {
-        title: 'Guest reviews',
-        desc: 'Read verified traveller-style feedback.',
-        target: 'Stories',
+        title: "Guest reviews",
+        desc: "Read verified traveller-style feedback.",
+        target: "Stories",
       },
       {
-        title: 'Cape moments',
-        desc: 'Scenic route highlights and memorable stops.',
-        target: 'Stories',
+        title: "Cape moments",
+        desc: "Scenic route highlights and memorable stops.",
+        target: "Stories",
       },
       {
-        title: 'Adventure notes',
-        desc: 'See how the day feels from start to finish.',
-        target: '/tours',
+        title: "Adventure notes",
+        desc: "See how the day feels from start to finish.",
+        target: "/tours",
       },
       {
-        title: 'Travel confidence',
-        desc: 'Helpful guidance before booking.',
-        target: 'Contact',
+        title: "Travel confidence",
+        desc: "Helpful guidance before booking.",
+        target: "Contact",
       },
     ],
   },
 
   Tours: {
-    eyebrow: 'Browse tours',
-    title: 'Choose your Cape Town experience',
-    desc: 'Explore routes by category. Each card opens the tours section where users can preview details and request a trip.',
-    layout: 'cards',
-    ctaTarget: '/tours', // Ensures the "Open Tours" button at the bottom works
+    eyebrow: "Browse tours",
+    title: "Choose your Cape Town experience",
+    desc: "Explore routes by category. Each card opens the tours section where users can preview details and request a trip.",
+    layout: "cards",
+    ctaTarget: "/tours", // Ensures the "Open Tours" button at the bottom works
     cards: [
       {
-        title: 'Adrenaline',
-        desc: 'Shark cage diving, paragliding, snorkelling, and guided thrill experiences.',
-        image: resolveImage('/src/assets/images/tours/adrenaline/shark-cage-diving/1.webp'),
-        target: '/tours',
+        title: "Adrenaline",
+        desc: "Shark cage diving, paragliding, snorkelling, and guided thrill experiences.",
+        image: resolveImage(
+          "/src/assets/images/tours/adrenaline/shark-cage-diving/1.webp",
+        ),
+        target: "/tours",
       },
       {
-        title: 'Hiking',
-        desc: 'Lion’s Head and Table Mountain routes with scenic viewpoints.',
-        image: resolveImage('/src/assets/images/tours/hiking/lions-head/1.webp'),
-        target: '/tours',
+        title: "Hiking",
+        desc: "Lion’s Head and Table Mountain routes with scenic viewpoints.",
+        image: resolveImage(
+          "/src/assets/images/tours/hiking/lions-head/1.webp",
+        ),
+        target: "/tours",
       },
       {
-        title: 'Historical',
-        desc: 'Robben Island and cultural routes with meaningful local context.',
-        image: resolveImage('/src/assets/images/tours/historical/langa/2.webp'),
-        target: '/tours',
+        title: "Historical",
+        desc: "Robben Island and cultural routes with meaningful local context.",
+        image: resolveImage("/src/assets/images/tours/historical/langa/2.webp"),
+        target: "/tours",
       },
       {
-        title: 'Packages',
-        desc: 'Cape Peninsula and Stellenbosch wine farm full-day experiences.',
-        image: resolveImage('/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp'),
-        target: '/tours',
+        title: "Packages",
+        desc: "Cape Peninsula and Stellenbosch wine farm full-day experiences.",
+        image: resolveImage(
+          "/src/assets/images/tours/packages/3-day-garden-route/960px-Harbour_-_Knysna,_South_Af.webp",
+        ),
+        target: "/tours",
       },
     ],
   },
 
   FAQ: {
-    eyebrow: 'Cape Frontier policies',
-    title: 'Before you book',
-    desc: 'Quick policy links for booking, pickup, payments, cancellations, private tours, and vehicle arrangements. Final details are confirmed manually by Cape Frontier.',
-    ctaLabel: 'Policies',
-    ctaTarget: '/policies',
-    layout: 'links',
+    eyebrow: "Cape Frontier policies",
+    title: "Before you book",
+    desc: "Quick policy links for booking, pickup, payments, cancellations, private tours, and vehicle arrangements. Final details are confirmed manually by Cape Frontier.",
+    ctaLabel: "Policies",
+    ctaTarget: "/policies",
+    layout: "links",
     links: [
       {
-        title: 'Booking policy',
-        desc: 'Guests book for their own group size, and checkout participants must match their party.',
-        target: '/policies#booking-policy',
+        title: "Booking policy",
+        desc: "Guests book for their own group size, and checkout participants must match their party.",
+        target: "/policies#booking-policy",
       },
       {
-        title: 'Pickup policy',
-        desc: 'Pickup is included unless stated otherwise and confirmed manually after booking.',
-        target: '/policies#pickup-policy',
+        title: "Pickup policy",
+        desc: "Pickup is included unless stated otherwise and confirmed manually after booking.",
+        target: "/policies#pickup-policy",
       },
       {
-        title: 'Payment flow',
-        desc: 'Select tour, complete booking form, pay online, then receive confirmation.',
-        target: '/policies#payment-policy',
+        title: "Payment flow",
+        desc: "Select tour, complete booking form, pay online, then receive confirmation.",
+        target: "/policies#payment-policy",
       },
       {
-        title: 'Cancellations',
-        desc: 'Refunds and penalties depend on timing, with weather options handled separately.',
-        target: '/policies#cancellation-policy',
+        title: "Cancellations",
+        desc: "Refunds and penalties depend on timing, with weather options handled separately.",
+        target: "/policies#cancellation-policy",
       },
       {
-        title: 'Rescheduling',
-        desc: 'Reschedules depend on availability and Cape Frontier confirmation.',
-        target: '/policies#reschedule-policy',
+        title: "Rescheduling",
+        desc: "Reschedules depend on availability and Cape Frontier confirmation.",
+        target: "/policies#reschedule-policy",
       },
       {
-        title: 'Private tours',
-        desc: 'Private tours have an extra per-vehicle fee and exclude entrance fees unless stated.',
-        target: '/policies#private-tour-policy',
+        title: "Private tours",
+        desc: "Private tours have an extra per-vehicle fee and exclude entrance fees unless stated.",
+        target: "/policies#private-tour-policy",
       },
       {
-        title: 'Vehicles',
-        desc: 'Cape Frontier decides vehicle size based on group size and operational needs.',
-        target: '/policies#vehicle-policy',
+        title: "Vehicles",
+        desc: "Cape Frontier decides vehicle size based on group size and operational needs.",
+        target: "/policies#vehicle-policy",
       },
     ],
   },
-}
+};
 
-const Navbar = () => {
-  const navigate = useLoadingNavigate()
-  const location = useLocation()
+// --------------------------------------------------
+// COLLAPSE (smoothly shrinks a navbar group to nothing)
+// --------------------------------------------------
 
-  const isCheckout = location.pathname === '/checkout'
-  const isBooking = location.pathname === '/booking'
-  const isSuccess = location.pathname === '/success'
+const COLLAPSE_MS = 500;
+const COLLAPSE_DELAY_MS = 150; // slight delay so it follows the page swap
+const COLLAPSE_EASE = "cubic-bezier(0.65, 0, 0.35, 1)";
 
-  // On the tours page only the logo and the kids button are visible
-  const isTours =
-    location.pathname === '/tours' ||
-    location.pathname.startsWith('/tours/')
+const Collapse = ({
+  open,
+  display = "grid",
+  alwaysOpenOnMd = false,
+  pad = "none",
+  children,
+}) => {
+  // "settled" = fully open and idle. Overflow is only clipped while moving,
+  // so shadows and hover lifts aren't cut off once the group is open.
+  const [settled, setSettled] = useState(open);
 
-  const [language, setLanguage] = useState('EN')
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [hoverIndex, setHoverIndex] = useState(null)
-  const [pendingSection, setPendingSection] = useState(null)
-  const [activeMega, setActiveMega] = useState(null)
-  const [activeMobileMega, setActiveMobileMega] = useState(null)
+  useEffect(() => {
+    const t = setTimeout(
+      () => setSettled(open),
+      open ? COLLAPSE_DELAY_MS + COLLAPSE_MS + 100 : COLLAPSE_DELAY_MS,
+    );
+    return () => clearTimeout(t);
+  }, [open]);
 
-  const navbarRef = useRef(null)
-  const accentRef = useRef(null)
-  const mobilePanelRef = useRef(null)
-  const megaPanelRef = useRef(null)
-  const mobileMenuContentRef = useRef(null)
-  const megaCloseTimerRef = useRef(null)
+  const state = open
+    ? "grid-cols-[1fr] opacity-100 visible"
+    : alwaysOpenOnMd
+      ? "grid-cols-[0fr] opacity-0 invisible md:grid-cols-[1fr] md:opacity-100 md:visible"
+      : "grid-cols-[0fr] opacity-0 invisible";
 
-  const activeMegaData = activeMega ? megaMenus[activeMega] : null
+  const overflow =
+    open && settled
+      ? "overflow-visible"
+      : alwaysOpenOnMd
+        ? "overflow-hidden md:overflow-visible"
+        : "overflow-hidden";
+
+  const padding =
+    pad === "right" ? "pr-2 lg:pr-3" : pad === "left" ? "pl-2 lg:pl-3" : "";
+
+  return (
+    <div
+      className={`${display} shrink-0 ${state}`}
+      style={{
+        transition: [
+          `grid-template-columns ${COLLAPSE_MS}ms ${COLLAPSE_EASE} ${COLLAPSE_DELAY_MS}ms`,
+          `opacity ${COLLAPSE_MS * 0.6}ms ease ${COLLAPSE_DELAY_MS}ms`,
+          `visibility ${COLLAPSE_MS}ms linear ${COLLAPSE_DELAY_MS}ms`,
+        ].join(", "),
+      }}
+    >
+      <div className={`flex min-w-0 items-center ${overflow}`}>
+        <div className={`flex shrink-0 items-center ${padding}`}>
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Navbar = ({ displayedPath }) => {
+  const navigate = useLoadingNavigate();
+  const location = useLocation();
+  const shownPath = displayedPath ?? location.pathname;
+  const onToursNow =
+    location.pathname === "/tours" || location.pathname.startsWith("/tours/");
+
+  const mode = useTransitionMode();
+  const reduceMotion = useReducedMotion();
+  const logoWhiteDelay =
+    LOGO_WHITE_DELAY[reduceMotion ? FALLBACK_TRANSITION : mode] ??
+    LOGO_WHITE_DELAY[FALLBACK_TRANSITION];
+
+  const [pastTop, setPastTop] = useState(false);
+
+  useEffect(() => {
+    const update = () => setPastTop(window.scrollY > LOGO_WHITE_MAX_SCROLL);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, [location.pathname]);
+
+  const whiteLogo = onToursNow && !pastTop;
+  const logoDelay = whiteLogo
+    ? Math.min(logoWhiteDelay, LOGO_WHITE_MAX_DELAY)
+    : 0;
+
+  const isCheckout = shownPath === "/checkout";
+  const isBooking = shownPath === "/booking";
+  const isSuccess = shownPath === "/success";
+  const isTours = shownPath === "/tours" || shownPath.startsWith("/tours/");
+
+  const [language, setLanguage] = useState("EN");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [hoverIndex, setHoverIndex] = useState(null);
+  const [pendingSection, setPendingSection] = useState(null);
+  const [activeMega, setActiveMega] = useState(null);
+  const [activeMobileMega, setActiveMobileMega] = useState(null);
+
+  const navbarRef = useRef(null);
+  const accentRef = useRef(null);
+  const mobilePanelRef = useRef(null);
+  const megaPanelRef = useRef(null);
+  const mobileMenuContentRef = useRef(null);
+  const megaCloseTimerRef = useRef(null);
+
+  const activeMegaData = activeMega ? megaMenus[activeMega] : null;
 
   // --------------------------------------------------
   // AFFILIATION REFS
   // --------------------------------------------------
 
-  const affiliationRef = useRef(null)
-  const affiliationTextRef = useRef(null)
-  const affiliationHandshakeRef = useRef(null)
-  const affiliationLogoRef = useRef(null)
-  const affiliationGlowRef = useRef(null)
+  const affiliationRef = useRef(null);
+  const affiliationTextRef = useRef(null);
+  const affiliationHandshakeRef = useRef(null);
+  const affiliationLogoRef = useRef(null);
+  const affiliationGlowRef = useRef(null);
 
   // --------------------------------------------------
   // MAIN LOGO
   // --------------------------------------------------
 
-  const mainLogoRef = useRef(null)
+  const mainLogoRef = useRef(null);
 
   const scrollWindowTo = (y) => {
-    const targetY = Math.max(0, y)
+    const targetY = Math.max(0, y);
 
-    ScrollTrigger.refresh()
+    ScrollTrigger.refresh();
 
     if (window.lenis) {
       window.lenis.scrollTo(targetY, {
         duration: 1,
         force: true,
-      })
-      return
+      });
+      return;
     }
 
     window.scrollTo({
       top: targetY,
-      behavior: 'smooth',
-    })
-  }
+      behavior: "smooth",
+    });
+  };
 
-  const scrollToTop = () => scrollWindowTo(0)
+  const scrollToTop = () => scrollWindowTo(0);
 
   const scrollToSection = (sectionId) => {
-    if (!sectionId) return false
+    if (!sectionId) return false;
 
-    const el = document.getElementById(sectionId)
+    const el = document.getElementById(sectionId);
 
-    if (!el) return false
+    if (!el) return false;
 
-    const y =
-      el.getBoundingClientRect().top +
-      window.scrollY
+    const y = el.getBoundingClientRect().top + window.scrollY;
 
-    scrollWindowTo(y)
+    scrollWindowTo(y);
 
-    return true
-  }
+    return true;
+  };
 
   // --------------------------------------------------
   // DESKTOP MEGA MENU
   // --------------------------------------------------
 
   const openMega = (label, index, event) => {
-    if (window.innerWidth < 768) return
+    if (window.innerWidth < 768) return;
 
-    window.clearTimeout(
-      megaCloseTimerRef.current
-    )
+    window.clearTimeout(megaCloseTimerRef.current);
 
-    setHoverIndex(index)
-    setActiveMega(label)
+    setHoverIndex(index);
+    setActiveMega(label);
 
     if (navbarRef.current) {
       gsap.to(navbarRef.current, {
-        y: '0%',
+        y: "0%",
         duration: 0.18,
-        ease: 'power2.out',
-      })
+        ease: "power2.out",
+      });
     }
-  }
+  };
 
   const scheduleCloseMega = () => {
-    window.clearTimeout(
-      megaCloseTimerRef.current
-    )
+    window.clearTimeout(megaCloseTimerRef.current);
 
-    megaCloseTimerRef.current =
-      window.setTimeout(() => {
-        setActiveMega(null)
-        setHoverIndex(null)
-      }, 120)
-  }
+    megaCloseTimerRef.current = window.setTimeout(() => {
+      setActiveMega(null);
+      setHoverIndex(null);
+    }, 120);
+  };
 
   const keepMegaOpen = () => {
-    window.clearTimeout(
-      megaCloseTimerRef.current
-    )
-  }
+    window.clearTimeout(megaCloseTimerRef.current);
+  };
 
   // --------------------------------------------------
   // NAVIGATION
   // --------------------------------------------------
 
   const handleNavClick = (label, event) => {
-    event?.preventDefault?.()
-    event?.stopPropagation?.()
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
 
-    setMenuOpen(false)
-    setActiveMega(null)
-    setActiveMobileMega(null)
-    setHoverIndex(null)
+    setMenuOpen(false);
+    setActiveMega(null);
+    setActiveMobileMega(null);
+    setHoverIndex(null);
 
     // Check for explicit path routes (like /tours)
-    if (
-      typeof label === 'string' &&
-      label.startsWith('/')
-    ) {
-      setPendingSection(null)
-      navigate(label)
-      return
+    if (typeof label === "string" && label.startsWith("/")) {
+      setPendingSection(null);
+      navigate(label);
+      return;
     }
 
-    if (label === 'Home') {
-      setPendingSection(null)
+    if (label === "Home") {
+      setPendingSection(null);
 
-      if (location.pathname !== '/') {
-        navigate('/', {
+      if (location.pathname !== "/") {
+        navigate("/", {
           state: {
-            scrollTo: 'top',
+            scrollTo: "top",
           },
-        })
+        });
 
-        return
+        return;
       }
 
-      scrollToTop()
-      return
+      scrollToTop();
+      return;
     }
 
-    const sectionId = sectionIdMap[label]
+    const sectionId = sectionIdMap[label];
 
-    if (!sectionId) return
+    if (!sectionId) return;
 
-    setPendingSection(sectionId)
+    setPendingSection(sectionId);
 
-    if (location.pathname !== '/') {
-      navigate('/', {
+    if (location.pathname !== "/") {
+      navigate("/", {
         state: {
           scrollTo: sectionId,
         },
-      })
+      });
 
-      return
+      return;
     }
 
     requestAnimationFrame(() => {
-      const didScroll =
-        scrollToSection(sectionId)
+      const didScroll = scrollToSection(sectionId);
 
       if (didScroll) {
-        setPendingSection(null)
+        setPendingSection(null);
       }
-    })
-  }
+    });
+  };
 
-  const toggleMobileMega = (
-    label,
-    event
-  ) => {
-    event?.preventDefault?.()
-    event?.stopPropagation?.()
+  const toggleMobileMega = (label, event) => {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
 
-    if (label === 'Home') {
-      handleNavClick(label, event)
-      return
+    if (label === "Home") {
+      handleNavClick(label, event);
+      return;
     }
 
-    setActiveMobileMega((current) =>
-      current === label ? null : label
-    )
-  }
+    setActiveMobileMega((current) => (current === label ? null : label));
+  };
 
   // --------------------------------------------------
   // PENDING SECTION SCROLL
   // --------------------------------------------------
 
   useEffect(() => {
-    if (
-      location.pathname !== '/' ||
-      !pendingSection
-    ) {
-      return
-    }
+    if (shownPath !== "/" || !pendingSection) return;
 
-    const delays = [
-      0,
-      80,
-      180,
-      350,
-      650,
-      950,
-    ]
+    const delays = [0, 80, 180, 350, 650, 950];
 
     const timers = delays.map((delay) =>
       window.setTimeout(() => {
-        const didScroll =
-          scrollToSection(
-            pendingSection
-          )
+        const didScroll = scrollToSection(pendingSection);
 
         if (didScroll) {
-          setPendingSection(null)
+          setPendingSection(null);
         }
-      }, delay)
-    )
+      }, delay),
+    );
 
-    return () =>
-      timers.forEach((timer) =>
-        window.clearTimeout(timer)
-      )
-  }, [
-    location.pathname,
-    pendingSection,
-  ])
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [shownPath, pendingSection]);
 
   // --------------------------------------------------
   // ACCENT ANIMATION
   // --------------------------------------------------
 
   useEffect(() => {
-    if (!accentRef.current) return
+    if (!accentRef.current) return;
 
-    const tween = gsap.to(
-      accentRef.current,
-      {
-        x: 14,
-        duration: 2,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      }
-    )
+    const tween = gsap.to(accentRef.current, {
+      x: 14,
+      duration: 2,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
 
-    return () => tween.kill()
-  }, [])
+    return () => tween.kill();
+  }, []);
 
   // --------------------------------------------------
   // MOBILE MENU ANIMATION
   // --------------------------------------------------
 
   useEffect(() => {
-    if (!menuOpen) return
+    if (!menuOpen) return;
 
     if (navbarRef.current) {
       gsap.to(navbarRef.current, {
-        y: '0%',
+        y: "0%",
         duration: 0.2,
-        ease: 'power2.out',
-      })
+        ease: "power2.out",
+      });
     }
 
-    if (!mobilePanelRef.current) return
+    if (!mobilePanelRef.current) return;
 
     gsap.fromTo(
       mobilePanelRef.current,
@@ -490,26 +543,21 @@ const Navbar = () => {
         opacity: 1,
         y: 0,
         duration: 0.24,
-        ease: 'power2.out',
-      }
-    )
-  }, [menuOpen])
+        ease: "power2.out",
+      },
+    );
+  }, [menuOpen]);
 
   // --------------------------------------------------
   // DESKTOP MEGA ANIMATION
   // --------------------------------------------------
 
   useEffect(() => {
-    if (
-      !activeMega ||
-      !megaPanelRef.current
-    ) {
-      return
+    if (!activeMega || !megaPanelRef.current) {
+      return;
     }
 
-    gsap.killTweensOf(
-      megaPanelRef.current
-    )
+    gsap.killTweensOf(megaPanelRef.current);
 
     gsap.fromTo(
       megaPanelRef.current,
@@ -517,37 +565,33 @@ const Navbar = () => {
         opacity: 0,
         y: -10,
         scale: 0.985,
-        filter: 'blur(4px)',
+        filter: "blur(4px)",
       },
       {
         opacity: 1,
         y: 0,
         scale: 1,
-        filter: 'blur(0px)',
+        filter: "blur(0px)",
         duration: 0.24,
-        ease: 'power2.out',
-      }
-    )
-  }, [activeMega])
+        ease: "power2.out",
+      },
+    );
+  }, [activeMega]);
 
   // --------------------------------------------------
   // MOBILE MEGA ANIMATION
   // --------------------------------------------------
 
   useEffect(() => {
-    if (
-      !activeMobileMega ||
-      !mobileMenuContentRef.current
-    ) {
-      return
+    if (!activeMobileMega || !mobileMenuContentRef.current) {
+      return;
     }
 
-    const activePanel =
-      mobileMenuContentRef.current.querySelector(
-        `[data-mobile-mega="${activeMobileMega}"]`
-      )
+    const activePanel = mobileMenuContentRef.current.querySelector(
+      `[data-mobile-mega="${activeMobileMega}"]`,
+    );
 
-    if (!activePanel) return
+    if (!activePanel) return;
 
     gsap.fromTo(
       activePanel,
@@ -557,14 +601,14 @@ const Navbar = () => {
         y: -6,
       },
       {
-        height: 'auto',
+        height: "auto",
         opacity: 1,
         y: 0,
         duration: 0.24,
-        ease: 'power2.out',
-      }
-    )
-  }, [activeMobileMega])
+        ease: "power2.out",
+      },
+    );
+  }, [activeMobileMega]);
 
   // --------------------------------------------------
   // RESIZE
@@ -573,87 +617,74 @@ const Navbar = () => {
   useEffect(() => {
     const onResize = () => {
       if (window.innerWidth >= 768) {
-        setMenuOpen(false)
-        setActiveMobileMega(null)
+        setMenuOpen(false);
+        setActiveMobileMega(null);
       }
 
       if (window.innerWidth < 768) {
-        setActiveMega(null)
-        setHoverIndex(null)
+        setActiveMega(null);
+        setHoverIndex(null);
       }
-    }
+    };
 
-    window.addEventListener(
-      'resize',
-      onResize
-    )
+    window.addEventListener("resize", onResize);
 
-    return () =>
-      window.removeEventListener(
-        'resize',
-        onResize
-      )
-  }, [])
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   // --------------------------------------------------
   // ROUTE CHANGE
   // --------------------------------------------------
 
   useEffect(() => {
-    setMenuOpen(false)
-    setActiveMega(null)
-    setActiveMobileMega(null)
-    setHoverIndex(null)
-  }, [location.pathname])
+    setMenuOpen(false);
+    setActiveMega(null);
+    setActiveMobileMega(null);
+    setHoverIndex(null);
+  }, [location.pathname]);
 
   useEffect(() => {
     return () => {
-      window.clearTimeout(
-        megaCloseTimerRef.current
-      )
-    }
-  }, [])
+      window.clearTimeout(megaCloseTimerRef.current);
+    };
+  }, []);
 
   // --------------------------------------------------
   // MAIN LOGO HOVER
   // --------------------------------------------------
 
   const animateMainLogoIn = () => {
-    if (!mainLogoRef.current) return
+    if (!mainLogoRef.current) return;
 
-    gsap.killTweensOf(
-      mainLogoRef.current
-    )
+    gsap.killTweensOf(mainLogoRef.current);
 
     gsap.to(mainLogoRef.current, {
       scale: 1.045,
       y: -1,
       duration: 0.35,
-      ease: 'power3.out',
-    })
-  }
+      ease: "power3.out",
+    });
+  };
 
   const animateMainLogoOut = () => {
-    if (!mainLogoRef.current) return
+    if (!mainLogoRef.current) return;
 
-    gsap.killTweensOf(
-      mainLogoRef.current
-    )
+    gsap.killTweensOf(mainLogoRef.current);
 
     gsap.to(mainLogoRef.current, {
       scale: 1,
       y: 0,
       duration: 0.3,
-      ease: 'power3.out',
-    })
-  }
+      ease: "power3.out",
+    });
+  };
 
   // --------------------------------------------------
   // AFFILIATION ANIMATION
   // --------------------------------------------------
 
   const animateAffiliationIn = () => {
-    if (!affiliationRef.current) return
+    if (!affiliationRef.current) return;
 
     gsap.killTweensOf([
       affiliationRef.current,
@@ -661,55 +692,41 @@ const Navbar = () => {
       affiliationHandshakeRef.current,
       affiliationLogoRef.current,
       affiliationGlowRef.current,
-    ])
+    ]);
 
-    const textWidth =
-      affiliationTextRef.current?.scrollWidth ||
-      0
+    const textWidth = affiliationTextRef.current?.scrollWidth || 0;
 
-    gsap.to(
-      affiliationTextRef.current,
-      {
-        width: textWidth,
-        opacity: 1,
-        x: 0,
-        letterSpacing: '0.14em',
-        duration: 0.45,
-        ease: 'power3.out',
-      }
-    )
+    gsap.to(affiliationTextRef.current, {
+      width: textWidth,
+      opacity: 1,
+      x: 0,
+      letterSpacing: "0.14em",
+      duration: 0.45,
+      ease: "power3.out",
+    });
 
-    gsap.to(
-      affiliationRef.current,
-      {
-        scale: 1.04,
-        y: -2,
-        duration: 0.45,
-        ease: 'power3.out',
-      }
-    )
+    gsap.to(affiliationRef.current, {
+      scale: 1.04,
+      y: -2,
+      duration: 0.45,
+      ease: "power3.out",
+    });
 
-    gsap.to(
-      affiliationHandshakeRef.current,
-      {
-        rotate: 12,
-        scale: 1.18,
-        duration: 0.25,
-        ease: 'power2.out',
-        yoyo: true,
-        repeat: 1,
-      }
-    )
+    gsap.to(affiliationHandshakeRef.current, {
+      rotate: 12,
+      scale: 1.18,
+      duration: 0.25,
+      ease: "power2.out",
+      yoyo: true,
+      repeat: 1,
+    });
 
-    gsap.to(
-      affiliationLogoRef.current,
-      {
-        scale: 1.1,
-        x: 2,
-        duration: 0.55,
-        ease: 'back.out(2)',
-      }
-    )
+    gsap.to(affiliationLogoRef.current, {
+      scale: 1.1,
+      x: 2,
+      duration: 0.55,
+      ease: "back.out(2)",
+    });
 
     gsap.fromTo(
       affiliationGlowRef.current,
@@ -721,13 +738,13 @@ const Navbar = () => {
         xPercent: 180,
         opacity: 1,
         duration: 0.8,
-        ease: 'power2.inOut',
-      }
-    )
-  }
+        ease: "power2.inOut",
+      },
+    );
+  };
 
   const animateAffiliationOut = () => {
-    if (!affiliationRef.current) return
+    if (!affiliationRef.current) return;
 
     gsap.killTweensOf([
       affiliationRef.current,
@@ -735,65 +752,46 @@ const Navbar = () => {
       affiliationHandshakeRef.current,
       affiliationLogoRef.current,
       affiliationGlowRef.current,
-    ])
+    ]);
 
-    gsap.to(
-      affiliationTextRef.current,
-      {
-        width: 0,
-        opacity: 0,
-        x: -6,
-        duration: 0.3,
-        ease: 'power3.inOut',
-      }
-    )
+    gsap.to(affiliationTextRef.current, {
+      width: 0,
+      opacity: 0,
+      x: -6,
+      duration: 0.3,
+      ease: "power3.inOut",
+    });
 
-    gsap.to(
-      affiliationRef.current,
-      {
-        scale: 1,
-        y: 0,
-        duration: 0.35,
-        ease: 'power3.out',
-      }
-    )
+    gsap.to(affiliationRef.current, {
+      scale: 1,
+      y: 0,
+      duration: 0.35,
+      ease: "power3.out",
+    });
 
-    gsap.to(
-      affiliationHandshakeRef.current,
-      {
-        rotate: 0,
-        scale: 1,
-        duration: 0.3,
-        ease: 'power3.out',
-      }
-    )
+    gsap.to(affiliationHandshakeRef.current, {
+      rotate: 0,
+      scale: 1,
+      duration: 0.3,
+      ease: "power3.out",
+    });
 
-    gsap.to(
-      affiliationLogoRef.current,
-      {
-        scale: 1,
-        x: 0,
-        duration: 0.35,
-        ease: 'power3.out',
-      }
-    )
+    gsap.to(affiliationLogoRef.current, {
+      scale: 1,
+      x: 0,
+      duration: 0.35,
+      ease: "power3.out",
+    });
 
-    gsap.to(
-      affiliationGlowRef.current,
-      {
-        opacity: 0,
-        duration: 0.2,
-        ease: 'power2.out',
-      }
-    )
-  }
+    gsap.to(affiliationGlowRef.current, {
+      opacity: 0,
+      duration: 0.2,
+      ease: "power2.out",
+    });
+  };
 
-  if (
-    isCheckout ||
-    isBooking ||
-    isSuccess
-  ) {
-    return null
+  if (isCheckout || isBooking || isSuccess) {
+    return null;
   }
 
   return (
@@ -804,60 +802,27 @@ const Navbar = () => {
 
       <header
         ref={navbarRef}
-        className={`
-          fixed inset-x-0 top-0 z-[9990]
-          w-screen max-w-[100dvw]
-          overflow-x-clip
-          border-white/10
-          backdrop-blur-xl
-          transition-all duration-200
-          ${
-            menuOpen
-              ? 'pointer-events-none opacity-0 sm:pointer-events-auto sm:opacity-100'
-              : 'opacity-100'
-          }
-        `}
+        className={`fixed inset-x-0 top-0 z-[9990] w-screen max-w-[100dvw] overflow-x-clip border-white/10 backdrop-blur-xl transition-opacity duration-200 ${
+          menuOpen
+            ? "pointer-events-none opacity-0 sm:pointer-events-auto sm:opacity-100"
+            : "opacity-100"
+        }`}
       >
-        <div
-          className="
-            mx-auto flex w-full max-w-[100dvw] min-w-0
-            items-center
-            gap-3
-            px-3 py-2
-            sm:px-4
-            md:px-6
-            lg:px-8
-          "
-        >
-
+        <div className="mx-auto flex w-full max-w-[100dvw] min-w-0 items-center gap-3 px-3 py-2 sm:px-4 md:px-6 lg:px-8">
           {/* =====================================================
               MAIN LOGO
+              Follows the real route immediately. Leaving /tours it
+              recolours before the curtain; entering /tours it waits
+              until the new page is being revealed.
           ===================================================== */}
 
           <a
             href="/"
             aria-label="Cape Frontier Travel & Tours"
-            onClick={(event) =>
-              handleNavClick(
-                'Home',
-                event
-              )
-            }
-            onMouseEnter={
-              animateMainLogoIn
-            }
-            onMouseLeave={
-              animateMainLogoOut
-            }
-            className="
-              group
-              relative
-              flex
-              shrink-0
-              items-center
-              justify-center
-              overflow-visible
-            "
+            onClick={(event) => handleNavClick("Home", event)}
+            onMouseEnter={animateMainLogoIn}
+            onMouseLeave={animateMainLogoOut}
+            className="group relative flex shrink-0 items-center justify-center overflow-visible"
           >
             <img
               ref={mainLogoRef}
@@ -866,454 +831,177 @@ const Navbar = () => {
               fetchPriority="high"
               loading="eager"
               decoding="async"
-              className="
-                block
-                h-14
-                w-auto
-                max-w-[220px]
-                shrink-0
-                object-contain
-                object-center
-                sm:h-16
-                sm:max-w-[235px]
-                lg:h-[68px]
-                lg:max-w-[250px]
-              "
+              className={`block h-14 w-auto max-w-[220px] shrink-0 object-contain object-center transition-[filter] duration-200 sm:h-16 sm:max-w-[235px] lg:h-[68px] lg:max-w-[250px] ${
+                whiteLogo ? "brightness-0 invert" : ""
+              }`}
+              style={{
+                transition: `filter ${LOGO_FADE_MS}ms ease-out ${logoDelay}s`,
+              }}
             />
           </a>
 
           {/* =====================================================
-              DESKTOP NAV
-              (on /tours this wrapper stays visible on every screen
-               size, but only the kids button is rendered inside it)
+              RIGHT SIDE: every group collapses on /tours except kids
           ===================================================== */}
 
-          <div
-            className={`
-              ml-auto
-              min-w-0
-              items-center
-              gap-2
-              lg:gap-3
-              ${
-                isTours
-                  ? 'flex'
-                  : 'hidden md:flex'
-              }
-            `}
-          >
+          <div className="ml-auto flex min-w-0 items-center">
+            {/* AFFILIATION */}
+            <Collapse open={!isTours} display="hidden md:grid" pad="right">
+              <div
+                ref={affiliationRef}
+                className="group relative flex shrink-0 items-center rounded-full duration-300 hover:bg-white"
+                onMouseEnter={animateAffiliationIn}
+                onMouseLeave={animateAffiliationOut}
+              >
+                <div className="mr-1 h-8 w-px shrink-0 bg-gradient-to-b from-transparent via-white/30 to-transparent" />
 
-            {!isTours && (
-              <>
-                {/* =================================================
-                    CAPE TOWN TOURISM AFFILIATION
-                ================================================= */}
-
-                <div
-                  ref={affiliationRef}
-                  className="
-                    group
-                    relative
-                    hidden
-                    shrink-0
-                    items-center
-                    sm:flex
-                    hover:bg-white
-                    rounded-full
-                    duration-300
-                  "
-                  onMouseEnter={
-                    animateAffiliationIn
-                  }
-                  onMouseLeave={
-                    animateAffiliationOut
-                  }
+                <a
+                  href="https://www.capetown.travel"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Cape Town Tourism"
+                  className="relative flex items-center gap-2 overflow-hidden rounded-full border border-white/10 bg-white/[0.055] px-2.5 py-1 shadow-[0_8px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl transition-colors duration-300 hover:border-white/25 hover:bg-white/[0.10]"
                 >
-                  {/* Divider */}
-
-                  <div
-                    className="
-                      mr-1
-                      h-8
-                      w-px
-                      shrink-0
-                      bg-gradient-to-b
-                      from-transparent
-                      via-white/30
-                      to-transparent
-                    "
+                  {/* Animated light sweep */}
+                  <span
+                    ref={affiliationGlowRef}
+                    className="pointer-events-none absolute -inset-y-4 left-0 w-8 -skew-x-12 bg-white/30 opacity-0 blur-md"
                   />
 
-                  <a
-                    href="https://www.capetown.travel"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Cape Town Tourism"
-                    className="
-                      relative
-                      flex
-                      items-center
-                      gap-2
-                      overflow-hidden
-                      rounded-full
-                      border
-                      border-white/10
-                      bg-white/[0.055]
-                      px-2.5
-                      py-1
-                      backdrop-blur-xl
-                      shadow-[0_8px_30px_rgba(0,0,0,0.12)]
-                      transition-colors
-                      duration-300
-                      hover:border-white/25
-                      hover:bg-white/[0.10]
-                    "
+                  {/* In affiliation with */}
+                  <span
+                    ref={affiliationTextRef}
+                    className="text-md relative z-10 block shrink-0 overflow-hidden whitespace-nowrap font-frank font-bold text-blue-600"
+                    style={{ width: 0, opacity: 0 }}
                   >
+                    Affiliation {'"Love Cape Town"'}
+                  </span>
 
-                    {/* Animated light sweep */}
-
-                    <span
-                      ref={affiliationGlowRef}
-                      className="
-                        pointer-events-none
-                        absolute
-                        -inset-y-4
-                        left-0
-                        w-8
-                        -skew-x-12
-                        bg-white/30
-                        blur-md
-                        opacity-0
-                      "
+                  {/* Handshake */}
+                  <span
+                    ref={affiliationHandshakeRef}
+                    className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/[0.08]"
+                  >
+                    <img
+                      src="/icons/handshake.webp"
+                      className="h-4.5 w-4.5 object-contain"
+                      alt=""
+                      aria-hidden="true"
                     />
+                  </span>
 
-                    {/* In affiliation with */}
+                  {/* Love Cape Town */}
+                  <img
+                    ref={affiliationLogoRef}
+                    src="/assets/brand/logo-love-ct-blue.webp"
+                    className="relative z-10 h-8 w-auto shrink-0 object-contain opacity-90"
+                    alt="Love Cape Town"
+                  />
+                </a>
+              </div>
+            </Collapse>
 
-                    <span
-                      ref={affiliationTextRef}
-                      className="
-                        relative
-                        z-10
-                        block
-                        shrink-0
-                        overflow-hidden
-                        whitespace-nowrap
-                        font-frank
-                        text-md
-                        text-blue-600
-                        font-bold
-                      "
-                      style={{
-                        width: 0,
-                        opacity: 0,
-                      }}
-                    >
-                      Affiliation  {'"Love Cape Town"'}
-                    </span>
+            {/* DESKTOP NAV PILL */}
+            <Collapse open={!isTours} display="hidden md:grid" pad="right">
+              <nav
+                className="flex shrink-0 items-center gap-1 rounded-full bg-blue-600 px-4 shadow-[0_8px_30px_rgba(0,0,0,0.16)] lg:gap-2 lg:px-8"
+                aria-label="Desktop navigation"
+              >
+                {navItems.map((item, index) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={(event) => handleNavClick(item.target, event)}
+                    onMouseEnter={(event) => openMega(item.label, index, event)}
+                    onMouseLeave={scheduleCloseMega}
+                    className="rounded-full px-2.5 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-white/20 hover:text-white lg:px-4"
+                  >
+                    <span className="relative inline-flex items-center">
+                      {item.label}
 
-                    {/* Handshake */}
-
-                    <span
-                      ref={
-                        affiliationHandshakeRef
-                      }
-                      className="
-                        relative
-                        z-10
-                        flex
-                        h-7
-                        w-7
-                        shrink-0
-                        items-center
-                        justify-center
-                        rounded-full
-                        bg-white/[0.08]
-                      "
-                    >
-                      <img
-                        src="/icons/handshake.webp"
-                        className="
-                          h-4.5
-                          w-4.5
-                          object-contain
-                        "
-                        alt=""
-                        aria-hidden="true"
+                      <span
+                        className={`absolute -bottom-1 left-0 h-[2px] rounded-full bg-white transition-all duration-300 ${
+                          hoverIndex === index
+                            ? "w-full opacity-100"
+                            : "w-0 opacity-0"
+                        }`}
                       />
                     </span>
+                  </button>
+                ))}
+              </nav>
+            </Collapse>
 
-                    {/* Love Cape Town */}
+            {/* KIDS ACTIVITIES
+                Open on /tours at every size. Off /tours it is open on
+                desktop and collapsed on mobile (as before). */}
+            <Collapse open={isTours} alwaysOpenOnMd>
+              <div className="shrink-0">
+                <KidsActivitiesNavbar />
+              </div>
+            </Collapse>
 
-                    <img
-                      ref={affiliationLogoRef}
-                      src="/assets/brand/logo-love-ct-blue.webp"
-                      className="
-                        relative
-                        z-10
-                        h-8
-                        w-auto
-                        shrink-0
-                        object-contain
-                        opacity-90
-                      "
-                      alt="Love Cape Town"
-                    />
-
-                  </a>
-                </div>
-
-                <nav
-                  className="
-                    flex
-                    items-center
-                    gap-1
-                    rounded-full
-                    bg-blue-600
-                    px-4
-                    shadow-[0_8px_30px_rgba(0,0,0,0.16)]
-                    lg:gap-2
-                    lg:px-8
-                  "
-                  aria-label="Desktop navigation"
-                >
-
-                  {navItems.map(
-                    (item, index) => (
-                      <button
-                        key={item.label}
-                        type="button"
-                        onClick={(event) =>
-                          handleNavClick(
-                            item.target,
-                            event
-                          )
-                        }
-                        onMouseEnter={(event) =>
-                          openMega(
-                            item.label,
-                            index,
-                            event
-                          )
-                        }
-                        onMouseLeave={
-                          scheduleCloseMega
-                        }
-                        className="
-                          rounded-full
-                          px-2.5
-                          py-2
-                          text-sm
-                          font-bold
-                          text-white
-                          transition-all
-                          duration-300
-                          hover:bg-white/20
-                          hover:text-white
-                          lg:px-4
-                        "
-                      >
-                        <span
-                          className="
-                            relative
-                            inline-flex
-                            items-center
-                          "
-                        >
-                          {item.label}
-
-                          <span
-                            className={`
-                              absolute
-                              -bottom-1
-                              left-0
-                              h-[2px]
-                              rounded-full
-                              bg-white
-                              transition-all
-                              duration-300
-                              ${
-                                hoverIndex === index
-                                  ? 'w-full opacity-100'
-                                  : 'w-0 opacity-0'
-                              }
-                            `}
-                          />
-                        </span>
-                      </button>
-                    )
-                  )}
-                </nav>
-              </>
-            )}
-
-            {/* KIDS ACTIVITIES (always visible, including /tours) */}
-            <KidsActivitiesNavbar />
-
-            {/* =================================================
-                CONTACT
-            ================================================= */}
-
-            {!isTours && (
+            {/* CONTACT */}
+            <Collapse open={!isTours} display="hidden md:grid" pad="left">
               <button
                 type="button"
                 onClick={() => {
-                  const contact =
-                    document.querySelector(
-                      '#contact'
-                    )
+                  const contact = document.querySelector("#contact");
 
-                  if (!contact) return
+                  if (!contact) return;
 
                   contact.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                  })
+                    behavior: "smooth",
+                    block: "start",
+                  });
                 }}
-                className="
-                  flex
-                  shrink-0
-                  items-center
-                  gap-2
-                  rounded-full
-                  border
-                  border-white/14
-                  bg-white
-                  px-3
-                  py-1
-                  text-xs
-                  font-extrabold
-                  text-blue-600
-                  shadow-[0_8px_30px_rgba(0,0,0,0.16)]
-                  transition
-                  duration-300
-                  hover:-translate-y-0.5
-                  hover:bg-green
-                "
+                className="flex shrink-0 items-center gap-2 rounded-full border border-white/14 bg-white px-3 py-1 text-xs font-extrabold text-blue-600 shadow-[0_8px_30px_rgba(0,0,0,0.16)] transition duration-300 hover:-translate-y-0.5 hover:bg-green"
               >
                 <img
                   src="/icons/faqBlue.png"
-                  className="
-                    h-4
-                    w-4
-                    sm:h-5
-                    sm:w-5
-                  "
+                  className="h-4 w-4 sm:h-5 sm:w-5"
                   alt="CONTACT"
                 />
 
-                <span>
-                  Contact
-                </span>
+                <span>Contact</span>
               </button>
-            )}
+            </Collapse>
 
-          </div>
-
-          {/* =====================================================
-              MOBILE MENU BUTTON (hidden on /tours)
-          ===================================================== */}
-
-          {!isTours && (
-            <div
-              className="
-                ml-auto
-                flex
-                shrink-0
-                items-center
-                gap-1.5
-                sm:hidden
-              "
-            >
+            {/* MOBILE MENU BUTTON (collapses on /tours) */}
+            <Collapse open={!isTours} display="grid sm:hidden">
               <button
                 type="button"
                 aria-label="Toggle menu"
                 aria-expanded={menuOpen}
                 onClick={(event) => {
-                  event.preventDefault()
-                  event.stopPropagation()
-                  setMenuOpen(
-                    (prev) => !prev
-                  )
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setMenuOpen((prev) => !prev);
                 }}
-                className="
-                  flex
-                  h-9
-                  w-9
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-full
-                  border
-                  border-white/14
-                  bg-white/8
-                  backdrop-blur-sm
-                "
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/14 bg-white/8 backdrop-blur-sm"
               >
-                <div
-                  className="
-                    relative
-                    flex
-                    h-4
-                    w-5
-                    flex-col
-                    justify-between
-                  "
-                >
+                <div className="relative flex h-4 w-5 flex-col justify-between">
                   <span
-                    className={`
-                      block
-                      h-[2px]
-                      w-full
-                      rounded-full
-                      bg-white
-                      transition-all
-                      duration-300
-                      ${
-                        menuOpen
-                          ? 'translate-y-[7px] rotate-45'
-                          : ''
-                      }
-                    `}
+                    className={`block h-[2px] w-full rounded-full bg-white transition-all duration-300 ${
+                      menuOpen ? "translate-y-[7px] rotate-45" : ""
+                    }`}
                   />
 
                   <span
-                    className={`
-                      block
-                      h-[2px]
-                      w-full
-                      rounded-full
-                      bg-white
-                      transition-all
-                      duration-300
-                      ${
-                        menuOpen
-                          ? 'opacity-0'
-                          : 'opacity-100'
-                      }
-                    `}
+                    className={`block h-[2px] w-full rounded-full bg-white transition-all duration-300 ${
+                      menuOpen ? "opacity-0" : "opacity-100"
+                    }`}
                   />
 
                   <span
-                    className={`
-                      block
-                      h-[2px]
-                      w-full
-                      rounded-full
-                      bg-white
-                      transition-all
-                      duration-300
-                      ${
-                        menuOpen
-                          ? '-translate-y-[7px] -rotate-45'
-                          : ''
-                      }
-                    `}
+                    className={`block h-[2px] w-full rounded-full bg-white transition-all duration-300 ${
+                      menuOpen ? "-translate-y-[7px] -rotate-45" : ""
+                    }`}
                   />
                 </div>
               </button>
-            </div>
-          )}
-
+            </Collapse>
+          </div>
         </div>
       </header>
 
@@ -1323,7 +1011,7 @@ const Navbar = () => {
 
       {!isTours &&
         activeMegaData &&
-        typeof document !== 'undefined' &&
+        typeof document !== "undefined" &&
         createPortal(
           <div
             className="
@@ -1336,7 +1024,7 @@ const Navbar = () => {
               md:block
             "
           />,
-          document.body
+          document.body,
         )}
 
       {/* =========================================================
@@ -1345,14 +1033,12 @@ const Navbar = () => {
 
       {!isTours &&
         activeMegaData &&
-        typeof document !== 'undefined' &&
+        typeof document !== "undefined" &&
         createPortal(
           <div
             ref={megaPanelRef}
             onMouseEnter={keepMegaOpen}
-            onMouseLeave={
-              scheduleCloseMega
-            }
+            onMouseLeave={scheduleCloseMega}
             className="
               fixed
               left-0
@@ -1391,7 +1077,6 @@ const Navbar = () => {
                   lg:grid-cols-[0.68fr_1.32fr]
                 "
               >
-
                 {/* Intro */}
 
                 <div
@@ -1405,9 +1090,7 @@ const Navbar = () => {
                 >
                   {activeMegaData.logo && (
                     <img
-                      src={
-                        activeMegaData.logo
-                      }
+                      src={activeMegaData.logo}
                       alt="Cape Frontier logo"
                       className="
                         mb-4
@@ -1428,9 +1111,7 @@ const Navbar = () => {
                       text-blue-400
                     "
                   >
-                    {
-                      activeMegaData.eyebrow
-                    }
+                    {activeMegaData.eyebrow}
                   </p>
 
                   <h3
@@ -1443,9 +1124,7 @@ const Navbar = () => {
                       text-neutral-950
                     "
                   >
-                    {
-                      activeMegaData.title
-                    }
+                    {activeMegaData.title}
                   </h3>
 
                   <p
@@ -1458,18 +1137,15 @@ const Navbar = () => {
                       text-neutral-600
                     "
                   >
-                    {
-                      activeMegaData.desc
-                    }
+                    {activeMegaData.desc}
                   </p>
 
                   <button
                     type="button"
                     onClick={(event) =>
                       handleNavClick(
-                        activeMegaData.ctaTarget ??
-                          activeMega,
-                        event
+                        activeMegaData.ctaTarget ?? activeMega,
+                        event,
                       )
                     }
                     className="
@@ -1489,20 +1165,14 @@ const Navbar = () => {
                       hover:-translate-y-0.5
                     "
                   >
-                    Open{' '}
-                    {activeMegaData.ctaLabel ??
-                      activeMega}
-
-                    <span aria-hidden="true">
-                      →
-                    </span>
+                    Open {activeMegaData.ctaLabel ?? activeMega}
+                    <span aria-hidden="true">→</span>
                   </button>
                 </div>
 
                 {/* Mega Content */}
 
-                {activeMegaData.layout ===
-                'cards' ? (
+                {activeMegaData.layout === "cards" ? (
                   <div
                     className="
                       grid
@@ -1511,18 +1181,12 @@ const Navbar = () => {
                       lg:grid-cols-4
                     "
                   >
-                    {activeMegaData.cards.map(
-                      (card) => (
-                        <button
-                          key={card.title}
-                          type="button"
-                          onClick={(event) =>
-                            handleNavClick(
-                              card.target,
-                              event
-                            )
-                          }
-                          className="
+                    {activeMegaData.cards.map((card) => (
+                      <button
+                        key={card.title}
+                        type="button"
+                        onClick={(event) => handleNavClick(card.target, event)}
+                        className="
                             group
                             overflow-hidden
                             rounded-[1.35rem]
@@ -1536,18 +1200,18 @@ const Navbar = () => {
                             hover:bg-white
                             hover:shadow-[0_16px_34px_rgba(0,0,0,0.08)]
                           "
-                        >
-                          <div
-                            className="
+                      >
+                        <div
+                          className="
                               relative
                               h-32
                               overflow-hidden
                             "
-                          >
-                            <img
-                              src={card.image}
-                              alt={card.title}
-                              className="
+                        >
+                          <img
+                            src={card.image}
+                            alt={card.title}
+                            className="
                                 h-full
                                 w-full
                                 object-cover
@@ -1555,11 +1219,11 @@ const Navbar = () => {
                                 duration-500
                                 group-hover:scale-110
                               "
-                              loading="lazy"
-                            />
+                            loading="lazy"
+                          />
 
-                            <div
-                              className="
+                          <div
+                            className="
                                 absolute
                                 inset-0
                                 bg-gradient-to-t
@@ -1567,10 +1231,10 @@ const Navbar = () => {
                                 via-black/10
                                 to-transparent
                               "
-                            />
+                          />
 
-                            <p
-                              className="
+                          <p
+                            className="
                                 absolute
                                 bottom-3
                                 left-3
@@ -1584,25 +1248,24 @@ const Navbar = () => {
                                 text-black
                                 shadow-sm
                               "
-                            >
-                              {card.title}
-                            </p>
-                          </div>
+                          >
+                            {card.title}
+                          </p>
+                        </div>
 
-                          <p
-                            className="
+                        <p
+                          className="
                               p-3
                               font-bitter
                               text-xs
                               leading-5
                               text-neutral-600
                             "
-                          >
-                            {card.desc}
-                          </p>
-                        </button>
-                      )
-                    )}
+                        >
+                          {card.desc}
+                        </p>
+                      </button>
+                    ))}
                   </div>
                 ) : (
                   <div
@@ -1613,18 +1276,12 @@ const Navbar = () => {
                       lg:grid-cols-4
                     "
                   >
-                    {activeMegaData.links.map(
-                      (link) => (
-                        <button
-                          key={link.title}
-                          type="button"
-                          onClick={(event) =>
-                            handleNavClick(
-                              link.target,
-                              event
-                            )
-                          }
-                          className="
+                    {activeMegaData.links.map((link) => (
+                      <button
+                        key={link.title}
+                        type="button"
+                        onClick={(event) => handleNavClick(link.target, event)}
+                        className="
                             group
                             rounded-[1.35rem]
                             border
@@ -1638,32 +1295,32 @@ const Navbar = () => {
                             hover:bg-white
                             hover:shadow-[0_16px_34px_rgba(0,0,0,0.08)]
                           "
-                        >
-                          <p
-                            className="
+                      >
+                        <p
+                          className="
                               font-bitter
                               text-sm
                               font-bold
                               text-neutral-950
                             "
-                          >
-                            {link.title}
-                          </p>
+                        >
+                          {link.title}
+                        </p>
 
-                          <p
-                            className="
+                        <p
+                          className="
                               mt-2
                               font-bitter
                               text-xs
                               leading-5
                               text-neutral-600
                             "
-                          >
-                            {link.desc}
-                          </p>
+                        >
+                          {link.desc}
+                        </p>
 
-                          <span
-                            className="
+                        <span
+                          className="
                               mt-3
                               inline-flex
                               rounded-full
@@ -1680,18 +1337,17 @@ const Navbar = () => {
                               group-hover:bg-neutral-950
                               group-hover:text-white
                             "
-                          >
-                            View
-                          </span>
-                        </button>
-                      )
-                    )}
+                        >
+                          View
+                        </span>
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
 
       {/* =========================================================
@@ -1700,7 +1356,7 @@ const Navbar = () => {
 
       {!isTours &&
         menuOpen &&
-        typeof document !== 'undefined' &&
+        typeof document !== "undefined" &&
         createPortal(
           <div
             className="
@@ -1709,17 +1365,10 @@ const Navbar = () => {
               z-[9980]
               sm:hidden
             "
-            onClick={() =>
-              setMenuOpen(false)
-            }
-            onPointerDown={(event) =>
-              event.stopPropagation()
-            }
-            onTouchStart={(event) =>
-              event.stopPropagation()
-            }
+            onClick={() => setMenuOpen(false)}
+            onPointerDown={(event) => event.stopPropagation()}
+            onTouchStart={(event) => event.stopPropagation()}
           >
-
             {/* Backdrop */}
 
             <div
@@ -1733,15 +1382,9 @@ const Navbar = () => {
 
             <div
               ref={mobilePanelRef}
-              onClick={(event) =>
-                event.stopPropagation()
-              }
-              onPointerDown={(event) =>
-                event.stopPropagation()
-              }
-              onTouchStart={(event) =>
-                event.stopPropagation()
-              }
+              onClick={(event) => event.stopPropagation()}
+              onPointerDown={(event) => event.stopPropagation()}
+              onTouchStart={(event) => event.stopPropagation()}
               className="
                 absolute
                 bottom-3
@@ -1769,11 +1412,9 @@ const Navbar = () => {
                   backdrop-blur-2xl
                 "
                 style={{
-                  WebkitOverflowScrolling:
-                    'touch',
+                  WebkitOverflowScrolling: "touch",
                 }}
               >
-
                 {/* =================================================
                     MOBILE BRAND
                 ================================================= */}
@@ -1792,9 +1433,7 @@ const Navbar = () => {
                 >
                   <button
                     type="button"
-                    onClick={() =>
-                      setMenuOpen(false)
-                    }
+                    onClick={() => setMenuOpen(false)}
                     className="
                       absolute
                       right-3
@@ -1923,21 +1562,12 @@ const Navbar = () => {
                   aria-label="Mobile navigation"
                 >
                   {navItems
-                    .filter(
-                      (item) =>
-                        item.label !==
-                        'Contact'
-                    )
+                    .filter((item) => item.label !== "Contact")
                     .map((item) => (
                       <button
                         key={item.label}
                         type="button"
-                        onClick={(event) =>
-                          handleNavClick(
-                            item.target,
-                            event
-                          )
-                        }
+                        onClick={(event) => handleNavClick(item.target, event)}
                         className="
                           group
                           flex
@@ -2029,7 +1659,6 @@ const Navbar = () => {
                       gap-2
                     "
                   >
-
                     {/* Location */}
 
                     <div
@@ -2063,11 +1692,7 @@ const Navbar = () => {
                         >
                           <path d="M12 21s7-4.4 7-11a7 7 0 1 0-14 0c0 6.6 7 11 7 11Z" />
 
-                          <circle
-                            cx="12"
-                            cy="10"
-                            r="2.5"
-                          />
+                          <circle cx="12" cy="10" r="2.5" />
                         </svg>
                       </span>
 
@@ -2094,12 +1719,8 @@ const Navbar = () => {
                             text-white/52
                           "
                         >
-                          Guided Cape Town
-                          routes, local
-                          pickup support,
-                          and manual
-                          booking
-                          confirmation.
+                          Guided Cape Town routes, local pickup support, and
+                          manual booking confirmation.
                         </p>
                       </div>
                     </div>
@@ -2150,8 +1771,7 @@ const Navbar = () => {
                             text-white/86
                           "
                         >
-                          Secure booking
-                          flow
+                          Secure booking flow
                         </p>
 
                         <p
@@ -2163,16 +1783,11 @@ const Navbar = () => {
                             text-white/52
                           "
                         >
-                          Choose your
-                          tour, confirm
-                          your group, pay
-                          online, then
-                          receive
-                          confirmation.
+                          Choose your tour, confirm your group, pay online, then
+                          receive confirmation.
                         </p>
                       </div>
                     </div>
-
                   </div>
                 </div>
 
@@ -2214,12 +1829,7 @@ const Navbar = () => {
 
                     <button
                       type="button"
-                      onClick={(event) =>
-                        handleNavClick(
-                          '/policies',
-                          event
-                        )
-                      }
+                      onClick={(event) => handleNavClick("/policies", event)}
                       className="
                         rounded-full
                         bg-white/[0.08]
@@ -2249,42 +1859,18 @@ const Navbar = () => {
                     "
                   >
                     {[
-                      [
-                        'Booking',
-                        '/policies#booking-policy',
-                      ],
-                      [
-                        'Pickup',
-                        '/policies#pickup-policy',
-                      ],
-                      [
-                        'Payment',
-                        '/policies#payment-policy',
-                      ],
-                      [
-                        'Cancellation',
-                        '/policies#cancellation-policy',
-                      ],
-                      [
-                        'Reschedule',
-                        '/policies#reschedule-policy',
-                      ],
-                      [
-                        'Private tours',
-                        '/policies#private-tour-policy',
-                      ],
-                    ].map(
-                      ([label, target]) => (
-                        <button
-                          key={label}
-                          type="button"
-                          onClick={(event) =>
-                            handleNavClick(
-                              target,
-                              event
-                            )
-                          }
-                          className="
+                      ["Booking", "/policies#booking-policy"],
+                      ["Pickup", "/policies#pickup-policy"],
+                      ["Payment", "/policies#payment-policy"],
+                      ["Cancellation", "/policies#cancellation-policy"],
+                      ["Reschedule", "/policies#reschedule-policy"],
+                      ["Private tours", "/policies#private-tour-policy"],
+                    ].map(([label, target]) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={(event) => handleNavClick(target, event)}
+                        className="
                             rounded-xl
                             border
                             border-white/[0.08]
@@ -2302,11 +1888,10 @@ const Navbar = () => {
                             hover:bg-white/10
                             hover:text-white
                           "
-                        >
-                          {label}
-                        </button>
-                      )
-                    )}
+                      >
+                        {label}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -2325,12 +1910,7 @@ const Navbar = () => {
                 >
                   <button
                     type="button"
-                    onClick={(event) =>
-                      handleNavClick(
-                        'Contact',
-                        event
-                      )
-                    }
+                    onClick={(event) => handleNavClick("Contact", event)}
                     className="
                       flex
                       items-center
@@ -2360,19 +1940,12 @@ const Navbar = () => {
                       aria-hidden="true"
                     />
 
-                    <span>
-                      FAQ
-                    </span>
+                    <span>FAQ</span>
                   </button>
 
                   <button
                     type="button"
-                    onClick={(event) =>
-                      handleNavClick(
-                        'Contact',
-                        event
-                      )
-                    }
+                    onClick={(event) => handleNavClick("Contact", event)}
                     className="
                       flex
                       items-center
@@ -2392,20 +1965,15 @@ const Navbar = () => {
                       hover:bg-green-100
                     "
                   >
-                    <span>
-                      Contact
-                    </span>
+                    <span>Contact</span>
 
-                    <span aria-hidden="true">
-                      →
-                    </span>
+                    <span aria-hidden="true">→</span>
                   </button>
                 </div>
-
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
 
       {/* =========================================================
@@ -2427,7 +1995,7 @@ const Navbar = () => {
         }
       `}</style>
     </>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

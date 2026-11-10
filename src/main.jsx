@@ -15,7 +15,6 @@ import PageNotFound from './pages/PageNotFound.jsx'
 import CheckoutPaystack from './pages/CheckoutPaystack'
 import CheckoutSuccessPaystack from './pages/CheckoutSuccessPaystack'
 
-// SETUP - Plain route array (NO createBrowserRouter!)
 const routes = [
   {
     path: '*',
@@ -23,52 +22,29 @@ const routes = [
     children: [
       { index: true, element: <Home /> },
       { path: 'tours/:slug', element: <TourDetails /> },
-      { path: "tours", element: <Tour /> },
+      { path: 'tours', element: <Tour /> },
       { path: 'policies', element: <Policies /> },
       { path: 'checkout', element: <CheckoutPaystack /> },
       { path: 'success', element: <CheckoutSuccessPaystack /> },
-    ]
+    ],
   },
-  { path: '*', element: <PageNotFound /> }
+  { path: '*', element: <PageNotFound /> },
 ]
 
 export const createRoot = ViteReactSSG(
   { routes },
-  ({ router, isClient }) => {
+  ({ isClient }) => {
     if (isClient) {
-      // 1. Disable browser's native scroll restoration
+      // Disable the browser's native scroll restoration
       if (window.history && 'scrollRestoration' in window.history) {
         window.history.scrollRestoration = 'manual'
       }
 
-      // 2. Ensure Lenis is initialized and ready
-      // (Assuming you have Lenis globally; if not, import it and init here)
-      if (window.lenis) {
-        // Stop any ongoing Lenis scroll to prevent race
-        window.lenis.stop()
-        // Reset to top instantly
-        window.lenis.scrollTo(0, { immediate: true, force: true })
-        // Start Lenis again
-        window.lenis.start()
-      }
-
-      // 3. Register ScrollTrigger plugin if not already
       gsap.registerPlugin(ScrollTrigger)
 
-      // 4. Refresh ScrollTrigger after a short delay (allow layout to settle)
-      setTimeout(() => {
-        ScrollTrigger.refresh(true)
-      }, 200)
-
-      // 5. Listen to route changes to reset scroll and refresh
-      router.subscribe(() => {
-        if (window.lenis) {
-          window.lenis.scrollTo(0, { immediate: true, force: true })
-          window.lenis.start()
-        }
-        // Refresh ScrollTrigger after route change
-        requestAnimationFrame(() => ScrollTrigger.refresh(true))
-      })
+      // Initial layout refresh. Route-change scroll reset and refresh
+      // now live in AnimatedRoutes so they run after the exit animation.
+      setTimeout(() => ScrollTrigger.refresh(true), 200)
     }
   },
   ({ children }) => <HelmetProvider>{children}</HelmetProvider>

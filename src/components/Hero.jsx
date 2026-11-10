@@ -1,16 +1,11 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link } from "react-router-dom";
 // TODO: adjust this path to wherever useLoadingNavigate lives
 import { useLoadingNavigate } from "./useLoadingNavigate";
 import { resolveImage } from "../utils/ImageLoader.js";
 
 import { site } from "../utils/siteConfig.js";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 // useLayoutEffect warns during SSR; fall back to useEffect on the server.
 const useIsoLayoutEffect =
@@ -61,57 +56,51 @@ if (import.meta.env?.DEV && slides.length === 0) {
   );
 }
 
-// Look up a hero image by filename (used by the promo cards). Falls back to the
-// first slide if that file doesn't exist, so a missing file never breaks a card.
-
 const SLIDE_MS = 6500;
 const PROMO_MS = 5000; // how long each promo stays visible
 
+// Hero photo: calm by design. Photos only cross-fade (no zoom, no movement) and
+// nothing about them reacts to scrolling. Set SLIDE_AUTOPLAY to false for one
+// still photo (the first one).
+const SLIDE_AUTOPLAY = true;
+const FADE_S = 1.8; // cross-fade length in seconds
+
 // -----------------------------------------------------------------------------
 // Promotions shown under the tour select block.
-// `short` = one-line mobile copy, `text` = desktop copy.
-// Every colour for a promo lives in its own class strings below so a promo is
-// one self-contained object. (Tailwind needs full class names, no templating.)
+// `short` = the one-line subtitle, `badge` = the small chip (tablet and up).
+// Every colour for a promo lives in its own class strings so a promo is one
+// self-contained object. (Tailwind needs full class names, no templating.)
 // -----------------------------------------------------------------------------
 const promos = [
   {
     key: "peninsula",
-    tag: "Limited-time offer",
     title: "Cape Peninsula Tour",
     short: "Entry fees included.",
-    text: "All entry fees included. Discover Cape Town’s iconic coastline at a special price, for a limited time only.",
-    stamp: { big: "All-in", small: "entry fees" },
+    badge: "Limited time",
     cta: "View tour",
     to: "/tours/peninsula-tour-2", // tour slug
     image: resolveImage(
       "src/assets/images/tours/packages/peninsula-tour/1.webp",
     ),
-    // colours
-    card: "bg-[linear-gradient(135deg,#e0f2fe_0%,#bae6fd_50%,#93c5fd_100%)] text-[#0a1f5c]",
-    tagClass: "bg-[#0938ef]/10 text-[#0938ef]",
-    sealClass: "border-[#0938ef] text-[#0938ef]",
-    ctaClass: "bg-[#0938ef] text-white group-hover:bg-[#002dcb]",
-    ring: "ring-white/80",
+    // colours: ocean blue -> cyan
+    card: "bg-[linear-gradient(110deg,#0938ef_0%,#2f6bff_55%,#22d3ee_100%)] text-white",
+    badgeClass: "bg-white/20 text-white ring-1 ring-white/40",
+    ctaClass: "bg-white text-[#0938ef] group-hover:bg-sky-50",
   },
   {
     key: "heritage",
-    tag: "Must experience",
     title: "Heritage Cape Flats Community Tour",
     short: "Groups of 7–10 save 20%.",
-    text: "Groups of 7–10 guests save 20%. Go deeper into Cape Town and take a story home with you.",
-    stamp: { big: "20%", small: "off" },
+    badge: "Must experience",
+    cta: "View tour",
+    to: "/tours/heritage-faith-cape-flats-community-tour", // TODO: replace with the real slug
     image: resolveImage(
       "src/assets/images/tours/historical/cape-flats-heritage-faith/1.webp",
     ),
-    cta: "View tour",
-    to: "/tours/heritage-faith-cape-flats-community-tour", // TODO: replace with the real slug
-
-    // colours
-    card: "bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-600 text-white",
-    tagClass: "bg-white/20 text-white",
-    sealClass: "border-emerald-500 text-emerald-700",
+    // colours: emerald -> lime
+    card: "bg-[linear-gradient(110deg,#047857_0%,#10b981_55%,#bef264_100%)] text-white",
+    badgeClass: "bg-white/20 text-white ring-1 ring-white/40",
     ctaClass: "bg-white text-emerald-700 group-hover:bg-emerald-50",
-    ring: "ring-white/80",
   },
 ];
 
@@ -120,12 +109,11 @@ const promos = [
 // Why this does not flicker:
 //  - the first promo is in the markup as "active" from the very first paint, so
 //    there is no hidden -> visible switch on load (transitions only run on change)
-//  - animations touch transform / opacity only (compositor friendly): no
-//    clip-path, no filter glows, no backdrop blur
+//  - animations touch transform / opacity only (compositor friendly)
 //  - the card has a fixed height and its photo sits in a fixed box, so a late
 //    font or image can never move anything
 //  - the progress bars render an empty track until the clock starts, then fill
-//    from zero (the old placeholder bar jumped when the clock started)
+//    from zero
 const PROMO_CSS = `
   @keyframes promoFill {
     from { transform: scaleX(0); }
@@ -134,13 +122,7 @@ const PROMO_CSS = `
   /* One diagonal light sweep, then a long rest. transform only. */
   @keyframes promoShine {
     0%        { transform: translateX(-160%) skewX(-24deg); }
-    22%, 100% { transform: translateX(560%)  skewX(-24deg); }
-  }
-  /* The seal settles in with a small overshoot (no opacity change) */
-  @keyframes promoPop {
-    0%   { transform: scale(0.7) rotate(-16deg); }
-    60%  { transform: scale(1.08) rotate(-4deg); }
-    100% { transform: scale(1) rotate(-6deg); }
+    22%, 100% { transform: translateX(700%)  skewX(-24deg); }
   }
 
   /* Slides share one grid cell and cross-fade. Inactive slides become
@@ -148,7 +130,7 @@ const PROMO_CSS = `
   .promo-slide {
     opacity: 0;
     visibility: hidden;
-    transform: translateY(10px) scale(0.985);
+    transform: translateY(8px);
     pointer-events: none;
     transition: opacity 0.4s ease, transform 0.4s ease, visibility 0s linear 0.4s;
   }
@@ -160,15 +142,12 @@ const PROMO_CSS = `
     transition: opacity 0.5s ease 0.1s, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.1s, visibility 0s;
   }
 
-  .promo-badge { transform: rotate(-6deg); }
-  .promo-slide[data-active="true"] .promo-badge { animation: promoPop 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
   .promo-slide[data-active="true"] .promo-shine { animation: promoShine 6.5s ease-in-out 0.6s infinite; }
 
   .promo-fill { transform-origin: left; animation: promoFill ${PROMO_MS}ms linear forwards; }
 
   @media (prefers-reduced-motion: reduce) {
     .promo-slide, .promo-slide[data-active="true"] { transition: none; transform: none; }
-    .promo-slide[data-active="true"] .promo-badge,
     .promo-slide[data-active="true"] .promo-shine { animation: none; }
     .promo-shine { display: none; }
     .promo-fill { animation: none; transform: scaleX(1); }
@@ -177,8 +156,12 @@ const PROMO_CSS = `
 
 // -----------------------------------------------------------------------------
 // PromoBanner
-// Bold, fixed-height card; one promo at a time; thin progress bars underneath.
+// Compact colour card: round photo, title + one line, offer chip, arrow.
+// One promo at a time, thin progress bars underneath.
 // `ready` (page loaded + fonts in) only starts the rotation clock.
+// The outer wrapper (innerRef) hides on scroll down and returns on scroll up,
+// exactly like TourSelect (see the effect in Hero). The slides inside animate
+// with CSS only, so the two never touch the same element.
 // -----------------------------------------------------------------------------
 const PromoBanner = ({
   innerRef,
@@ -193,7 +176,7 @@ const PromoBanner = ({
     ref={innerRef}
     onMouseEnter={() => setPaused(true)}
     onMouseLeave={() => setPaused(false)}
-    className="relative mt-3 w-full max-w-4xl self-center px-2 sm:mt-0 sm:px-0"
+    className="relative mt-3 w-full max-w-xl self-center px-2 sm:mt-0 sm:px-0"
   >
     <style>{PROMO_CSS}</style>
 
@@ -213,23 +196,23 @@ const PromoBanner = ({
               aria-label={`${p.cta}: ${p.title}`}
               aria-hidden={!isActive}
               tabIndex={isActive ? 0 : -1}
-              className={`group relative isolate flex h-[88px] w-full transform-gpu items-center gap-3 overflow-hidden rounded-2xl p-2.5 shadow-[0_14px_32px_rgba(0,0,0,0.30),inset_0_1px_0_rgba(255,255,255,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:h-[108px] sm:gap-4 sm:p-3 ${p.card}`}
+              className={`group relative isolate flex h-[60px] w-full transform-gpu items-center gap-3 overflow-hidden rounded-2xl p-2 pr-2.5 shadow-[0_10px_24px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:h-[68px] sm:gap-3.5 ${p.card}`}
             >
               {/* top gloss */}
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-1/2 bg-gradient-to-b from-white/25 to-transparent"
+                className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-1/2 bg-gradient-to-b from-white/20 to-transparent"
               />
               {/* light sweep */}
               <span
                 aria-hidden="true"
-                className="promo-shine pointer-events-none absolute inset-y-0 left-0 -z-10 w-[16%] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.55),transparent)]"
+                className="promo-shine pointer-events-none absolute inset-y-0 left-0 -z-10 w-[10%] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent)]"
               />
 
-              {/* Cover photo (tablet and up) */}
+              {/* Round cover photo */}
               <span
                 aria-hidden="true"
-                className={`hidden h-full w-28 shrink-0 overflow-hidden rounded-xl bg-black/10 ring-2 sm:block md:w-40 ${p.ring}`}
+                className="aspect-square h-full shrink-0 overflow-hidden rounded-xl bg-black/10 ring-2 ring-white/70"
               >
                 {p.image && (
                   <img
@@ -238,50 +221,34 @@ const PromoBanner = ({
                     loading="eager"
                     decoding="async"
                     draggable={false}
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                   />
                 )}
               </span>
 
               {/* Copy */}
-              <span className="min-w-0 flex-1 leading-snug">
-                <span
-                  className={`hidden rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] sm:inline-block ${p.tagClass}`}
-                >
-                  {p.tag}
-                </span>
-
-                <strong className="block line-clamp-2 text-[15px] font-extrabold leading-tight sm:mt-1 sm:line-clamp-1 sm:text-lg md:text-xl">
+              <span className="min-w-0 flex-1 leading-tight">
+                <strong className="block truncate text-[14px] font-extrabold sm:text-base">
                   {p.title}
                 </strong>
-
-                <span className="mt-0.5 block truncate text-[12px] font-medium opacity-90 sm:hidden">
+                <span className="mt-0.5 block truncate text-[12px] font-medium text-white/90 sm:text-[13px]">
                   {p.short}
                 </span>
-                <span className="hidden text-[13px] font-medium leading-snug opacity-90 sm:line-clamp-2">
-                  {p.text}
-                </span>
               </span>
 
-              {/* Offer seal */}
+              {/* Offer chip (tablet and up) */}
               <span
                 aria-hidden="true"
-                className={`promo-badge flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-full border-2 border-dashed bg-white text-center shadow-[0_4px_10px_rgba(0,0,0,0.25)] sm:h-[4.5rem] sm:w-[4.5rem] ${p.sealClass}`}
+                className={`hidden shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] sm:inline-block ${p.badgeClass}`}
               >
-                <span className="whitespace-nowrap text-[15px] font-extrabold leading-none sm:text-xl">
-                  {p.stamp.big}
-                </span>
-                <span className="mt-[3px] whitespace-nowrap text-[8.5px] font-semibold leading-none sm:text-[10px]">
-                  {p.stamp.small}
-                </span>
+                {p.badge}
               </span>
 
-              {/* CTA */}
+              {/* Arrow */}
               <span
                 aria-hidden="true"
-                className={`inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3 font-bitter text-xs font-black shadow-[0_6px_14px_rgba(0,0,0,0.22)] transition-colors sm:px-4 sm:text-sm ${p.ctaClass}`}
+                className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.22)] transition-colors sm:h-9 sm:w-9 ${p.ctaClass}`}
               >
-                <span className="hidden md:inline">{p.cta}</span>
                 <svg
                   className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
                   viewBox="0 0 24 24"
@@ -301,7 +268,7 @@ const PromoBanner = ({
     </div>
 
     {/* Progress bars: the active one fills over PROMO_MS, all are clickable */}
-    <div className="mt-1 flex justify-center gap-2">
+    <div className="mt-0.5 flex justify-center gap-2">
       {promos.map((p, i) => {
         const isActive = i === active;
 
@@ -314,7 +281,7 @@ const PromoBanner = ({
             onClick={() => onSelect(i)}
             className="py-2"
           >
-            <span className="relative block h-1 w-10 overflow-hidden rounded-full bg-white/35 shadow-[0_1px_3px_rgba(0,0,0,0.35)] transition-colors hover:bg-white/55 sm:w-12">
+            <span className="relative block h-1 w-8 overflow-hidden rounded-full bg-white/40 shadow-[0_1px_3px_rgba(0,0,0,0.35)] transition-colors hover:bg-white/60 sm:w-10">
               {isActive && ready && (
                 <span
                   aria-hidden="true"
@@ -355,7 +322,6 @@ const Hero = () => {
 
   const heroRef = useRef(null);
   const contentRef = useRef(null);
-  const tourSelectRef = useRef(null);
   const promoRef = useRef(null);
   const scrollRef = useRef(null);
   const shineRef = useRef(null);
@@ -429,25 +395,65 @@ const Hero = () => {
     };
   }, []);
 
-  // Pin TourSelect while the hero scrolls away (desktop only)
+  // NOTE: there is no ScrollTrigger in this component. Home.jsx pins the whole
+  // hero and About slides up over it; a second pin in here would nest inside
+  // Home's pin and cause jitter.
+
+  // Promo banner hide / show, the same as TourSelect: it hides by moving UP
+  // (and fading), and reveals by coming back DOWN into place. The banner sits in the pinned hero, so it stays at the same
+  // spot on screen. TourSelect is part of the page, so it only comes back into
+  // view when you are back at the top; the banner therefore only returns at the
+  // top of the page too, not on any scroll up. Uses the native scroll event,
+  // which Lenis keeps updating, so it works with or without Lenis.
   useEffect(() => {
-    const mm = gsap.matchMedia();
+    const el = promoRef.current;
+    if (!el) return;
 
-    mm.add("(min-width: 768px)", () => {
-      if (!heroRef.current || !tourSelectRef.current) return;
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
-      const st = ScrollTrigger.create({
-        trigger: heroRef.current,
-        start: "top top",
-        end: "bottom top",
-        pin: tourSelectRef.current,
-        pinSpacing: false,
+    const TOP_PX = 5; // at or above this scroll position counts as "at the top"
+    let hidden = false;
+
+    const show = () => {
+      if (!hidden) return;
+      hidden = false;
+      gsap.to(el, {
+        y: 0,
+        autoAlpha: 1,
+        duration: 0.4,
+        ease: "power3.out",
+        overwrite: true,
       });
+    };
 
-      return () => st.kill();
-    });
+    const hide = () => {
+      if (hidden) return;
+      hidden = true;
+      gsap.to(el, {
+        y: reduceMotion ? 0 : -40,
+        autoAlpha: 0,
+        duration: reduceMotion ? 0.01 : 0.35,
+        ease: "power3.out",
+        overwrite: true,
+      });
+    };
 
-    return () => mm.revert();
+    const onScroll = () => {
+      if ((window.scrollY || 0) <= TOP_PX) show();
+      else hide();
+    };
+
+    gsap.set(el, { y: 0, autoAlpha: 1, force3D: true });
+    onScroll(); // correct state if the page loads already scrolled
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      gsap.killTweensOf(el);
+      gsap.set(el, { clearProps: "transform,opacity,visibility" });
+    };
   }, []);
 
   // Intro + looping animations
@@ -473,31 +479,15 @@ const Hero = () => {
         }
       }
 
-      if (!reduceMotion && first) {
-        gsap.fromTo(
-          first,
-          { scale: 1.02 },
-          { scale: 1.08, duration: 7, ease: "power1.out" },
-        );
-      }
-
       if (reduceMotion) return;
 
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-
-      if (tourSelectRef.current) {
-        tl.from(tourSelectRef.current, { y: -10, opacity: 0, duration: 0.75 });
-      }
 
       // NOTE: the promo banner is NOT animated with GSAP. It animates with CSS
       // (see PROMO_CSS); GSAP would fight those transforms and opacity.
 
       if (scrollRef.current) {
-        tl.from(
-          scrollRef.current,
-          { y: 60, opacity: 0, duration: 0.55 },
-          "-=0.25",
-        );
+        tl.from(scrollRef.current, { y: 60, opacity: 0, duration: 0.55 });
       }
 
       if (arrowRef.current) {
@@ -530,7 +520,7 @@ const Hero = () => {
 
   // Automatic slideshow (pauses in background tabs, off for reduced motion)
   useEffect(() => {
-    if (!extrasReady || slides.length <= 1) return;
+    if (!SLIDE_AUTOPLAY || !extrasReady || slides.length <= 1) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const interval = setInterval(() => {
@@ -579,7 +569,7 @@ const Hero = () => {
     };
   }, [promoReady, promoPaused, promoState.active]);
 
-  // Slide cross-fade
+  // Slide cross-fade: slow and still (no zoom, no movement) so it stays calm.
   useEffect(() => {
     const prev = prevSlide.current;
     const next = currentSlide;
@@ -590,13 +580,12 @@ const Hero = () => {
     if (!prevBg || !nextBg) return;
 
     gsap.killTweensOf([prevBg, nextBg]);
-    gsap.set(nextBg, { opacity: 0, scale: 1.02 });
+    gsap.set(nextBg, { opacity: 0 });
 
     gsap
       .timeline()
-      .to(prevBg, { opacity: 0, duration: 1.2, ease: "power2.inOut" }, 0)
-      .to(nextBg, { opacity: 1, duration: 1.2, ease: "power2.inOut" }, 0)
-      .to(nextBg, { scale: 1.08, duration: 6.5, ease: "power1.out" }, 0);
+      .to(prevBg, { opacity: 0, duration: FADE_S, ease: "power1.inOut" }, 0)
+      .to(nextBg, { opacity: 1, duration: FADE_S, ease: "power1.inOut" }, 0);
 
     prevSlide.current = next;
   }, [currentSlide]);
@@ -609,29 +598,32 @@ const Hero = () => {
       aria-label="Cape Frontier hero"
       className="relative h-[100svh] min-h-[100svh] w-full max-w-full overflow-x-hidden overflow-y-clip bg-[#0b1220] font-frank text-white"
     >
-      {/* Real <img> elements: crawlable, preloadable, and alt-texted.
-          Slide 1 is eager + high priority; the rest are added after load. */}
-      {visibleSlides.map((slide, index) => (
-        <img
-          key={slide.key}
-          ref={(el) => {
-            bgRefs.current[index] = el;
-          }}
-          src={toSrc(slide.image)}
-          alt={slide.alt}
-          aria-hidden={index !== currentSlide}
-          loading={index === 0 ? "eager" : "lazy"}
-          fetchPriority={index === 0 ? "high" : "auto"}
-          decoding={index === 0 ? "sync" : "async"}
-          draggable={false}
-          onError={(e) =>
-            console.error("[Hero] image failed to load:", e.currentTarget.src)
-          }
-          className={`absolute inset-0 h-full w-full object-cover will-change-transform ${
-            index === 0 ? "opacity-100" : "opacity-0"
-          }`}
-        />
-      ))}
+      {/* Photo layer: a plain full-size box, the photos sit still inside it. */}
+      <div className="absolute inset-0">
+        {/* Real <img> elements: crawlable, preloadable, and alt-texted.
+            Slide 1 is eager + high priority; the rest are added after load. */}
+        {visibleSlides.map((slide, index) => (
+          <img
+            key={slide.key}
+            ref={(el) => {
+              bgRefs.current[index] = el;
+            }}
+            src={toSrc(slide.image)}
+            alt={slide.alt}
+            aria-hidden={index !== currentSlide}
+            loading={index === 0 ? "eager" : "lazy"}
+            fetchPriority={index === 0 ? "high" : "auto"}
+            decoding={index === 0 ? "sync" : "async"}
+            draggable={false}
+            onError={(e) =>
+              console.error("[Hero] image failed to load:", e.currentTarget.src)
+            }
+            className={`absolute inset-0 h-full w-full object-cover will-change-transform ${
+              index === 0 ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        ))}
+      </div>
 
       {/* Background glow */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.14),transparent_36%)]" />
@@ -644,12 +636,10 @@ const Hero = () => {
           {/* SEO: the page needs exactly one <h1>. */}
           <h1 className="sr-only">{site.heroH1}</h1>
 
-          {/* Placeholder used for the desktop TourSelect pinning.
-              Adjust the min heights if the banner overlaps the search box. */}
-          <div
-            ref={tourSelectRef}
-            className="w-full max-w-5xl min-h-[200px] sm:min-h-[200px] md:min-h-[100px] lg:min-h-[80px]"
-          />
+          {/* Spacer that reserves room for the TourSelect, which Home.jsx
+              renders above the hero. Adjust the min heights if the banner
+              overlaps the search box. */}
+          <div className="w-full max-w-5xl min-h-[200px] sm:min-h-[200px] md:min-h-[100px] lg:min-h-[80px]" />
 
           {/* Promo banner: Cape Peninsula + Heritage, one at a time */}
           <PromoBanner

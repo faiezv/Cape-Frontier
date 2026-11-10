@@ -577,16 +577,6 @@ function Tours() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // ── Fix Navbar Logo/Titles when at the top of the page ──────────────────
-  useEffect(() => {
-    if (!scrolled) {
-      document.body.classList.add("tours-at-top");
-    } else {
-      document.body.classList.remove("tours-at-top");
-    }
-    return () => document.body.classList.remove("tours-at-top");
-  }, [scrolled]);
-
   // ── Derived data ────────────────────────────────────────────────────────
   const promoList = useMemo(() => tours.filter((t) => t.onPromo), []);
   const hasPromos = promoList.length > 0;
@@ -779,20 +769,6 @@ function Tours() {
 
   return (
     <>
-      {/* Fix for dark logo/title on dark background at the top of the page */}
-      <style>{`
-        body.tours-at-top header a[href="/"] img,
-        body.tours-at-top header a[href="/"] svg {
-          filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0,0,0,0.15)) !important;
-          transition: filter 0.3s ease;
-        }
-        body.tours-at-top header a[href="/"] span,
-        body.tours-at-top header a[href="/"] h1,
-        body.tours-at-top header a[href="/"] p {
-          color: #ffffff !important;
-          transition: color 0.3s ease;
-        }
-      `}</style>
 
       {/* path is required: without it the canonical becomes `${origin}undefined` */}
       <Seo

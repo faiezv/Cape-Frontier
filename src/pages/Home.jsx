@@ -21,6 +21,13 @@ gsap.registerPlugin(ScrollTrigger);
 // it hidden while the tours list is on screen.
 const HIDE_BUTTON_OVER_TOURS = false;
 
+// -----------------------------------------------------------------------------
+// Hero scroll effect (curtain reveal)
+// The hero stays pinned and still: no scaling, fading, dimming or parallax. The
+// About section simply slides up over it. TourSelect and the promo banner hide
+// by moving up and come back by moving down.
+// -----------------------------------------------------------------------------
+
 const isTouchDevice = () => {
   if (typeof window === "undefined") return false;
   return (
@@ -159,7 +166,7 @@ const Home = () => {
         if (hidden) return;
         hidden = true;
         gsap.to(section, {
-          y: 100,
+          y: -40,
           autoAlpha: 0,
           duration: 0.35,
           ease: "power3.out",
@@ -248,20 +255,6 @@ const Home = () => {
         // can kill the ScrollTrigger, remove the pin-spacer and restore
         // inline styles on unmount.
         ctx = gsap.context(() => {
-          const resetHero = () => {
-            gsap.set(heroEl, {
-              clearProps: "filter",
-              scale: 1,
-              opacity: 1,
-              x: 0,
-              y: 0,
-              transformOrigin: "center top",
-              force3D: true,
-              backfaceVisibility: "hidden",
-              willChange: "transform, opacity",
-            });
-          };
-
           const getHeroScrollDistance = () => {
             const heroHeight = heroEl.offsetHeight || 0;
             const visualHeight = window.visualViewport?.height || 0;
@@ -269,19 +262,17 @@ const Home = () => {
             return Math.max(heroHeight, visualHeight, windowHeight, 1);
           };
 
-          resetHero();
-
-          gsap.set([heroEl, aboutEl], {
+          // Only About moves as a whole. The hero itself is never scaled.
+          gsap.set(aboutEl, {
+            y: 40,
             force3D: true,
             backfaceVisibility: "hidden",
-            willChange: "transform, opacity",
+            willChange: "transform",
           });
-
-          gsap.set(aboutEl, { y: 40 });
 
           const tl = gsap.timeline({
             scrollTrigger: {
-              id: "home-hero-pin-scale",
+              id: "home-hero-pin-curtain",
               trigger: heroEl,
               start: "top top",
               end: () =>
@@ -294,28 +285,14 @@ const Home = () => {
               anticipatePin: touchDevice ? 0 : 1,
               invalidateOnRefresh: true,
               refreshPriority: 5,
-              onRefreshInit: () => {
-                if (window.scrollY <= 2) resetHero();
-              },
               onRefresh: (self) => {
-                if (window.scrollY <= 2) {
-                  self.animation?.progress(0);
-                  resetHero();
-                }
+                if (window.scrollY <= 2) self.animation?.progress(0);
               },
             },
           });
 
-          tl.to(aboutEl, { y: 0, force3D: true, ease: "none" }, 0).to(
-            heroEl,
-            {
-              scale: touchDevice ? 0.72 : 0.6,
-              opacity: touchDevice ? 0.82 : 0.1,
-              force3D: true,
-              ease: "none",
-            },
-            0,
-          );
+          // About rises into place: this is the "curtain".
+          tl.to(aboutEl, { y: 0, force3D: true, ease: "none" }, 0);
         }, pageRef);
 
         ScrollTrigger.refresh(true);

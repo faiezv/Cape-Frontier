@@ -8397,7 +8397,7 @@ export const tours = [
     slug: "3-day-garden-route-safari-escape",
     canonicalPath: "/tours/3-day-garden-route-safari-escape",
     childFriendly: true, // family packages offered for children 3–11 (QUERY CLIENT: minimum age)
-    // daysInAdvance: ???, // QUERY CLIENT (booking cut-off)
+    daysInAdvance: 30, // QUERY CLIENT (booking cut-off)
 
     seo: {
       title:
@@ -9059,7 +9059,7 @@ export const tours = [
     slug: "4-day-cape-town-signature-explorer",
     canonicalPath: "/tours/4-day-cape-town-signature-explorer",
     childFriendly: true, // family pricing offered (QUERY CLIENT: child age range; Day 4 includes wine tastings)
-    // daysInAdvance: ???, // QUERY CLIENT (booking cut-off)
+    daysInAdvance: 30,
 
     seo: {
       title:
@@ -9941,7 +9941,7 @@ export const tours = [
     slug: "4-day-garden-route-safari-explorer",
     canonicalPath: "/tours/4-day-garden-route-safari-explorer",
     childFriendly: true, // children aged 4–11 priced (QUERY CLIENT: other ages)
-    // daysInAdvance: ???, // QUERY CLIENT (booking cut-off)
+    daysInAdvance: 30,
 
     seo: {
       title:
