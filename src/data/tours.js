@@ -8152,7 +8152,6 @@ export const tours = [
               duration: "",
               type: "transfer",
               optional: false,
-              image: "",
             },
             {
               id: "d1-route62",
@@ -8198,10 +8197,9 @@ export const tours = [
             availabilityNote:
               "Accommodation to be confirmed based on guest preference and availability.",
             options: ["3-star guesthouse or lodge", "Breakfast included"],
-            image: "",
+            image: "/src/assets/images/accomodation/gondwana-game-reserve.webp", // TODO
           },
 
-          images: [],
         },
 
         {
@@ -8334,7 +8332,6 @@ export const tours = [
               duration: "",
               type: "safari",
               optional: false,
-              image: "",
             },
             {
               id: "d3-breakfast",
@@ -8345,7 +8342,6 @@ export const tours = [
               duration: "",
               type: "food",
               optional: false,
-              image: "",
             },
             {
               id: "d3-museum",
@@ -8356,7 +8352,6 @@ export const tours = [
               duration: "",
               type: "heritage",
               optional: false,
-              image: "",
             },
             {
               id: "d3-zipline",
@@ -8367,7 +8362,6 @@ export const tours = [
               duration: "",
               type: "adventure",
               optional: true,
-              image: "",
             },
             {
               id: "d3-return",
@@ -8378,14 +8372,12 @@ export const tours = [
               duration: "",
               type: "transfer",
               optional: false,
-              image: "",
             },
           ],
 
           // QUERY CLIENT: Day 3 lunch is mentioned in the itinerary but not listed as included
           meals: { breakfast: true, lunch: false, dinner: false },
 
-          images: [],
         },
       ],
     },
@@ -10286,7 +10278,7 @@ export const tours = [
 
       route: {
         title:
-          "Cape Town → Gondwana → Oudtshoorn → Knysna → Tsitsikamma → Hermanus → Cape Town",
+          "Cape Town → Gondwana → Oudtshoorn → Knysna → Tsitsikamma → Cape Town",
         description: "",
       },
 

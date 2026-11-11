@@ -80,6 +80,18 @@ const deriveSeatState = (assignments) => {
   };
 };
 
+const clampAssignments = (assignments, limit) => {
+  let kept = 0;
+  return (assignments || []).map((band) => {
+    if (!band) return null;
+    if (kept < limit) {
+      kept++;
+      return band;
+    }
+    return null;
+  });
+};
+
 const Booking = ({ embeddedTour, bookingData }) => {
   const nav = useNavigate();
   const location = useLocation();
@@ -158,6 +170,16 @@ const Booking = ({ embeddedTour, bookingData }) => {
   const minPeople = tour?.minPeople ?? 1;
   const childFriendly = tour?.childFriendly !== false;
 
+  // Tour-specific cap (tour.maxPeople), never above vehicle capacity.
+  // Ignored when missing or lower than minPeople.
+  const rawMaxPeople = Number(tour?.maxPeople);
+  const tourMaxPeople =
+    Number.isFinite(rawMaxPeople) &&
+    Math.floor(rawMaxPeople) >= Math.max(minPeople, 1)
+      ? Math.floor(rawMaxPeople)
+      : null;
+  const maxPeople = Math.min(MAX_GUESTS, tourMaxPeople ?? MAX_GUESTS);
+
   // ─── Seat helpers ────────────────────────────────────────────
   const syncSeatDerived = (prev, assignments) => {
     const d = deriveSeatState(assignments);
@@ -187,10 +209,12 @@ const Booking = ({ embeddedTour, bookingData }) => {
         const adultSeats = assignments.filter((a) => a === "adult").length;
         if (adultSeats <= 1) return;
       }
+
       setFormData((prev) => {
         const p = prev.seatAssignments || Array(MAX_GUESTS).fill(null);
+        if (p.filter(Boolean).length >= maxPeople) return prev;
         const next = [...p];
-        next[seatIndex] = null;
+        next[seatIndex] = band;
         return syncSeatDerived(prev, next);
       });
       return;
@@ -215,7 +239,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
   };
 
   const handleResetSeats = () => {
-    const start = Math.max(1, Math.min(minPeople, MAX_GUESTS));
+    const start = Math.max(1, Math.min(minPeople, maxPeople));
     const assignments = Array(MAX_GUESTS).fill(null);
     for (let i = 0; i < start; i++) assignments[i] = "adult";
     setFormData((prev) => syncSeatDerived(prev, assignments));
@@ -671,7 +695,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
   useEffect(() => {
     if (!tour || bookingData || defaultInitializedRef.current) return;
     defaultInitializedRef.current = true;
-    const start = Math.max(1, Math.min(minPeople, MAX_GUESTS));
+    const start = Math.max(1, Math.min(minPeople, maxPeople));
     const assignments = Array(MAX_GUESTS).fill(null);
     for (let i = 0; i < start; i++) assignments[i] = "adult";
     setFormData((prev) => syncSeatDerived(prev, assignments));
@@ -1032,7 +1056,8 @@ const Booking = ({ embeddedTour, bookingData }) => {
                     bandCounts={bandCounts}
                     participantCount={participantCount}
                     minPeople={minPeople}
-                    maxGuests={MAX_GUESTS}
+                    maxGuests={maxPeople}
+                    tourMaxPeople={tourMaxPeople}
                     childFriendly={childFriendly}
                     isEditing={showGroupEditor}
                     hasSnapshot={Boolean(groupSnapshot)}

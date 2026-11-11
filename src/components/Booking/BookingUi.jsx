@@ -204,8 +204,9 @@ export function BandFlipSwitch({ band, checked, disabled, onToggle }) {
   );
 }
 
-function Seat({ seatIndex, band, onClick }) {
+function Seat({ seatIndex, band, onClick, locked }) {
   const taken = Boolean(band);
+  const blocked = locked && !taken;
   const c = taken ? BAND_COLORS[band] : null;
   const initial = taken ? BAND_INITIAL[band] : "";
 
@@ -213,15 +214,20 @@ function Seat({ seatIndex, band, onClick }) {
     <button
       type="button"
       onClick={onClick}
+      disabled={blocked}
       aria-label={
         taken
           ? `Remove seat ${seatIndex + 1} (${band})`
-          : `Add a guest to seat ${seatIndex + 1}`
+          : blocked
+            ? "Group is full"
+            : `Add a guest to seat ${seatIndex + 1}`
       }
       className={`relative flex h-8 w-full min-w-0 items-center justify-center rounded-md border text-[11px] font-black transition-all duration-150 active:scale-95 ${
         taken
           ? c.seat
-          : "border-dashed border-neutral-300 bg-neutral-50 text-neutral-300 hover:border-neutral-400 hover:bg-neutral-100 hover:text-neutral-500"
+          : blocked
+            ? "cursor-not-allowed border-dashed border-neutral-200 bg-neutral-50 text-neutral-200 active:scale-100"
+            : "border-dashed border-neutral-300 bg-neutral-50 text-neutral-300 hover:border-neutral-400 hover:bg-neutral-100 hover:text-neutral-500"
       }`}
     >
       {taken ? initial : "+"}
@@ -229,7 +235,14 @@ function Seat({ seatIndex, band, onClick }) {
   );
 }
 
-function Vehicle({ vehicleIndex, seatAssignments, onSeatTap, label, disabled }) {
+function Vehicle({
+  vehicleIndex,
+  seatAssignments,
+  onSeatTap,
+  label,
+  disabled,
+  locked,
+}) {
   const startIdx = vehicleIndex * SEATS_PER_VEHICLE;
   const cols = SEATS_PER_VEHICLE / 2;
 
@@ -240,6 +253,7 @@ function Vehicle({ vehicleIndex, seatAssignments, onSeatTap, label, disabled }) 
         key={`${row}-${col}`}
         seatIndex={seatIdx}
         band={seatAssignments[seatIdx] || null}
+        locked={locked}
         onClick={() => onSeatTap(seatIdx)}
       />
     );
@@ -282,10 +296,19 @@ function Vehicle({ vehicleIndex, seatAssignments, onSeatTap, label, disabled }) 
   );
 }
 
-export function VehicleSeating({ seatAssignments, onSeatTap }) {
+export function VehicleSeating({
+  seatAssignments,
+  onSeatTap,
+  maxGuests = MAX_VEHICLES * SEATS_PER_VEHICLE,
+}) {
   const taken = (seatAssignments || []).filter(Boolean).length;
-  const vehiclesShown = Math.min(
+  const locked = taken >= maxGuests;
+  const vehiclesNeeded = Math.min(
     MAX_VEHICLES,
+    Math.max(1, Math.ceil(maxGuests / SEATS_PER_VEHICLE)),
+  );
+  const vehiclesShown = Math.min(
+    vehiclesNeeded,
     Math.floor(taken / SEATS_PER_VEHICLE) + 1,
   );
   const multi = vehiclesShown > 1;
@@ -317,6 +340,7 @@ export function VehicleSeating({ seatAssignments, onSeatTap }) {
                     onSeatTap={onSeatTap}
                     label={multi ? `Vehicle ${v + 1}` : ""}
                     disabled={!visible}
+                    locked={locked}
                   />
                 </div>
               </div>

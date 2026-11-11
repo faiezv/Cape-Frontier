@@ -499,6 +499,7 @@ export function GroupSizeSection({
   participantCount,
   minPeople,
   maxGuests,
+  tourMaxPeople,
   childFriendly,
   isEditing,
   hasSnapshot,
@@ -513,6 +514,7 @@ export function GroupSizeSection({
   const taken = participantCount;
   const isFirstTap = taken === 0;
   const canConfirm = taken >= Math.max(1, minPeople);
+  const atLimit = Number.isFinite(maxGuests) && taken >= maxGuests;
   const activeName = activeBrush ? BAND_COLORS[activeBrush]?.name : "—";
 
   return (
@@ -577,14 +579,13 @@ export function GroupSizeSection({
           <div className="mb-3 flex items-start gap-2 rounded-xl border border-amber-200/80 bg-amber-50/70 px-3 py-2 text-xs text-amber-800">
             <span aria-hidden="true">⚠️</span>
             <span className="min-w-0">
-              <b>This tour is not child-friendly.</b> Only adult seats can
-              be added.
+              <b>This tour is not child-friendly.</b> Only adult seats can be
+              added.
             </span>
           </div>
         )}
 
         <div className="mb-3">
-
           <div className="mx-auto flex w-full min-w-0 max-w-md flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-2">
             {GUEST_BANDS.map((band) => {
               const disabled = band.key !== "adult" && !childFriendly;
@@ -612,10 +613,24 @@ export function GroupSizeSection({
           </div>
         )}
 
+        {tourMaxPeople && (
+          <p className="mb-2 text-center text-[11px] text-neutral-500">
+            This tour takes up to {tourMaxPeople} guests.
+          </p>
+        )}
+
         <VehicleSeating
           seatAssignments={seatAssignments}
           onSeatTap={onSeatTap}
+          maxGuests={maxGuests}
         />
+
+        {atLimit && (
+          <p className="mt-3 rounded-xl border border-amber-200/80 bg-amber-50/70 px-3 py-2 text-center text-xs font-semibold text-amber-800">
+            Maximum group size reached ({maxGuests} guests). Remove a seat to
+            change who is coming.
+          </p>
+        )}
 
         {tour?.groupPricing?.enabled && (
           <button

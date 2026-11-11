@@ -6,6 +6,10 @@ import React, {
   useCallback,
 } from "react";
 import { resolveImage } from "../../utils/ImageLoader";
+import {
+  getItineraryPhoto,
+  isItineraryPhotoPath,
+} from "../../utils/ItineraryPhotos";
 
 /* ============================================================
    VITE TOUR IMAGE ASSETS
@@ -19,6 +23,10 @@ import { resolveImage } from "../../utils/ImageLoader";
 
    import.meta.glob lets Vite discover the assets at build time
    without requiring one import per image.
+
+   (Itinerary photos are found by folder convention instead, see
+   utils/itineraryPhotos.js:
+   src/assets/images/tours/<tour.imageFolder>/ItineraryPhotos/d1/1.webp)
 ============================================================ */
 const tourImageAssets = import.meta.glob(
   "/src/assets/images/tours/**/*.{webp,png,jpg,jpeg}",
@@ -27,6 +35,11 @@ const tourImageAssets = import.meta.glob(
     query: "?url",
     import: "default",
   },
+);
+
+/* Route-stop matching must never pick up itinerary photos */
+const routeAssetKeys = Object.keys(tourImageAssets).filter(
+  (key) => !isItineraryPhotoPath(key),
 );
 
 /* ============================================================
@@ -170,8 +183,8 @@ const ActivityIcon = ({ type, monochrome = false }) => {
 /* ============================================================
    FALLBACK ACTIVITY IMAGES
 
-   These are only used when an activity does NOT have its own
-   `image` property.
+   These are only used when an activity has no image of its own
+   and no photo in the ItineraryPhotos folder.
 ============================================================ */
 const activityImages = {
   transfer: null,
@@ -189,17 +202,32 @@ const activityImages = {
    RESOLVE ACTIVITY IMAGE
 
    Priority:
-   1. activity.image
-   2. type fallback
-   3. nothing
+   1. activity.image (explicit path in the tour data)
+   2. ItineraryPhotos folder:
+      tours/<imageFolder>/ItineraryPhotos/d<day>/<activity number>.webp
+   3. type fallback
+   4. nothing
 ============================================================ */
-const getActivityImage = (activity) => {
+const getActivityImage = (
+  activity,
+  { imageFolder, dayNumber, activityIndex } = {},
+) => {
   if (activity?.image) {
     const resolved = resolveImage(activity.image);
 
     if (resolved) {
       return resolved;
     }
+  }
+
+  const fromFolder = getItineraryPhoto(
+    imageFolder,
+    dayNumber,
+    (activityIndex ?? 0) + 1,
+  );
+
+  if (fromFolder) {
+    return fromFolder;
   }
 
   return activityImages[activity?.type] || null;
@@ -343,16 +371,15 @@ const routeStopImageRules = [
 
 /* ============================================================
    FIND ASSET BY PARTIAL FILENAME
+   (itinerary photos are excluded, see routeAssetKeys)
 ============================================================ */
 const findTourAsset = (parts = []) => {
-  const keys = Object.keys(tourImageAssets);
-
   for (const part of parts) {
     const normalizedPart = part.toLowerCase().replace(/[^a-z0-9]/g, "");
 
     if (!normalizedPart) continue;
 
-    const match = keys.find((key) => {
+    const match = routeAssetKeys.find((key) => {
       // Normalize the full key (remove non-alphanumeric)
       const normalizedKey = key.toLowerCase().replace(/[^a-z0-9]/g, "");
       // Check if the full key contains the normalized part
@@ -675,8 +702,13 @@ const RouteTimeline = ({ route, labels }) => {
 
 /* ============================================================
    MAIN COMPONENT
+
+   Props:
+   - itinerary: the tour's itinerary object
+   - imageFolder: the tour's imageFolder (e.g. "packages/west-coast"),
+     used to find photos in .../ItineraryPhotos/d1/1.webp
 ============================================================ */
-const TourItinerary = ({ itinerary }) => {
+const TourItinerary = ({ itinerary, imageFolder }) => {
   const days = itinerary?.days || [];
 
   const routeLabels = generateRouteLabels(itinerary?.route?.title, days);
@@ -966,6 +998,7 @@ const TourItinerary = ({ itinerary }) => {
                 key={`day-${day.day}-${index}`}
                 day={day}
                 index={index}
+                imageFolder={imageFolder}
                 onClick={() => openDay(index)}
               />
             ))}
@@ -1010,6 +1043,7 @@ const TourItinerary = ({ itinerary }) => {
               dayStarts={dayStarts}
               current={current}
               routeTitle={itinerary.route?.title}
+              imageFolder={imageFolder}
               onStep={stepSlide}
               onGoTo={goToSlide}
               registerScroller={registerScroller}
@@ -1057,12 +1091,25 @@ const TourItinerary = ({ itinerary }) => {
 /* ============================================================
    DAY CARD
 ============================================================ */
-function DayCard({ day, index, onClick }) {
+function DayCard({ day, index, onClick, imageFolder }) {
   const activityTypes = day.activities?.map((a) => a.type) || [];
 
   const previewTypes = activityTypes.slice(0, 3);
 
   const extraCount = activityTypes.length - previewTypes.length;
+
+  /* Hover thumbnails: only activities that actually have a photo */
+  const thumbs = (day.activities || [])
+    .map((activity, activityIndex) => ({
+      key: activity.id ?? activityIndex,
+      alt: activity.title ?? "Activity",
+      src: getActivityImage(activity, {
+        imageFolder,
+        dayNumber: day.day,
+        activityIndex,
+      }),
+    }))
+    .filter((thumb) => thumb.src);
 
   return (
     <button
@@ -1090,16 +1137,19 @@ function DayCard({ day, index, onClick }) {
         </span>
 
         {/* IMAGE ARRAY – hidden initially, slides up on hover */}
-        <div className="flex overflow-x-auto gap-2 opacity-0 translate-y-2 transition-all duration-300 ease-out group-hover:opacity-100 group-hover:translate-y-0">
-          {day.activities?.map((activity, index) => (
-            <img
-              key={activity.id ?? index}
-              src={resolveImage(activity.image)} // try this
-              alt={activity.name ?? "Activity"}
-              className="h-12 w-12 flex-shrink-0 bg-red-400 object-cover"
-            />
-          ))}
-        </div>
+        {thumbs.length > 0 && (
+          <div className="flex overflow-x-auto gap-2 opacity-0 translate-y-2 transition-all duration-300 ease-out group-hover:opacity-100 group-hover:translate-y-0">
+            {thumbs.map((thumb) => (
+              <img
+                key={thumb.key}
+                src={thumb.src}
+                alt={thumb.alt}
+                loading="lazy"
+                className="h-12 w-12 flex-shrink-0 object-cover"
+              />
+            ))}
+          </div>
+        )}
 
         {/* TITLE */}
         <h3
@@ -1154,6 +1204,7 @@ function DayStage({
   dayStarts,
   current,
   routeTitle,
+  imageFolder,
   onStep,
   onGoTo,
   registerScroller,
@@ -1350,12 +1401,18 @@ function DayStage({
                 }}
               >
                 {slide.type === "overview" ? (
-                  <OverviewSlide day={slideDay} mapsUrl={mapsUrl} />
+                  <OverviewSlide
+                    day={slideDay}
+                    mapsUrl={mapsUrl}
+                    imageFolder={imageFolder}
+                  />
                 ) : (
                   <ActivitySlide
                     activity={slideDay.activities[slide.activityIndex]}
                     activityIndex={slide.activityIndex}
                     activityCount={slide.activityCount}
+                    imageFolder={imageFolder}
+                    dayNumber={slideDay.day}
                   />
                 )}
               </div>
@@ -1431,7 +1488,7 @@ function DayStage({
 /* ============================================================
    OVERVIEW SLIDE  (route -> stay)
 ============================================================ */
-function OverviewSlide({ day, mapsUrl }) {
+function OverviewSlide({ day, mapsUrl, imageFolder }) {
   const routeStops = day.route
     ? day.route
         .split("→")
@@ -1442,9 +1499,11 @@ function OverviewSlide({ day, mapsUrl }) {
   const hasRoute = routeStops.length > 0;
   const hasStay = Boolean(day.accommodation?.title);
 
-  const accommodationImage = day.accommodation?.image
-    ? resolveImage(day.accommodation.image)
-    : null;
+  /* accommodation.image wins; otherwise ItineraryPhotos/d<day>/stay.webp */
+  const accommodationImage =
+    (day.accommodation?.image
+      ? resolveImage(day.accommodation.image)
+      : null) || getItineraryPhoto(imageFolder, day.day, "stay");
 
   if (!hasRoute && !hasStay) {
     return (
@@ -1632,8 +1691,18 @@ function OverviewSlide({ day, mapsUrl }) {
 /* ============================================================
    ACTIVITY SLIDE
 ============================================================ */
-function ActivitySlide({ activity, activityIndex, activityCount }) {
-  const image = getActivityImage(activity);
+function ActivitySlide({
+  activity,
+  activityIndex,
+  activityCount,
+  imageFolder,
+  dayNumber,
+}) {
+  const image = getActivityImage(activity, {
+    imageFolder,
+    dayNumber,
+    activityIndex,
+  });
 
   return (
     <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col justify-center gap-4 px-4 pb-20 pt-4 pr-9 sm:gap-5 sm:px-8 sm:pb-16 sm:pt-6 sm:pr-14">
