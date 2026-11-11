@@ -1,7 +1,6 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 
 import vehicles from "../../data/vehicles.js";
-import { resolveImage } from "../../utils/ImageLoader.js";
 
 // ============================================================
 // CONFIG
@@ -116,38 +115,6 @@ const images = buildList(imageModules);
 const hasVideos = videos.length > 0;
 const hasImages = images.length > 0;
 
-// ============================================================
-// 2. FLEET (computed once at module load)
-// ============================================================
-
-const fallbackFleetImages = [1, 2, 3, 4, 5].map((n) => `/images/content/vehicles/${n}.webp`);
-const DEFAULT_DESC =
-  "Comfortable Cape Frontier transport used for private and group tour operations.";
-
-const pick = (v, keys) => {
-  for (const k of keys) if (v?.[k]) return v[k];
-  return null;
-};
-
-const toFleetItem = (v, i) => {
-  const isStr = typeof v === "string";
-  const fallbackTitle = `Cape Frontier vehicle ${i + 1}`;
-  return {
-    id: (!isStr && pick(v, ["id", "slug", "title", "name"])) || `vehicle-${i}`,
-    image: resolveImage(
-      isStr
-        ? v
-        : pick(v, ["image", "img", "src", "photo", "cover"]) || v?.images?.[0] || v?.gallery?.[0]
-    ),
-    title: isStr ? fallbackTitle : pick(v, ["title", "name", "model", "label"]) || fallbackTitle,
-    description: isStr ? DEFAULT_DESC : pick(v, ["description", "desc", "summary", "note"]) || DEFAULT_DESC,
-    capacity: isStr ? "Tour vehicle" : pick(v, ["capacity", "seats", "passengers", "type"]) || "Tour vehicle",
-  };
-};
-
-const fleetSource = Array.isArray(vehicles) && vehicles.length ? vehicles : fallbackFleetImages;
-let fleetItems = fleetSource.map(toFleetItem).filter((v) => v.image);
-if (!fleetItems.length) fleetItems = fallbackFleetImages.map(toFleetItem);
 
 // ============================================================
 // 3. SMALL PIECES
@@ -169,7 +136,7 @@ const Styles = () => (
 );
 
 
-const CloseIcon = () => (
+export const CloseIcon = () => (
   <span className="relative block h-4 w-4" aria-hidden="true">
     <span className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 rotate-45 rounded-full bg-current" />
     <span className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 -rotate-45 rounded-full bg-current" />
@@ -183,7 +150,7 @@ const Chevron = ({ dir }) => (
 );
 
 // Locks page scroll and wires a key handler while a dialog is mounted.
-const useDialog = (onKeyDown) => {
+export const useDialog = (onKeyDown) => {
   const handlerRef = useRef(onKeyDown);
   handlerRef.current = onKeyDown;
   useEffect(() => {
@@ -198,12 +165,12 @@ const useDialog = (onKeyDown) => {
   }, []);
 };
 
-const focusRing =
+export const focusRing =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500";
 
 // Hover zoom only on devices that really hover, so taps on a phone never leave
 // a tile stuck in its zoomed "hover" state.
-const hoverZoom = "[@media(hover:hover)]:group-hover:scale-105";
+export const hoverZoom = "[@media(hover:hover)]:group-hover:scale-105";
 
 // ============================================================
 // 4. IMAGES
@@ -503,19 +470,6 @@ const VideoGallery = () => {
             onLoadedMetadata={(e) => noteAspect(selected.id, e.currentTarget)}
           />
         </div>
-
-        {/*
-        <div className="mt-3 flex items-center justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-1.5">
-            <img src="/icons/mapPin.png" alt="" aria-hidden="true" className="h-3.5 w-3.5 shrink-0 object-contain opacity-50" />
-            <p className="truncate font-bitter text-xs font-semibold italic text-black/50">{selected.location}</p>
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <span className="font-frank text-base font-bold text-black">4.7</span>
-            <StarRating rating={4.7} />
-          </div>
-        </div>
-        */}
       </div>
 
       {/* Filmstrip: paged grid, same See more / See less behaviour as photos */}
@@ -586,74 +540,6 @@ const VideoGallery = () => {
   );
 };
 
-// ============================================================
-// 6. FLEET
-// ============================================================
-
-const FleetCard = memo(({ vehicle, onOpen }) => (
-  <button
-    type="button"
-    onClick={() => onOpen(vehicle)}
-    className={`group w-[9.5rem] shrink-0 snap-start touch-manipulation overflow-hidden rounded-2xl border border-black/[0.06] bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md min-[400px]:w-[10.5rem] lg:w-auto ${focusRing}`}
-  >
-    <div className="h-24 overflow-hidden min-[400px]:h-28 lg:h-32">
-      <img
-        src={vehicle.image}
-        alt={vehicle.title}
-        loading="lazy"
-        decoding="async"
-        className={`h-full w-full object-cover transition-transform duration-500 ${hoverZoom}`}
-      />
-    </div>
-    <div className="p-2.5 sm:p-3">
-      <p className="truncate font-frank text-base font-bold leading-tight text-black">{vehicle.title}</p>
-      <p className="mt-1 truncate font-bitter text-xs font-bold text-green-600">{vehicle.capacity}</p>
-    </div>
-  </button>
-));
-
-const FleetModal = ({ vehicle, onClose }) => {
-  useDialog((e) => e.key === "Escape" && onClose());
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={vehicle.title}
-      className="gf-fade fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:p-4"
-      onClick={onClose}
-    >
-      {/* The card itself does not scroll, so the close button always stays put;
-          only its content area scrolls on short screens. */}
-      <div
-        className="relative flex max-h-full w-full min-w-0 max-w-4xl flex-col overflow-hidden rounded-2xl bg-white p-2 shadow-2xl sm:rounded-3xl sm:p-3"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          type="button"
-          onClick={onClose}
-          autoFocus
-          aria-label="Close fleet image"
-          className={`absolute right-4 top-4 z-20 grid h-11 w-11 place-items-center rounded-full bg-black/70 text-white transition hover:bg-black sm:h-10 sm:w-10 ${focusRing}`}
-        >
-          <CloseIcon />
-        </button>
-
-        <div className="min-h-0 overflow-y-auto overscroll-contain">
-          <img
-            src={vehicle.image}
-            alt={vehicle.title}
-            className="max-h-[50dvh] w-full rounded-xl object-contain sm:max-h-[64dvh] sm:rounded-2xl"
-          />
-          <div className="p-3 sm:p-4">
-            <h3 className="font-frank text-2xl font-bold leading-none text-black sm:text-3xl">{vehicle.title}</h3>
-            <p className="mt-1.5 font-bitter text-sm font-bold text-green-700">{vehicle.capacity}</p>
-            <p className="mt-3 max-w-2xl font-bitter text-sm leading-relaxed text-black/80 sm:text-base">{vehicle.description}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // ============================================================
 // 7. MAIN COMPONENT
@@ -669,15 +555,12 @@ const TABS = [
   { key: "videos", label: "Videos", count: videos.length, show: hasVideos },
 ].filter((t) => t.show);
 
-const GoalsGallery = () => {
+const Gallery = () => {
   const [tab, setTab] = useState("videos");
   const [lightboxIndex, setLightboxIndex] = useState(null);
-  const [fleetVehicle, setFleetVehicle] = useState(null);
 
   const openLightbox = useCallback((i) => setLightboxIndex(i), []);
   const closeLightbox = useCallback(() => setLightboxIndex(null), []);
-  const openFleet = useCallback((v) => setFleetVehicle(v), []);
-  const closeFleet = useCallback(() => setFleetVehicle(null), []);
 
   return (
     // min-w-0 + max-w-full keep this block inside its parent. The one thing
@@ -735,30 +618,8 @@ const GoalsGallery = () => {
         {tab === "videos" && hasVideos && <VideoGallery />}
       </section>
 
-      {/* Fleet */}
-      <section className="mx-auto mt-3 w-full min-w-0 max-w-6xl overflow-hidden rounded-3xl border border-black/[0.06] bg-white p-3 shadow-[0_10px_30px_rgba(15,23,42,0.05)] [contain-intrinsic-size:auto_22rem] [content-visibility:auto] sm:mt-4 sm:rounded-[2rem] sm:p-5">
-        <div className="mb-3 flex items-end justify-between gap-4 sm:mb-4">
-          <h3 className="font-frank text-2xl font-bold leading-none text-black sm:text-3xl">Our fleet</h3>
-          <p className="hidden max-w-sm text-right font-bitter text-xs leading-relaxed text-black/60 lg:block">
-            Vehicles are matched to the route, group size and needs of each booking.
-          </p>
-        </div>
-
-        {/* On phones the strip runs edge to edge inside the card (negative margin
-            + matching padding) so cards slide off the screen edge naturally. */}
-        <div className="-mx-3 flex snap-x touch-pan-x [contain:inline-size] gap-2.5 overflow-x-auto overscroll-x-contain scroll-px-3 px-3 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:-mx-5 sm:scroll-px-5 sm:px-5 lg:mx-0 lg:grid lg:grid-cols-5 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden">
-          {fleetItems.map((v) => (
-            <FleetCard key={v.id} vehicle={v} onOpen={openFleet} />
-          ))}
-        </div>
-      </section>
-
-      {lightboxIndex !== null && (
-        <Lightbox index={lightboxIndex} onChange={setLightboxIndex} onClose={closeLightbox} />
-      )}
-      {fleetVehicle && <FleetModal vehicle={fleetVehicle} onClose={closeFleet} />}
     </div>
   );
 };
 
-export default GoalsGallery;
+export default Gallery;
