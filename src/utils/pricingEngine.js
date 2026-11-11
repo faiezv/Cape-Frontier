@@ -7,6 +7,9 @@ export const convertPrice = (baseAmount = 0, targetCurrency = "ZAR") =>
 export const formatMoney = (amount, currency = "ZAR") =>
   `${currency} ${Number(amount || 0).toFixed(2)}`;
 
+// Kept for any external callers (UI display, legacy imports).
+// NOTE: no longer used inside computePricing — private/custom fees
+// have been removed as a priced feature.
 export const getFee = (tour, type) => {
   const defaults = { private: 750, custom: 500 };
   if (Array.isArray(tour?.additionalPricing)) {
@@ -54,48 +57,32 @@ export const computePricing = ({
 }) => {
   const adults = Math.max(0, Number(adultCount) || 0);
 
+  // ── Age buckets ────────────────────────────────────────────────────
+  // toddler: 0–4, child: 5–11, teen: 12–17
   const normalizedChildAges = (Array.isArray(childAges) ? childAges : [])
     .map((a) => Number(a))
     .filter((a) => Number.isFinite(a) && a >= 0 && a <= 17);
 
-  const toddlers = normalizedChildAges.filter((a) => a <= 5).length;
-  const children = normalizedChildAges.filter((a) => a >= 6 && a <= 11).length;
+  const toddlers = normalizedChildAges.filter((a) => a < 5).length;
+  const children = normalizedChildAges.filter((a) => a >= 5 && a <= 11).length;
   const teens = normalizedChildAges.filter((a) => a >= 12 && a <= 17).length;
 
-  // Total heads (used for display / limits).
+  // All heads (used for limits / display)
   const participantCount = adults + normalizedChildAges.length;
-
-  // ── Qualifying headcount for group pricing ─────────────────────────
-  // Only adults and teens count toward the group-tier threshold.
-  // Toddlers and children do NOT — a "group of 6" means 6 paying
-  // adult-equivalent guests, not 3 adults plus 3 toddlers.
-
-  const counts = {
-    teens: true,
-    children: false,
-    toddlers: false,
-    ...(tour?.groupPricing?.countsTowardTier || {}),
-  };
-
-  const qualifyingHeadcount =
-    adults +
-    (counts.teens ? teens : 0) +
-    (counts.children ? children : 0) +
-    (counts.toddlers ? toddlers : 0);
-
-  const hasOptions = Array.isArray(tour?.options) && tour.options.length > 0;
-  const selectedTourOption = hasOptions
-    ? tour.options.find((o) => o.id === selectedOption) || null
-    : null;
 
   // ── Base prices (ZAR) ──────────────────────────────────────────────
   const getBasePrice = (prefix) => {
     if (!Array.isArray(tour?.pricing)) return 0;
     const entry = tour.pricing.find((p) =>
-      p.category?.toLowerCase().startsWith(prefix.toLowerCase()),
+      p.category?.toLowerCase().trim().startsWith(prefix.toLowerCase()),
     );
     return Number(entry?.pricePerPerson) || 0;
   };
+
+  const hasOptions = Array.isArray(tour?.options) && tour.options.length > 0;
+  const selectedTourOption = hasOptions
+    ? tour.options.find((o) => o.id === selectedOption) || null
+    : null;
 
   let adultPriceZar = getBasePrice("adult");
   if (hasOptions) {
@@ -106,9 +93,20 @@ export const computePricing = ({
     adultPriceZar = Number(tour?.priceBase) || 0;
   }
 
+  // Teen falls back to adult when no teen pricing entry exists.
   const teenPriceZar = getBasePrice("teen") || adultPriceZar;
   const childPriceZar = getBasePrice("child");
   const toddlerPriceZar = getBasePrice("toddler");
+
+  // ── Qualifying headcount for group tiers ───────────────────────────
+  // Rule: teens only count toward the tier threshold when their rate
+  // equals the adult rate. Otherwise only adults qualify. Children
+  // and toddlers never count toward the tier threshold.
+  const EPS = 0.005;
+  const teensCountForTier =
+    Math.abs(teenPriceZar - adultPriceZar) < EPS;
+
+  const qualifyingHeadcount = adults + (teensCountForTier ? teens : 0);
 
   // ── Convert to selected currency ───────────────────────────────────
   const adultPrice = convertPrice(adultPriceZar, currency);
@@ -134,9 +132,6 @@ export const computePricing = ({
   let isCustomQuote = false;
   let groupPricingType = null;
 
-  // Effective per-person rates — initialised to base rates and
-  // overwritten below whenever a group tier changes them. These are
-  // the numbers the UI should render as "× per person".
   let effectiveAdultPrice = adultPrice;
   let effectiveTeenPrice = teenPrice;
   let effectiveChildPrice = childPrice;
@@ -155,7 +150,6 @@ export const computePricing = ({
       Number.isFinite(rawGroupTotal) &&
       rawGroupTotal > 0
     ) {
-      // Fixed group total — convert from ZAR to selected currency
       groupPricingType = "groupTotal";
       discountedSubtotal = convertPrice(rawGroupTotal, currency);
       groupDiscountAmount = Math.max(0, originalSubtotal - discountedSubtotal);
@@ -167,8 +161,6 @@ export const computePricing = ({
       teenDiscountAmount = 0;
       hasDiscount = groupDiscountAmount > 0;
 
-      // Spread the group-total (minus children/toddlers) across the
-      // adult-equivalent guests so the UI can still show a per-person rate.
       const adultTeenCount = adults + teens;
       if (adultTeenCount > 0) {
         const adultTeenPortion = Math.max(
@@ -249,15 +241,9 @@ export const computePricing = ({
     }
   }
 
-  // ── Fees ───────────────────────────────────────────────────────────
-  const privateFee = formData?.isPrivate
-    ? convertPrice(getFee(tour, "private"), currency)
-    : 0;
-  const customFee = formData?.isCustom
-    ? convertPrice(getFee(tour, "custom"), currency)
-    : 0;
-
   // ── Extras ─────────────────────────────────────────────────────────
+  // "fixed" and "quantity" add to the total; "request" and "external"
+  // are selectable but carry no engine-side cost.
   const pricingExtras = Array.isArray(tour?.additionalPricing)
     ? tour.additionalPricing
     : [];
@@ -307,10 +293,7 @@ export const computePricing = ({
   const kaToddlerPrice = Number(selectedKidsActivity?.toddlerPrice) || 0;
 
   const kidsActivityAdultTotal = convertPrice(kaAdultPrice * adults, currency);
-  const kidsActivityChildTotal = convertPrice(
-    kaChildPrice * children,
-    currency,
-  );
+  const kidsActivityChildTotal = convertPrice(kaChildPrice * children, currency);
   const kidsActivityToddlerTotal = convertPrice(
     kaToddlerPrice * toddlers,
     currency,
@@ -319,13 +302,10 @@ export const computePricing = ({
     kidsActivityAdultTotal + kidsActivityChildTotal + kidsActivityToddlerTotal;
 
   // ── Final total ────────────────────────────────────────────────────
+  // Private / custom fees removed from pricing.
   const finalTotal = isCustomQuote
     ? null
-    : discountedSubtotal +
-      privateFee +
-      customFee +
-      extrasTotal +
-      kidsActivityTotal;
+    : discountedSubtotal + extrasTotal + kidsActivityTotal;
 
   const fmt = (n) => formatMoney(n, currency);
 
@@ -335,17 +315,16 @@ export const computePricing = ({
     children,
     toddlers,
     teens,
-    participantCount, // all heads (used for limits / display)
-    qualifyingHeadcount, // adults + teens — the tier-matching count
+    participantCount,
+    qualifyingHeadcount,
 
-    // Per-person base prices (in selected currency)
+    // Per-person base prices (selected currency)
     adultPrice,
     teenPrice,
     childPrice,
     toddlerPrice,
 
-    // Per-person *effective* prices — reflect any group tier that was
-    // applied. UI should use these for "N × rate" rows.
+    // Effective per-person prices (post-group tier)
     effectiveAdultPrice,
     effectiveTeenPrice,
     effectiveChildPrice,
@@ -369,9 +348,9 @@ export const computePricing = ({
     teenDiscountAmount,
     discountedSubtotal,
 
-    // Fees
-    privateFee,
-    customFee,
+    // Fees — returned as 0 for backwards compatibility.
+    privateFee: 0,
+    customFee: 0,
 
     // Extras
     extrasTotal,
@@ -402,8 +381,8 @@ export const computePricing = ({
     displayDiscountedSubtotal: isCustomQuote
       ? "Custom quote"
       : fmt(discountedSubtotal),
-    displayPrivateFee: privateFee > 0 ? fmt(privateFee) : "—",
-    displayCustomFee: customFee > 0 ? fmt(customFee) : "—",
+    displayPrivateFee: "—",
+    displayCustomFee: "—",
     displayExtrasTotal: extrasTotal > 0 ? fmt(extrasTotal) : "—",
     displayKidsActivityTotal: selectedKidsActivity
       ? fmt(kidsActivityTotal)
@@ -417,7 +396,6 @@ export const computePricing = ({
   };
 };
 
-// Called server-side before Paystack charge creation
 export const verifyPriceToken = (token, expectedTourId) => {
   const secret = process.env.PRICE_SECRET;
   try {

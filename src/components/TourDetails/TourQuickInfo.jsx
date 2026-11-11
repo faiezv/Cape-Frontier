@@ -14,7 +14,8 @@ const TourQuickInfo = ({
 }) => {
   const safeTour = tour || {};
 
-  const [activeItem, setActiveItem] = useState("price");
+  // Set to null so nothing is open by default
+  const [activeItem, setActiveItem] = useState(null);
 
   const detailsRef = useRef(null);
   const detailContentRef = useRef(null);
@@ -133,8 +134,10 @@ const TourQuickInfo = ({
     },
   ];
 
-  const activeItemData =
-    items.find((item) => item.id === activeItem) || items[0];
+  // Safely find the active data or return null
+  const activeItemData = activeItem
+    ? items.find((item) => item.id === activeItem)
+    : null;
 
   useLayoutEffect(() => {
     if (!detailsRef.current || !detailContentRef.current) return;
@@ -143,6 +146,17 @@ const TourQuickInfo = ({
 
     gsap.killTweensOf([detailsRef.current, content]);
 
+    // If nothing is active, animate height to 0
+    if (!activeItemData) {
+      gsap.to(detailsRef.current, {
+        height: 0,
+        duration: 0.35,
+        ease: "power3.out",
+      });
+      return;
+    }
+
+    // If active, animate open
     gsap.set(content, {
       opacity: 0,
       y: 8,
@@ -167,34 +181,24 @@ const TourQuickInfo = ({
       delay: 0.08,
       ease: "power2.out",
     });
-  }, [activeItem]);
+  }, [activeItem, activeItemData]);
 
   if (!tour) return null;
 
   const handleSelect = (id) => {
-    setActiveItem(id);
+    // Toggle: if clicking the same item, close it. Otherwise, open the new one.
+    setActiveItem((prev) => (prev === id ? null : id));
   };
 
   return (
-    <section className="relative z-20 mx-auto w-full max-w-6xl px-4 py-5 sm:px-5 lg:px-6">
+    <section className="relative z-20 mx-auto w-full max-w-7xl px-4 py-5 sm:px-5 lg:px-6">
       <div className="overflow-hidden rounded-[1.5rem] border border-blue-100 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.10)]">
-
-        {/* ------------------------------------------------ */}
-        {/* INDICATOR                                       */}
-        {/* ------------------------------------------------ */}
-
-        <div className="border-b border-blue-50 bg-blue-50/40 px-4 py-2.5 text-center sm:px-6">
-          <p className="font-bitter text-[10px] font-bold uppercase tracking-[0.18em] text-blue-500 sm:text-[11px]">
-            Tap an icon to explore
-          </p>
-        </div>
 
         {/* ------------------------------------------------ */}
         {/* ICON BUTTONS                                    */}
         {/* ------------------------------------------------ */}
 
         <div className="grid grid-cols-4 border-b border-blue-100">
-
           {items.map((item) => {
             const isActive = activeItem === item.id;
             const isPrice = item.accent === "price";
@@ -307,83 +311,85 @@ const TourQuickInfo = ({
             ref={detailContentRef}
             className="px-5 py-5 sm:px-7 sm:py-6 lg:px-8"
           >
-            <div
-              className={`
-                rounded-2xl border p-4
-                sm:p-5
-                ${
-                  activeItemData.accent === "price"
-                    ? "border-blue-100 bg-blue-50/50"
-                    : activeItemData.accent === "rating"
-                      ? "border-amber-100 bg-amber-50/40"
-                      : "border-neutral-100 bg-neutral-50/70"
-                }
-              `}
-            >
-              {/* Label */}
-              <div className="mb-2 flex items-center gap-2">
-                <span
-                  className={`
-                    flex h-7 w-7 shrink-0 items-center justify-center
-                    rounded-full
-                    ${
-                      activeItemData.accent === "price"
-                        ? "bg-blue-600 text-white"
-                        : activeItemData.accent === "rating"
-                          ? "bg-amber-100 text-amber-600"
-                          : "bg-blue-100 text-blue-700"
-                    }
-                  `}
-                >
-                  {React.cloneElement(activeItemData.icon, {
-                    className: "h-3.5 w-3.5",
-                  })}
-                </span>
-
-                <span
-                  className={`
-                    font-bitter text-[10px]
-                    font-bold uppercase
-                    tracking-[0.16em]
-                    ${
-                      activeItemData.accent === "rating"
-                        ? "text-amber-600"
-                        : "text-blue-500"
-                    }
-                  `}
-                >
-                  {activeItemData.title}
-                </span>
-              </div>
-
-              {/* Main value */}
-              <p
+            {activeItemData && (
+              <div
                 className={`
-                  break-words font-bitter
-                  text-lg font-bold leading-snug
-                  sm:text-xl
+                  rounded-2xl border p-4
+                  sm:p-5
                   ${
                     activeItemData.accent === "price"
-                      ? "text-blue-700"
+                      ? "border-blue-100 bg-blue-50/50"
                       : activeItemData.accent === "rating"
-                        ? "text-neutral-950"
-                        : "text-neutral-950"
+                        ? "border-amber-100 bg-amber-50/40"
+                        : "border-neutral-100 bg-neutral-50/70"
                   }
                 `}
               >
-                {activeItemData.value}
-              </p>
+                {/* Label */}
+                <div className="mb-2 flex items-center gap-2">
+                  <span
+                    className={`
+                      flex h-7 w-7 shrink-0 items-center justify-center
+                      rounded-full
+                      ${
+                        activeItemData.accent === "price"
+                          ? "bg-blue-600 text-white"
+                          : activeItemData.accent === "rating"
+                            ? "bg-amber-100 text-amber-600"
+                            : "bg-blue-100 text-blue-700"
+                      }
+                    `}
+                  >
+                    {React.cloneElement(activeItemData.icon, {
+                      className: "h-3.5 w-3.5",
+                    })}
+                  </span>
 
-              {/* Description */}
-              <p className="mt-2 max-w-3xl font-bitter text-xs leading-relaxed text-neutral-500 sm:text-sm">
-                {activeItemData.description}
-              </p>
+                  <span
+                    className={`
+                      font-bitter text-[10px]
+                      font-bold uppercase
+                      tracking-[0.16em]
+                      ${
+                        activeItemData.accent === "rating"
+                          ? "text-amber-600"
+                          : "text-blue-500"
+                      }
+                    `}
+                  >
+                    {activeItemData.title}
+                  </span>
+                </div>
 
-              {/* Reviews */}
-              {activeItem === "reviews" && (
-                <ReviewsPreview reviews={tourReviews} />
-              )}
-            </div>
+                {/* Main value */}
+                <p
+                  className={`
+                    break-words font-bitter
+                    text-lg font-bold leading-snug
+                    sm:text-xl
+                    ${
+                      activeItemData.accent === "price"
+                        ? "text-blue-700"
+                        : activeItemData.accent === "rating"
+                          ? "text-neutral-950"
+                          : "text-neutral-950"
+                    }
+                  `}
+                >
+                  {activeItemData.value}
+                </p>
+
+                {/* Description */}
+                <p className="mt-2 max-w-3xl font-bitter text-xs leading-relaxed text-neutral-500 sm:text-sm">
+                  {activeItemData.description}
+                </p>
+
+                {/* Reviews */}
+                {activeItem === "reviews" && (
+                  <ReviewsPreview reviews={tourReviews} />
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

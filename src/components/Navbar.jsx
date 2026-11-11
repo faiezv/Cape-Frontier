@@ -274,7 +274,7 @@ const Navbar = ({ displayedPath }) => {
   const location = useLocation();
   const shownPath = displayedPath ?? location.pathname;
   const onToursNow =
-    location.pathname === "/tours" || location.pathname.startsWith("/tours/");
+    location.pathname === "/tours" 
 
   const mode = useTransitionMode();
   const reduceMotion = useReducedMotion();

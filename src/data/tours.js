@@ -155,7 +155,8 @@ export const tours = [
     title: "Shark Cage Diving",
     slug: "shark-cage-diving-gansbaai",
     canonicalPath: "/tours/shark-cage-diving-gansbaai",
-    childFriendly: true,
+    description:
+      "Experience one of South Africa's most thrilling ocean encounters — Shark Cage Diving in Gansbaai, the global hotspot for Great White Sharks. This all‑inclusive adventure includes hotel pick‑up and drop‑off in Cape Town, professional crew, and a safe, unforgettable dive experience.",
 
     seo: {
       title: "Shark Cage Diving in Gansbaai | Cape Frontier Tours",
@@ -187,8 +188,8 @@ export const tours = [
 
     priceBase: 4900,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
+    minAge: 12,
+    childFriendly: true,
 
     pricing: [
       {
@@ -197,23 +198,21 @@ export const tours = [
         note: "Minimum two participants required.",
       },
       {
-        category: "Teen: Children under 18",
+        category: "Teens",
         pricePerPerson: 4900,
         note: "Teens are charged at full adult-rate.",
       },
       {
-        category: "Child: Children under 12",
+        category: "Children",
         pricePerPerson: 2400,
         note: "",
       },
       {
-        category: "Toddler: Children under 5",
+        category: "Toddler",
         pricePerPerson: 0,
         note: "Free of charge for children under 5 years old.",
       },
     ],
-
-    additionalPricing: [],
 
     groupPricing: {
       enabled: true,
@@ -229,9 +228,6 @@ export const tours = [
       ],
     },
 
-
-    description:
-      "Experience one of South Africa's most thrilling ocean encounters — Shark Cage Diving in Gansbaai, the global hotspot for Great White Sharks. This all‑inclusive adventure includes hotel pick‑up and drop‑off in Cape Town, professional crew, and a safe, unforgettable dive experience.",
 
     highlights: [
       { text: "Close‑up shark encounters" },
@@ -468,7 +464,6 @@ export const tours = [
     id: 2, // New tour ID to be assigned (e.g., 21)
     type: TOUR_TYPES.ADRENALINE,
     category: TOUR_MODIFIERS.HALF_DAY,
-    childFriendly: false,
 
     title: "Shooting Experience Packages",
     slug: "shooting-experience-packages",
@@ -505,8 +500,8 @@ export const tours = [
 
     priceBase: 2000,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
+    minAge: 18,
+    childFriendly: false,
 
     pricing: [
       {
@@ -838,18 +833,27 @@ export const tours = [
 
     priceBase: 3000,
     minPeople: 1,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
+    minAge: 12,
 
     pricing: [
       {
-        category: "1 Adult",
+        category: "Adult",
         pricePerPerson: 3000,
         note: "All-inclusive per person",
       },
       {
-        category: "Children (5–17 years)",
+        category: "Teens",
         pricePerPerson: 2600,
+        note: "All-inclusive per child",
+      },
+      {
+        category: "Children ",
+        pricePerPerson: 2600,
+        note: "All-inclusive per child",
+      },
+      {
+        category: "Toddler",
+        pricePerPerson: 0,
         note: "All-inclusive per child",
       },
     ],

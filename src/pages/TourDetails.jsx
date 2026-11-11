@@ -943,8 +943,9 @@ export default function TourDetails() {
       `}</style>
 
         {/* HERO */}
-        <TourHero tour={tour} />
-
+        <div className="relative">
+          <TourHero tour={tour} />
+        </div>
         {/* QUICK INFO BAR*/}
         <TourQuickInfo
           tour={tour}
@@ -956,26 +957,64 @@ export default function TourDetails() {
           DurationIcon={DurationIcon}
           RatingIcon={RatingIcon}
         />
+        {/* NEW BUTTON POSITION - Above TourQuickInfo */}
+        <div className="relative z-30 mx-auto flex max-w-6xl justify-center gap-3 px-4 mb-6 sm:px-5">
+          <button
+            type="button"
+            onClick={goBackToPreviousScroll}
+            className="pointer-events-auto group inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white px-5 py-2.5 font-bitter text-xs font-bold text-black shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-neutral-50 sm:px-6 sm:py-3 sm:text-sm"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5"
+              aria-hidden="true"
+            >
+              <path d="M19 12H5" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M12 19l-7-7 7-7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Go Back
+          </button>
+
+          <button
+            type="button"
+            onClick={scrollToBooking}
+            className="pointer-events-auto group inline-flex items-center gap-2 rounded-full border border-blue-700 bg-blue-600 px-5 py-2.5 font-bitter text-xs font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700 sm:px-6 sm:py-3 sm:text-sm"
+          >
+            Go to Booking
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="m12 5 7 7-7 7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+
+
 
         {/* TOUR CONTENT: PRICING,  */}
         <section
           ref={desktopContentSectionRef}
-          className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 pt-12 pb-12 sm:px-5 lg:px-5 lg:pt-20 lg:pb-14 lg:grid-cols-[1.32fr_0.68fr] xl:gap-10"
+          className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 pt-12 pb-12 sm:px-5 lg:px-5 lg:pt-20 lg:pb-26 lg:grid-cols-[1.32fr_0.68fr] xl:gap-10"
         >
+          {/* Content */}
           <div ref={contentColumnRef} className="space-y-9">
-            {/* PRICING */}
-            <ContentBlock eyebrow="Pricing" title="Tour Pricing" icon="pricing">
-              <TourPricing pricing={tour.pricing} />
-
-              {tour.additionalPricing?.length > 0 && (
-                <AdditionalPricing pricing={tour.additionalPricing} />
-              )}
-
-              {tour.groupPricing?.enabled && (
-                <TourGroupPricing groupPricing={tour.groupPricing} />
-              )}
-            </ContentBlock>
-
             {/* DESCRIPTION */}
             <ContentBlock
               eyebrow="Overview"
@@ -988,6 +1027,18 @@ export default function TourDetails() {
               <p className="px-4 pb-4 font-bitter text-sm text-neutral-500">
                 {site.tourIntro}
               </p>
+            </ContentBlock>
+            {/* PRICING */}
+            <ContentBlock eyebrow="Pricing" title="Tour Pricing" icon="pricing">
+              <TourPricing pricing={tour.pricing} />
+
+              {tour.additionalPricing?.length > 0 && (
+                <AdditionalPricing pricing={tour.additionalPricing} />
+              )}
+
+              {tour.groupPricing?.enabled && (
+                <TourGroupPricing groupPricing={tour.groupPricing} />
+              )}
             </ContentBlock>
 
             {/* GALLERY */}
@@ -1279,65 +1330,8 @@ export default function TourDetails() {
           >
             <div
               ref={itineraryPinRef}
-              className="mx-auto max-w-6xl px-4 py-10 lg:px-5 lg:py-10"
+              className="mx-auto max-w-6xl px-4 py-26 lg:px-5"
             >
-              {/* Header with Skip Button moved here */}
-              <div
-                className="relative z-30 flex flex-col gap-5 rounded-[1.25rem] bg-blue-50/85 p-4 text-center lg:flex-row 
-              lg:items-center lg:justify-between lg:gap-6 lg:p-15 lg:text-left"
-              >
-                <div className="max-w-2xl">
-                  <span className="font-bitter text-[11px] uppercase tracking-[0.24em] text-blue-600">
-                    Full Itinerary
-                  </span>
-
-                  <h2 className="mt-2 font-frank text-3xl font-bold leading-none sm:text-4xl lg:text-5xl">
-                    Your route, stop by stop
-                  </h2>
-
-                  <p className="mt-3 font-bitter text-sm leading-relaxed text-neutral-600 lg:hidden">
-                    Compact route preview. Open a stop only when you need more
-                    detail.
-                  </p>
-
-                  {/* <p className="mt-4 hidden font-bitter leading-relaxed text-neutral-600 lg:block">
-                    Scroll through the route while each stop detail and image
-                    snaps into the same focused frame.
-                  </p> */}
-                </div>
-
-                {/* Skip button moved to top right with pulse */}
-                <div className="flex items-center justify-center lg:justify-end">
-                  <button
-                    type="button"
-                    onClick={scrollToBooking}
-                    className="group relative inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-6 py-3 font-bitter text-sm font-semibold text-white shadow-[0_8px_24px_rgba(37,99,235,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-700 active:scale-95"
-                  >
-                    {/* Pulse ring */}
-                    <span
-                      className="absolute inset-0 rounded-full bg-blue-500 opacity-40 animate-ping group-hover:animate-none pointer-events-none"
-                      style={{ animationDuration: "2s" }}
-                    />
-
-                    <span className="relative z-10 flex items-center gap-2">
-                      Skip to booking
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
-                      >
-                        <path d="M5 12h14" />
-                        <path d="m12 5 7 7-7 7" />
-                      </svg>
-                    </span>
-                  </button>
-                </div>
-              </div>
-
               {/* DESKTOP */}
               <div className="hidden lg:grid lg:grid-cols-[0.96fr_1.04fr] lg:items-start lg:gap-8">
                 {/* STOP INFORMATION */}

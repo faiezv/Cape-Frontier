@@ -2,20 +2,26 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import DatePicker from 'react-datepicker'
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-import { resolveTourImage } from '../../utils/ImageLoader.js';
+import { resolveTourImage } from '../../utils/ImageLoader.js'
 import tours from '../../data/tours.js'
 import 'react-datepicker/dist/react-datepicker.css'
 
-import { useNavigate } from 'react-router-dom'
-import { useLoadingNavigate } from "../useLoadingNavigate.jsx"
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useLoadingNavigate } from '../useLoadingNavigate.jsx'
+import CurrencySelector from './CurrencySelector.jsx'
+import DestinationModal from './DestinationModal.jsx'
 
-import { formatMoney } from './Helpers.jsx'; // or '../Tours/Helpers.jsx' depending on path
+gsap.registerPlugin(ScrollTrigger)
 
 // -----------------------------------------------------------------------------
-// data helpers (unchanged)
+// data helpers
 // -----------------------------------------------------------------------------
+const FEATURED_TOUR_ID = 12
+const FALLBACK_IMAGE = './images/content/random/1.webp'
+const FALLBACK_DESCRIPTION =
+  'Guided Cape Town experience with local insight, scenic stops and easy online booking.'
+
 const FALLBACK_TOURS = [
   'Table Mountain Hike',
   'Cape Point Explorer',
@@ -27,96 +33,129 @@ const FALLBACK_TOURS = [
   "Chapman's Peak Sunset",
 ]
 
-const getTourTitle = (tour) => {
-  if (typeof tour === 'string') return tour
-  return tour?.title || tour?.name || ''
+const stripHtml = (value) => {
+  if (!value || typeof value !== 'string') return ''
+  if (typeof document !== 'undefined') {
+    const tmp = document.createElement('div')
+    tmp.innerHTML = value
+    return (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim()
+  }
+  return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+const getTourTitle = (tour) => (typeof tour === 'string' ? tour : tour?.title || tour?.name || '')
+
+const getTourDescription = (tour) => {
+  if (typeof tour === 'string') return FALLBACK_DESCRIPTION
+  const raw =
+    tour?.shortDescription ||
+    tour?.excerpt ||
+    tour?.summary ||
+    tour?.intro ||
+    tour?.description ||
+    ''
+  return stripHtml(raw)
+}
+
+const getTourTagline = (tour) => {
+  if (typeof tour === 'string') return ''
+  const raw =
+    tour?.tagline ||
+    tour?.subtitle ||
+    tour?.kicker ||
+    tour?.heroLine ||
+    ''
+  return stripHtml(raw)
 }
 
 const getTourImage = (tour) => {
-  if (typeof tour === 'string') {
-    return fallbackUrl; // you can import a fallback directly
-  }
+  if (typeof tour === 'string') return FALLBACK_IMAGE
   let imagePath =
     tour?.image ||
     tour?.img ||
     tour?.cover ||
     (tour?.gallery && tour.gallery[0]) ||
-    (tour?.images && tour.images[0]);
-
-  if (!imagePath && tour.imageFolder) {
-    imagePath = `/src/assets/images/tours/${tour.imageFolder}/1.webp`;
+    (tour?.images && tour.images[0])
+  if (!imagePath && tour?.imageFolder) {
+    imagePath = `/src/assets/images/tours/${tour.imageFolder}/1.webp`
   }
-  return resolveTourImage(imagePath);
-};
-
-const getTourLocation = (tour) => {
-  if (typeof tour === 'string') return 'Cape Town, South Africa'
-  return tour?.location || tour?.area || 'Cape Town, South Africa'
+  return resolveTourImage(imagePath) || FALLBACK_IMAGE
 }
+
+const getTourLocation = (tour) =>
+  typeof tour === 'string' ? 'Cape Town, South Africa' : tour?.location || tour?.area || 'Cape Town, South Africa'
 
 const getTourLink = (tour) => {
   if (typeof tour === 'string') return '#tours'
   return tour?.canonicalPath || (tour?.slug ? `/tours/${tour.slug}` : '#tours')
 }
 
-const formatTourPrice = (tour) => {
-  if (typeof tour === 'string') return null
-
+const getTourPrice = (tour) => {
+  if (typeof tour === 'string') return { amount: null, currency: 'ZAR' }
   const amount = tour?.priceBase ?? tour?.price ?? tour?.fromPrice
-  const currency = tour?.baseCurrency || 'ZAR'
-
-  if (!amount) return null
-
-  try {
-    return formatMoney(Number(amount), currency)
-  } catch (error) {
-    console.error('Error formatting price:', error)
-    return `${currency} ${Number(amount).toFixed(2)}`
-  }
+  return { amount: amount ? Number(amount) : null, currency: tour?.baseCurrency || 'ZAR' }
 }
 
 const getTourMeta = (tour) => {
   if (typeof tour === 'string') return 'Guided Cape Town experience'
-  return [tour?.duration, tour?.category, tour?.type]
-    .filter(Boolean)
-    .join(' • ') || 'Guided Cape Town experience'
+  return [tour?.duration, tour?.category, tour?.type].filter(Boolean).join(' • ') || 'Guided Cape Town experience'
+}
+
+const fallbackOptions = () =>
+  FALLBACK_TOURS.map((title) => ({
+    title,
+    image: FALLBACK_IMAGE,
+    description: FALLBACK_DESCRIPTION,
+    tagline: '',
+    location: 'Cape Town, South Africa',
+    meta: 'Guided Cape Town experience',
+    priceAmount: null,
+    priceCurrency: 'ZAR',
+    duration: null,
+    category: null,
+    type: 'other',
+    link: '#tours',
+    raw: title,
+  }))
+
+const getTourOptions = () => {
+  if (!Array.isArray(tours) || !tours.length) return fallbackOptions()
+  const options = tours
+    .map((tour) => ({
+      id: tour?.id,
+      title: getTourTitle(tour),
+      image: getTourImage(tour),
+      description: getTourDescription(tour),
+      tagline: getTourTagline(tour),
+      location: getTourLocation(tour),
+      meta: getTourMeta(tour),
+      priceAmount: getTourPrice(tour).amount,
+      priceCurrency: getTourPrice(tour).currency,
+      duration: tour?.duration || null,
+      category: tour?.category || tour?.type || null,
+      type: tour?.type || 'other',
+      link: getTourLink(tour),
+      raw: tour,
+    }))
+    .filter((tour) => tour.title)
+  return options.length ? options : fallbackOptions()
 }
 
 // -----------------------------------------------------------------------------
-// NEW: advance-booking window logic
+// advance-booking window
 // -----------------------------------------------------------------------------
-// A tour can declare `daysInAdvance` (a whole number of calendar days that
-// must pass before it's bookable, e.g. 3). When a tour doesn't declare it,
-// we fall back to "no same-day bookings" — but computed conservatively:
-// the candidate date must have a *full* 24 hours of clearance from right
-// now, measured from that date's midnight (00:00). Since "now" is almost
-// never exactly midnight, this naturally rolls the minimum forward an
-// extra day whenever there isn't a full day's clearance yet — e.g. if
-// it's 7am today, "tomorrow" only gives ~17 hours of buffer before its
-// midnight, so the earliest bookable date becomes the day after that.
 const DAY_MS = 24 * 60 * 60 * 1000
-
 const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate())
 
 const getMinBookableDate = (tour, now = new Date()) => {
-  const daysInAdvance =
-    tour && typeof tour === 'object' ? tour.daysInAdvance : undefined
+  const daysInAdvance = tour && typeof tour === 'object' ? tour.daysInAdvance : undefined
 
-  if (
-    typeof daysInAdvance === 'number' &&
-    !Number.isNaN(daysInAdvance) &&
-    daysInAdvance >= 0
-  ) {
-    // Explicit rule: a straightforward calendar-day offset from today.
+  if (typeof daysInAdvance === 'number' && !Number.isNaN(daysInAdvance) && daysInAdvance >= 0) {
     const minDate = startOfDay(now)
     minDate.setDate(minDate.getDate() + daysInAdvance)
     return minDate
   }
 
-  // No daysInAdvance declared => no same-day bookings, with a 24h buffer
-  // measured against the candidate date's midnight rather than just the
-  // calendar date, so a booking made in the early morning doesn't sneak
-  // through on "tomorrow" without a full day's notice.
   const cutoff = new Date(now.getTime() + DAY_MS)
   const cutoffMidnight = startOfDay(cutoff)
   if (cutoff.getTime() > cutoffMidnight.getTime()) {
@@ -126,9 +165,7 @@ const getMinBookableDate = (tour, now = new Date()) => {
 }
 
 const getAdvanceNoticeLabel = (tour) => {
-  const daysInAdvance =
-    tour && typeof tour === 'object' ? tour.daysInAdvance : undefined
-
+  const daysInAdvance = tour && typeof tour === 'object' ? tour.daysInAdvance : undefined
   if (typeof daysInAdvance === 'number' && !Number.isNaN(daysInAdvance)) {
     if (daysInAdvance <= 0) return 'Same-day bookings allowed'
     return `Requires at least ${daysInAdvance} day${daysInAdvance === 1 ? '' : 's'} advance notice`
@@ -136,95 +173,46 @@ const getAdvanceNoticeLabel = (tour) => {
   return 'No same-day bookings — book at least a day ahead'
 }
 
-const getTourOptions = () => {
-  if (!Array.isArray(tours) || !tours.length) {
-    return FALLBACK_TOURS.map((title) => ({
-      title,
-      image: './images/content/random/1.webp',
-      location: 'Cape Town, South Africa',
-      meta: 'Guided Cape Town experience',
-      price: null,
-      duration: null,
-      category: null,
-      type: 'other',
-      link: '#tours',
-      raw: title,
-    }))
-  }
-
-  const options = tours
-  .map((tour) => ({
-    id: tour?.id,
-    title: getTourTitle(tour),
-    image: getTourImage(tour),
-    location: getTourLocation(tour),
-    meta: getTourMeta(tour),
-    price: formatTourPrice(tour),
-    duration: tour?.duration || null,
-    category: tour?.category || tour?.type || null,
-    type: tour?.type || 'other',
-    link: getTourLink(tour),
-    raw: tour,
-  }))
-  .filter((tour) => tour.title)
-
-  return options.length ? options : FALLBACK_TOURS.map((title) => ({
-    title,
-    image: './images/content/random/1.webp',
-    location: 'Cape Town, South Africa',
-    meta: 'Guided Cape Town experience',
-    price: null,
-    duration: null,
-    category: null,
-    type: 'other',
-    link: '#tours',
-    raw: title,
-  }))
-}
-
 // -----------------------------------------------------------------------------
-// Scroll‑lock hook (no layout jump)
+// scroll lock (no layout jump)
 // -----------------------------------------------------------------------------
 const useScrollLock = (locked) => {
   useEffect(() => {
     if (!locked) {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-
-      if (window.lenis) {
-        window.lenis.start();
-      }
-
-      return;
+      document.documentElement.style.overflow = ''
+      document.body.style.overflow = ''
+      document.body.style.paddingRight = ''
+      if (window.lenis) window.lenis.start()
+      return undefined
     }
 
-    const scrollbarWidth =
-      window.innerWidth - document.documentElement.clientWidth;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+    const htmlOverflow = document.documentElement.style.overflow
+    const bodyOverflow = document.body.style.overflow
+    const bodyPadding = document.body.style.paddingRight
 
-    const htmlOverflow = document.documentElement.style.overflow;
-    const bodyOverflow = document.body.style.overflow;
-    const bodyPadding = document.body.style.paddingRight;
-
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    document.body.style.paddingRight = `${scrollbarWidth}px`;
-
-    if (window.lenis) {
-      window.lenis.stop();
-    }
+    document.documentElement.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden'
+    document.body.style.paddingRight = `${scrollbarWidth}px`
+    if (window.lenis) window.lenis.stop()
 
     return () => {
-      document.documentElement.style.overflow = htmlOverflow;
-      document.body.style.overflow = bodyOverflow;
-      document.body.style.paddingRight = bodyPadding;
+      document.documentElement.style.overflow = htmlOverflow
+      document.body.style.overflow = bodyOverflow
+      document.body.style.paddingRight = bodyPadding
+      if (window.lenis) window.lenis.start()
+    }
+  }, [locked])
+}
 
-      if (window.lenis) {
-        window.lenis.start();
-      }
-    };
-  }, [locked]);
-};
+const MODAL_TITLES = { destination: 'Select a tour', date: 'Choose a date', participants: 'Guests' }
+const MODAL_WIDTHS = {
+  destination: 'max-w-[94vw] sm:max-w-4xl',
+  date: 'max-w-md sm:max-w-lg md:max-w-xl',
+  participants: 'max-w-[94vw] sm:max-w-md',
+}
+const FEEDBACK_TEXT = ['✓ Tour saved', '✓ Date saved', '✓ Guests saved']
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`
 
 // -----------------------------------------------------------------------------
 // component
@@ -232,10 +220,9 @@ const useScrollLock = (locked) => {
 function TourSelect() {
   const [destination, setDestination] = useState('')
   const [destinationId, setDestinationId] = useState(null)
-
   const [date, setDate] = useState(null)
   const [adults, setAdults] = useState(1)
-  const [childAges, setChildAges] = useState([]) // each entry is a child's age (0-17)
+  const [childAges, setChildAges] = useState([])
   const [participantsConfirmed, setParticipantsConfirmed] = useState(false)
   const [activeModal, setActiveModal] = useState(null)
   const [viewportWidth, setViewportWidth] = useState(
@@ -243,69 +230,36 @@ function TourSelect() {
   )
   const [mobileStep, setMobileStep] = useState(0)
   const [justCompletedStep, setJustCompletedStep] = useState(null)
-  const [selectionFeedback, setSelectionFeedback] = useState(null)
   const [searchAttempted, setSearchAttempted] = useState(false)
   const [searchError, setSearchError] = useState(null)
-  const [preventSameDay, setPreventSameDay] = useState(false)
-
-  // Filter state for destination modal
   const [filterType, setFilterType] = useState('all')
-
-  // Mobile: expanded row index
-  const [expandedIndex, setExpandedIndex] = useState(null)
+  const [headerMenuOpen, setHeaderMenuOpen] = useState(false)
 
   const mobileCardRef = useRef(null)
   const desktopTileRefs = useRef({})
   const errorBarRef = useRef(null)
-
-  // Refs for animated text elements (mobile)
   const mobileValueTextRef = useRef(null)
   const mobilePreviewTextRef = useRef(null)
   const mobileIconRef = useRef(null)
-
-  // Refs for desktop tiles (value and preview per tile)
   const desktopValueRefs = useRef({})
   const desktopPreviewRefs = useRef({})
+  const headerFilterRef = useRef(null)
 
-  // Refs for progress line animation
-  const line1Ref = useRef(null)
-  const line2Ref = useRef(null)
-
-  // Refs for destination modal row animations and title overflow checks
-  const destinationModalRef = useRef(null)
-  const destinationRowRefs = useRef([])
-  const destinationTitleRefs = useRef([])
-
-  // -----------------------------------------------------------------
-  // NEW: loading state for destination modal
-  // -----------------------------------------------------------------
-  const [destinationLoading, setDestinationLoading] = useState(false);
-
-  // -----------------------------------------------------------------
-  // NEW: featured tour scroll shrink progress (0 = full, 1 = compact)
-  // -----------------------------------------------------------------
-  const [featuredProgress, setFeaturedProgress] = useState(0);
-  const featuredContainerRef = useRef(null);
-  const featuredScrollFrameRef = useRef(null);
+  const navigate = useLoadingNavigate()
 
   const isMobileLayout = viewportWidth < 700
   const tourOptions = useMemo(() => getTourOptions(), [])
 
-  const FEATURED_TOUR_ID = 12;
-
-  const featuredTour = useMemo(
-    () => tourOptions.find((tour) => tour.id === FEATURED_TOUR_ID),
+  const tourTypes = useMemo(
+    () => ['all', ...Array.from(new Set(tourOptions.map((t) => t.type).filter(Boolean)))],
     [tourOptions]
-  );
+  )
 
-  // -----------------------------------------------------------------
-  // NEW: resolve the raw tour object for the current destination so we
-  // can tell whether children are allowed on it.
-  // -----------------------------------------------------------------
   const selectedTourRaw = useMemo(() => {
-    const match = destinationId != null
-      ? tourOptions.find((tour) => tour.id === destinationId)
-      : tourOptions.find((tour) => tour.title === destination)
+    const match =
+      destinationId != null
+        ? tourOptions.find((tour) => tour.id === destinationId)
+        : tourOptions.find((tour) => tour.title === destination)
     return match ? match.raw : null
   }, [tourOptions, destination, destinationId])
 
@@ -314,14 +268,9 @@ function TourSelect() {
     return selectedTourRaw.childFriendly !== false
   }, [selectedTourRaw])
 
-  // -----------------------------------------------------------------
-  // NEW: minimum bookable date for the currently selected tour, driven
-  // by tour.daysInAdvance (see getMinBookableDate above). Recomputed
-  // whenever the tour changes or the date modal is (re)opened, so the
-  // "now" baseline doesn't go stale if the picker's been open a while.
-  // -----------------------------------------------------------------
   const minBookableDate = useMemo(
     () => getMinBookableDate(selectedTourRaw),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedTourRaw, activeModal]
   )
 
@@ -330,19 +279,18 @@ function TourSelect() {
     [destination, selectedTourRaw]
   )
 
-  // Compute unique tour types for filter
-  const tourTypes = useMemo(() => {
-    const types = new Set(tourOptions.map(t => t.type).filter(Boolean))
-    return ['all', ...Array.from(types)]
-  }, [tourOptions])
+  const formattedDate = date
+    ? date.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })
+    : 'Select date'
 
-  const filteredTours = useMemo(() => {
-    if (filterType === 'all') return tourOptions
-    return tourOptions.filter(t => t.type === filterType)
-  }, [tourOptions, filterType])
+  const children = childAges.length
+  const participants = adults + children
+  const canSearch = Boolean(destination && date && participantsConfirmed)
+  const recommendedStep = !destination ? 0 : !date ? 1 : !participantsConfirmed ? 2 : 3
 
-  const navigate = useLoadingNavigate()
-
+  // ---------------------------------------------------------------------------
+  // effects
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     const onResize = () => setViewportWidth(window.innerWidth)
     onResize()
@@ -350,34 +298,9 @@ function TourSelect() {
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
-  const formattedDate = date
-    ? date.toLocaleDateString('en-ZA', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    })
-    : 'Select date'
-
-  const children = childAges.length
-  const participants = adults + children
-
-  const canSearch = Boolean(destination && date && participantsConfirmed)
-  const hasDetails = Boolean(
-    destination || date || adults !== 1 || children !== 0 || participantsConfirmed
-  )
-
-  const getRecommendedStep = () => {
-    if (!destination) return 0
-    if (!date) return 1
-    if (!participantsConfirmed) return 2
-    return 3
-  }
-
-  const recommendedStep = getRecommendedStep()
-
   useEffect(() => {
     if (!isMobileLayout) return
-    setMobileStep((previousStep) => Math.min(previousStep, recommendedStep))
+    setMobileStep((prev) => Math.min(prev, recommendedStep))
   }, [isMobileLayout, destination, date, participantsConfirmed, recommendedStep])
 
   useEffect(() => {
@@ -386,132 +309,28 @@ function TourSelect() {
     setSearchError(null)
   }, [canSearch])
 
-  // Animate progress lines
-  useLayoutEffect(() => {
-    const animateLine = (lineRef, shouldFill) => {
-      if (!lineRef.current) return
-      gsap.killTweensOf(lineRef.current)
-      gsap.to(lineRef.current, {
-        width: shouldFill ? '100%' : '0%',
-        duration: 0.5,
-        ease: 'power2.out',
-        overwrite: true,
-      })
-    }
-
-    const timeoutId = setTimeout(() => {
-      animateLine(line1Ref, recommendedStep >= 1)
-      animateLine(line2Ref, recommendedStep >= 2)
-    }, 30)
-    return () => clearTimeout(timeoutId)
-  }, [recommendedStep])
-
   useEffect(() => {
-    if (line1Ref.current) line1Ref.current.style.width = recommendedStep >= 1 ? '100%' : '0%'
-    if (line2Ref.current) line2Ref.current.style.width = recommendedStep >= 2 ? '100%' : '0%'
-  }, [])
-
-  // Stable scroll lock (no layout jump)
-  useScrollLock(!!activeModal);
-
-  const close = () => setActiveModal(null)
-
-  // ---------------------------------------------------------------------------
-  // Enhanced animation with icon pop (mobile only)
-  // ---------------------------------------------------------------------------
-  const animateSavedFeedback = (
-    stepIndex,
-    nextStep,
-    updatedValue,
-    updatedPreview,
-    targetStepIndex
-  ) => {
-    setJustCompletedStep(targetStepIndex)
-
-    let valueEl, previewEl, iconEl
-
-    if (isMobileLayout) {
-      valueEl = mobileValueTextRef.current
-      previewEl = mobilePreviewTextRef.current
-      iconEl = mobileIconRef.current
-    } else {
-      valueEl = desktopValueRefs.current[targetStepIndex]
-      previewEl = desktopPreviewRefs.current[targetStepIndex]
+    if (!headerMenuOpen) return undefined
+    const onDown = (e) => {
+      if (headerFilterRef.current && !headerFilterRef.current.contains(e.target)) {
+        setHeaderMenuOpen(false)
+      }
     }
-
-    if (!valueEl || !previewEl) {
-      setSelectionFeedback({
-        id: Date.now(),
-        stepIndex: targetStepIndex,
-        text: stepIndex === 0 ? '✓ Tour saved' : stepIndex === 1 ? '✓ Date saved' : '✓ Guests saved',
-      })
-      setTimeout(() => {
-        setJustCompletedStep(null)
-        setSelectionFeedback(null)
-        if (isMobileLayout) setMobileStep(Math.min(nextStep, 2))
-      }, 650)
-      return
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        setHeaderMenuOpen(false)
+      }
     }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [headerMenuOpen])
 
-    const feedbackText = stepIndex === 0 ? '✓ Tour saved' : stepIndex === 1 ? '✓ Date saved' : '✓ Guests saved'
-    const originalValueColor = valueEl.style.color
-
-    const tl = gsap.timeline({
-      onComplete: () => {
-        gsap.delayedCall(0.7, () => {
-          setJustCompletedStep(null)
-
-          if (isMobileLayout) {
-            setMobileStep(Math.min(nextStep, 2))
-          }
-        })
-      },
-    })
-
-    tl.to([valueEl, previewEl], {
-      opacity: 0,
-      y: -8,
-      duration: 0.2,
-      ease: 'power2.in',
-    })
-      .call(() => {
-        valueEl.innerText = feedbackText
-        valueEl.style.color = '#16a34a'
-      })
-      .set([valueEl, previewEl], { y: 6, opacity: 0 })
-      .to([valueEl, previewEl], {
-        opacity: 1,
-        y: 0,
-        duration: 0.25,
-        ease: 'back.out(0.6)',
-      })
-      .to({}, { duration: 0.55 })
-      .to([valueEl, previewEl], {
-        opacity: 0,
-        y: -6,
-        duration: 0.2,
-        ease: 'power2.in',
-      })
-      .call(() => {
-        valueEl.innerText = updatedValue
-        valueEl.style.color = originalValueColor || ''
-        previewEl.innerText = updatedPreview
-      })
-      .set([valueEl, previewEl], { y: 8, opacity: 0 })
-      .to([valueEl, previewEl], {
-        opacity: 1,
-        y: 0,
-        duration: 0.25,
-        ease: 'back.out(0.7)',
-      })
-  }
-
-  const completeStepWithDelay = (stepIndex, nextStep, updatedValue, updatedPreview, targetStepIndex) => {
-    close()
-    setTimeout(() => {
-      animateSavedFeedback(stepIndex, nextStep, updatedValue, updatedPreview, targetStepIndex)
-    }, 120)
-  }
+  useScrollLock(!!activeModal)
 
   useLayoutEffect(() => {
     if (!isMobileLayout || !mobileCardRef.current) return undefined
@@ -529,164 +348,94 @@ function TourSelect() {
     if (!searchError || !errorBarRef.current) return undefined
     const el = errorBarRef.current
     gsap.killTweensOf(el)
-    gsap.fromTo(el, { height: 0, y: -10, autoAlpha: 0 }, { height: 'auto', y: 0, autoAlpha: 1, duration: 0.28, ease: 'power2.out' })
+    gsap.fromTo(
+      el,
+      { height: 0, y: -10, autoAlpha: 0 },
+      { height: 'auto', y: 0, autoAlpha: 1, duration: 0.28, ease: 'power2.out' }
+    )
     const timer = window.setTimeout(() => {
-      gsap.to(el, { height: 0, y: -8, autoAlpha: 0, duration: 0.24, ease: 'power2.in', onComplete: () => setSearchError(null) })
+      gsap.to(el, {
+        height: 0,
+        y: -8,
+        autoAlpha: 0,
+        duration: 0.24,
+        ease: 'power2.in',
+        onComplete: () => setSearchError(null),
+      })
     }, 3600)
     return () => window.clearTimeout(timer)
   }, [searchError?.id])
 
-  // ===========================================================================
-  // FIX: GLITCH-FREE DESTINATION MODAL ANIMATION with loading dots
-  // ===========================================================================
   useEffect(() => {
-    // Only run when the destination modal is open
-    if (activeModal !== 'destination') {
-      setDestinationLoading(false);
-      setFeaturedProgress(0);
-      return;
+    const timer = setTimeout(() => ScrollTrigger.refresh(), 50)
+    return () => clearTimeout(timer)
+  }, [searchError, activeModal, canSearch])
+
+  // ---------------------------------------------------------------------------
+  // saved-feedback animation
+  // ---------------------------------------------------------------------------
+  const close = () => setActiveModal(null)
+
+  const animateSavedFeedback = (stepIndex, nextStep, updatedValue, updatedPreview, targetStepIndex) => {
+    setJustCompletedStep(targetStepIndex)
+
+    const valueEl = isMobileLayout ? mobileValueTextRef.current : desktopValueRefs.current[targetStepIndex]
+    const previewEl = isMobileLayout ? mobilePreviewTextRef.current : desktopPreviewRefs.current[targetStepIndex]
+
+    if (!valueEl || !previewEl) {
+      setTimeout(() => {
+        setJustCompletedStep(null)
+        if (isMobileLayout) setMobileStep(Math.min(nextStep, 2))
+      }, 650)
+      return
     }
 
-    // Start loading
-    setDestinationLoading(true);
+    const originalValueColor = valueEl.style.color
 
-    // Immediately hide all rows (they are already hidden via inline styles, but ensure it)
-    const rows = destinationRowRefs.current.filter(Boolean);
-    if (rows.length) {
-      gsap.set(rows, { opacity: 0, y: 12 });
-    }
+    const tl = gsap.timeline({
+      onComplete: () => {
+        gsap.delayedCall(0.7, () => {
+          setJustCompletedStep(null)
+          if (isMobileLayout) setMobileStep(Math.min(nextStep, 2))
+        })
+      },
+    })
 
-    // Simulate loading delay (300ms) – feels snappy and professional
-    const loadTimer = setTimeout(() => {
-      setDestinationLoading(false);
-
-      // Grab rows again (refs might have updated if filter changed)
-      const rowsNow = destinationRowRefs.current.filter(Boolean);
-      if (rowsNow.length) {
-        gsap.to(rowsNow, {
-          opacity: 1,
-          y: 0,
-          stagger: 0.05,
-          duration: 0.4,
-          ease: 'power2.out',
-          clearProps: 'opacity,transform', // remove inline styles after animation
-        });
-      }
-    }, 300);
-
-    // Cleanup timers and kill tweens when modal closes or filter changes
-    return () => {
-      clearTimeout(loadTimer);
-      const rowsNow = destinationRowRefs.current.filter(Boolean);
-      if (rowsNow.length) {
-        gsap.killTweensOf(rowsNow);
-      }
-    };
-  }, [activeModal, filterType]);
-
-  // Reset loading state when modal closes
-  useEffect(() => {
-    if (activeModal !== 'destination') {
-      setDestinationLoading(false);
-      setFeaturedProgress(0);
-    }
-  }, [activeModal]);
-
-  // ===========================================================================
-  // SCROLL SHRINK FOR FEATURED TOUR + WHEEL FORWARDING (prevent main page scroll)
-  // ===========================================================================
-  useEffect(() => {
-    if (activeModal !== 'destination') {
-      setFeaturedProgress(0);
-      if (featuredScrollFrameRef.current) {
-        cancelAnimationFrame(featuredScrollFrameRef.current);
-        featuredScrollFrameRef.current = null;
-      }
-      return;
-    }
-
-    const container = destinationModalRef.current;
-    if (!container) return;
-
-    const handleScroll = () => {
-      if (featuredScrollFrameRef.current) return;
-      featuredScrollFrameRef.current = requestAnimationFrame(() => {
-        const card = featuredContainerRef.current;
-        if (!card) {
-          featuredScrollFrameRef.current = null;
-          return;
-        }
-        const scrollTop = container.scrollTop;
-        const cardHeight = card.offsetHeight || 280;
-        const threshold = cardHeight * 0.5;
-        const progress = Math.min(scrollTop / threshold, 1);
-        setFeaturedProgress(progress);
-        featuredScrollFrameRef.current = null;
-      });
-    };
-
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    // Initial check
-    handleScroll();
-
-    // --- FIX: forward wheel events from featured container to the tour list,
-    //         and prevent main page scroll with stopPropagation + preventDefault
-    const featuredEl = featuredContainerRef.current;
-    if (featuredEl) {
-      const wheelHandler = (e) => {
-        e.preventDefault();
-        e.stopPropagation();  // FIX: stop bubbling to main page
-        container.scrollBy({ top: e.deltaY, behavior: 'auto' });
-      };
-      featuredEl.addEventListener('wheel', wheelHandler, { passive: false });
-      return () => {
-        container.removeEventListener('scroll', handleScroll);
-        featuredEl.removeEventListener('wheel', wheelHandler);
-        if (featuredScrollFrameRef.current) {
-          cancelAnimationFrame(featuredScrollFrameRef.current);
-          featuredScrollFrameRef.current = null;
-        }
-      };
-    } else {
-      return () => {
-        container.removeEventListener('scroll', handleScroll);
-        if (featuredScrollFrameRef.current) {
-          cancelAnimationFrame(featuredScrollFrameRef.current);
-          featuredScrollFrameRef.current = null;
-        }
-      };
-    }
-  }, [activeModal]);
-
-  // Overflow check for title marquee (desktop only) – now deferred until after animation
-  useEffect(() => {
-    if (isMobileLayout || activeModal !== 'destination') return;
-    const timer = setTimeout(() => {
-      destinationTitleRefs.current.forEach((el) => {
-        if (!el) return;
-        const parent = el.closest('.marquee-wrapper');
-        if (!parent) return;
-        if (el.scrollWidth > parent.clientWidth) {
-          parent.classList.add('marquee-active');
-        } else {
-          parent.classList.remove('marquee-active');
-        }
-      });
-    }, 700);
-    return () => clearTimeout(timer);
-  }, [filteredTours, isMobileLayout, activeModal]);
-
-  const getMissingDetails = () => {
-    const missing = []
-    if (!destination) missing.push('destination')
-    if (!date) missing.push('date')
-    if (!participantsConfirmed) missing.push('guests')
-    return missing
+    tl.to([valueEl, previewEl], { opacity: 0, y: -8, duration: 0.2, ease: 'power2.in' })
+      .call(() => {
+        valueEl.innerText = FEEDBACK_TEXT[stepIndex]
+        valueEl.style.color = '#16a34a'
+      })
+      .set([valueEl, previewEl], { y: 6, opacity: 0 })
+      .to([valueEl, previewEl], { opacity: 1, y: 0, duration: 0.25, ease: 'back.out(0.6)' })
+      .to({}, { duration: 0.55 })
+      .to([valueEl, previewEl], { opacity: 0, y: -6, duration: 0.2, ease: 'power2.in' })
+      .call(() => {
+        valueEl.innerText = updatedValue
+        valueEl.style.color = originalValueColor || ''
+        previewEl.innerText = updatedPreview
+      })
+      .set([valueEl, previewEl], { y: 8, opacity: 0 })
+      .to([valueEl, previewEl], { opacity: 1, y: 0, duration: 0.25, ease: 'back.out(0.7)' })
   }
 
+  const completeStepWithDelay = (stepIndex, nextStep, updatedValue, updatedPreview, targetStepIndex) => {
+    close()
+    setTimeout(() => {
+      animateSavedFeedback(stepIndex, nextStep, updatedValue, updatedPreview, targetStepIndex)
+    }, 120)
+  }
+
+  // ---------------------------------------------------------------------------
+  // navigation
+  // ---------------------------------------------------------------------------
   const handleSearchClick = () => {
     if (!canSearch) {
-      const missing = getMissingDetails()
+      const missing = []
+      if (!destination) missing.push('destination')
+      if (!date) missing.push('date')
+      if (!participantsConfirmed) missing.push('guests')
+
       setSearchAttempted(true)
       setSearchError({ id: Date.now(), message: `Please select ${missing.join(', ')} before searching.` })
       if (isMobileLayout) {
@@ -697,10 +446,11 @@ function TourSelect() {
       return
     }
 
-    // NEW: final safety check — re-validate the chosen date against this
-    // tour's advance-booking window before letting the search through.
     if (date && date < minBookableDate) {
-      setSearchError({ id: Date.now(), message: 'Your selected date no longer meets this tour\u2019s advance-booking window. Please choose a new date.' })
+      setSearchError({
+        id: Date.now(),
+        message: 'Your selected date no longer meets this tour\u2019s advance-booking window. Please choose a new date.',
+      })
       setDate(null)
       setParticipantsConfirmed(false)
       if (isMobileLayout) setMobileStep(1)
@@ -732,28 +482,35 @@ function TourSelect() {
     })
   }
 
-  const handleResetDetails = () => {
-    setDestination('')
-    setDestinationId(null)
-    setDate(null)
-    setAdults(1)
-    setChildAges([])
-    setParticipantsConfirmed(false)
-    setActiveModal(null)
-    setMobileStep(0)
-    setJustCompletedStep(null)
-    setSelectionFeedback(null)
-    setSearchAttempted(false)
-    setSearchError(null)
-    gsap.killTweensOf([mobileCardRef.current, ...Object.values(desktopTileRefs.current)].filter(Boolean))
+  // "See details" — route links are navigated WITHOUT closing the modal so
+  // the framer-motion page-transition curtain covers the still-open modal
+  // (the modal unmounts naturally when the old page exits). The button in
+  // DestinationModal shows a spinner while this navigation is in flight.
+  //
+  // Hash links resolve on the same page, so we DO close the modal before
+  // scrolling — otherwise the modal would block the target section.
+  const handleSeeDetails = (tour) => {
+    if (!tour?.link) return
+
+    if (tour.link.startsWith('/')) {
+      navigate(tour.link)
+      return
+    }
+
+    const id = tour.link.replace(/^#/, '')
+    const el = id ? document.getElementById(id) : null
+    if (!el) return
+    close()
+    const y = el.getBoundingClientRect().top + window.scrollY
+    if (window.lenis) window.lenis.scrollTo(y, { duration: 0.85, force: true })
+    else window.scrollTo({ top: y, behavior: 'smooth' })
   }
 
   // ---------------------------------------------------------------------------
-  // Children helpers (age-based, mirrors Booking.jsx's per-child age model)
+  // guests helpers
   // ---------------------------------------------------------------------------
   const addChild = () => {
-    if (!isChildFriendly) return
-    if (childAges.length >= 20) return
+    if (!isChildFriendly || childAges.length >= 20) return
     setChildAges((prev) => [...prev, 6])
     setParticipantsConfirmed(false)
   }
@@ -772,6 +529,73 @@ function TourSelect() {
     setParticipantsConfirmed(false)
   }
 
+  // ---------------------------------------------------------------------------
+  // selection handlers
+  // ---------------------------------------------------------------------------
+  const handleDestinationSelect = (tourTitle, tourId) => {
+    const match =
+      tourId != null
+        ? tourOptions.find((tour) => tour.id === tourId)
+        : tourOptions.find((tour) => tour.title === tourTitle)
+    const rawTour = match ? match.raw : null
+    const tourAllowsChildren = !(rawTour && typeof rawTour === 'object' && rawTour.childFriendly === false)
+
+    setDestination(tourTitle)
+    setDestinationId(tourId ?? null)
+    setParticipantsConfirmed(false)
+
+    if (!tourAllowsChildren) setChildAges([])
+
+    if (date && date < getMinBookableDate(rawTour)) {
+      setDate(null)
+      setSearchError({
+        id: Date.now(),
+        message: `${tourTitle} needs more advance notice — please pick a new date.`,
+      })
+    }
+
+    completeStepWithDelay(0, 1, tourTitle, `Selected: ${tourTitle}`, 0)
+  }
+
+  const handleDateSelect = (selectedDate) => {
+    if (minBookableDate && selectedDate < minBookableDate) {
+      setSearchError({
+        id: Date.now(),
+        message: 'That date is too soon for this tour — please choose a later date.',
+      })
+      return
+    }
+
+    const newFormattedDate = selectedDate.toLocaleDateString('en-ZA', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    })
+    setDate(selectedDate)
+    setParticipantsConfirmed(false)
+    completeStepWithDelay(
+      1,
+      2,
+      newFormattedDate,
+      destination ? `${destination} • ${newFormattedDate}` : newFormattedDate,
+      1
+    )
+  }
+
+  const handleParticipantsConfirm = () => {
+    setParticipantsConfirmed(true)
+    completeStepWithDelay(
+      2,
+      3,
+      plural(participants, 'participant', 'participants'),
+      `${plural(adults, 'adult', 'adults')}${children ? ` • ${plural(children, 'child', 'children')}` : ''}`,
+      2
+    )
+  }
+
+  // ---------------------------------------------------------------------------
+  // step cards
+  // ---------------------------------------------------------------------------
   const cards = useMemo(
     () => [
       {
@@ -789,9 +613,9 @@ function TourSelect() {
         label: 'When?',
         value: formattedDate,
         preview: destination
-          ? (date
+          ? date
             ? `${destination} • ${formattedDate}`
-            : (advanceNoticeLabel || `${destination} selected`))
+            : advanceNoticeLabel || `${destination} selected`
           : 'Destination required first',
         icon: './icons/calendar.png',
         status: date ? 'Done' : mobileStep === 1 ? 'Current' : 'Pending',
@@ -808,12 +632,13 @@ function TourSelect() {
       {
         key: 'participants',
         label: 'Who?',
-        value: `${participants} ${participants === 1 ? 'participant' : 'participants'}`,
-        preview: destination && date
-          ? (participantsConfirmed
-            ? `${adults} ${adults === 1 ? 'adult' : 'adults'}${children ? ` • ${children} ${children === 1 ? 'child' : 'children'}` : ''}`
-            : 'Confirm adults and children')
-          : 'Destination and date required first',
+        value: plural(participants, 'participant', 'participants'),
+        preview:
+          destination && date
+            ? participantsConfirmed
+              ? `${plural(adults, 'adult', 'adults')}${children ? ` • ${plural(children, 'child', 'children')}` : ''}`
+              : 'Confirm adults and children'
+            : 'Destination and date required first',
         icon: './icons/guest.png',
         status: participantsConfirmed ? 'Done' : mobileStep === 2 ? 'Current' : 'Pending',
         complete: Boolean(participantsConfirmed),
@@ -836,7 +661,7 @@ function TourSelect() {
         label: 'Ready?',
         value: canSearch ? 'Ready to search' : 'Complete booking details',
         preview: canSearch
-          ? `${destination} • ${formattedDate} • ${adults} ${adults === 1 ? 'adult' : 'adults'}${children ? ` • ${children} ${children === 1 ? 'child' : 'children'}` : ''}`
+          ? `${destination} • ${formattedDate} • ${plural(adults, 'adult', 'adults')}${children ? ` • ${plural(children, 'child', 'children')}` : ''}`
           : 'Finish the selections to continue',
         icon: './icons/go.png',
         status: canSearch ? 'Ready' : mobileStep === 3 ? 'Current' : 'Pending',
@@ -849,24 +674,25 @@ function TourSelect() {
 
   const currentCard = cards[Math.min(mobileStep, 2)] || cards[0]
 
+  const handleMobileContinue = () => {
+    if (canSearch && mobileStep >= 2) {
+      handleSearchClick()
+      return
+    }
+    if (!currentCard.complete) {
+      currentCard.onClick()
+      return
+    }
+    setMobileStep((prev) => Math.min(2, prev + 1))
+  }
+
+  // ---------------------------------------------------------------------------
+  // style helpers
+  // ---------------------------------------------------------------------------
   const iconShellClass = (complete, isCurrent, isJustCompleted) => {
-    if (isJustCompleted) {
-      return `
-      bg-green-400
-      ring-4 ring-green-300
-      shadow-[0_0_18px_rgba(34,197,94,0.85)]
-      scale-110
-    `
-    }
-
-    if (complete) {
-      return 'bg-green-100 ring-1 ring-green-200'
-    }
-
-    if (isCurrent) {
-      return 'bg-blue-50 ring-1 ring-blue-100'
-    }
-
+    if (isJustCompleted) return 'bg-green-400 ring-4 ring-green-300 shadow-[0_0_18px_rgba(34,197,94,0.85)] scale-110'
+    if (complete) return 'bg-green-100 ring-1 ring-green-200'
+    if (isCurrent) return 'bg-blue-50 ring-1 ring-blue-100'
     return 'bg-black/[0.04]'
   }
 
@@ -883,888 +709,327 @@ function TourSelect() {
     return 'bg-[#020817] hover:bg-black shadow-[0_14px_30px_rgba(0,0,0,0.18)]'
   }
 
-  const ResetIcon = () => (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M3 12a9 9 0 1 0 3-6.7" />
-      <path d="M3 4v5h5" />
-    </svg>
-  )
-
-  const SameDayToggle = () => {
-    const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development'
-    if (!isDev) return null
-    return (
-      <div className="flex items-center gap-2 shrink-0 ml-2">
-        <button
-          type="button"
-          onClick={() => setPreventSameDay(!preventSameDay)}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${preventSameDay ? 'bg-blue-600' : 'bg-black/20'}`}
-          aria-label="Prevent same-day bookings"
-        >
-          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${preventSameDay ? 'translate-x-6' : 'translate-x-1'}`} />
-        </button>
-        <span className="font-mont text-[11px] font-black uppercase tracking-[0.08em] text-black/60">Block same-day</span>
-      </div>
-    )
-  }
-
-  const StepProgress = () => (
-    <div className="flex w-full items-center gap-2">
-      <span className={`hidden shrink-0 rounded-full px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.16em] sm:inline-flex ${canSearch ? 'bg-green-100 text-green-800 ring-1 ring-green-300' : 'bg-blue-100 text-blue-800 ring-1 ring-blue-200'}`}>
-        {canSearch ? 'Ready to search' : `Step ${Math.min(mobileStep + 1, 3)} of 3`}
-      </span>
-      <div className="flex min-w-0 flex-1 items-center">
-        {[1, 2, 3].map((stepNumber, index) => {
-          const isActive = index === recommendedStep
-          const isDone = index < recommendedStep
-          return (
-            <div key={stepNumber} className="flex min-w-0 flex-1 items-center last:flex-none">
-              <button
-                type="button"
-                onClick={() => setMobileStep(Math.min(index, recommendedStep))}
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-bitter text-[11px] font-black tracking-normal transition-all duration-300 ${isDone ? 'bg-green-300 text-green-950 shadow-[0_0_0_3px_rgba(134,239,172,0.35)]' : isActive ? 'bg-blue-600 text-white -[0_10px_24px_rgba(37,99,235,0.22)]' : 'bg-black/7 text-black/40'}`}
-                aria-label={`Go to step ${stepNumber}`}
-              >
-                {stepNumber}
-              </button>
-              {index < 2 && (
-                <div className="relative mx-2 h-px flex-1 bg-black/14 overflow-hidden">
-                  <div ref={index === 0 ? line1Ref : line2Ref} className="absolute left-0 top-0 h-full bg-blue-500 will-change-[width]" style={{ width: index === 0 ? (recommendedStep >= 1 ? '100%' : '0%') : (recommendedStep >= 2 ? '100%' : '0%') }} />
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
-      <SameDayToggle />
-      <span className={`shrink-0 rounded-full px-2.5 py-1 font-bitter text-[9px] font-black uppercase tracking-[0.12em] sm:hidden ${canSearch ? 'bg-green-100 text-green-800 ring-1 ring-green-300' : 'bg-blue-100 text-blue-800 ring-1 ring-blue-200'}`}>
-        {canSearch ? 'Ready' : 'Current'}
-      </span>
-      <button
-        type="button"
-        onClick={handleResetDetails}
-        disabled={!hasDetails}
-        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black/8 bg-white text-black/45 transition hover:text-blue-700 disabled:pointer-events-none disabled:opacity-30"
-        aria-label="Reset booking details"
-        title="Reset details"
-      >
-        <ResetIcon />
-      </button>
-    </div>
-  )
-
-  const handleMobileContinue = () => {
-    if (canSearch && mobileStep >= 2) {
-      handleSearchClick()
-      return
-    }
-    if (!currentCard.complete) {
-      currentCard.onClick()
-      return
-    }
-    setMobileStep((previousStep) => Math.min(2, previousStep + 1))
-  }
-
-  const handleDestinationSelect = (tourTitle, tourId) => {
-    const newValue = tourTitle
-    const newPreview = `Selected: ${tourTitle}`
-
-    const match = tourId != null
-      ? tourOptions.find((tour) => tour.id === tourId)
-      : tourOptions.find((tour) => tour.title === tourTitle)
-    const rawTour = match ? match.raw : null
-    const tourAllowsChildren = !(rawTour && typeof rawTour === 'object' && rawTour.childFriendly === false)
-
-    setDestination(tourTitle)
-    setDestinationId(tourId ?? null) // NEW
-    setParticipantsConfirmed(false)
-
-    // If the newly selected tour doesn't allow children, strip any
-    // children that may have been added while a different (child-friendly)
-    // tour was selected — otherwise they'd carry over, already "added",
-    // onto a tour that shouldn't allow them at all.
-    if (!tourAllowsChildren) {
-      setChildAges([])
-    }
-
-    // NEW: re-validate the currently selected date against the newly
-    // selected tour's advance-booking window (tour.daysInAdvance). A
-    // tour that requires more notice can invalidate a date the customer
-    // already picked, so clear it rather than silently letting a stale,
-    // too-soon date through to search/checkout.
-    const newMinDate = getMinBookableDate(rawTour)
-    if (date && date < newMinDate) {
-      setDate(null)
-      setSearchError({
-        id: Date.now(),
-        message: `${tourTitle} needs more advance notice — please pick a new date.`,
-      })
-    }
-
-    completeStepWithDelay(0, 1, newValue, newPreview, 0)
-  }
-
-  const handleDateSelect = (selectedDate) => {
-    // NEW: guard against picking (or the picker somehow returning) a date
-    // that falls before this tour's minimum advance-booking window.
-    if (minBookableDate && selectedDate < minBookableDate) {
-      setSearchError({
-        id: Date.now(),
-        message: 'That date is too soon for this tour — please choose a later date.',
-      })
-      return
-    }
-
-    const newFormattedDate = selectedDate.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })
-    const newValue = newFormattedDate
-    const newPreview = destination ? `${destination} • ${newFormattedDate}` : newFormattedDate
-    setDate(selectedDate)
-    setParticipantsConfirmed(false)
-    completeStepWithDelay(1, 2, newValue, newPreview, 1)
-  }
-
-  const handleParticipantsConfirm = () => {
-    const newValue = `${participants} ${participants === 1 ? 'participant' : 'participants'}`
-    const newPreview = `${adults} ${adults === 1 ? 'adult' : 'adults'}${children ? ` • ${children} ${children === 1 ? 'child' : 'children'}` : ''}`
-    setParticipantsConfirmed(true)
-    completeStepWithDelay(2, 3, newValue, newPreview, 2)
-  }
-
-  useEffect(() => {
-    const timer = setTimeout(() => ScrollTrigger.refresh(), 50);
-    return () => clearTimeout(timer);
-  }, [searchError, activeModal, hasDetails, canSearch]);
-
   const renderDayContents = (day, dateObj) => {
-    const isToday = dateObj && new Date().toDateString() === dateObj.toDateString()
-    const isBeforeMinDate = Boolean(
+    const isBeforeMin = Boolean(
       dateObj && minBookableDate && startOfDay(dateObj).getTime() < minBookableDate.getTime()
     )
-    const isDisabled = (preventSameDay && isToday) || isBeforeMinDate
     return (
       <div className="relative flex items-center justify-center">
         <span>{day}</span>
-        {isDisabled && <span className="absolute inset-0 flex items-center justify-center text-red-500 text-lg font-bold opacity-80">✗</span>}
+        {isBeforeMin && (
+          <span className="absolute inset-0 flex items-center justify-center text-lg font-bold text-red-500 opacity-80">
+            ✗
+          </span>
+        )}
       </div>
     )
   }
 
-  const modalNode = activeModal && typeof document !== 'undefined' ? createPortal(
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md" onClick={close}>
-      <div
-        className={`modal-content flex max-h-[80vh] w-full flex-col overflow-hidden rounded-3xl bg-white/95 
-           sm:max-h-[85vh] sm:mt-16 ${
-          activeModal === 'date' ? 'max-w-md sm:max-w-lg md:max-w-xl' :
-          activeModal === 'participants' ? 'max-w-[94vw] sm:max-w-md' :
-          'max-w-[94vw] sm:max-w-3xl'
-        }`}
-        onClick={(e) => e.stopPropagation()}
-        style={{ animation: 'modal-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both' }}
-      >
-        {/* ===== STICKY HEADER ===== */}
-        <div className="sticky top-0 z-10 flex items-center justify-between 
-        border-b border-black/5 bg-white/95 px-4 py-3 backdrop-blur-sm">
-          {activeModal === 'destination' && (
-            <span className="font-bitter text-sm font-black uppercase tracking-[0.12em] text-black/60">
-              Select a tour
-            </span>
-          )}
-          {activeModal === 'date' && (
-            <span className="font-bitter text-sm font-black uppercase tracking-[0.12em] text-black/60">
-              Choose a date
-            </span>
-          )}
-          {activeModal === 'participants' && (
-            <span className="font-bitter text-sm font-black uppercase tracking-[0.12em] text-black/60">
-              Guests
-            </span>
-          )}
-          <button
-            type="button"
+  // ---------------------------------------------------------------------------
+  // modal
+  // ---------------------------------------------------------------------------
+  const isDestinationModal = activeModal === 'destination'
+
+  const modalNode =
+    activeModal && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 px-4 pb-4 pt-24 backdrop-blur-md"
             onClick={close}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-black/40 transition-colors hover:bg-black/5 hover:text-black"
-            aria-label="Close"
           >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 6 6 18M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        {activeModal === 'destination' && (
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-
-            {/* ============================================================
-                FEATURED TOUR – Premium Ad-Style Card with Scroll Shrink
-                ============================================================ */}
-            {featuredTour && (
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={MODAL_TITLES[activeModal]}
+              className={`relative flex max-h-[calc(100dvh-7rem)] w-full flex-col overflow-hidden rounded-3xl bg-white ${MODAL_WIDTHS[activeModal]}`}
+              onClick={(e) => e.stopPropagation()}
+              style={{ animation: 'modal-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both' }}
+            >
               <div
-                ref={featuredContainerRef}
-                className="shrink-0 border-b border-black/5 bg-white transition-all duration-300 ease-out pointer-events-auto"
-                style={{
-                  height: `clamp(110px, ${280 - featuredProgress * 170}px, 280px)`,
-                  padding: `${Math.max(10, 14 - featuredProgress * 4)}px ${Math.max(10, 14 - featuredProgress * 4)}px`,
-                }}
+                className={
+                  isDestinationModal
+                    ? 'absolute inset-x-0 top-0 z-40 flex items-center justify-between gap-2 bg-transparent px-3 py-2.5 backdrop-blur-md sm:px-4 sm:py-3'
+                    : 'relative z-40 flex shrink-0 items-center justify-between gap-2 border-b border-black/5 bg-white px-3 py-2.5 sm:px-4 sm:py-3'
+                }
               >
-                <div
-                  className="group relative w-full h-full overflow-hidden rounded-[28px] text-left ring-1 ring-black/5 shadow-[0_20px_55px_rgba(15,23,42,0.28)] transition-shadow duration-700 hover:shadow-[0_28px_70px_rgba(15,23,42,0.38)] pointer-events-none"
-                >
-                  <img
-                    src={featuredTour.image}
-                    alt={featuredTour.title}
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04] pointer-events-none"
-                    loading="eager"
-                    decoding="async"
-                  />
+                {isDestinationModal ? (
+                  <div className="flex min-w-0 items-center gap-2">
 
-                  {/* Legibility gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/42 to-black/10 pointer-events-none" />
-                  {/* Premium accent glow, top-right */}
-                  <div className="absolute inset-0 bg-gradient-to-bl from-emerald-400/14 via-transparent to-transparent pointer-events-none" />
-                  {/* Crisp inner edge */}
-                  <div className="pointer-events-none absolute inset-0 rounded-[28px] ring-1 ring-inset ring-white/10" />
-
-                  <div
-                    className="relative flex flex-col justify-center h-full p-2 sm:p-4 md:p-5 pointer-events-none"
-                    style={{
-                      padding: `${Math.max(10, 14 - featuredProgress * 4)}px ${Math.max(10, 14 - featuredProgress * 4)}px`,
-                    }}
-                  >
-                    <div className="max-w-2xl">
-
-                      {/* --- FULL CONTENT (shown when not shrunk) --- */}
-                      <div className={featuredProgress < 0.5 ? 'block' : 'hidden'}>
-                        <div className="mb-1 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-2.5 py-1 backdrop-blur-md sm:mb-1.5 sm:px-3">
-                          <span className="relative flex h-1.5 w-1.5">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-                          </span>
-                          <span className="font-bitter text-[7px] font-black uppercase tracking-[0.18em] text-white/90 sm:text-[9px]">
-                            ✨ Featured tour
-                          </span>
-                        </div>
-
-                        <h2 className="font-frank font-black leading-[1.04] tracking-tight text-white drop-shadow-[0_6px_16px_rgba(0,0,0,0.45)] transition-all duration-300"
-                            style={{ fontSize: `clamp(1.15rem, ${2.25 - featuredProgress * 1.2}rem, 2.25rem)` }}>
-                          Be the reason a child smiles today.
-                        </h2>
-
-                        <div className="mt-1 flex items-center gap-1.5 text-white/85">
-                          <svg className="h-2.5 w-2.5 text-emerald-300/80 sm:h-3.5 sm:w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                            <path d="M2 17l10 5 10-5" />
-                            <path d="M2 12l10 5 10-5" />
-                          </svg>
-                          <span className="font-mont text-[10px] font-semibold tracking-wide text-white/85 sm:text-xs">
-                            {featuredTour.title}
-                          </span>
-                        </div>
-
-                        <div className="mt-1 flex flex-wrap items-center gap-1 sm:mt-1.5 sm:gap-1.5">
-                          {featuredTour.location && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-1.5 py-0.5 text-[8px] font-semibold text-white/85 ring-1 ring-white/10 backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-[10px]">
-                              <svg className="h-2 w-2 text-white/55 sm:h-2.5 sm:w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" />
-                                <circle cx="12" cy="10" r="3" />
-                              </svg>
-                              {featuredTour.location}
-                            </span>
-                          )}
-                          {featuredTour.price && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/25 px-1.5 py-0.5 text-[8px] font-black text-emerald-200 ring-1 ring-emerald-300/20 backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-[10px]">
-                              <svg className="h-2 w-2 text-emerald-300/80 sm:h-2.5 sm:w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                <circle cx="12" cy="12" r="10" />
-                                <path d="M8 12h8" />
-                                <path d="M12 8v8" />
-                              </svg>
-                              From {featuredTour.price}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="mt-1 flex items-center gap-2 sm:mt-2">
-                          <button
-                            type="button"
-                            onClick={() => handleDestinationSelect(featuredTour.title, featuredTour.id)}
-                            className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 font-bitter text-[9px] font-black uppercase tracking-[0.08em] text-black shadow-[0_10px_26px_rgba(0,0,0,0.3)] transition-all duration-300 hover:scale-105 hover:shadow-[0_14px_34px_rgba(0,0,0,0.4)] active:scale-95 sm:px-4 sm:py-1.5 sm:text-[10px]"
-                          >
-                            Explore this tour
-                            <svg className="h-2.5 w-2.5 transition-transform duration-300 group-hover:translate-x-1 sm:h-3 sm:w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M5 12h14" />
-                              <path d="M12 5l7 7-7 7" />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* --- COMPACT CONTENT (shown when shrunk) --- */}
-                      <div className={`items-center justify-between gap-3 ${featuredProgress >= 0.5 ? 'flex' : 'hidden'}`}>
-                        <div className="flex min-w-0 items-center gap-2.5">
-                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-sm ring-1 ring-white/25 backdrop-blur-md">
-                            ✨
-                          </span>
-                          <div className="min-w-0">
-                            <p className="truncate font-frank text-sm font-black text-white sm:text-base">
-                              {featuredTour.title}
-                            </p>
-                            <p className="font-mont text-[9px] font-bold uppercase tracking-[0.14em] text-white/60">
-                              Featured tour
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleDestinationSelect(featuredTour.title, featuredTour.id)}
-                          className="pointer-events-auto inline-flex shrink-0 items-center gap-1 rounded-full bg-white px-3 py-1.5 font-bitter text-[9px] font-black uppercase tracking-[0.08em] text-black shadow-[0_8px_20px_rgba(0,0,0,0.25)] transition-all duration-300 hover:scale-105 active:scale-95"
-                        >
-                          Select
-                          <svg className="h-2.5 w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M5 12h14" />
-                            <path d="M12 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                      </div>
-
+                    <div className="rounded-full bg-white/15 ring-1 ring-white/30 backdrop-blur-md">
+                      <CurrencySelector />
                     </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ============================================================
-                FILTER + TOUR CONTENT
-                ============================================================ */}
-            <div className="flex min-h-0 flex-1 overflow-hidden">
-
-              {/* ============================================================
-                  FILTER SIDEBAR — DESKTOP
-                  ============================================================ */}
-              {!isMobileLayout && (
-                <div className="w-44 shrink-0 border-r border-black/5 bg-white/50 p-3 backdrop-blur-sm sm:w-52">
-                  <p className="mb-2 font-bitter text-[10px] font-black uppercase tracking-[0.12em] text-black/40">
-                    Filter by
-                  </p>
-                  <div className="flex flex-col gap-1">
-                    {tourTypes.map((type) => (
+                    <div ref={headerFilterRef} className="relative">
                       <button
-                        key={type}
                         type="button"
-                        onClick={() => setFilterType(type)}
-                        className={`rounded-lg px-3 py-2 text-left font-mont text-sm font-medium capitalize transition-colors ${
-                          filterType === type
-                            ? 'bg-blue-100 text-blue-800 ring-1 ring-blue-300'
-                            : 'text-black/60 hover:bg-black/5'
-                        }`}
+                        onClick={() => setHeaderMenuOpen((open) => !open)}
+                        aria-haspopup="listbox"
+                        aria-expanded={headerMenuOpen}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-2 font-mont text-xs font-bold text-white ring-1 ring-white/30 backdrop-blur-md transition-colors hover:bg-white/25 sm:text-sm"
                       >
-                        {type === 'all' ? 'All tours' : type}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* ============================================================
-                  TOUR LIST
-                  ============================================================ */}
-              <div
-                ref={destinationModalRef}
-                className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-3 pb-2 sm:p-4"
-                onWheel={(e) => e.stopPropagation()}
-                onTouchMove={(e) => e.stopPropagation()}
-                data-lenis-prevent
-              >
-
-                {/* ========================================================
-                    MOBILE FILTERS
-                    ======================================================== */}
-                {isMobileLayout && (
-                  <>
-                    <div className="mb-3 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                      {tourTypes.map((type) => (
-                        <button
-                          key={type}
-                          type="button"
-                          onClick={() => setFilterType(type)}
-                          className={`whitespace-nowrap rounded-full px-3 py-1.5 font-mont text-xs font-medium capitalize transition-colors ${
-                            filterType === type
-                              ? 'bg-blue-600 text-white shadow-md'
-                              : 'bg-black/5 text-black/60 hover:bg-black/10'
-                          }`}
+                        <span className="capitalize">{filterType === 'all' ? 'All tours' : filterType}</span>
+                        <svg
+                          className={`h-3.5 w-3.5 transition-transform duration-200 ${headerMenuOpen ? 'rotate-180' : ''}`}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                         >
-                          {type === 'all' ? 'All' : type}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="mb-3 flex items-center gap-2 text-xs text-black/40">
-                      <svg
-                        className="h-4 w-4"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M7 13l3 3 7-7" />
-                        <circle cx="12" cy="12" r="10" />
-                      </svg>
-                      <span className="font-mont">
-                        Tap a tour to expand and select
-                      </span>
-                    </div>
-                  </>
-                )}
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </button>
 
-                {/* ========================================================
-                    LOADER (blue dots circle)
-                    ======================================================== */}
-                {destinationLoading && (
-                  <div className="flex justify-center items-center py-6">
-                    <div className="loader-dots-circle">
-                      <span></span>
-                      <span></span>
-                      <span></span>
-                    </div>
-                  </div>
-                )}
-
-                {/* ========================================================
-                    NO TOURS
-                    ======================================================== */}
-                {filteredTours.length === 0 ? (
-                  <div className="flex h-full items-center justify-center text-black/40">
-                    No tours match this filter.
-                  </div>
-                ) : (
-                  /* ======================================================
-                     TOUR ROWS – each row starts hidden (opacity:0, y:12)
-                     ====================================================== */
-                  filteredTours.map((tour, index) => {
-                    const selected = destination === tour.title;
-                    const isExpanded =
-                      isMobileLayout && expandedIndex === index;
-
-                    return (
-                      <div
-                        key={tour.title}
-                        ref={(el) => {
-                          destinationRowRefs.current[index] = el;
-                        }}
-                        className={`
-                          group relative mb-2 w-full cursor-pointer
-                          overflow-hidden rounded-xl border
-                          transition-all duration-300
-
-                          ${!isMobileLayout && 'hover:h-28'}
-
-                          ${
-                            !isMobileLayout
-                              ? 'h-20'
-                              : isExpanded
-                                ? 'h-40'
-                                : 'h-20'
-                          }
-
-                          ${
-                            selected
-                              ? 'border-green-500 ring-2 ring-green-500/30'
-                              : 'border-black/5 hover:border-blue-200/60 hover:shadow-md'
-                          }
-                        `}
-                        style={{
-                          opacity: 0,
-                          transform: 'translateY(12px)',
-                          willChange: 'transform, opacity'
-                        }}
-                        onClick={() => {
-                          if (isMobileLayout) {
-                            setExpandedIndex((prev) =>
-                              prev === index ? null : index
-                            );
-                          } else {
-                            handleDestinationSelect(tour.title, tour.id);
-                          }
-                        }}
-                      >
-
-                        {/* ==================================================
-                            DESKTOP
-                            ================================================== */}
-                        {!isMobileLayout && (
-                          <>
-                            <div className="absolute inset-0 -z-10 transition-opacity duration-300 group-hover:opacity-0">
-                              <img
-                                src={tour.image}
-                                className="h-full w-full object-cover brightness-[0.6]"
-                                alt=""
-                                loading="lazy"
-                                decoding="async"
-                              />
-                              <div className="absolute inset-0 flex items-center justify-center overflow-hidden px-4">
-                                <div className="marquee-wrapper w-full overflow-hidden whitespace-nowrap">
-                                  <div
-                                    ref={(el) => {
-                                      destinationTitleRefs.current[index] = el;
-                                    }}
-                                    className="marquee-text inline-block font-frank text-xl font-black uppercase tracking-wide text-white drop-shadow-xl sm:text-2xl"
-                                  >
-                                    {tour.title}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="absolute inset-0 flex items-center gap-3 bg-white/90 px-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                              <img
-                                src={tour.image}
-                                className="h-14 w-14 shrink-0 rounded-lg object-cover shadow-md"
-                                alt=""
-                                loading="lazy"
-                                decoding="async"
-                              />
-                              <div className="min-w-0 flex-1">
-                                <p className="truncate font-frank text-sm font-bold text-black/85">
-                                  {tour.title}
-                                </p>
-                                <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
-                                  <span className="inline-flex items-center gap-1 rounded-full bg-black/[0.04] px-2 py-0.5 font-mont text-[10px] text-black/55">
-                                    <svg
-                                      className="h-3 w-3 text-black/30"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                    >
-                                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" />
-                                      <circle cx="12" cy="10" r="3" />
-                                    </svg>
-                                    {tour.location}
-                                  </span>
-                                  {tour.duration && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50/70 px-2 py-0.5 font-mont text-[10px] text-blue-700">
-                                      <svg
-                                        className="h-3 w-3 text-blue-400"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                      >
-                                        <circle cx="12" cy="12" r="10" />
-                                        <polyline points="12 6 12 12 16 14" />
-                                      </svg>
-                                      {tour.duration}
-                                    </span>
-                                  )}
-                                  {tour.price && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-green-100/80 px-2 py-0.5 font-bitter text-[10px] font-black text-green-800">
-                                      From {tour.price}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                              <a
-                                href={tour.link}
-                                onClick={(e) => e.stopPropagation()}
-                                className="shrink-0 rounded-full border-2 border-transparent bg-blue-600 px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-white shadow-md transition-all duration-300 hover:border-blue-400 hover:shadow-[0_0_12px_rgba(59,130,246,0.5)]"
-                              >
-                                See details
-                              </a>
-                            </div>
-                          </>
-                        )}
-
-                        {/* ==================================================
-                            MOBILE
-                            ================================================== */}
-                        {isMobileLayout && (
-                          <>
-                            <div
-                              className={`absolute inset-0 transition-opacity duration-300 ${
-                                isExpanded
-                                  ? 'opacity-0'
-                                  : 'opacity-100'
-                              }`}
-                            >
-                              <img
-                                src={tour.image}
-                                className="h-full w-full object-cover brightness-[0.6]"
-                                alt=""
-                                loading="lazy"
-                                decoding="async"
-                              />
-                              <div className="absolute inset-0 flex items-center justify-center overflow-hidden px-4">
-                                <div className="w-full overflow-hidden whitespace-nowrap">
-                                  <div className="inline-block font-frank text-xl font-black uppercase tracking-wide text-white drop-shadow-xl">
-                                    {tour.title}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div
-                              className={`absolute inset-0 flex items-center gap-3 bg-white/95 px-3 transition-opacity duration-300 ${
-                                isExpanded
-                                  ? 'opacity-100'
-                                  : 'opacity-0'
-                              }`}
-                            >
-                              <img
-                                src={tour.image}
-                                className="h-14 w-14 shrink-0 rounded-lg object-cover shadow-md"
-                                alt=""
-                                loading="lazy"
-                                decoding="async"
-                              />
-                              <div className="min-w-0 flex-1">
-                                <p className="truncate font-frank text-sm font-bold text-black/85">
-                                  {tour.title}
-                                </p>
-                                <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
-                                  <span className="inline-flex items-center gap-1 rounded-full bg-black/[0.04] px-2 py-0.5 font-mont text-[10px] text-black/55">
-                                    <svg
-                                      className="h-3 w-3 text-black/30"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                    >
-                                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" />
-                                      <circle cx="12" cy="10" r="3" />
-                                    </svg>
-                                    {tour.location}
-                                  </span>
-                                  {tour.duration && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50/70 px-2 py-0.5 font-mont text-[10px] text-blue-700">
-                                      <svg
-                                        className="h-3 w-3 text-blue-400"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                      >
-                                        <circle cx="12" cy="12" r="10" />
-                                        <polyline points="12 6 12 12 16 14" />
-                                      </svg>
-                                      {tour.duration}
-                                    </span>
-                                  )}
-                                  {tour.price && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-green-100/80 px-2 py-0.5 font-bitter text-[10px] font-black text-green-800">
-                                      From {tour.price}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="flex shrink-0 flex-col items-end gap-1">
+                      {headerMenuOpen && (
+                        <ul
+                          role="listbox"
+                          className="absolute left-0 top-full z-50 mt-1.5 max-h-64 w-56 overflow-y-auto rounded-2xl bg-white p-1.5 shadow-[0_20px_50px_rgba(15,23,42,0.22)] ring-1 ring-black/10"
+                          data-lenis-prevent
+                        >
+                          {tourTypes.map((type) => {
+                            const active = type === filterType
+                            return (
+                              <li key={type} role="option" aria-selected={active}>
                                 <button
                                   type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDestinationSelect(tour.title, tour.id);
+                                  onClick={() => {
+                                    setFilterType(type)
+                                    setHeaderMenuOpen(false)
                                   }}
-                                  className="rounded-full bg-blue-600 px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-white shadow-md transition-all duration-300 hover:bg-blue-700"
+                                  className={`flex w-full items-center justify-between rounded-xl px-4 py-2.5 text-left font-mont text-sm font-semibold capitalize transition-colors ${
+                                    active ? 'bg-sky-50 text-sky-700' : 'text-black/70 hover:bg-black/5'
+                                  }`}
                                 >
-                                  Select
+                                  {type === 'all' ? 'All tours' : type}
+                                  {active && (
+                                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                      <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                  )}
                                 </button>
-                                <a
-                                  href={tour.link}
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="rounded-full border border-blue-600 px-3 py-1.5 font-bitter text-[10px] font-black uppercase tracking-[0.08em] text-blue-600 shadow-md transition-all duration-300 hover:bg-blue-700 hover:text-white"
-                                >
-                                  Details
-                                </a>
-                              </div>
-                            </div>
-                          </>
-                        )}
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      )}
+                    </div>
 
-                        {/* ==================================================
-                            SELECTED CHECKMARK
-                            ================================================== */}
-                        {selected && (
-                          <div className="absolute right-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-green-500 shadow-md">
-                            <svg
-                              className="h-3.5 w-3.5 text-white"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="3"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                          </div>
-                        )}
-
-                      </div>
-                    );
-                  })
-                )}
-
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeModal === 'date' && (
-          <div className="flex flex-col items-center gap-2 p-4 pb-6 sm:p-6 md:p-8">
-            {advanceNoticeLabel && (
-              <p className="text-center font-mont text-xs font-semibold text-black/50">
-                {advanceNoticeLabel}
-              </p>
-            )}
-            <div className="datepicker-large">
-              <DatePicker
-                selected={date}
-                onChange={handleDateSelect}
-                minDate={minBookableDate}
-                renderDayContents={renderDayContents}
-                filterDate={(dateObj) => {
-                  if (minBookableDate && startOfDay(dateObj).getTime() < minBookableDate.getTime()) {
-                    return false
-                  }
-                  if (preventSameDay) {
-                    const today = new Date()
-                    return dateObj.toDateString() !== today.toDateString()
-                  }
-                  return true
-                }}
-                inline
-              />
-            </div>
-          </div>
-        )}
-
-        {activeModal === 'participants' && (
-          <div className="flex-1 overflow-y-auto px-4 pb-5 pt-2 text-black sm:px-6 sm:pb-6">
-            <div className="mb-4 flex justify-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-blue-50 shadow-md ring-1 ring-blue-200">
-                <img src="./icons/guest.png" className="h-10 w-auto" alt="Guests" aria-hidden="true" />
-              </div>
-            </div>
-            <div className="grid gap-3">
-              <div className="flex items-center justify-between gap-4 rounded-2xl border border-black/8 bg-black/[0.02] px-4 py-3">
-                <div>
-                  <p className="font-bitter text-sm font-black uppercase tracking-[0.12em]">Adults</p>
-                  <p className="font-mont text-xs text-black/40">Ages 13+</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button type="button" onClick={() => { setAdults((prev) => Math.max(1, prev - 1)); setParticipantsConfirmed(false) }} className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black disabled:opacity-30" disabled={adults === 1}>−</button>
-                  <span className="w-7 text-center font-mont text-base">{adults}</span>
-                  <button type="button" onClick={() => { setAdults((prev) => Math.min(20, prev + 1)); setParticipantsConfirmed(false) }} className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black">+</button>
-                </div>
-              </div>
-
-              {/* ================================================================
-                  CHILDREN — per-child age selection, gated on childFriendly
-                  ================================================================ */}
-              <div className="rounded-2xl border border-black/8 bg-black/[0.02] px-4 py-3">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="font-bitter text-sm font-black uppercase tracking-[0.12em]">Children</p>
-                    <p className="font-mont text-xs text-black/40">
-                      {isChildFriendly ? "Add each child's age" : 'Not available for this tour'}
-                    </p>
                   </div>
-                  <span className="rounded-full bg-blue-50 px-2.5 py-1 font-mont text-[10px] font-black text-blue-700">
-                    {childAges.length}
+                ) : (
+                  <span className="font-bitter text-sm font-black uppercase tracking-[0.12em] text-black/60">
+                    {MODAL_TITLES[activeModal]}
                   </span>
-                </div>
-
-                {!isChildFriendly && (
-                  <div className="mt-3 flex items-center gap-2 rounded-lg border border-amber-200/80 bg-amber-50/70 px-3 py-2 font-mont text-xs text-amber-800">
-                    <span aria-hidden="true">⚠️</span>
-                    <span>This tour isn&apos;t child-friendly, so children can&apos;t be added.</span>
-                  </div>
                 )}
 
                 <button
                   type="button"
-                  disabled={!isChildFriendly}
-                  onClick={addChild}
-                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5 font-mont text-xs font-black uppercase tracking-[0.05em] text-blue-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+                  onClick={close}
+                  aria-label="Close"
+                  className="close-btn flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-600 text-white shadow-[0_6px_18px_rgba(220,38,38,0.4)] transition-colors hover:bg-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-300"
                 >
-                  <span className="text-base leading-none">+</span> Add child
+                  <svg
+                    className="close-icon h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
                 </button>
-
-                {childAges.length > 0 && (
-                  <div className="mt-3 space-y-2">
-                    {childAges.map((age, index) => {
-                      const numericAge = Number(age) || 0
-                      let category, icon
-                      if (numericAge <= 5) { category = 'Toddler'; icon = '🧒' }
-                      else if (numericAge <= 11) { category = 'Child'; icon = '👦' }
-                      else { category = 'Teen'; icon = '🧑' }
-
-                      return (
-                        <div
-                          key={index}
-                          className="flex items-center gap-2.5 rounded-xl border border-black/5 bg-white px-3 py-2 transition-colors duration-200 hover:border-blue-100 hover:bg-blue-50/40"
-                        >
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-neutral-50 text-base shadow-sm">
-                            {icon}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="font-mont text-xs font-black text-neutral-900">{category} {index + 1}</p>
-                            <p className="font-mont text-[10px] text-neutral-400">{numericAge} yrs</p>
-                          </div>
-                          <div className="flex shrink-0 items-center rounded-lg border border-black/10 bg-white">
-                            <button
-                              type="button"
-                              onClick={() => updateChildAge(index, -1)}
-                              disabled={numericAge <= 0}
-                              className="flex h-7 w-7 items-center justify-center rounded-l-lg text-sm font-black text-neutral-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30"
-                              aria-label={`Decrease ${category} ${index + 1} age`}
-                            >
-                              −
-                            </button>
-                            <div className="flex h-7 min-w-[34px] items-center justify-center border-x border-black/5 px-1 font-mont text-xs font-black text-neutral-950">
-                              {numericAge}
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => updateChildAge(index, 1)}
-                              disabled={numericAge >= 17}
-                              className="flex h-7 w-7 items-center justify-center rounded-r-lg text-sm font-black text-neutral-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30"
-                              aria-label={`Increase ${category} ${index + 1} age`}
-                            >
-                              +
-                            </button>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => removeChild(index)}
-                            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-neutral-300 transition-all duration-200 hover:bg-red-50 hover:text-red-500"
-                            aria-label={`Remove ${category} ${index + 1}`}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
               </div>
-            </div>
-            <div className="mt-4 rounded-2xl bg-green-50 px-4 py-3 font-mont text-xs text-green-800 ring-1 ring-green-200">
-              Total guests: <span className="font-bold">{participants}</span>
-            </div>
-            <button type="button" onClick={handleParticipantsConfirm} className="mt-4 w-full rounded-xl bg-black py-3 font-bitter text-sm font-black uppercase tracking-[0.12em] text-white transition-colors hover:bg-black/80">Confirm guests</button>
-          </div>
-        )}
-      </div>
-    </div>,
-    document.body
-  ) : null
 
+              {activeModal === 'destination' && (
+                <DestinationModal
+                  tourOptions={tourOptions}
+                  selectedTitle={destination}
+                  featuredId={FEATURED_TOUR_ID}
+                  filterType={filterType}
+                  onSelect={handleDestinationSelect}
+                  onSeeDetails={handleSeeDetails}
+                />
+              )}
+
+              {activeModal === 'date' && (
+                <div className="flex flex-col items-center gap-2 p-4 pb-6 sm:p-6 md:p-8">
+                  {advanceNoticeLabel && (
+                    <p className="text-center font-mont text-xs font-semibold text-black/50">
+                      {advanceNoticeLabel}
+                    </p>
+                  )}
+                  <div className="datepicker-large">
+                    <DatePicker
+                      selected={date}
+                      onChange={handleDateSelect}
+                      minDate={minBookableDate}
+                      renderDayContents={renderDayContents}
+                      filterDate={(d) =>
+                        !(minBookableDate && startOfDay(d).getTime() < minBookableDate.getTime())
+                      }
+                      inline
+                    />
+                  </div>
+                </div>
+              )}
+
+              {activeModal === 'participants' && (
+                <div className="flex-1 overflow-y-auto px-4 pb-5 pt-2 text-black sm:px-6 sm:pb-6">
+                  <div className="mb-4 flex justify-center">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-blue-50 shadow-md ring-1 ring-blue-200">
+                      <img src="./icons/guest.png" className="h-10 w-auto" alt="Guests" aria-hidden="true" />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3">
+                    <div className="flex items-center justify-between gap-4 rounded-2xl border border-black/8 bg-black/[0.02] px-4 py-3">
+                      <div>
+                        <p className="font-bitter text-sm font-black uppercase tracking-[0.12em]">Adults</p>
+                        <p className="font-mont text-xs text-black/40">Ages 13+</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAdults((prev) => Math.max(1, prev - 1))
+                            setParticipantsConfirmed(false)
+                          }}
+                          disabled={adults === 1}
+                          className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black disabled:opacity-30"
+                        >
+                          −
+                        </button>
+                        <span className="w-7 text-center font-mont text-base">{adults}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAdults((prev) => Math.min(20, prev + 1))
+                            setParticipantsConfirmed(false)
+                          }}
+                          className="flex h-9 w-9 items-center justify-center rounded-full border border-black/20 text-lg transition-colors hover:border-black"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-black/8 bg-black/[0.02] px-4 py-3">
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <p className="font-bitter text-sm font-black uppercase tracking-[0.12em]">Children</p>
+                          <p className="font-mont text-xs text-black/40">
+                            {isChildFriendly ? "Add each child's age" : 'Not available for this tour'}
+                          </p>
+                        </div>
+                        <span className="rounded-full bg-blue-50 px-2.5 py-1 font-mont text-[10px] font-black text-blue-700">
+                          {childAges.length}
+                        </span>
+                      </div>
+
+                      {!isChildFriendly && (
+                        <div className="mt-3 flex items-center gap-2 rounded-lg border border-amber-200/80 bg-amber-50/70 px-3 py-2 font-mont text-xs text-amber-800">
+                          <span aria-hidden="true">⚠️</span>
+                          <span>This tour isn&apos;t child-friendly, so children can&apos;t be added.</span>
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        disabled={!isChildFriendly}
+                        onClick={addChild}
+                        className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5 font-mont text-xs font-black uppercase tracking-[0.05em] text-blue-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+                      >
+                        <span className="text-base leading-none">+</span> Add child
+                      </button>
+
+                      {childAges.length > 0 && (
+                        <div className="mt-3 space-y-2">
+                          {childAges.map((age, index) => {
+                            const numericAge = Number(age) || 0
+                            let category, icon
+                            if (numericAge <= 5) { category = 'Toddler'; icon = '🧒' }
+                            else if (numericAge <= 11) { category = 'Child'; icon = '👦' }
+                            else { category = 'Teen'; icon = '🧑' }
+
+                            return (
+                              <div
+                                key={index}
+                                className="flex items-center gap-2.5 rounded-xl border border-black/5 bg-white px-3 py-2 transition-colors duration-200 hover:border-blue-100 hover:bg-blue-50/40"
+                              >
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-neutral-50 text-base shadow-sm">
+                                  {icon}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="font-mont text-xs font-black text-neutral-900">{category} {index + 1}</p>
+                                  <p className="font-mont text-[10px] text-neutral-400">{numericAge} yrs</p>
+                                </div>
+                                <div className="flex shrink-0 items-center rounded-lg border border-black/10 bg-white">
+                                  <button
+                                    type="button"
+                                    onClick={() => updateChildAge(index, -1)}
+                                    disabled={numericAge <= 0}
+                                    className="flex h-7 w-7 items-center justify-center rounded-l-lg text-sm font-black text-neutral-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30"
+                                    aria-label={`Decrease ${category} ${index + 1} age`}
+                                  >
+                                    −
+                                  </button>
+                                  <div className="flex h-7 min-w-[34px] items-center justify-center border-x border-black/5 px-1 font-mont text-xs font-black text-neutral-950">
+                                    {numericAge}
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => updateChildAge(index, 1)}
+                                    disabled={numericAge >= 17}
+                                    className="flex h-7 w-7 items-center justify-center rounded-r-lg text-sm font-black text-neutral-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30"
+                                    aria-label={`Increase ${category} ${index + 1} age`}
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeChild(index)}
+                                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-neutral-300 transition-all duration-200 hover:bg-red-50 hover:text-red-500"
+                                  aria-label={`Remove ${category} ${index + 1}`}
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-2xl bg-green-50 px-4 py-3 font-mont text-xs text-green-800 ring-1 ring-green-200">
+                    Total guests: <span className="font-bold">{participants}</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleParticipantsConfirm}
+                    className="mt-4 w-full rounded-xl bg-black py-3 font-bitter text-sm font-black uppercase tracking-[0.12em] text-white transition-colors hover:bg-black/80"
+                  >
+                    Confirm guests
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>,
+          document.body
+        )
+      : null
+
+  // ---------------------------------------------------------------------------
+  // render
+  // ---------------------------------------------------------------------------
   return (
     <>
-
-      {/* top of container */}
-      <div className="relative mx-auto w-full max-w-5xl overflow-visible rounded-[26px] 
-       p-3 sm:rounded-[28px] sm:p-4">
-
+      <div className="relative mx-auto w-full max-w-5xl overflow-visible rounded-[26px] p-3 sm:rounded-[28px] sm:p-4">
         {isMobileLayout ? (
           <div className="rounded-[22px] p-2">
             <button
@@ -1789,7 +1054,7 @@ function TourSelect() {
                 <div ref={mobileValueTextRef} className="h-6 truncate font-frank text-xl font-black leading-tight text-[#020817]">
                   {currentCard.value}
                 </div>
-                <div ref={mobilePreviewTextRef} className="h-6 mt-1 line-clamp-2 font-mont text-sm text-black/45">
+                <div ref={mobilePreviewTextRef} className="mt-1 line-clamp-2 h-6 font-mont text-sm text-black/45">
                   {currentCard.preview}
                 </div>
               </div>
@@ -1807,37 +1072,56 @@ function TourSelect() {
               <button
                 type="button"
                 onClick={handleMobileContinue}
-                className={`flex min-w-[9.5rem] items-center justify-center gap-2 rounded-2xl px-5 py-3 font-bitter text-sm font-black uppercase tracking-[0.08em] text-white transition ${canSearch && mobileStep >= 2 ? searchButtonClass(canSearch, searchAttempted) : 'bg-[#020817] hover:bg-black shadow-[0_14px_30px_rgba(0,0,0,0.18)]'}`}
+                className={`flex min-w-[9.5rem] items-center justify-center gap-2 rounded-2xl px-5 py-3 font-bitter text-sm font-black uppercase tracking-[0.08em] text-white transition ${canSearch && mobileStep >= 2 ? searchButtonClass(canSearch, searchAttempted) : 'bg-[#020817] shadow-[0_14px_30px_rgba(0,0,0,0.18)] hover:bg-black'}`}
               >
                 <span>{canSearch && mobileStep >= 2 ? 'Search' : 'Continue'}</span>
-                <img src={canSearch && mobileStep >= 2 ? './icons/go.png' : './icons/topRightArrow.png'} className="h-4 w-auto" alt="" aria-hidden="true" />
+                <img
+                  src={canSearch && mobileStep >= 2 ? './icons/go.png' : './icons/topRightArrow.png'}
+                  className="h-4 w-auto"
+                  alt=""
+                  aria-hidden="true"
+                />
               </button>
             </div>
           </div>
         ) : (
-          <div className="grid max-w-full overflow-hidden rounded-[22px] 
-          border-4 border-blue-500 bg-white min-[700px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_190px] min-[1100px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_220px]">
+          <div className="grid max-w-full overflow-hidden rounded-[22px] border-4 border-blue-500 bg-white min-[700px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_190px] min-[1100px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_220px]">
             {cards.slice(0, 3).map((card, index) => (
               <button
                 key={card.key}
-                ref={(el) => { desktopTileRefs.current[index] = el }}
+                ref={(el) => {
+                  desktopTileRefs.current[index] = el
+                }}
                 type="button"
                 onClick={card.onClick}
-                className={`group flex min-w-0 items-center gap-3 border-black/8 bg-white px-4 py-4 text-left transition-all duration-300 hover:bg-blue-50/35 sm:px-5 sm:py-5 min-[700px]:min-h-[92px] min-[700px]:px-3 min-[900px]:px-5 ${index < 2 ? 'border-b min-[700px]:border-b-0 min-[700px]:border-r' : 'border-b min-[700px]:border-b-0 min-[700px]:border-r'}`}
+                className="group flex min-w-0 items-center gap-3 border-b border-black/8 bg-white px-4 py-4 text-left transition-all duration-300 hover:bg-blue-50/35 sm:px-5 sm:py-5 min-[700px]:min-h-[92px] min-[700px]:border-b-0 min-[700px]:border-r min-[700px]:px-3 min-[900px]:px-5"
               >
-                <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-colors duration-300 group-hover:scale-105 ${card.complete ? 'bg-green-100 ring-1 ring-green-200' : 'bg-black/[0.04]'}`}>
+                <div
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-colors duration-300 group-hover:scale-105 ${card.complete ? 'bg-green-100 ring-1 ring-green-200' : 'bg-black/[0.04]'}`}
+                >
                   <img src={card.icon} className="h-6 w-auto" alt="" aria-hidden="true" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div ref={(el) => { desktopValueRefs.current[index] = el }} className="truncate font-frank text-base font-black text-black/75">
+                  <div
+                    ref={(el) => {
+                      desktopValueRefs.current[index] = el
+                    }}
+                    className="truncate font-frank text-base font-black text-black/75"
+                  >
                     {card.value}
                   </div>
-                  <div ref={(el) => { desktopPreviewRefs.current[index] = el }} className="mt-0.5 hidden truncate font-mont text-xs text-black/40 sm:block">
+                  <div
+                    ref={(el) => {
+                      desktopPreviewRefs.current[index] = el
+                    }}
+                    className="mt-0.5 hidden truncate font-mont text-xs text-black/40 sm:block"
+                  >
                     {card.preview}
                   </div>
                 </div>
               </button>
             ))}
+
             <div className="min-w-0 bg-white p-3 sm:p-4 min-[700px]:p-3 min-[1100px]:p-4">
               <button
                 type="button"
@@ -1854,7 +1138,10 @@ function TourSelect() {
 
       {searchError && (
         <div className="mx-auto w-full max-w-5xl px-2">
-          <div ref={errorBarRef} className="mt-2 overflow-hidden rounded-2xl border border-red-200 bg-red-50/95 shadow-[0_14px_34px_rgba(248,113,113,0.14)] backdrop-blur-md">
+          <div
+            ref={errorBarRef}
+            className="mt-2 overflow-hidden rounded-2xl border border-red-200 bg-red-50/95 shadow-[0_14px_34px_rgba(248,113,113,0.14)] backdrop-blur-md"
+          >
             <div className="flex items-center gap-3 px-4 py-3">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -1879,15 +1166,6 @@ function TourSelect() {
           from { opacity: 0; transform: scale(0.96) translateY(6px); }
           to { opacity: 1; transform: scale(1) translateY(0); }
         }
-        .modal-scrollable {
-          scrollbar-width: thin;
-          scrollbar-color: #cbd5e1 #f1f5f9;
-          overscroll-behavior: contain;
-        }
-        .modal-scrollable::-webkit-scrollbar { width: 6px; }
-        .modal-scrollable::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        .modal-scrollable::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .modal-scrollable::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .datepicker-large .react-datepicker { font-size: 1.1rem; width: 100%; }
         .datepicker-large .react-datepicker__month-container { width: 100%; }
         .datepicker-large .react-datepicker__day-name,
@@ -1910,45 +1188,11 @@ function TourSelect() {
             width: 2.2rem; line-height: 2.2rem; margin: 0.1rem; font-size: 0.9rem;
           }
         }
-
-        /* --- Marquee animation (only when .marquee-active is present) --- */
-        .marquee-wrapper {
-          width: 100%;
-          overflow: hidden;
-          white-space: nowrap;
-        }
-        .marquee-wrapper.marquee-active .marquee-text {
-          display: inline-block;
-          padding-left: 100%;
-          animation: scrollText 12s linear infinite;
-        }
-        @keyframes scrollText {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-100%); }
-        }
-
-        /* --- Blue dots circle loader --- */
-        .loader-dots-circle {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 8px;
-        }
-        .loader-dots-circle span {
-          display: block;
-          width: 14px;
-          height: 14px;
-          border-radius: 50%;
-          background: #3b82f6;
-          animation: dotPulse 1.2s ease-in-out infinite both;
-        }
-        .loader-dots-circle span:nth-child(1) { animation-delay: -0.32s; }
-        .loader-dots-circle span:nth-child(2) { animation-delay: -0.16s; }
-        .loader-dots-circle span:nth-child(3) { animation-delay: 0s; }
-
-        @keyframes dotPulse {
-          0%, 80%, 100% { transform: scale(0.5); opacity: 0.3; }
-          40% { transform: scale(1); opacity: 1; }
+        .close-btn .close-icon { transform-style: preserve-3d; }
+        @media (prefers-reduced-motion: no-preference) {
+          @keyframes close-flip-x { from { transform: rotateX(0deg); } to { transform: rotateX(360deg); } }
+          .close-btn:hover .close-icon,
+          .close-btn:focus-visible .close-icon { animation: close-flip-x 0.6s ease-in-out; }
         }
       `}</style>
     </>

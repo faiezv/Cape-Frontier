@@ -34,7 +34,23 @@ const Styles = () => (
   `}</style>
 )
 
-function SeeAllTours() {
+const BUTTON_CLASSES =
+  'group relative inline-flex min-h-12 items-center gap-3 overflow-hidden rounded-full bg-blue-700 py-2.5 pl-6 pr-3 font-bitter text-sm font-black text-white shadow-[0_14px_32px_rgba(0,30,255,0.28)] transition duration-300 hover:-translate-y-0.5 hover:bg-blue-800 hover:shadow-[0_18px_38px_rgba(0,30,255,0.34)] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 sm:text-base'
+
+/**
+ * Call-to-action that sits directly beneath the tour browser.
+ *
+ * - `href`      → render a real <a> (e.g. href="/tours"). Wins over scrolling.
+ * - `targetId`  → element to smooth-scroll to when no href is given.
+ * - `label`     → button copy.
+ */
+function SeeAllTours({
+  targetId = 'featured-tours',
+  fallbackId = 'journey-start',
+  label = 'Browse all tours',
+  href = null,
+  className = '',
+}) {
   const sectionRef = useRef(null)
   const [shown, setShown] = useState(false)
 
@@ -62,10 +78,10 @@ function SeeAllTours() {
     return () => io.disconnect()
   }, [])
 
-  const scrollToTours = useCallback(() => {
+  const scrollToTarget = useCallback(() => {
     const target =
-      document.getElementById('tours') ||
-      document.getElementById('featured-tours')
+      document.getElementById(targetId) ||
+      (fallbackId ? document.getElementById(fallbackId) : null)
 
     if (!target) return
 
@@ -77,13 +93,31 @@ function SeeAllTours() {
     }
 
     window.scrollTo({ top: y, behavior: 'smooth' })
-  }, [])
+  }, [targetId, fallbackId])
+
+  const inner = (
+    <>
+      {/* light sweep across the button */}
+      <span
+        aria-hidden="true"
+        className="sat-shimmer pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-white/25"
+      />
+
+      <span id="see-all-tours-title" className="relative">
+        {label}
+      </span>
+
+      <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white text-blue-700">
+        <ArrowDownIcon className="sat-bob h-4 w-4" />
+      </span>
+    </>
+  )
 
   return (
     <section
       ref={sectionRef}
       aria-labelledby="see-all-tours-title"
-      className="flex w-full justify-center px-4 py-8 sm:py-12"
+      className={`flex w-full justify-center px-4 py-6 sm:py-8 ${className}`}
     >
       <Styles />
 
@@ -92,54 +126,22 @@ function SeeAllTours() {
           shown ? 'sat-shown' : 'sat-hidden'
         }`}
       >
-        <div className="flex items-center gap-3">
-          <span aria-hidden="true" className="h-px w-8 bg-black/15 sm:w-12" />
-          <p
-            className="font-bitter text-[11px] font-black uppercase tracking-[0.24em] sm:text-xs"
-            style={{ color: 'var(--color-brand-lightblue)' }}
-          >
-            Explore more
-          </p>
-          <span aria-hidden="true" className="h-px w-8 bg-black/15 sm:w-12" />
-        </div>
-
-        <h2
-          id="see-all-tours-title"
-          className="mt-3 font-frank text-3xl font-bold leading-[1.05] sm:text-4xl"
-          style={{ color: 'var(--color-brand-darkblue)' }}
-        >
-          Not sure which one fits you?
-        </h2>
-
-        <p className="mt-3 max-w-md font-mont text-sm leading-relaxed text-black/60 sm:text-base">
-          Hikes, city routes, sundowners and packages. Browse the full list and
-          find the Cape Town experience that suits your group.
-        </p>
-
-        <div className="relative mt-6">
+        <div className="relative">
           {/* soft pulsing halo behind the button */}
           <span
             aria-hidden="true"
             className="sat-ring pointer-events-none absolute inset-0 rounded-full bg-blue-700/40"
           />
 
-          <button
-            type="button"
-            onClick={scrollToTours}
-            className="group relative inline-flex min-h-12 items-center gap-3 overflow-hidden rounded-full bg-blue-700 py-2.5 pl-6 pr-3 font-bitter text-sm font-black text-white shadow-[0_14px_32px_rgba(0,30,255,0.28)] transition duration-300 hover:-translate-y-0.5 hover:bg-blue-800 hover:shadow-[0_18px_38px_rgba(0,30,255,0.34)] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 sm:text-base"
-          >
-            {/* light sweep across the button */}
-            <span
-              aria-hidden="true"
-              className="sat-shimmer pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-white/25"
-            />
-
-            <span className="relative">Browse every tour</span>
-
-            <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white text-blue-700">
-              <ArrowDownIcon className="sat-bob h-4 w-4" />
-            </span>
-          </button>
+          {href ? (
+            <a href={href} className={BUTTON_CLASSES}>
+              {inner}
+            </a>
+          ) : (
+            <button type="button" onClick={scrollToTarget} className={BUTTON_CLASSES}>
+              {inner}
+            </button>
+          )}
         </div>
       </div>
     </section>

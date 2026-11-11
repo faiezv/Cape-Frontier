@@ -6,7 +6,6 @@ import PopularTours from "./PopularTours.jsx";
 import StripeSponsored from "./StripeSponsored.jsx";
 import WhatMakesUsDifferent from "./WhatMakesUsDifferent.jsx";
 import FeaturedTours from "./FeaturedTours.jsx";
-import SeeAllTours from "./SeeAllTours.jsx";
 import Tours from "../Tours/Tours.jsx";
 import { site } from "../../utils/siteConfig.js";
 
@@ -26,13 +25,6 @@ gsap.registerPlugin(ScrollTrigger);
 // -----------------------------------------------------------------------------
 // Per-site copy
 // -----------------------------------------------------------------------------
-// The .co.za and .com builds share one codebase, so without this their visible
-// text is identical and Google merges them as duplicates. Edit the wording so
-// every claim is true for your business.
-//
-// Only the FIRST slide is in the pre-rendered HTML (the rotation runs in the
-// browser), so slide 0 (eyebrow, title, description), mobileDesc and the stats
-// carry the per-site wording.
 const COPY = {
   coza: {
     slides: [
@@ -88,8 +80,6 @@ const COPY = {
   },
 };
 
-// Same switch as Tours.jsx: decided per build, so each domain's pre-rendered
-// HTML ships its own wording.
 const isZA = site.key === "coza";
 const copy = isZA ? COPY.coza : COPY.com;
 
@@ -99,8 +89,6 @@ const exploreSlides = copy.slides.map((item, index) => ({
   ...item,
   img: slideImages[index],
 }));
-
-// The linkCards array is commented out – we keep it as is.
 
 const stats = copy.stats;
 
@@ -149,9 +137,6 @@ const About = () => {
   const [slideIndex, setSlideIndex] = useState(0);
   const slide = exploreSlides[slideIndex];
 
-  // ---------------------------------------------------------------------------
-  // page navigation helpers (unchanged)
-  // ---------------------------------------------------------------------------
   const scrollToSection = useCallback((primaryId, fallbackId = null) => {
     const target =
       document.getElementById(primaryId) ||
@@ -332,7 +317,8 @@ const About = () => {
                 </div>
               </div>
             </div>
-            {/* //Stats  */}
+
+            {/* Stats */}
             <div className="flex min-w-0 flex-col justify-between gap-5 md:w-1/2 md:gap-8">
               <div className="flex flex-col gap-3 md:gap-4 items-center">
                 <div className="overflow-hidden">
@@ -413,31 +399,29 @@ const About = () => {
         </div>
       </section>
 
+      {/* -------------------------------------------------------------------
+          Tour browser + "browse all tours" CTA underneath it
+      ------------------------------------------------------------------- */}
       <section id="tours" ref={toursSectionRef} className="relative z-26">
         <Tours />
       </section>
 
-      {/* ---------------------------------------------------------------------
+      {/* -------------------------------------------------------------------
           journey area – link strip still commented out
-      --------------------------------------------------------------------- */}
+      ------------------------------------------------------------------- */}
       <section className="relative z-20 w-full">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 sm:gap-8 sm:px-6 lg:px-8">
-          {/* <div className="md:block">
-            <CurrentPopularTour />
-          </div> */}
 
-          <div id="journey-start" className="scroll-mt-24 mb-24">
-            <SeeAllTours />
+          <div id="journey-start" className="scroll-mt-24 my-12">
             <FeaturedTours />
           </div>
 
-          {/* <ReviewsShowcase reviews={reviews} NumberBadge={NumberBadge} /> */}
         </div>
       </section>
 
-      {/* ---------------------------------------------------------------------
+      {/* -------------------------------------------------------------------
           trust + remaining sections (unchanged)
-      --------------------------------------------------------------------- */}
+      ------------------------------------------------------------------- */}
       <section className="relative z-20 w-full scroll-mt-24">
         <WhatMakesUsDifferent />
         <div className="mx-auto flex w-full max-w-5xl flex-col px-4 sm:px-6 lg:px-8">
