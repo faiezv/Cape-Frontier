@@ -231,7 +231,6 @@ export const tours = [
       ],
     },
 
-
     highlights: [
       { text: "Close‑up shark encounters" },
       { text: "Safe steel cage with professional supervision" },
@@ -884,8 +883,6 @@ export const tours = [
         },
       ],
     },
-
-
 
     description:
       "Experience one of Cape Town's most iconic adventures — a scenic tandem paragliding flight over the Atlantic coastline. Guests enjoy breathtaking views of Sea Point, the Twelve Apostles, and the city bowl while flying with a licensed and accredited tandem paragliding operator.",
@@ -1600,7 +1597,6 @@ export const tours = [
       icon: "",
       tiers: [],
     },
-
 
     description:
       "Since Carroll Shelby introduced the first Cobra in 1962, this iconic machine has captured the imagination of drivers worldwide. If touring the Cape Peninsula in a bus or standard rental car doesn't excite you, elevate your adventure — drive a Cobra and make the journey part of the experience. This popular 24‑hour option allows you to explore Cape Point and all the top highlights at your own pace.",
@@ -2804,7 +2800,6 @@ export const tours = [
       ],
     },
 
-
     description:
       "A guided hike up Platteklip Gorge, one of the most direct routes to the top of Table Mountain. This route is steep, scenic, and rewarding for active travellers.",
 
@@ -3000,7 +2995,6 @@ export const tours = [
         },
       ],
     },
-
 
     description:
       "Langa Township, meaning 'sun' in isiXhosa, is Cape Town's oldest township and a vibrant destination for experiencing South Africa's culture, history, and community spirit. Established formally in 1927 following the 1923 Urban Areas Act, Langa is one of South Africa's oldest townships and played a pivotal role in the anti-apartheid struggle. It was initially developed to house Black Africans under strict apartheid regulations. The name 'Langa' derives from Chief Langalibalele, who resisted colonial authorities and was imprisoned on Robben Island, while 'sun' reflects its Xhosa meaning.",
@@ -3337,7 +3331,6 @@ export const tours = [
       tiers: [],
     },
 
-
     description:
       "Robben Island is a small island off the coast of Cape Town, South Africa, historically used as a prison for political prisoners, including Nelson Mandela, and now serves as a UNESCO World Heritage Site and museum symbolizing the triumph of the human spirit over oppression. Robben Island, whose name derives from the Dutch word for 'seals,' spans roughly 5 square miles and lies about 7 kilometres from Cape Town. The island has a long and complex history stretching over 400 years. Other prominent prisoners included Robert Sobukwe, Ahmed Kathrada, and Walter Sisulu. Today, Robben Island is a UNESCO World Heritage Site and home to the Robben Island Museum. Visitors can explore the former prison, historical buildings, and natural landscapes, often guided by former inmates who share firsthand experiences. The island's enduring legacy lies in its poignant symbolism of resistance, resilience, and reconciliation, making it a major site of learning and reflection on South African history.",
 
@@ -3595,7 +3588,7 @@ export const tours = [
       enabled: true,
       icon: "/icons/savemore.png",
       countsTowardTier: {
-        teens: true,      // default true, matches current behaviour
+        teens: true, // default true, matches current behaviour
         children: true,
         toddlers: false,
       },
@@ -3636,7 +3629,6 @@ export const tours = [
         },
       ],
     },
-
 
     description:
       "A powerful cultural immersion into Cape Town's Coloured heritage — exploring Islamic and Christian roots, slavery, forced removals, and modern community life. Guests enjoy a traditional Cape Malay lunch and take part in meaningful community upliftment through food distribution. Every booking directly supports underprivileged families.",
@@ -4075,7 +4067,6 @@ export const tours = [
         },
       ],
     },
-
 
     description:
       "Discover the history, culture and iconic landmarks of Cape Town on a private full-day city experience. Begin with artisan coffee at the famous Truth Coffee before exploring some of the city's most important heritage sites, including District Six Museum, the Slave Lodge and the Castle of Good Hope. Continue through the colourful streets of Bo-Kaap, experience South Africa's gemstone industry at Afrogem, and finish the day at Table Mountain for panoramic views across Cape Town, the Atlantic Ocean and surrounding mountains. This experience combines Cape Town's complex history, vibrant communities, creative culture and spectacular scenery into one comprehensive private city tour.",
@@ -4907,310 +4898,6 @@ export const tours = [
 
     tags: ["Package", "Full Day", "Premium Route", "Cape Peninsula"],
   },
-  // Stellenbosch Wine-Estate
-  {
-    id: 15,
-    type: TOUR_TYPES.PACKAGES,
-    category: TOUR_MODIFIERS.FULL_DAY,
-
-    title: "Premium Stellenbosch Wine, Cheese & Chocolate Pairing Tour",
-    slug: "premium-stellenbosch-wine-cheese-chocolate-pairing-tour",
-    canonicalPath:
-      "/tours/premium-stellenbosch-wine-cheese-chocolate-pairing-tour",
-    childFriendly: true,
-
-    seo: {
-      title:
-        "Premium Stellenbosch Wine, Cheese & Chocolate Pairing Tour | Cape Frontier Tours",
-      description:
-        "Enjoy a private full-day Stellenbosch wine experience visiting Spier, Delaire Graff and Rust en Vrede, with wine tastings, cheese pairings, lunch, scenic views and a professional private driver-guide.",
-      keywords: [
-        "Stellenbosch wine tour",
-        "Stellenbosch wine cheese chocolate tour",
-        "Cape Town wine tour",
-        "Spier Wine Farm tour",
-        "Delaire Graff wine tour",
-        "Rust en Vrede wine tour",
-        "private Stellenbosch wine tour",
-        "Cape Winelands wine tour",
-      ],
-    },
-
-    workflow: defaultWorkflow,
-
-    image: getCoverImage(`${STELLENBOSCH_WINE_BASE}/delaire`),
-    images: packageGallery(
-      STELLENBOSCH_WINE_BASE,
-      ["spier", "delaire", "rust-en-vrede"],
-      3,
-    ),
-    destinationGalleries: packageDestinationGalleries(
-      STELLENBOSCH_WINE_BASE,
-      ["spier", "delaire", "rust-en-vrede"],
-      3,
-    ),
-    imageFolder: "packages/wine-farms",
-
-    location: "Stellenbosch, South Africa",
-    duration: "Full Day",
-
-    priceBase: 2250,
-    minPeople: 4,
-
-    pricing: [
-      {
-        category: "Adults",
-        pricePerPerson: 2250,
-        note: "Private driver/guide • Minimum 4 guests",
-      },
-      {
-        category: "Teens (12–17 years)",
-        pricePerPerson: 950,
-        note: "Kids grape juice tasting at Spier • Lunch at Rust en Vrede • No wine tasting",
-      },
-      {
-        category: "Children (5–11 years)",
-        pricePerPerson: 950,
-        note: "Kids grape juice tasting at Spier • Lunch at Rust en Vrede • No wine tasting",
-      },
-      {
-        category: "Toddlers",
-        pricePerPerson: null,
-        note: "Toddlers are not suitable for this tour.",
-      },
-    ],
-
-    groupPricing: {
-      enabled: true,
-      icon: "/icons/savemore.png",
-      tiers: [
-        {
-          minPeople: 5,
-          maxPeople: null,
-          perPerson: 2000,
-          label: "5+ Guests",
-          note: "Reduced adult rate for groups of 5 or more",
-        },
-      ],
-    },
-
-
-    description:
-      "A premium private Stellenbosch wine experience visiting three exceptional estates: Spier Wine Farm, Delaire Graff Estate and Rust en Vrede. Enjoy wine tastings and cheese pairings at Spier and Delaire Graff, followed by a wine tasting and lunch at historic Rust en Vrede. The experience combines scenic Cape Winelands landscapes, historic estates, premium wine, food pairings and a professional private driver-guide.",
-
-    highlights: [
-      { text: "Private driver and professional guide" },
-      { text: "Three premium Stellenbosch wine estates" },
-      { text: "Wine and cheese pairings included" },
-      { text: "Lunch included at Rust en Vrede" },
-      { text: "Scenic mountain and vineyard views" },
-      { text: "Cape Dutch architecture and historic estates" },
-      { text: "Kids grape juice tasting at Spier" },
-    ],
-
-    included: [
-      { text: "Private vehicle for the full tour" },
-      { text: "Professional driver/guide" },
-      { text: "Wine tasting at Spier Wine Farm" },
-      { text: "Cheese pairing at Spier" },
-      { text: "Kids grape juice tasting at Spier" },
-      { text: "Wine tasting at Delaire Graff" },
-      { text: "Cheese pairing at Delaire Graff" },
-      { text: "Wine tasting at Rust en Vrede" },
-      { text: "Lunch at Rust en Vrede" },
-      { text: "Bottled water" },
-      { text: "Pick-up and drop-off in Cape Town CBD" },
-      { text: "Photo stops at all three estates" },
-      { text: "Guided explanations of each estate" },
-    ],
-
-    excluded: [
-      { text: "Dessert at Rust en Vrede" },
-      { text: "Additional beverages at any estate" },
-      { text: "Premium wine upgrades, including Icon and Reserve wines" },
-      { text: "Charcuterie platters at Delaire Graff" },
-      { text: "Eagle Encounters at Spier" },
-      { text: "Kids activities beyond the included grape juice tasting" },
-      { text: "Wine tasting for children" },
-      { text: "Gratuities" },
-      { text: "Personal purchases, including wine bottles and gifts" },
-      { text: "Any extras not specifically listed under inclusions" },
-    ],
-
-    pickupOptions: DEFAULT_PICKUP_OPTIONS,
-
-    stops: [
-      {
-        id: "spier",
-        name: "Spier Wine Farm",
-        time: "09:30",
-        duration: "1.5 hours",
-        note: "Wine tasting and cheese pairing",
-        description:
-          "One of South Africa's oldest wine farms, established in 1692. Spier combines Cape Dutch heritage, scenic lawns, riverside areas and a relaxed, family-friendly atmosphere. Guests enjoy a wine tasting and cheese pairing, while children can enjoy a grape juice tasting.",
-        exactLocation: mapLocation({
-          label: "Spier Wine Farm",
-          address: "R310 Baden Powell Drive, Stellenbosch, South Africa",
-          query: "Spier Wine Farm Stellenbosch",
-        }),
-        images: getTourImages(`${STELLENBOSCH_WINE_BASE}/spier`, 3),
-        touristComments: [
-          {
-            name: "Chloe",
-            country: "AU",
-            text: "Spier was relaxed and beautiful, and the cheese pairing was a lovely way to start the day.",
-          },
-        ],
-      },
-
-      {
-        id: "delaire-graff",
-        name: "Delaire Graff",
-        time: "11:30",
-        duration: "1.5 hours",
-        note: "Premium wine tasting and cheese pairing",
-        description:
-          "Perched on the Helshoogte Pass overlooking the Simonsberg and Banghoek Valley, Delaire Graff combines luxury architecture, art, gardens and dramatic mountain views. Guests enjoy a premium wine tasting with a beautifully presented cheese pairing.",
-        exactLocation: mapLocation({
-          label: "Delaire Graff Estate",
-          address: "Helshoogte Road, Stellenbosch, South Africa",
-          query: "Delaire Graff Estate Stellenbosch",
-        }),
-        images: getTourImages(`${STELLENBOSCH_WINE_BASE}/delaire`, 3),
-        touristComments: [
-          {
-            name: "Isabella",
-            country: "IT",
-            text: "The views were incredible and the estate felt incredibly elegant without being rushed.",
-          },
-        ],
-      },
-
-      {
-        id: "rust-en-vrede",
-        name: "Rust en Vrede",
-        time: "13:30",
-        duration: "2 hours",
-        note: "Wine tasting and lunch",
-        description:
-          "A historic Stellenbosch estate dating back to 1694, Rust en Vrede is renowned for its premium red wines and historic Cape Dutch buildings. Guests enjoy a wine tasting followed by lunch in an elegant and peaceful estate setting.",
-        exactLocation: mapLocation({
-          label: "Rust en Vrede Wine Estate",
-          address: "Annandale Road, Stellenbosch, South Africa",
-          query: "Rust en Vrede Wine Estate Stellenbosch",
-        }),
-        images: getTourImages(`${STELLENBOSCH_WINE_BASE}/rust-en-vrede`, 3),
-        touristComments: [
-          {
-            name: "Oliver",
-            country: "UK",
-            text: "The historic setting was beautiful, and finishing the tour with lunch made the whole experience feel very special.",
-          },
-        ],
-      },
-    ],
-
-    groupDiscount: {
-      enabled: false,
-      icon: "/icons/savemore.png",
-      rules: [],
-    },
-
-    needToKnow: [
-      {
-        text: "The tour has a minimum requirement of 4 guests.",
-      },
-      {
-        text: "Adult pricing is R2,250 per person for groups of 4.",
-      },
-      {
-        text: "Adult groups of 5 or more receive the R2,000 per person group rate.",
-      },
-      {
-        text: "Children aged 5–17 years are charged R950 per child.",
-      },
-      {
-        text: "Children do not participate in wine tastings.",
-      },
-      {
-        text: "Children can enjoy the grape juice tasting at Spier.",
-      },
-      {
-        text: "Estate availability may affect exact booking times.",
-      },
-      {
-        text: "The tour follows a relaxed premium itinerary with three estate visits.",
-      },
-    ],
-
-    cancellationPolicy: {
-      summary:
-        "Estate availability and advance bookings can affect the final itinerary.",
-      items: [
-        {
-          text: "Wine farm stops may change depending on estate availability.",
-        },
-        {
-          text: "Tasting and lunch reservations may require advance confirmation.",
-        },
-        {
-          text: "Final cancellation rules must be confirmed at the time of booking.",
-        },
-      ],
-    },
-
-    faqs: [
-      {
-        question: "How many wine estates are included?",
-        answer:
-          "The tour visits three estates: Spier Wine Farm, Delaire Graff Estate and Rust en Vrede.",
-      },
-      {
-        question: "What is included in the wine and food pairings?",
-        answer:
-          "Spier includes a wine tasting and cheese pairing. Delaire Graff includes a wine tasting and cheese pairing. Rust en Vrede includes a wine tasting and lunch.",
-      },
-      {
-        question: "Can children join the tour?",
-        answer:
-          "Yes. Children aged 5–17 years are welcome and are charged R950 per child. Children receive a grape juice tasting at Spier and lunch at Rust en Vrede but do not participate in wine tastings.",
-      },
-      {
-        question: "What is the minimum number of guests?",
-        answer: "The private tour requires a minimum of 4 guests.",
-      },
-      {
-        question: "Is there a group discount?",
-        answer:
-          "Yes. Groups of 5 or more receive a reduced adult rate of R2,000 per person.",
-      },
-      {
-        question: "Is transport included?",
-        answer:
-          "Yes. The experience includes a private vehicle, professional driver/guide, bottled water and Cape Town CBD pick-up and drop-off.",
-      },
-      {
-        question: "Are premium wine upgrades included?",
-        answer:
-          "No. Premium Icon and Reserve wine upgrades are excluded and can be purchased separately where available.",
-      },
-      {
-        question: "Is the Delaire Graff charcuterie platter included?",
-        answer:
-          "No. Charcuterie platters at Delaire Graff are optional and are not included in the tour price.",
-      },
-    ],
-
-    tags: [
-      "Wine",
-      "Stellenbosch",
-      "Full Day",
-      "Cape Winelands",
-      "Cheese Pairing",
-      "Private Tour",
-      "Family Friendly",
-    ],
-  },
   // District-Six + Langa
   {
     id: 17, // New tour ID to be assigned (e.g., 37)
@@ -5670,8 +5357,6 @@ export const tours = [
       tiers: [],
     },
 
-
-
     description:
       "A full-day guided experience starting and ending in Cape Town. Guests enjoy a mix of adrenaline, animal encounters, artisanal chocolate tasting, scenic Winelands views, Franschhoek village exploration, and the world-famous Babylonstoren gardens. Perfect for families, couples, and small groups.",
 
@@ -5780,7 +5465,7 @@ export const tours = [
           },
         ],
 
-        image: ['/src/assets/images/tours/packages/cool-runnings/5.webp']
+        image: ["/src/assets/images/tours/packages/cool-runnings/5.webp"],
       },
 
       {
@@ -5810,7 +5495,6 @@ export const tours = [
             text: "Browsing a boutique shop with scarves, blankets, and handmade goods",
           },
         ],
-
       },
 
       {
@@ -5924,7 +5608,6 @@ export const tours = [
       },
     ],
 
-
     needToKnow: [
       {
         text: "Lunch is not included in the tour price.",
@@ -5985,9 +5668,7 @@ export const tours = [
     workflow: defaultWorkflow,
 
     image: "/src/assets/images/tours/packages/family-wine/1.webp",
-    images: [
-      "/src/assets/images/tours/packages/family-wine/1.webp",
-    ],
+    images: ["/src/assets/images/tours/packages/family-wine/1.webp"],
     imageFolder: "packages/family-wine",
     videos: [],
 
@@ -6052,8 +5733,6 @@ export const tours = [
         },
       ],
     },
-
-
 
     description:
       "This full-day family-friendly experience combines the beauty of the Stellenbosch Winelands with activities designed to keep children entertained. Adults can enjoy a premium wine tasting at Vredenheim while children explore the Big Cats Park, farm animals, jungle gym and gardens. The day continues with a choice of Butterfly World or Giraffe House, a relaxed lunch in Stellenbosch, a historic town walk, scenic views along Helshoogte Pass and seasonal strawberry picking at Mooiberge. With comfortable private transport, bottled water and structured timing, this tour offers a relaxed and memorable Cape Winelands experience for the whole family.",
@@ -6384,6 +6063,309 @@ export const tours = [
       "day-tour",
     ],
   },
+  // Stellenbosch Wine-Estate
+  {
+    id: 15,
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.FULL_DAY,
+
+    title: "Premium Stellenbosch Wine, Cheese & Chocolate Pairing Tour",
+    slug: "premium-stellenbosch-wine-cheese-chocolate-pairing-tour",
+    canonicalPath:
+      "/tours/premium-stellenbosch-wine-cheese-chocolate-pairing-tour",
+    childFriendly: true,
+
+    seo: {
+      title:
+        "Premium Stellenbosch Wine, Cheese & Chocolate Pairing Tour | Cape Frontier Tours",
+      description:
+        "Enjoy a private full-day Stellenbosch wine experience visiting Spier, Delaire Graff and Rust en Vrede, with wine tastings, cheese pairings, lunch, scenic views and a professional private driver-guide.",
+      keywords: [
+        "Stellenbosch wine tour",
+        "Stellenbosch wine cheese chocolate tour",
+        "Cape Town wine tour",
+        "Spier Wine Farm tour",
+        "Delaire Graff wine tour",
+        "Rust en Vrede wine tour",
+        "private Stellenbosch wine tour",
+        "Cape Winelands wine tour",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: getCoverImage(`${STELLENBOSCH_WINE_BASE}/delaire`),
+    images: packageGallery(
+      STELLENBOSCH_WINE_BASE,
+      ["spier", "delaire", "rust-en-vrede"],
+      3,
+    ),
+    destinationGalleries: packageDestinationGalleries(
+      STELLENBOSCH_WINE_BASE,
+      ["spier", "delaire", "rust-en-vrede"],
+      3,
+    ),
+    imageFolder: "packages/wine-farms",
+
+    location: "Stellenbosch, South Africa",
+    duration: "Full Day",
+
+    priceBase: 2250,
+    minPeople: 4,
+
+    pricing: [
+      {
+        category: "Adults",
+        pricePerPerson: 2250,
+        note: "Private driver/guide • Minimum 4 guests",
+      },
+      {
+        category: "Teens (12–17 years)",
+        pricePerPerson: 950,
+        note: "Kids grape juice tasting at Spier • Lunch at Rust en Vrede • No wine tasting",
+      },
+      {
+        category: "Children (5–11 years)",
+        pricePerPerson: 950,
+        note: "Kids grape juice tasting at Spier • Lunch at Rust en Vrede • No wine tasting",
+      },
+      {
+        category: "Toddlers",
+        pricePerPerson: null,
+        note: "Toddlers are not suitable for this tour.",
+      },
+    ],
+
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        {
+          minPeople: 5,
+          maxPeople: null,
+          perPerson: 2000,
+          label: "5+ Guests",
+          note: "Reduced adult rate for groups of 5 or more",
+        },
+      ],
+    },
+
+    description:
+      "A premium private Stellenbosch wine experience visiting three exceptional estates: Spier Wine Farm, Delaire Graff Estate and Rust en Vrede. Enjoy wine tastings and cheese pairings at Spier and Delaire Graff, followed by a wine tasting and lunch at historic Rust en Vrede. The experience combines scenic Cape Winelands landscapes, historic estates, premium wine, food pairings and a professional private driver-guide.",
+
+    highlights: [
+      { text: "Private driver and professional guide" },
+      { text: "Three premium Stellenbosch wine estates" },
+      { text: "Wine and cheese pairings included" },
+      { text: "Lunch included at Rust en Vrede" },
+      { text: "Scenic mountain and vineyard views" },
+      { text: "Cape Dutch architecture and historic estates" },
+      { text: "Kids grape juice tasting at Spier" },
+    ],
+
+    included: [
+      { text: "Private vehicle for the full tour" },
+      { text: "Professional driver/guide" },
+      { text: "Wine tasting at Spier Wine Farm" },
+      { text: "Cheese pairing at Spier" },
+      { text: "Kids grape juice tasting at Spier" },
+      { text: "Wine tasting at Delaire Graff" },
+      { text: "Cheese pairing at Delaire Graff" },
+      { text: "Wine tasting at Rust en Vrede" },
+      { text: "Lunch at Rust en Vrede" },
+      { text: "Bottled water" },
+      { text: "Pick-up and drop-off in Cape Town CBD" },
+      { text: "Photo stops at all three estates" },
+      { text: "Guided explanations of each estate" },
+    ],
+
+    excluded: [
+      { text: "Dessert at Rust en Vrede" },
+      { text: "Additional beverages at any estate" },
+      { text: "Premium wine upgrades, including Icon and Reserve wines" },
+      { text: "Charcuterie platters at Delaire Graff" },
+      { text: "Eagle Encounters at Spier" },
+      { text: "Kids activities beyond the included grape juice tasting" },
+      { text: "Wine tasting for children" },
+      { text: "Gratuities" },
+      { text: "Personal purchases, including wine bottles and gifts" },
+      { text: "Any extras not specifically listed under inclusions" },
+    ],
+
+    pickupOptions: DEFAULT_PICKUP_OPTIONS,
+
+    stops: [
+      {
+        id: "spier",
+        name: "Spier Wine Farm",
+        time: "09:30",
+        duration: "1.5 hours",
+        note: "Wine tasting and cheese pairing",
+        description:
+          "One of South Africa's oldest wine farms, established in 1692. Spier combines Cape Dutch heritage, scenic lawns, riverside areas and a relaxed, family-friendly atmosphere. Guests enjoy a wine tasting and cheese pairing, while children can enjoy a grape juice tasting.",
+        exactLocation: mapLocation({
+          label: "Spier Wine Farm",
+          address: "R310 Baden Powell Drive, Stellenbosch, South Africa",
+          query: "Spier Wine Farm Stellenbosch",
+        }),
+        images: getTourImages(`${STELLENBOSCH_WINE_BASE}/spier`, 3),
+        touristComments: [
+          {
+            name: "Chloe",
+            country: "AU",
+            text: "Spier was relaxed and beautiful, and the cheese pairing was a lovely way to start the day.",
+          },
+        ],
+      },
+
+      {
+        id: "delaire-graff",
+        name: "Delaire Graff",
+        time: "11:30",
+        duration: "1.5 hours",
+        note: "Premium wine tasting and cheese pairing",
+        description:
+          "Perched on the Helshoogte Pass overlooking the Simonsberg and Banghoek Valley, Delaire Graff combines luxury architecture, art, gardens and dramatic mountain views. Guests enjoy a premium wine tasting with a beautifully presented cheese pairing.",
+        exactLocation: mapLocation({
+          label: "Delaire Graff Estate",
+          address: "Helshoogte Road, Stellenbosch, South Africa",
+          query: "Delaire Graff Estate Stellenbosch",
+        }),
+        images: getTourImages(`${STELLENBOSCH_WINE_BASE}/delaire`, 3),
+        touristComments: [
+          {
+            name: "Isabella",
+            country: "IT",
+            text: "The views were incredible and the estate felt incredibly elegant without being rushed.",
+          },
+        ],
+      },
+
+      {
+        id: "rust-en-vrede",
+        name: "Rust en Vrede",
+        time: "13:30",
+        duration: "2 hours",
+        note: "Wine tasting and lunch",
+        description:
+          "A historic Stellenbosch estate dating back to 1694, Rust en Vrede is renowned for its premium red wines and historic Cape Dutch buildings. Guests enjoy a wine tasting followed by lunch in an elegant and peaceful estate setting.",
+        exactLocation: mapLocation({
+          label: "Rust en Vrede Wine Estate",
+          address: "Annandale Road, Stellenbosch, South Africa",
+          query: "Rust en Vrede Wine Estate Stellenbosch",
+        }),
+        images: getTourImages(`${STELLENBOSCH_WINE_BASE}/rust-en-vrede`, 3),
+        touristComments: [
+          {
+            name: "Oliver",
+            country: "UK",
+            text: "The historic setting was beautiful, and finishing the tour with lunch made the whole experience feel very special.",
+          },
+        ],
+      },
+    ],
+
+    groupDiscount: {
+      enabled: false,
+      icon: "/icons/savemore.png",
+      rules: [],
+    },
+
+    needToKnow: [
+      {
+        text: "The tour has a minimum requirement of 4 guests.",
+      },
+      {
+        text: "Adult pricing is R2,250 per person for groups of 4.",
+      },
+      {
+        text: "Adult groups of 5 or more receive the R2,000 per person group rate.",
+      },
+      {
+        text: "Children aged 5–17 years are charged R950 per child.",
+      },
+      {
+        text: "Children do not participate in wine tastings.",
+      },
+      {
+        text: "Children can enjoy the grape juice tasting at Spier.",
+      },
+      {
+        text: "Estate availability may affect exact booking times.",
+      },
+      {
+        text: "The tour follows a relaxed premium itinerary with three estate visits.",
+      },
+    ],
+
+    cancellationPolicy: {
+      summary:
+        "Estate availability and advance bookings can affect the final itinerary.",
+      items: [
+        {
+          text: "Wine farm stops may change depending on estate availability.",
+        },
+        {
+          text: "Tasting and lunch reservations may require advance confirmation.",
+        },
+        {
+          text: "Final cancellation rules must be confirmed at the time of booking.",
+        },
+      ],
+    },
+
+    faqs: [
+      {
+        question: "How many wine estates are included?",
+        answer:
+          "The tour visits three estates: Spier Wine Farm, Delaire Graff Estate and Rust en Vrede.",
+      },
+      {
+        question: "What is included in the wine and food pairings?",
+        answer:
+          "Spier includes a wine tasting and cheese pairing. Delaire Graff includes a wine tasting and cheese pairing. Rust en Vrede includes a wine tasting and lunch.",
+      },
+      {
+        question: "Can children join the tour?",
+        answer:
+          "Yes. Children aged 5–17 years are welcome and are charged R950 per child. Children receive a grape juice tasting at Spier and lunch at Rust en Vrede but do not participate in wine tastings.",
+      },
+      {
+        question: "What is the minimum number of guests?",
+        answer: "The private tour requires a minimum of 4 guests.",
+      },
+      {
+        question: "Is there a group discount?",
+        answer:
+          "Yes. Groups of 5 or more receive a reduced adult rate of R2,000 per person.",
+      },
+      {
+        question: "Is transport included?",
+        answer:
+          "Yes. The experience includes a private vehicle, professional driver/guide, bottled water and Cape Town CBD pick-up and drop-off.",
+      },
+      {
+        question: "Are premium wine upgrades included?",
+        answer:
+          "No. Premium Icon and Reserve wine upgrades are excluded and can be purchased separately where available.",
+      },
+      {
+        question: "Is the Delaire Graff charcuterie platter included?",
+        answer:
+          "No. Charcuterie platters at Delaire Graff are optional and are not included in the tour price.",
+      },
+    ],
+
+    tags: [
+      "Wine",
+      "Stellenbosch",
+      "Full Day",
+      "Cape Winelands",
+      "Cheese Pairing",
+      "Private Tour",
+      "Family Friendly",
+    ],
+  },
   // Stellenbosch & Franschhoek Winelands + Tram
   {
     id: 23,
@@ -6415,10 +6397,8 @@ export const tours = [
 
     workflow: defaultWorkflow,
 
-    image: '/src/assets/images/tours/packages/winelands+tram/1.webp',
-    images: [
-      '/src/assets/images/tours/packages/winelands+tram/1.webp',
-    ],
+    image: "/src/assets/images/tours/packages/winelands+tram/1.webp",
+    images: ["/src/assets/images/tours/packages/winelands+tram/1.webp"],
     imageFolder: "packages/winelands+tram",
     videos: [],
 
@@ -6501,8 +6481,6 @@ export const tours = [
         },
       ],
     },
-
-
 
     description:
       "A luxurious full-day journey through the Stellenbosch and Franschhoek Winelands, featuring three premium wine estates, breathtaking scenery, included cheese OR chocolate pairings, and the iconic Franschhoek Wine Tram. Perfect for couples, families and wine lovers seeking a relaxed, scenic and unforgettable Cape Winelands experience. The tour is family-friendly, with spacious wine-estate lawns, mountain scenery, outdoor areas and an open-air Wine Tram experience that children can enjoy.",
@@ -6658,8 +6636,6 @@ export const tours = [
       ],
     },
 
-
-
     safetyPolicy: {
       summary:
         "Guests are expected to follow the safety and venue guidelines provided by the driver-guide and each wine estate.",
@@ -6773,7 +6749,6 @@ export const tours = [
         optional: false,
         image: "",
       },
-
     ],
     securityAndLiability: null,
 
@@ -6935,9 +6910,7 @@ export const tours = [
     workflow: defaultWorkflow,
 
     image: "/src/assets/images/tours/packages/cape-town-gems/3.webp",
-    images: [
-      "/src/assets/images/tours/packages/cape-town-gems/3.webp"
-    ],
+    images: ["/src/assets/images/tours/packages/cape-town-gems/3.webp"],
     imageFolder: "packages/cape-town-gems",
     videos: [],
 
@@ -7229,7 +7202,6 @@ export const tours = [
       },
     ],
 
-
     securityAndLiability: null,
 
     accommodation: {
@@ -7333,8 +7305,7 @@ export const tours = [
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.DAY_TOUR,
 
-    title:
-      "West Coast National Park, Kraalbaai & Groote Post Winery",
+    title: "West Coast National Park, Kraalbaai & Groote Post Winery",
     slug: "west-coast-national-park-kraalbaai-groote-post-winery-tour",
     canonicalPath:
       "/tours/west-coast-national-park-kraalbaai-groote-post-winery-tour",
@@ -7364,9 +7335,7 @@ export const tours = [
     workflow: defaultWorkflow,
 
     image: "/src/assets/images/tours/packages/west-coast/1.webp",
-    images: [
-      "/src/assets/images/tours/packages/west-coast/1.webp",
-    ],
+    images: ["/src/assets/images/tours/packages/west-coast/1.webp"],
     imageFolder: "packages/west-coast",
     videos: [],
 
@@ -7445,7 +7414,6 @@ export const tours = [
         },
       ],
     },
-
 
     description:
       "A private full-day journey along the Cape West Coast, combining the natural beauty of West Coast National Park, the turquoise lagoon waters of Kraalbaai and the peaceful countryside setting of Groote Post Winery. Guests can enjoy wildlife viewing, scenic lagoon viewpoints, beach time, photography stops and a standard wine tasting at Groote Post. The experience also includes private transport, a professional driver-guide, onboard Wi-Fi, bottled water and all listed entry fees.",
@@ -7625,7 +7593,6 @@ export const tours = [
       ],
     },
 
-
     safetyPolicy: {
       summary:
         "Guests must follow the safety requirements of West Coast National Park, Kraalbaai activity operators and Groote Post Winery.",
@@ -7655,7 +7622,6 @@ export const tours = [
     itinerary: null,
 
     stops: [
-
       {
         name: "Yzerfontein",
         description:
@@ -7722,7 +7688,6 @@ export const tours = [
         image: "",
       },
     ],
-
 
     needToKnow: [
       {
@@ -7853,512 +7818,6 @@ export const tours = [
       "family-friendly",
     ],
   },
-    // 4-Day Gondwana & Garden Route
-  // {
-  //   id: null, // assign
-  //   type: TOUR_TYPES.PACKAGES,
-  //   category: TOUR_MODIFIERS.MULTI_DAY,
-
-  //   title: "4-Day Gondwana Safari & Garden Route Experience",
-  //   slug: "4-day-gondwana-garden-route-safari",
-  //   canonicalPath: "/tours/4-day-gondwana-garden-route-safari",
-  //   // childFriendly: ???, // QUERY CLIENT
-  //   // daysInAdvance: ???, // QUERY CLIENT (booking cut-off for the 12–15 Dec departure)
-
-  //   seo: {
-  //     title:
-  //       "4-Day Gondwana Big Five Safari & Garden Route Tour from Cape Town | Cape Frontier Tours",
-  //     description:
-  //       "4 days, 3 nights: luxury Big Five safari at Gondwana, Mossel Bay zipline, Knysna sunset cruise and wildlife sanctuaries. Departs Cape Town 12 Dec 2026.",
-  //     keywords: [
-  //       "Gondwana safari",
-  //       "Gondwana Private Game Reserve",
-  //       "Garden Route tour",
-  //       "4 day Garden Route tour",
-  //       "Big Five safari Garden Route",
-  //       "Mossel Bay zipline",
-  //       "Knysna sunset cruise",
-  //       "Knysna Elephant Park",
-  //       "Monkeyland",
-  //       "Birds of Eden",
-  //       "Cape Town multi-day tour",
-  //     ],
-  //   },
-
-  //   workflow: defaultWorkflow,
-
-  //   image:
-  //     "/src/assets/images/tours/packages/4-day-gondwana-garden-route/hero.webp", // TODO
-  //   images: [], // TODO
-  //   imageFolder: "packages/4-day-gondwana-garden-route",
-  //   videos: [],
-
-  //   location: "Garden Route, South Africa",
-  //   duration: "4 Days / 3 Nights",
-
-  //   priceBase: 39500, // only known price; lower it if group discounts are confirmed
-  //   minPeople: 2,
-
-  //   pricing: [
-  //     {
-  //       category: "Standard package",
-  //       pricePerPerson: 39500, // QUERY CLIENT: per person, per couple, or per room?
-  //       note: "4 days / 3 nights including accommodation, game drives, Mossel Bay zipline and Knysna sunset cruise.",
-  //     },
-
-  //     // QUERY CLIENT: left out on purpose. TourPricing runs Number(pricePerPerson),
-  //     // so null, "" or undefined would render "R0.00" or "RNaN" on the live page.
-  //     // { category: "Solo Traveller", pricePerPerson: ???, note: "" },
-  //     // { category: "Children (12-17 years)", pricePerPerson: ???, note: "" },
-  //     // { category: "Children (4–12 years)", pricePerPerson: ???, note: "" },
-  //     // { category: "Children (0–3 years)", pricePerPerson: ???, note: "" },
-  //   ],
-
-  //   additionalPricing: [
-  //     {
-  //       type: "request",
-  //       category: "Optional Wolf Sanctuary Visit (Day 4)",
-  //       price: null, // QUERY CLIENT
-  //       unit: "per person",
-  //       currency: "ZAR",
-  //       note: "Optional stop on the return to Cape Town. Price on request.",
-  //     },
-  //   ],
-
-  //   groupPricing: {
-  //     enabled: false, // QUERY CLIENT: turn on only if group discounts exist
-  //     icon: "/icons/savemore.png",
-  //     tiers: [
-  //       // { minPeople: 2, maxPeople: 2, perPerson: ???, label: "2 Guests", note: "" },
-  //       // { minPeople: 3, maxPeople: 4, perPerson: ???, label: "3–4 Guests", note: "" },
-  //       // { minPeople: 5, perPerson: ???, label: "5+ Guests", note: "" },
-  //     ],
-  //   },
-
-  //   rating: null,
-  //   stars: null,
-  //   mainReviewerName: "",
-  //   mainReviewerCountry: "",
-  //   reviewYear: null,
-  //   otherReviews: null,
-  //   mainReview: "",
-
-  //   description:
-  //     "Escape on an unforgettable journey along South Africa's famous Garden Route. Enjoy luxury accommodation, thrilling adventure activities, spectacular coastal scenery and an authentic Big Five safari at Gondwana Private Game Reserve. This carefully crafted itinerary combines relaxation, wildlife encounters, breathtaking landscapes and adventure into one extraordinary holiday experience.",
-
-  //   highlights: [
-  //     {
-  //       text: "Gondwana Private Game Reserve — Luxury Big Five safari with game drives",
-  //     },
-  //     {
-  //       text: "Mossel Bay Zipline Adventure — The world's longest over-ocean zipline",
-  //     },
-  //     {
-  //       text: "Knysna Sunset Cruise — A lagoon cruise past the Knysna Heads",
-  //     },
-  //     { text: "Monkeyland Sanctuary" },
-  //     { text: "Birds of Eden" },
-  //     { text: "Jukani Wildlife Sanctuary" },
-  //     { text: "Knysna Elephant Park" },
-  //   ],
-
-  //   included: [
-  //     {
-  //       text: "3 nights' accommodation (Gondwana Private Game Reserve, then Knysna Waterfront Lodge)",
-  //     },
-  //     { text: "Free Wi-Fi in the lodge and rooms at Gondwana" },
-  //     { text: "Lunch and dinner on Day 1" },
-  //     { text: "Afternoon and morning game drives with beverages and snacks" },
-  //     { text: "Breakfast on the morning of 13 December" },
-  //     { text: "Housekeeping" },
-  //     {
-  //       text: "Mossel Bay Zipline experience (the world's longest over-ocean zipline)",
-  //     },
-  //     { text: "Knysna Sunset Lagoon Cruise" },
-  //     {
-  //       text: "Complimentary filtered water, coffee and tea in accommodation and during meals",
-  //     },
-  //     // QUERY CLIENT: entry fees (Jukani, Monkeyland, Birds of Eden, Elephant Park),
-  //     // vehicle, driver/guide and transfers are not stated in the source, so not listed.
-  //   ],
-
-  //   excluded: [
-  //     {
-  //       text: "Soft drinks and alcoholic beverages (except those served on game drives)",
-  //     },
-  //     { text: "Lunches and selected dinners not listed as included" },
-  //     { text: "Travel insurance" },
-  //     { text: "Personal expenses" },
-  //     { text: "Gratuities" },
-  //   ],
-
-  //   pickupOptions: [], // QUERY CLIENT: pickup points, if offered
-  //   requirements: [],
-
-  //   arrangements: {
-  //     availability: "Fixed dates: 12–15 December 2026",
-  //     duration: "4 Days / 3 Nights",
-  //     operatingTime: "",
-  //     departure: "11:00 from Cape Town",
-  //     return: "15 December 2026, return to Cape Town",
-  //     location: "Cape Town → Gondwana → Knysna → Cape Town",
-  //     clothing: [],
-  //     thingsToBring: [],
-  //     passengerPolicy: "",
-  //     notes: [
-  //       "Gondwana check-in 14:00; check-out 11:00 on 13 December 2026",
-  //       "Optional Wolf Sanctuary visit on Day 4",
-  //     ],
-  //   },
-
-  //   // null until supplied (empty objects are truthy and would
-  //   // render empty sections in TourDetails)
-  //   weatherPolicy: null,
-  //   cancellationPolicy: null,
-  //   safetyPolicy: null,
-
-  //   /*
-  //    * MULTI-DAY ITINERARY
-  //    */
-  //   itinerary: {
-  //     intro: {
-  //       title: "Your 4-Day Garden Route Journey",
-  //       description:
-  //         "From a luxury Big Five safari at Gondwana to the lagoon, forests and wildlife sanctuaries around Knysna.",
-  //     },
-
-  //     route: {
-  //       title: "Cape Town → Gondwana → Mossel Bay → Knysna → Cape Town",
-  //       description: "",
-  //     },
-
-  //     days: [
-  //       {
-  //         day: 1,
-  //         title: "Cape Town → Gondwana Game Reserve",
-  //         route: "Cape Town → Gondwana Private Game Reserve",
-  //         description:
-  //           "Drive the Garden Route to Gondwana Private Game Reserve, check in, enjoy lunch and head out on an afternoon game drive before dinner at the lodge.",
-
-  //         activities: [
-  //           {
-  //             id: "d1-depart",
-  //             title: "Depart Cape Town",
-  //             description:
-  //               "Scenic drive along the Garden Route towards Gondwana Private Game Reserve.",
-  //             time: "11:00",
-  //             duration: "",
-  //             type: "transfer",
-  //             optional: false,
-  //             image: "/images/tours/shared/pickup/1.webp",
-  //           },
-  //           {
-  //             id: "d1-checkin",
-  //             title: "Check in at Gondwana",
-  //             description:
-  //               "Settle into your room at the lodge. Lunch is included.",
-  //             time: "14:00",
-  //             duration: "",
-  //             type: "accommodation",
-  //             optional: false,
-  //             image:
-  //               "/images/tours/packages/4-day-gondwana-garden-route/d1-lodge.webp", // TODO
-  //           },
-  //           {
-  //             id: "d1-gamedrive",
-  //             title: "Afternoon game drive",
-  //             description:
-  //               "Look for the Big Five on a guided game drive, with beverages and snacks. Dinner follows at the lodge.",
-  //             time: "",
-  //             duration: "",
-  //             type: "safari",
-  //             optional: false,
-  //             image:
-  //               "/images/tours/packages/4-day-gondwana-garden-route/d1-gamedrive.webp", // TODO
-  //           },
-  //         ],
-
-  //         meals: { breakfast: false, lunch: true, dinner: true },
-
-  //         accommodation: {
-  //           title: "Gondwana Private Game Reserve",
-  //           location: "Garden Route, Western Cape",
-  //           availabilityNote:
-  //             "Check-in 14:00. Check-out 11:00 on 13 December 2026.",
-  //           options: [
-  //             "Wi-Fi in lodge and rooms",
-  //             "Housekeeping",
-  //             "Filtered water, coffee & tea",
-  //           ],
-  //           image: "/images/tours/packages/4-day-gondwana-garden-route/gondwana-lodge.webp",// TODO
-  //         },
-
-  //         images: [],
-  //       },
-
-  //       {
-  //         day: 2,
-  //         title: "Game Drive, Zipline & Sunset Cruise",
-  //         route: "Gondwana → Mossel Bay → Knysna",
-  //         description:
-  //           "After a morning game drive and breakfast, ride the Mossel Bay zipline, then continue to Knysna to explore Thesen Island and cruise the lagoon at sunset.",
-
-  //         activities: [
-  //           {
-  //             id: "d2-gamedrive",
-  //             title: "Morning game drive",
-  //             description:
-  //               "A final game drive with beverages and snacks, then breakfast before check-out at 11:00.",
-  //             time: "",
-  //             duration: "",
-  //             type: "safari",
-  //             optional: false,
-  //             image:
-  //               "/images/tours/packages/4-day-gondwana-garden-route/d2-gamedrive.webp", // TODO
-  //           },
-  //           {
-  //             id: "d2-zipline",
-  //             title: "Mossel Bay Zipline",
-  //             description: "Ride the world's longest over-ocean zipline.",
-  //             time: "",
-  //             duration: "",
-  //             type: "adventure",
-  //             optional: false,
-  //             image:
-  //               "/images/tours/packages/4-day-gondwana-garden-route/d2-zipline.webp", // TODO
-  //           },
-  //           {
-  //             id: "d2-thesen",
-  //             title: "Explore Thesen Island",
-  //             description:
-  //               "Arrive at Knysna Waterfront Lodge, then stroll the marina pathways of this lagoon-side village with its boutique shops, galleries, yachts and waterfront views.",
-  //             time: "",
-  //             duration: "",
-  //             type: "leisure",
-  //             optional: false,
-  //             image:
-  //               "/images/tours/packages/4-day-gondwana-garden-route/.webp", // TODO
-  //           },
-  //           {
-  //             id: "d2-cruise",
-  //             title: "Sunset Lagoon Cruise",
-  //             description:
-  //               "Cruise the calm Knysna Lagoon, learn about the area, and pass the sandstone Knysna Heads. Look out for seabirds, cormorants, herons and African fish eagles as the sky turns orange and gold.",
-  //             time: "Late afternoon",
-  //             duration: "",
-  //             type: "leisure",
-  //             optional: false,
-  //             image:
-  //               "/images/tours/packages/4-day-gondwana-garden-route/d2-cruise.webp", // TODO
-  //           },
-  //         ],
-
-  //         meals: { breakfast: true, lunch: false, dinner: false },
-
-  //         accommodation: {
-  //           title: "Knysna Waterfront Lodge",
-  //           location: "Knysna, Garden Route",
-  //           availabilityNote: "",
-  //           options: [],
-  //             image:
-  //               "/images/tours/packages/4-day-gondwana-garden-route/knysna-waterfront-lodge.webp", // TODO
-  //         },
-
-  //         images: [],
-  //       },
-
-  //       {
-  //         day: 3,
-  //         title: "Wildlife & Nature Experience",
-  //         route: "Knysna Waterfront Lodge → Wildlife sanctuaries → Knysna",
-  //         description:
-  //           "A day of wildlife and nature around Knysna: Jukani Wildlife Sanctuary, Monkeyland, Birds of Eden and the Knysna Heads viewpoint.",
-
-  //         activities: [
-  //           {
-  //             id: "d3-jukani",
-  //             title: "Jukani Wildlife Sanctuary",
-  //             description: "TODO: short description.",
-  //             time: "",
-  //             duration: "",
-  //             type: "wildlife",
-  //             optional: false,
-  //             image:
-  //               "/images/tours/packages/4-day-gondwana-garden-route/d3-jukani.webp", // TODO
-  //           },
-  //           {
-  //             id: "d3-monkeyland",
-  //             title: "Monkeyland",
-  //             description: "TODO: short description.",
-  //             time: "",
-  //             duration: "",
-  //             type: "wildlife",
-  //             optional: false,
-  //             image:
-  //               "/images/tours/packages/4-day-gondwana-garden-route/d3-monkeyland.webp", // TODO
-  //           },
-  //           {
-  //             id: "d3-birds",
-  //             title: "Birds of Eden",
-  //             description: "TODO: short description.",
-  //             time: "",
-  //             duration: "",
-  //             type: "wildlife",
-  //             optional: false,
-  //             image:
-  //               "/images/tours/packages/4-day-gondwana-garden-route/d3-birds.webp", // TODO
-  //           },
-  //           {
-  //             id: "d3-heads",
-  //             title: "Knysna Heads Scenic Viewpoint",
-  //             description:
-  //               "See the dramatic sandstone cliffs that guard the entrance between the lagoon and the Indian Ocean.",
-  //             time: "",
-  //             duration: "",
-  //             type: "scenic",
-  //             optional: false,
-  //             image:
-  //               "/images/tours/packages/4-day-gondwana-garden-route/d3-heads.webp", // TODO
-  //           },
-  //         ],
-
-  //         // meals: QUERY CLIENT (breakfast on Days 3 and 4 not stated)
-  //         accommodation: {
-  //           title: "Knysna Waterfront Lodge",
-  //           location: "Knysna, Garden Route",
-  //           availabilityNote: "",
-  //           options: [],
-  //         },
-
-  //         images: [],
-  //       },
-
-  //       {
-  //         day: 4,
-  //         title: "Elephants & the Return to Cape Town",
-  //         route: "Knysna → Cape Town",
-  //         description:
-  //           "Visit Knysna Elephant Park, with an optional stop at the Wolf Sanctuary, then drive back to Cape Town with photo stops along the way.",
-
-  //         activities: [
-  //           {
-  //             id: "d4-elephants",
-  //             title: "Knysna Elephant Park",
-  //             description: "TODO: short description.",
-  //             time: "",
-  //             duration: "",
-  //             type: "wildlife",
-  //             optional: false,
-  //             image:
-  //               "/images/tours/packages/4-day-gondwana-garden-route/d4-elephants.webp", // TODO
-  //           },
-  //           {
-  //             id: "d4-wolf",
-  //             title: "Wolf Sanctuary",
-  //             description: "An optional extra stop. Price on request.",
-  //             time: "",
-  //             duration: "",
-  //             type: "wildlife",
-  //             optional: true,
-  //             image:
-  //               "/images/tours/packages/4-day-gondwana-garden-route/d4-wolf.webp", // TODO
-  //           },
-  //           {
-  //             id: "d4-return",
-  //             title: "Return to Cape Town",
-  //             description:
-  //               "Drive back with breathtaking views and photo stops on route.",
-  //             time: "",
-  //             duration: "",
-  //             type: "scenic",
-  //             optional: false,
-  //             image: "/images/tours/shared/return/1.webp",
-  //           },
-  //         ],
-
-  //         // meals: QUERY CLIENT
-
-  //         images: [],
-  //       },
-  //     ],
-  //   },
-
-  //   stops: null,
-
-  //   vehicle: null,
-
-  //   securityAndLiability: null,
-
-  //   accommodation: {
-  //     included: true,
-  //     type: "Luxury Lodge",
-  //     description:
-  //       "1 night at Gondwana Private Game Reserve and 2 nights at Knysna Waterfront Lodge.",
-  //   },
-
-  //   needToKnow: [
-  //     { text: "Fixed departure: 12–15 December 2026" },
-  //     {
-  //       text: "Gondwana check-in is 14:00 and check-out is 11:00 on 13 December",
-  //     },
-  //     {
-  //       text: "A guest conservation levy is charged per stay at Gondwana (amount to be confirmed)",
-  //     },
-  //     {
-  //       text: "Complimentary filtered water, coffee and tea are provided in all accommodation and during meals",
-  //     },
-  //     {
-  //       text: "Soft drinks and alcoholic drinks are for your own account, except those served on game drives",
-  //     },
-  //     { text: "The Wolf Sanctuary visit on Day 4 is optional" },
-  //   ],
-
-  //   faqs: [
-  //     {
-  //       question: "How long is the tour?",
-  //       answer:
-  //         "This is a 4-day, 3-night tour departing and returning to Cape Town, running 12–15 December 2026.",
-  //     },
-  //     {
-  //       question: "Where do we stay?",
-  //       answer:
-  //         "One night at Gondwana Private Game Reserve and two nights at Knysna Waterfront Lodge.",
-  //     },
-  //     {
-  //       question: "What is included?",
-  //       answer:
-  //         "Accommodation, Wi-Fi at the lodge, lunch and dinner on Day 1, afternoon and morning game drives with beverages and snacks, breakfast on 13 December, housekeeping, the Mossel Bay zipline and the Knysna sunset lagoon cruise.",
-  //     },
-  //     {
-  //       question: "What is not included?",
-  //       answer:
-  //         "Soft drinks and alcoholic drinks (except on game drives), lunches and selected dinners not listed as included, travel insurance, personal expenses and gratuities.",
-  //     },
-  //     {
-  //       question: "Which places does the tour visit?",
-  //       answer:
-  //         "Gondwana Private Game Reserve, the Mossel Bay zipline, Thesen Island, a Knysna sunset lagoon cruise, Jukani Wildlife Sanctuary, Monkeyland, Birds of Eden, the Knysna Heads viewpoint and Knysna Elephant Park, with an optional Wolf Sanctuary stop.",
-  //     },
-  //   ],
-
-  //   tags: [
-  //     "Garden Route",
-  //     "Gondwana Game Reserve",
-  //     "Big 5 Safari",
-  //     "Safari",
-  //     "Multi-Day",
-  //     "4 Day Tour",
-  //     "Mossel Bay",
-  //     "Zipline",
-  //     "Knysna",
-  //     "Sunset Cruise",
-  //     "Wildlife",
-  //     "Luxury Safari",
-  //     "Adventure",
-  //     "South Africa",
-  //   ],
-  // },
-
   // 3-Day / 2-Night Garden Route & Safari Escape
   {
     id: 27, // assign
@@ -8396,7 +7855,7 @@ export const tours = [
 
     image:
       "/src/assets/images/tours/packages/3-day-garden-route-safari-escape/4.webp", // TODO
-    images: [], // TODO
+    images: getTourImages("packages/3-day-garden-route-safari-escape", 5), // TODO
     imageFolder: "packages/3-day-garden-route-safari-escape",
     videos: [],
 
@@ -8512,7 +7971,9 @@ export const tours = [
       { text: "Cango Caves exploration with natural limestone formations" },
       { text: "Swartberg Mountain scenery" },
       { text: "Knysna Heads and Knysna Waterfront" },
-      { text: "Private game reserve safari with wildlife viewing and game drive" },
+      {
+        text: "Private game reserve safari with wildlife viewing and game drive",
+      },
       { text: "Mossel Bay sightseeing and historical attractions" },
       { text: "Optional longest over-ocean zipline experience" },
     ],
@@ -8559,8 +8020,12 @@ export const tours = [
     pickupOptions: [], // QUERY CLIENT: pickup points, if offered
     requirements: [
       { text: "A valid passport is required for all international visitors" },
-      { text: "Guests are responsible for arranging valid travel documentation where required" },
-      { text: "Special dietary requirements must be communicated prior to departure" },
+      {
+        text: "Guests are responsible for arranging valid travel documentation where required",
+      },
+      {
+        text: "Special dietary requirements must be communicated prior to departure",
+      },
       { text: "Children must be accompanied by an adult at all times" },
     ],
 
@@ -8574,11 +8039,7 @@ export const tours = [
       location:
         "Cape Town → Robertson → Route 62 → Oudtshoorn → Cango Caves → Knysna → Garden Route Game Lodge → Mossel Bay → Cape Town",
 
-      clothing: [
-        "Comfortable walking shoes",
-        "Warm jacket",
-        "Sunglasses",
-      ],
+      clothing: ["Comfortable walking shoes", "Warm jacket", "Sunglasses"],
 
       thingsToBring: [
         "Valid passport (international visitors)",
@@ -8607,9 +8068,15 @@ export const tours = [
       summary:
         "Activities and safari sightings are subject to weather, environmental conditions and operational requirements. The itinerary may be adjusted for weather or road conditions.",
       items: [
-        { text: "The Mossel Bay Ocean Zipline is subject to availability and weather conditions" },
-        { text: "Safari sightings depend on weather and environmental conditions" },
-        { text: "The itinerary may be adjusted due to weather or road conditions" },
+        {
+          text: "The Mossel Bay Ocean Zipline is subject to availability and weather conditions",
+        },
+        {
+          text: "Safari sightings depend on weather and environmental conditions",
+        },
+        {
+          text: "The itinerary may be adjusted due to weather or road conditions",
+        },
         {
           text: "Accommodation and activity operators may amend services due to weather, safety or operational requirements",
         },
@@ -8620,14 +8087,22 @@ export const tours = [
       summary:
         "A 30% non-refundable deposit secures your booking. Refunds depend on how far ahead of departure you cancel, and all cancellations must be made in writing.",
       items: [
-        { text: "More than 30 days before departure: 90% refund of monies paid, less administration fees" },
+        {
+          text: "More than 30 days before departure: 90% refund of monies paid, less administration fees",
+        },
         { text: "15–30 days before departure: 50% refund of monies paid" },
         { text: "7–14 days before departure: 25% refund of monies paid" },
         { text: "Less than 7 days before departure: no refund" },
-        { text: "No-shows, unused services, missed departures and early departures are non-refundable" },
-        { text: "Certain third-party supplier fees may be non-refundable and will be deducted from any refund due" },
+        {
+          text: "No-shows, unused services, missed departures and early departures are non-refundable",
+        },
+        {
+          text: "Certain third-party supplier fees may be non-refundable and will be deducted from any refund due",
+        },
         { text: "All cancellations must be submitted in writing" },
-        { text: "Refunds, where applicable, are processed within 14 business days of cancellation approval" },
+        {
+          text: "Refunds, where applicable, are processed within 14 business days of cancellation approval",
+        },
       ],
     },
 
@@ -8636,7 +8111,9 @@ export const tours = [
         "Guest safety is the priority throughout the tour. Children must be accompanied by an adult at all times.",
       items: [
         { text: "Children must be accompanied by an adult at all times" },
-        { text: "Follow the instructions of your driver-guide, safari rangers and venue staff" },
+        {
+          text: "Follow the instructions of your driver-guide, safari rangers and venue staff",
+        },
         { text: "Itinerary changes may be made for guest safety" },
       ],
     },
@@ -8771,8 +8248,7 @@ export const tours = [
             {
               id: "d2-knysna-heads",
               title: "Knysna Heads",
-              description:
-                "Sightseeing at the famous Knysna Heads viewpoint.",
+              description: "Sightseeing at the famous Knysna Heads viewpoint.",
               time: "",
               duration: "",
               type: "scenic",
@@ -8832,7 +8308,9 @@ export const tours = [
             title: "Garden Route Game Lodge",
             location: "Garden Route, Western Cape",
             availabilityNote: "",
-            options: ["Safari lodge or tented accommodation, depending on room category"],
+            options: [
+              "Safari lodge or tented accommodation, depending on room category",
+            ],
             image: "",
           },
 
@@ -8861,7 +8339,8 @@ export const tours = [
             {
               id: "d3-breakfast",
               title: "Breakfast & Check-out",
-              description: "Breakfast at the game reserve, followed by check-out.",
+              description:
+                "Breakfast at the game reserve, followed by check-out.",
               time: "",
               duration: "",
               type: "food",
@@ -8925,22 +8404,42 @@ export const tours = [
     },
 
     needToKnow: [
-      { text: "Adult rate is R17,000 per person sharing (2 guests), including 15% VAT" },
-      { text: "Child rates when sharing with parents: R11,900 (3–5 years) and R12,750 (6–11 years)" },
+      {
+        text: "Adult rate is R17,000 per person sharing (2 guests), including 15% VAT",
+      },
+      {
+        text: "Child rates when sharing with parents: R11,900 (3–5 years) and R12,750 (6–11 years)",
+      },
       {
         text: "Family packages (2 adults): R45,900 with 1 child aged 3–5, R46,750 with 1 child aged 6–11, R57,800 with 2 children aged 3–5, R59,500 with 2 children aged 6–11, R69,700 with 3 children aged 3–5 and R72,250 with 3 children aged 6–11",
       },
-      { text: "Rates are in ZAR and may change with supplier rate adjustments until the deposit is received and confirmed" },
-      { text: "A 30% non-refundable deposit secures your booking; the balance is due 30 days before departure" },
-      { text: "Bookings made within 30 days of departure require full payment on confirmation" },
+      {
+        text: "Rates are in ZAR and may change with supplier rate adjustments until the deposit is received and confirmed",
+      },
+      {
+        text: "A 30% non-refundable deposit secures your booking; the balance is due 30 days before departure",
+      },
+      {
+        text: "Bookings made within 30 days of departure require full payment on confirmation",
+      },
       { text: "Payment can be made by EFT or an approved payment gateway" },
-      { text: "Cancellation refunds: 90% (more than 30 days), 50% (15–30 days), 25% (7–14 days) and none (less than 7 days)" },
-      { text: "Accommodation is 3-star; higher-category upgrades are available on request at extra cost" },
-      { text: "Optional activities (zipline, Knysna Lagoon Boat Cruise, oyster tasting, Cango Wildlife Ranch) are paid separately and subject to availability" },
-      { text: "Meals not listed in the itinerary, drinks and gratuities are not included" },
+      {
+        text: "Cancellation refunds: 90% (more than 30 days), 50% (15–30 days), 25% (7–14 days) and none (less than 7 days)",
+      },
+      {
+        text: "Accommodation is 3-star; higher-category upgrades are available on request at extra cost",
+      },
+      {
+        text: "Optional activities (zipline, Knysna Lagoon Boat Cruise, oyster tasting, Cango Wildlife Ranch) are paid separately and subject to availability",
+      },
+      {
+        text: "Meals not listed in the itinerary, drinks and gratuities are not included",
+      },
       { text: "Travel insurance is strongly recommended" },
       { text: "A valid passport is required for international visitors" },
-      { text: "Special dietary requirements must be communicated before departure" },
+      {
+        text: "Special dietary requirements must be communicated before departure",
+      },
     ],
 
     faqs: [
@@ -9056,7 +8555,7 @@ export const tours = [
 
     image:
       "/src/assets/images/tours/packages/4-day-cape-town-signature-explorer/1.webp", // TODO
-    images: [], // TODO
+    images: getTourImages("packages/4-day-cape-town-signature-explorer", 5),
     imageFolder: "packages/4-day-cape-town-signature-explorer",
     videos: [],
 
@@ -9179,9 +8678,7 @@ export const tours = [
       { text: "Items of a personal nature" },
     ],
 
-    pickupOptions: [
-      "Cape Town hotel or accommodation (agreed in advance)",
-    ], // QUERY CLIENT: pickup areas, if limited
+    pickupOptions: ["Cape Town hotel or accommodation (agreed in advance)"], // QUERY CLIENT: pickup areas, if limited
     requirements: [], // QUERY CLIENT: wine-tasting age requirement, child age limits
 
     arrangements: {
@@ -9214,11 +8711,19 @@ export const tours = [
       summary:
         "Marine wildlife excursions, Table Mountain Cableway operations and certain outdoor activities are weather dependent. Where possible, suitable alternatives or itinerary adjustments will be offered.",
       items: [
-        { text: "Marine wildlife excursions depend on sea conditions, weather and operator availability" },
-        { text: "Wildlife sightings during marine excursions cannot be guaranteed" },
-        { text: "A land-based alternative can be arranged if the boat excursion is affected by weather" },
+        {
+          text: "Marine wildlife excursions depend on sea conditions, weather and operator availability",
+        },
+        {
+          text: "Wildlife sightings during marine excursions cannot be guaranteed",
+        },
+        {
+          text: "A land-based alternative can be arranged if the boat excursion is affected by weather",
+        },
         { text: "Table Mountain Cableway operations are weather dependent" },
-        { text: "Chapman's Peak Drive can close because of weather or maintenance, in which case an alternative route is used" },
+        {
+          text: "Chapman's Peak Drive can close because of weather or maintenance, in which case an alternative route is used",
+        },
       ],
     },
 
@@ -9228,9 +8733,15 @@ export const tours = [
       items: [
         { text: "More than 30 days before travel: deposit forfeited" },
         { text: "15–30 days before travel: 50% cancellation fee applies" },
-        { text: "14 days or less before travel: 100% cancellation fee applies" },
-        { text: "No-shows, late arrivals, unused services and early departures are non-refundable" },
-        { text: "Certain third-party suppliers may have separate cancellation policies, which will be communicated where applicable" },
+        {
+          text: "14 days or less before travel: 100% cancellation fee applies",
+        },
+        {
+          text: "No-shows, late arrivals, unused services and early departures are non-refundable",
+        },
+        {
+          text: "Certain third-party suppliers may have separate cancellation policies, which will be communicated where applicable",
+        },
       ],
     },
 
@@ -9634,8 +9145,7 @@ export const tours = [
             {
               id: "d3-green-point",
               title: "Green Point / Sea Point",
-              description:
-                "A scenic coastal drive with selected photo stops.",
+              description: "A scenic coastal drive with selected photo stops.",
               time: "14:45",
               duration: "45 min",
               type: "scenic",
@@ -9806,18 +9316,38 @@ export const tours = [
     },
 
     needToKnow: [
-      { text: "From R12,995 per person sharing a vehicle (minimum 2 guests), or R25,990 per couple for a private exclusive experience" },
-      { text: "Family totals: R36,485 (2 adults + 1 child), R46,980 (2 adults + 2 children) and R57,475 (2 adults + 3 children)" },
+      {
+        text: "From R12,995 per person sharing a vehicle (minimum 2 guests), or R25,990 per couple for a private exclusive experience",
+      },
+      {
+        text: "Family totals: R36,485 (2 adults + 1 child), R46,980 (2 adults + 2 children) and R57,475 (2 adults + 3 children)",
+      },
       { text: "Group rates are available on request" },
-      { text: "Accommodation is not included; guests are collected daily from their Cape Town hotel or accommodation" },
-      { text: "Four lunches (one per touring day) are included; other meals and drinks are not" },
-      { text: "Daily collection times: 08:30 (Day 1), 08:00 (Day 2), 08:30 (Day 3) and 08:30 (Day 4), with returns at 17:00, 18:00, 16:30 and 17:30" },
-      { text: "A 30% non-refundable deposit confirms your booking; the balance is due 14 days before arrival" },
-      { text: "Bookings made within 14 days of travel require full payment at confirmation" },
+      {
+        text: "Accommodation is not included; guests are collected daily from their Cape Town hotel or accommodation",
+      },
+      {
+        text: "Four lunches (one per touring day) are included; other meals and drinks are not",
+      },
+      {
+        text: "Daily collection times: 08:30 (Day 1), 08:00 (Day 2), 08:30 (Day 3) and 08:30 (Day 4), with returns at 17:00, 18:00, 16:30 and 17:30",
+      },
+      {
+        text: "A 30% non-refundable deposit confirms your booking; the balance is due 14 days before arrival",
+      },
+      {
+        text: "Bookings made within 14 days of travel require full payment at confirmation",
+      },
       { text: "Payment can be made by EFT or approved payment methods" },
-      { text: "Marine excursions, the Table Mountain Cableway and some outdoor activities depend on the weather" },
-      { text: "Marine wildlife sightings cannot be guaranteed; a land-based alternative can be arranged" },
-      { text: "Chapman's Peak Drive can close because of weather or maintenance, in which case an alternative route is used" },
+      {
+        text: "Marine excursions, the Table Mountain Cableway and some outdoor activities depend on the weather",
+      },
+      {
+        text: "Marine wildlife sightings cannot be guaranteed; a land-based alternative can be arranged",
+      },
+      {
+        text: "Chapman's Peak Drive can close because of weather or maintenance, in which case an alternative route is used",
+      },
     ],
 
     faqs: [
@@ -9936,7 +9466,7 @@ export const tours = [
 
     image:
       "/src/assets/images/tours/packages/4-day-garden-route-safari-explorer/1.webp", // TODO
-    images: [], // TODO
+    images: getTourImages("packages/4-day-garden-route-safari-explorer", 3),
     imageFolder: "packages/4-day-garden-route-safari-explorer",
     videos: [],
 
@@ -9946,6 +9476,7 @@ export const tours = [
 
     priceBase: 24000,
     minPeople: 2,
+    minAge: 5,
 
     pricing: [
       {
@@ -9954,15 +9485,18 @@ export const tours = [
         note: "Per person, sharing a double or twin room.",
       },
       {
-        category: "Child: 4–11 Years",
+        category: "Child: 12–17 Years",
+        pricePerPerson: 24000,
+        note: "Same as adults.",
+      },
+      {
+        category: "Child: 5–11 Years",
         pricePerPerson: 12000,
-        note: "Child rate for guests aged 4–11 years.",
+        note: "Child rate for guests aged 5–11 years.",
       },
 
       // QUERY CLIENT: left out on purpose (no rate supplied; null would render "R0.00" or "RNaN")
       // { category: "Solo Traveller", pricePerPerson: ???, note: "" },
-      // { category: "Child: 0–3 Years", pricePerPerson: ???, note: "" },
-      // { category: "Child: 12–17 Years", pricePerPerson: ???, note: "" },
     ],
 
     /*
@@ -10052,7 +9586,9 @@ export const tours = [
       { text: "Professional driver-guide throughout the tour" },
       { text: "Fuel and vehicle operating costs" },
       { text: "Luxury air-conditioned vehicle" },
-      { text: "3 nights' accommodation in quality 3-star hotels and guesthouses" },
+      {
+        text: "3 nights' accommodation in quality 3-star hotels and guesthouses",
+      },
       { text: "Daily breakfast" },
       { text: "2 dinners and 1 lunch (as specified)" },
       { text: "Wine tasting experience in the Robertson Wine Valley" },
@@ -10079,12 +9615,12 @@ export const tours = [
       { text: "Items not specifically mentioned as included" },
     ],
 
-    pickupOptions: [
-      "Cape Town hotel pick-up and drop-off",
-    ], // QUERY CLIENT: pickup areas, if limited
+    pickupOptions: ["Cape Town hotel pick-up and drop-off"], // QUERY CLIENT: pickup areas, if limited
 
     requirements: [
-      { text: "Comfortable walking is required at Tsitsikamma National Park, Knysna Heads and the Cango Caves" },
+      {
+        text: "Comfortable walking is required at Tsitsikamma National Park, Knysna Heads and the Cango Caves",
+      },
     ],
 
     arrangements: {
@@ -10130,17 +9666,26 @@ export const tours = [
       summary:
         "Temperatures can vary between the coast, mountains and inland regions on the same day, and the weather can change unexpectedly, especially along the coast. Dress in layers.",
       items: [
-        { text: "Mornings, evenings and mountain passes can be cool year-round" },
-        { text: "Spring (Sep–Nov): light clothing with a warm layer for mornings and evenings" },
-        { text: "Summer (Dec–Feb): lightweight clothing, hat, sunscreen and comfortable footwear" },
-        { text: "Autumn (Mar–May): comfortable layered clothing and a light jacket" },
-        { text: "Winter (Jun–Aug): warm jacket, jersey, long trousers and closed walking shoes" },
+        {
+          text: "Mornings, evenings and mountain passes can be cool year-round",
+        },
+        {
+          text: "Spring (Sep–Nov): light clothing with a warm layer for mornings and evenings",
+        },
+        {
+          text: "Summer (Dec–Feb): lightweight clothing, hat, sunscreen and comfortable footwear",
+        },
+        {
+          text: "Autumn (Mar–May): comfortable layered clothing and a light jacket",
+        },
+        {
+          text: "Winter (Jun–Aug): warm jacket, jersey, long trousers and closed walking shoes",
+        },
       ],
     },
 
     cancellationPolicy: {
-      summary:
-        "Refunds depend on how far ahead of departure you cancel.",
+      summary: "Refunds depend on how far ahead of departure you cancel.",
       items: [
         { text: "More than 14 days before departure: 100% refund" },
         { text: "7–13 days before departure: 50% refund" },
@@ -10239,7 +9784,11 @@ export const tours = [
             title: "3-Star Guesthouse / Hotel",
             location: "Oudtshoorn, Klein Karoo",
             availabilityNote: "Subject to availability.",
-            options: ["Standard double or twin room", "Private en-suite", "Dinner & breakfast"],
+            options: [
+              "Standard double or twin room",
+              "Private en-suite",
+              "Dinner & breakfast",
+            ],
             image: "",
           },
 
@@ -10295,7 +9844,11 @@ export const tours = [
             title: "Knysna Waterfront Lodge (or similar 3-star property)",
             location: "Knysna, Garden Route",
             availabilityNote: "Subject to availability.",
-            options: ["Standard double or twin room", "Private en-suite", "Breakfast"],
+            options: [
+              "Standard double or twin room",
+              "Private en-suite",
+              "Breakfast",
+            ],
             image: "",
           },
 
@@ -10305,7 +9858,8 @@ export const tours = [
         {
           day: 3,
           title: "Tsitsikamma National Park & Plettenberg Bay",
-          route: "Knysna → Tsitsikamma National Park → Plettenberg Bay → Knysna",
+          route:
+            "Knysna → Tsitsikamma National Park → Plettenberg Bay → Knysna",
           description:
             "Travel east along the Garden Route to Tsitsikamma National Park, known for its ancient indigenous forests, dramatic cliffs and rugged coastline. Continue to Plettenberg Bay, a seaside destination celebrated for its pristine beaches, then return to Knysna for another overnight stay.",
 
@@ -10350,7 +9904,11 @@ export const tours = [
             title: "Knysna Waterfront Lodge (or similar 3-star property)",
             location: "Knysna, Garden Route",
             availabilityNote: "Subject to availability.",
-            options: ["Standard double or twin room", "Private en-suite", "Breakfast"],
+            options: [
+              "Standard double or twin room",
+              "Private en-suite",
+              "Breakfast",
+            ],
             image: "",
           },
 
@@ -10420,17 +9978,37 @@ export const tours = [
     },
 
     needToKnow: [
-      { text: "Adults are R24,000 per person and children aged 4–11 are R12,000 per person" },
-      { text: "Package totals: R48,000 for a couple, R60,000 for 2 adults + 1 child, R72,000 for 2 adults + 2 children and R84,000 for 2 adults + 3 children" },
-      { text: "Private group totals: R96,000 for 4 guests, R144,000 for 6 guests and R192,000 for 8 guests, with a 10% discount offered for groups of 6 and 8 sharing" },
-      { text: "Final pricing is confirmed at booking and depends on accommodation availability and seasonal rates" },
-      { text: "Daily breakfast, 2 dinners and 1 lunch (as specified) are included; other lunches and drinks are not" },
-      { text: "Night 1 is in Oudtshoorn and nights 2 and 3 are at Knysna Waterfront Lodge (or similar); there is no accommodation on Day 4" },
-      { text: "Monkeyland and Birds of Eden entrance fees are optional and not included" },
-      { text: "Comfortable walking is required at Tsitsikamma National Park, Knysna Heads and the Cango Caves" },
-      { text: "Dress in layers: temperatures vary between the coast, mountains and inland regions during the same day" },
+      {
+        text: "Adults are R24,000 per person and children aged 4–11 are R12,000 per person",
+      },
+      {
+        text: "Package totals: R48,000 for a couple, R60,000 for 2 adults + 1 child, R72,000 for 2 adults + 2 children and R84,000 for 2 adults + 3 children",
+      },
+      {
+        text: "Private group totals: R96,000 for 4 guests, R144,000 for 6 guests and R192,000 for 8 guests, with a 10% discount offered for groups of 6 and 8 sharing",
+      },
+      {
+        text: "Final pricing is confirmed at booking and depends on accommodation availability and seasonal rates",
+      },
+      {
+        text: "Daily breakfast, 2 dinners and 1 lunch (as specified) are included; other lunches and drinks are not",
+      },
+      {
+        text: "Night 1 is in Oudtshoorn and nights 2 and 3 are at Knysna Waterfront Lodge (or similar); there is no accommodation on Day 4",
+      },
+      {
+        text: "Monkeyland and Birds of Eden entrance fees are optional and not included",
+      },
+      {
+        text: "Comfortable walking is required at Tsitsikamma National Park, Knysna Heads and the Cango Caves",
+      },
+      {
+        text: "Dress in layers: temperatures vary between the coast, mountains and inland regions during the same day",
+      },
       { text: "Neutral-coloured clothing is recommended for the safari" },
-      { text: "Cancellations: 100% refund more than 14 days before departure, 50% refund 7–13 days before, and no refund less than 7 days before or for a no-show" },
+      {
+        text: "Cancellations: 100% refund more than 14 days before departure, 50% refund 7–13 days before, and no refund less than 7 days before or for a no-show",
+      },
     ],
 
     faqs: [
@@ -10498,7 +10076,650 @@ export const tours = [
       "South Africa",
     ],
   },
-  
+  // 5-Day Garden Route & Gondwana Big 5 Safari Tour
+  {
+    id: null, // assign
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.MULTI_DAY,
+
+    title: "5-Day Garden Route & Gondwana Big 5 Safari Tour",
+    slug: "5-day-garden-route-gondwana-big-5-safari",
+    canonicalPath: "/tours/5-day-garden-route-gondwana-big-5-safari",
+    // daysInAdvance: ???, // QUERY CLIENT (booking cut-off)
+
+    seo: {
+      title:
+        "5-Day Garden Route & Gondwana Big 5 Safari Tour from Cape Town | Cape Frontier Tours",
+      description:
+        "5 days, 4 nights from Cape Town: Gondwana Big 5 safari, Route 62, Cango Caves, Knysna, Tsitsikamma, Hermanus whale coast and Betty's Bay penguins.",
+      keywords: [
+        "5 day Garden Route tour",
+        "Gondwana Big 5 safari",
+        "Gondwana Game Reserve tour",
+        "Garden Route and safari tour",
+        "Cape Town to Garden Route tour",
+        "Route 62 tour",
+        "Cango Caves tour",
+        "Knysna Heads tour",
+        "Storms River Suspension Bridge tour",
+        "Hermanus whale watching tour",
+        "Betty's Bay penguin colony tour",
+        "Cape Town multi-day tour",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image:
+      "/src/assets/images/tours/packages/5-day-garden-route-gondwana-big-5-safari/1.webp", // TODO
+    images: getTourImages("packages/5-day-garden-route-gondwana-big-5-safari", 5), 
+    imageFolder: "packages/5-day-garden-route-gondwana-big-5-safari",
+    videos: [],
+
+    location:
+      "Gondwana, Oudtshoorn, Knysna, Tsitsikamma, Hermanus & Betty's Bay, Western Cape, South Africa",
+    duration: "5 Days / 4 Nights",
+
+    priceBase: 46000, // total package price from the client; QUERY CLIENT: per person, per couple or per room?
+    minPeople: 1, // QUERY CLIENT: source says solo travellers are welcome
+    maxPeople: 1,
+    childFriendly: true, // source says ideal for families (QUERY CLIENT: child rates and minimum age)
+
+    pricing: [
+      {
+        category: "Standard package",
+        pricePerPerson: 46000, // QUERY CLIENT: confirm what this covers (see note above)
+        note: "Total package price. Includes 4 nights' accommodation, breakfast and the listed activities.",
+      },
+
+      // QUERY CLIENT: left out on purpose (no rate supplied; null would render "R0.00" or "RNaN")
+      // { category: "Solo Traveller", pricePerPerson: ???, note: "" },
+      // { category: "Children", pricePerPerson: ???, note: "" },
+    ],
+
+    additionalPricing: [
+      {
+        type: "request",
+        category: "Cango Caves Adventure Tour upgrade",
+        price: null,
+        unit: "per person",
+        currency: "ZAR",
+        note: "Choose the Heritage Tour or the Adventure Tour. Any difference in price to be confirmed.", // QUERY CLIENT
+      },
+      {
+        type: "request",
+        category: "Ostrich Farm Experience (Oudtshoorn)",
+        price: null,
+        unit: "per person",
+        currency: "ZAR",
+        note: "Optional. Price on request.",
+      },
+      {
+        type: "request",
+        category:
+          "Tsitsikamma adventure options (ziplining, kayak & lilo, forest hiking)",
+        price: null,
+        unit: "per person",
+        currency: "ZAR",
+        note: "Optional. Price on request.", // QUERY CLIENT: confirm these are extra
+      },
+      {
+        type: "request",
+        category: "Bloukrans Bungy Jump",
+        price: null,
+        unit: "per person",
+        currency: "ZAR",
+        note: "Optional. Not included. Price on request.",
+      },
+    ],
+
+    groupPricing: {
+      enabled: false, // QUERY CLIENT: turn on only if group discounts exist
+      icon: "/icons/savemore.png",
+      tiers: [],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "A premium 5-day journey that combines a luxury Big 5 safari at Gondwana Game Reserve with the very best of the Garden Route. Enjoy mountain passes, forests, coastline, wine tasting and charming towns, all guided privately and comfortably. The tour begins with a luxury safari stay at Gondwana, followed by the scenic Route 62, the dramatic Cango Caves, the lagoon views of Knysna and adventure-rich Tsitsikamma National Park. The final day takes in Hermanus, Benguela Cove and the penguins of Betty's Bay before returning to Cape Town along the iconic Clarence Drive. With 4 nights of hand-selected accommodation, breakfast included and a dedicated driver-guide throughout, it is a complete Garden Route experience with the added value of a premium safari.",
+
+    highlights: [
+      { text: "Exclusive luxury Big 5 safari at Gondwana Game Reserve" },
+      {
+        text: "Route 62 scenic drive through mountain passes, orchards and Karoo landscapes",
+      },
+      { text: "Cango Caves guided tour (Heritage or Adventure)" },
+      { text: "Outeniqua Pass, Knysna Heads and Knysna Waterfront" },
+      {
+        text: "Tsitsikamma National Park and the Storms River Suspension Bridge",
+      },
+      { text: "Hermanus whale coast (seasonal whale watching)" },
+      { text: "Premium wine tasting at Benguela Cove Lagoon Wine Estate" },
+      { text: "African penguins at Stony Point, Betty's Bay" },
+      {
+        text: "Clarence Drive (R44), one of South Africa's most scenic coastal roads",
+      },
+      {
+        text: "4 nights in hand-selected guesthouses and lodges, breakfast included",
+      },
+      { text: "Dedicated private driver-guide throughout" },
+    ],
+
+    included: [
+      {
+        text: "4 nights' accommodation: Gondwana Game Reserve, De Zeekoe Guest Farm, Waterfront Lodge (Knysna) and At the Woods Guest House (Tsitsikamma)",
+      },
+      { text: "Gondwana conservation levy" },
+      { text: "Breakfast included with accommodation" },
+      { text: "Dedicated driver-guide throughout" },
+      { text: "Mossel Bay zipline" }, // QUERY CLIENT: not in the itinerary text
+      { text: "Cango Caves guided tour" },
+      { text: "Lagoon cruise" }, // QUERY CLIENT: itinerary calls lagoon cruises optional
+      { text: "Cheese and wine pairing" }, // QUERY CLIENT: not in the itinerary text
+      { text: "Stony Point African penguin colony, Betty's Bay" },
+      { text: "Tsitsikamma National Park entry" },
+      { text: "Storms River Suspension Bridge" },
+      { text: "Elephant Park" }, // QUERY CLIENT: not in the itinerary text
+      { text: "Jukani Wildlife Sanctuary" }, // QUERY CLIENT: not in the itinerary text
+    ],
+
+    excluded: [
+      { text: "Bloukrans Bungy Jump" },
+      { text: "Lunches and selected dinners" },
+      { text: "Travel insurance" },
+      { text: "Personal expenses" },
+      { text: "Alcoholic beverages" },
+      { text: "Gratuities" },
+    ],
+
+    pickupOptions: [], // QUERY CLIENT: pickup points, if offered
+    requirements: [],
+
+    arrangements: {
+      availability: "", // QUERY CLIENT: fixed dates or on request?
+      duration: "5 Days / 4 Nights",
+      operatingTime: "",
+      departure: "Cape Town", // QUERY CLIENT: departure time and pickup
+      return: "Cape Town, late afternoon of Day 5",
+      location:
+        "Cape Town → Gondwana → Oudtshoorn → Knysna → Tsitsikamma → Hermanus → Cape Town",
+
+      clothing: [],
+      thingsToBring: [],
+
+      passengerPolicy: "",
+
+      notes: [
+        "Accommodation: 1 room available, the luxury Kwena room at Gondwana (as quoted by Gondwana Game Reserve)", // QUERY CLIENT
+        "Night 1: Gondwana Game Reserve",
+        "Night 2: De Zeekoe Guest Farm, Oudtshoorn",
+        "Night 3: Waterfront Lodge, Knysna",
+        "Night 4: Tsitsikamma: At the Woods Guest House (also listed: Tsitsikamma Village Inn and Tsitsikamma Manor)",
+        "There is no overnight on Day 5; the tour ends in Cape Town",
+        "Whale watching at Hermanus is seasonal",
+        "Ideal for families, couples, solo travellers and small groups",
+      ],
+    },
+
+    // null until supplied (empty objects are truthy and would
+    // render empty sections in TourDetails)
+    weatherPolicy: null,
+    cancellationPolicy: null,
+    safetyPolicy: null,
+
+    /*
+     * MULTI-DAY ITINERARY
+     */
+    itinerary: {
+      intro: {
+        title: "Your 5-Day Garden Route & Big 5 Safari Journey",
+        description:
+          "A luxury Big 5 safari, Route 62, Knysna, Tsitsikamma and the Hermanus whale coast, ending with the penguins of Betty's Bay and Clarence Drive.",
+      },
+
+      route: {
+        title:
+          "Cape Town → Gondwana → Oudtshoorn → Knysna → Tsitsikamma → Hermanus → Cape Town",
+        description: "",
+      },
+
+      days: [
+        {
+          day: 1,
+          title: "Cape Town → Gondwana Game Reserve",
+          route: "Cape Town → Gondwana Game Reserve",
+          description:
+            "Your tour begins with an exclusive luxury Big 5 safari at Gondwana Game Reserve, one of the Garden Route's premier Big 5 destinations, followed by a night in a luxury lodge with panoramic views, private suites and exceptional hospitality.",
+
+          activities: [
+            {
+              id: "d1-depart",
+              title: "Depart Cape Town",
+              description:
+                "Travel along the Garden Route to Gondwana Game Reserve.",
+              time: "",
+              duration: "",
+              type: "transfer",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d1-zipline",
+              title: "Mossel Bay Zipline",
+              description:
+                "Included in your quote, though the source does not say when it takes place. Placed here as the stop closest to the route.", // QUERY CLIENT: confirm the day
+              time: "",
+              duration: "",
+              type: "adventure",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d1-safari",
+              title: "Exclusive Big 5 Safari",
+              description:
+                "A luxury safari at Gondwana Game Reserve. Expect sightings of lion, elephant, rhino, buffalo, giraffe, zebra and more.",
+              time: "",
+              duration: "",
+              type: "safari",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d1-lodge",
+              title: "Luxury Lodge Stay",
+              description:
+                "Panoramic views, private suites and exceptional hospitality.",
+              time: "",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+              image: "",
+            },
+          ],
+
+          // QUERY CLIENT: Day 1 meals not stated
+          meals: { breakfast: false, lunch: false, dinner: false },
+
+          accommodation: {
+            title: "Gondwana Game Reserve",
+            location: "Garden Route, Western Cape",
+            availabilityNote:
+              "As quoted by Gondwana: 1 room available, the luxury Kwena room. Conservation levy included.",
+            options: ["Luxury Kwena room", "Panoramic views", "Private suites"],
+            image: "",
+          },
+
+          images: [],
+        },
+
+        {
+          day: 2,
+          title: "Gondwana → Oudtshoorn (Route 62 & Cango Caves)",
+          route: "Gondwana → Route 62 → Oudtshoorn",
+          description:
+            "After breakfast, travel inland along Route 62 through mountain passes, orchards and Karoo landscapes. Take a guided tour of the Cango Caves, with the choice of the Heritage Tour or the Adventure Tour, and overnight in Oudtshoorn.",
+
+          activities: [
+            {
+              id: "d2-route62",
+              title: "Route 62 Scenic Drive",
+              description:
+                "Travel inland through mountain passes, orchards and Karoo landscapes.",
+              time: "",
+              duration: "",
+              type: "scenic",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d2-cango",
+              title: "Cango Caves: Guided Tour",
+              description:
+                "Choose between the Heritage Tour and the Adventure Tour.",
+              time: "",
+              duration: "",
+              type: "nature",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d2-ostrich",
+              title: "Ostrich Farm Experience",
+              description: "An optional ostrich farm experience.",
+              time: "",
+              duration: "",
+              type: "wildlife",
+              optional: true,
+              image: "",
+            },
+          ],
+
+          meals: { breakfast: true, lunch: false, dinner: false },
+
+          accommodation: {
+            title: "De Zeekoe Guest Farm",
+            location: "Oudtshoorn, Klein Karoo",
+            availabilityNote: "",
+            options: ["Breakfast included"],
+            image: "",
+          },
+
+          images: [],
+        },
+
+        {
+          day: 3,
+          title: "Oudtshoorn → Knysna (Lagoon & Heads)",
+          route: "Oudtshoorn → Outeniqua Pass → Knysna",
+          description:
+            "After breakfast, take the scenic Outeniqua Pass into the Garden Route forests. Enjoy the panoramic views from the Knysna Heads viewpoint and explore the Knysna Waterfront.",
+
+          activities: [
+            {
+              id: "d3-outeniqua",
+              title: "Outeniqua Pass",
+              description:
+                "A scenic mountain drive into the Garden Route forests.",
+              time: "",
+              duration: "",
+              type: "scenic",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d3-heads",
+              title: "Knysna Heads Viewpoint",
+              description:
+                "Panoramic views over the lagoon and the Indian Ocean.",
+              time: "",
+              duration: "",
+              type: "scenic",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d3-waterfront",
+              title: "Knysna Waterfront",
+              description: "Shops and cafés on the lagoon waterfront.",
+              time: "",
+              duration: "",
+              type: "leisure",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d3-lagoon-cruise",
+              title: "Knysna Lagoon Cruise",
+              description:
+                "A cruise on the Knysna Lagoon. The quote lists it as included, while the itinerary calls lagoon cruises optional.", // QUERY CLIENT
+              time: "",
+              duration: "",
+              type: "leisure",
+              optional: false,
+              image: "",
+            },
+          ],
+
+          meals: { breakfast: true, lunch: false, dinner: false },
+
+          accommodation: {
+            title: "Waterfront Lodge",
+            location: "Knysna, Garden Route",
+            availabilityNote: "",
+            options: ["Breakfast included"],
+            image: "",
+          },
+
+          images: [],
+        },
+
+        {
+          day: 4,
+          title: "Knysna → Tsitsikamma (Forests & Adventure)",
+          route: "Knysna → Tsitsikamma National Park",
+          description:
+            "After breakfast, head to Tsitsikamma National Park and walk the famous Storms River Suspension Bridge. Choose from adventure options including ziplining, kayak and lilo, and forest hiking.",
+
+          activities: [
+            {
+              id: "d4-elephant-park",
+              title: "Elephant Park",
+              description:
+                "Included in your quote, though the source does not say when it takes place.", // QUERY CLIENT: confirm the day
+              time: "",
+              duration: "",
+              type: "wildlife",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d4-jukani",
+              title: "Jukani Wildlife Sanctuary",
+              description:
+                "Included in your quote, though the source does not say when it takes place.", // QUERY CLIENT: confirm the day
+              time: "",
+              duration: "",
+              type: "wildlife",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d4-tsitsikamma",
+              title: "Tsitsikamma National Park",
+              description:
+                "Walk the famous Storms River Suspension Bridge in this forest and coastline park.",
+              time: "",
+              duration: "",
+              type: "nature",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d4-adventure",
+              title: "Adventure Options",
+              description: "Ziplining, kayak and lilo, or forest hiking.", // QUERY CLIENT: price and whether included
+              time: "",
+              duration: "",
+              type: "adventure",
+              optional: true,
+              image: "",
+            },
+          ],
+
+          meals: { breakfast: true, lunch: false, dinner: false },
+
+          accommodation: {
+            title: "At the Woods Guest House",
+            location: "Tsitsikamma, Garden Route",
+            availabilityNote:
+              "Also listed in the source: Tsitsikamma Village Inn and Tsitsikamma Manor.", // QUERY CLIENT
+            options: ["Breakfast included"],
+            image: "",
+          },
+
+          images: [],
+        },
+
+        {
+          day: 5,
+          title: "Tsitsikamma → Hermanus → Cape Town",
+          route:
+            "Tsitsikamma → Hermanus → Benguela Cove → Betty's Bay → Clarence Drive → Cape Town",
+          description:
+            "After breakfast, visit the Hermanus whale coast, enjoy a premium wine tasting at Benguela Cove, see the penguins at Betty's Bay and return to Cape Town along Clarence Drive, arriving in the late afternoon. There is no overnight on Day 5.",
+
+          activities: [
+            {
+              id: "d5-hermanus",
+              title: "Hermanus Whale Coast",
+              description: "Seasonal whale watching from the cliff paths.",
+              time: "",
+              duration: "",
+              type: "wildlife",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d5-benguela",
+              title: "Benguela Cove Lagoon Wine Estate",
+              description:
+                "A premium wine tasting with lagoon views, including the cheese and wine pairing listed in your quote.", // QUERY CLIENT: confirm the pairing happens here
+              time: "",
+              duration: "",
+              type: "wine",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d5-penguins",
+              title: "Betty's Bay Penguin Colony",
+              description: "African penguins at Stony Point Nature Reserve.",
+              time: "",
+              duration: "",
+              type: "wildlife",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d5-clarence",
+              title: "Clarence Drive (R44)",
+              description: "One of South Africa's most scenic coastal roads.",
+              time: "",
+              duration: "",
+              type: "scenic",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d5-return",
+              title: "Return to Cape Town",
+              description:
+                "Late afternoon arrival in Cape Town. No overnight; the tour ends on Day 5.",
+              time: "Late afternoon",
+              duration: "",
+              type: "transfer",
+              optional: false,
+              image: "",
+            },
+          ],
+
+          meals: { breakfast: true, lunch: false, dinner: false },
+          images: [],
+        },
+      ],
+    },
+
+    stops: null,
+
+    vehicle: null,
+
+    securityAndLiability: null,
+
+    accommodation: {
+      included: true,
+      type: "Luxury Safari Lodge & Guesthouses",
+      description:
+        "4 nights: Gondwana Game Reserve (luxury Kwena room), De Zeekoe Guest Farm in Oudtshoorn, Waterfront Lodge in Knysna and At the Woods Guest House in Tsitsikamma. Breakfast is included.",
+    },
+
+    needToKnow: [
+      { text: "The total package price is R46,000" },
+      {
+        text: "4 nights' accommodation is included, with breakfast; there is no overnight on Day 5",
+      },
+      {
+        text: "Accommodation at Gondwana is the luxury Kwena room, as quoted by Gondwana Game Reserve (1 room available)",
+      },
+      { text: "The Gondwana conservation levy is included" },
+      { text: "Lunches and selected dinners are not included" },
+      {
+        text: "Choose between the Cango Caves Heritage Tour and Adventure Tour",
+      },
+      {
+        text: "The ostrich farm experience and the Tsitsikamma adventure options (ziplining, kayak and lilo, forest hiking) are optional",
+      },
+      { text: "The Bloukrans Bungy Jump is not included" },
+      { text: "Whale watching at Hermanus is seasonal" },
+      {
+        text: "Alcoholic beverages, gratuities, travel insurance and personal expenses are not included",
+      },
+    ],
+
+    faqs: [
+      {
+        question: "How long is the tour?",
+        answer:
+          "This is a 5-day, 4-night private tour from Cape Town and back, with no overnight on Day 5.",
+      },
+      {
+        question: "Where do we stay?",
+        answer:
+          "Night 1 at Gondwana Game Reserve (luxury Kwena room), night 2 at De Zeekoe Guest Farm in Oudtshoorn, night 3 at Waterfront Lodge in Knysna and night 4 at At the Woods Guest House in Tsitsikamma. Breakfast is included.",
+      },
+      {
+        question: "What is included?",
+        answer:
+          "4 nights' accommodation with breakfast, the Gondwana conservation levy, a dedicated driver-guide, a Big 5 safari at Gondwana, the Cango Caves, a lagoon cruise, a cheese and wine pairing, the Stony Point penguin colony, Tsitsikamma National Park, the Storms River Suspension Bridge, Elephant Park, Jukani Wildlife Sanctuary and the Mossel Bay zipline.",
+      },
+      {
+        question: "What is not included?",
+        answer:
+          "The Bloukrans Bungy Jump, lunches and selected dinners, travel insurance, personal expenses, alcoholic beverages and gratuities.",
+      },
+      {
+        question: "Which animals can we see at Gondwana?",
+        answer:
+          "Expect sightings of lion, elephant, rhino, buffalo, giraffe, zebra and more on the Big 5 safari.",
+      },
+      {
+        question: "Which Cango Caves tour do we do?",
+        answer:
+          "You can choose between the Heritage Tour and the Adventure Tour.",
+      },
+      {
+        question: "What adventure activities are available at Tsitsikamma?",
+        answer:
+          "Ziplining, kayak and lilo, and forest hiking. You can also walk the famous Storms River Suspension Bridge.",
+      },
+      {
+        question: "Can we see whales at Hermanus?",
+        answer:
+          "Whale watching from the Hermanus cliff paths is seasonal, so sightings depend on the time of year.",
+      },
+      {
+        question: "Who is this tour suitable for?",
+        answer:
+          "It suits families, couples, solo travellers and small groups looking for a complete Garden Route experience with a premium safari.",
+      },
+    ],
+
+    tags: [
+      "Garden Route",
+      "Gondwana Game Reserve",
+      "Big 5 Safari",
+      "Safari",
+      "Multi-Day",
+      "5 Day Tour",
+      "Oudtshoorn",
+      "Cango Caves",
+      "Knysna",
+      "Tsitsikamma",
+      "Hermanus",
+      "Betty's Bay",
+      "Wine Tasting",
+      "Wildlife",
+      "Luxury Safari",
+      "South Africa",
+    ],
+  },
 ];
 
 export const getAllTourGalleryImages = (tour) => {
