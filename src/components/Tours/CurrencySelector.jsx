@@ -1,10 +1,19 @@
 // src/components/Tours/CurrencySelector.jsx
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { createPortal } from "react-dom";
 import { CURRENCIES, useCurrency } from "../../utils/currency";
 
-// Flag images from flagcdn.com. To avoid the third-party request, download the
-// PNGs into /public/flags/ and change this to `/flags/${cc}.png`.
 const flagSrc = (cc, width = 40) => `https://flagcdn.com/w${width}/${cc}.png`;
+
+const PANEL_MAX_WIDTH = 416; // 26rem
+const GAP = 8;
+const MARGIN = 8;
 
 function Flag({ cc }) {
   const [failed, setFailed] = useState(false);
@@ -49,19 +58,73 @@ const Chevron = ({ open }) => (
   </svg>
 );
 
-export default function CurrencySelector() {
+export default function CurrencySelector({ className = "" }) {
   const { code, live, setCode } = useCurrency();
   const [open, setOpen] = useState(false);
-  const rootRef = useRef(null);
+  const [shown, setShown] = useState(false);
+  const [pos, setPos] = useState(null);
+
+  const buttonRef = useRef(null);
+  const panelRef = useRef(null);
 
   const current = CURRENCIES.find((c) => c.code === code) ?? CURRENCIES[0];
+
+  const updatePosition = useCallback(() => {
+    const btn = buttonRef.current;
+    if (!btn) return;
+
+    const rect = btn.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    const width = Math.min(vw * 0.92, PANEL_MAX_WIDTH);
+    const left = Math.min(
+      Math.max(rect.left + rect.width / 2 - width / 2, MARGIN),
+      vw - width - MARGIN,
+    );
+
+    const spaceBelow = vh - rect.bottom - GAP - MARGIN;
+    const spaceAbove = rect.top - GAP - MARGIN;
+    const openUp = spaceBelow < 340 && spaceAbove > spaceBelow;
+
+    setPos({
+      left,
+      width,
+      openUp,
+      top: rect.bottom + GAP,
+      bottom: vh - rect.top + GAP,
+      maxHeight: Math.max(openUp ? spaceAbove : spaceBelow, 200),
+    });
+  }, []);
+
+  // Position the panel, keep it attached on scroll/resize, animate in
+  useLayoutEffect(() => {
+    if (!open) {
+      setShown(false);
+      return undefined;
+    }
+
+    updatePosition();
+    const raf = requestAnimationFrame(() => setShown(true));
+
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [open, updatePosition]);
 
   // Close on outside click / Escape
   useEffect(() => {
     if (!open) return undefined;
 
     const onPointerDown = (e) => {
-      if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false);
+      if (buttonRef.current?.contains(e.target)) return;
+      if (panelRef.current?.contains(e.target)) return;
+      setOpen(false);
     };
     const onKey = (e) => e.key === "Escape" && setOpen(false);
 
@@ -78,69 +141,82 @@ export default function CurrencySelector() {
     setOpen(false);
   };
 
-  return (
-    <div ref={rootRef} className="relative z-20 w-full sm:w-auto">
-      {/* Panel: opens downward from the button, aligned to its left edge */}
-      <div
-        id="currency-panel"
-        role="dialog"
-        aria-label="Choose currency"
-        aria-hidden={!open}
-        className={`absolute left-0 top-full mt-2 w-[min(92vw,26rem)] origin-top-left rounded-3xl border border-neutral-200 bg-white p-4 shadow-2xl shadow-blue-900/15 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          open
-            ? "visible translate-y-0 scale-100 opacity-100"
-            : "invisible -translate-y-2 scale-95 opacity-0"
-        }`}
-      >
-        <p className="mb-3 text-center text-[11px] font-bold uppercase tracking-[0.18em] text-neutral-400">
-          Show prices in
-        </p>
+  const panel =
+    open && pos && typeof document !== "undefined"
+      ? createPortal(
+          <div
+            ref={panelRef}
+            id="currency-panel"
+            role="dialog"
+            aria-label="Choose currency"
+            style={{
+              left: pos.left,
+              width: pos.width,
+              maxHeight: pos.maxHeight,
+              ...(pos.openUp ? { bottom: pos.bottom } : { top: pos.top }),
+            }}
+            className={`fixed z-[1000] flex flex-col rounded-3xl border border-neutral-200 bg-white p-4 shadow-2xl shadow-blue-900/15 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              pos.openUp ? "origin-bottom" : "origin-top"
+            } ${
+              shown
+                ? "translate-y-0 scale-100 opacity-100"
+                : `${pos.openUp ? "translate-y-2" : "-translate-y-2"} scale-95 opacity-0`
+            }`}
+          >
+            <p className="mb-3 shrink-0 text-center text-[11px] font-bold uppercase tracking-[0.18em] text-neutral-400">
+              Show prices in
+            </p>
 
-        <div
-          data-lenis-prevent
-          className="grid max-h-[50vh] grid-cols-2 gap-2 overflow-y-auto overscroll-contain sm:grid-cols-3"
-        >
-          {CURRENCIES.map((c) => {
-            const active = c.code === code;
-            return (
-              <button
-                key={c.code}
-                type="button"
-                onClick={() => choose(c.code)}
-                aria-pressed={active}
-                className={`flex items-center gap-2.5 rounded-2xl border px-3 py-2.5 text-left transition active:scale-95 ${
-                  active
-                    ? "border-blue-600 bg-blue-50 shadow-sm"
-                    : "border-neutral-200 bg-white hover:border-blue-300 hover:bg-blue-50/50"
-                }`}
-              >
-                <Flag cc={c.cc} />
-                <span className="min-w-0">
-                  <span
-                    className={`block text-sm font-bold leading-none ${
-                      active ? "text-blue-700" : "text-neutral-900"
+            <div
+              data-lenis-prevent
+              className="grid min-h-0 flex-1 grid-cols-2 gap-2 overflow-y-auto overscroll-contain sm:grid-cols-3"
+            >
+              {CURRENCIES.map((c) => {
+                const active = c.code === code;
+                return (
+                  <button
+                    key={c.code}
+                    type="button"
+                    onClick={() => choose(c.code)}
+                    aria-pressed={active}
+                    className={`flex items-center gap-2.5 rounded-2xl border px-3 py-2.5 text-left transition active:scale-95 ${
+                      active
+                        ? "border-blue-600 bg-blue-50 shadow-sm"
+                        : "border-neutral-200 bg-white hover:border-blue-300 hover:bg-blue-50/50"
                     }`}
                   >
-                    {c.code}
-                  </span>
-                  <span className="mt-1 block truncate text-[10px] font-medium leading-none text-neutral-500">
-                    {c.name}
-                  </span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
+                    <Flag cc={c.cc} />
+                    <span className="min-w-0">
+                      <span
+                        className={`block text-sm font-bold leading-none ${
+                          active ? "text-blue-700" : "text-neutral-900"
+                        }`}
+                      >
+                        {c.code}
+                      </span>
+                      <span className="mt-1 block truncate text-[10px] font-medium leading-none text-neutral-500">
+                        {c.name}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
 
-        <p className="mt-3 text-center text-[11px] leading-relaxed text-neutral-500">
-          Other currencies are approximate{live ? " (live rates)" : ""}.
-          Bookings are charged in South African rand (ZAR), and your bank
-          converts the amount at its own rate.
-        </p>
-      </div>
+            <p className="mt-3 shrink-0 text-center text-[11px] leading-relaxed text-neutral-500">
+              Other currencies are approximate{live ? " (live rates)" : ""}.
+              Bookings are charged in South African rand (ZAR), and your bank
+              converts the amount at its own rate.
+            </p>
+          </div>,
+          document.body,
+        )
+      : null;
 
-      {/* Toggle button */}
+  return (
+    <div className={`relative w-full sm:w-auto ${className}`}>
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
@@ -152,6 +228,8 @@ export default function CurrencySelector() {
         <span>{current.code}</span>
         <Chevron open={open} />
       </button>
+
+      {panel}
     </div>
   );
 }

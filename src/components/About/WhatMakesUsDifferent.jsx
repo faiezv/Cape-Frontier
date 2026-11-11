@@ -303,7 +303,7 @@ const WhatMakesUsDifferent = () => {
 
   // ----- JSX (with resolved images) -----
   return (
-    <section ref={pageRef} className="relative z-20 w-full py-16 sm:py-20 bg-white overflow-hidden">
+    <section ref={pageRef} className="relative z-20 w-full pt-16 sm:pt-20 bg-white overflow-hidden">
       <div className="mx-auto flex max-w-5xl flex-col gap-8  px-4 sm:px-6 lg:px-8">
         {/* HEADER */}
         <div
@@ -311,7 +311,7 @@ const WhatMakesUsDifferent = () => {
           className="relative z-30 mx-auto flex w-full max-w-4xl flex-col items-center gap-6 text-center"
         >
           <img src="/icons/infoDark.png" className="h-9 w-auto" alt="Info icon" />
-          <h2 className="font-frank text-4xl sm:text-5xl lg:text-6xl font-extrabold text-black leading-tight">
+          <h2 className="font-bitter text-4xl sm:text-5xl lg:text-6xl font-bold text-black leading-tight">
             <AnimatedWords text="What makes us different?" />
           </h2>
           <p className="wmud-subcopy max-w-2xl text-base sm:text-lg text-gray-600 leading-relaxed">
@@ -354,11 +354,11 @@ const WhatMakesUsDifferent = () => {
         </div>
 
 
-        <div 
+        {/* <div 
           id="gallery"
           className="mx-auto max-w-5xl rounded-lg px-4 sm:px-6 lg:px-0">
           <Gallery />
-        </div>
+        </div> */}
 
 
 

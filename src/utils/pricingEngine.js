@@ -1,8 +1,13 @@
 // src/utils/pricingEngine.js
 import { FX_RATES } from "../data/tours.js";
 
+export const resolveCurrency = (code) => {
+  const c = String(code || "ZAR").toUpperCase();
+  return FX_RATES[c] ? c : "ZAR";
+};
+
 export const convertPrice = (baseAmount = 0, targetCurrency = "ZAR") =>
-  Number(baseAmount || 0) * (FX_RATES[targetCurrency] || 1);
+  Number(baseAmount || 0) * (FX_RATES[resolveCurrency(targetCurrency)]);
 
 export const formatMoney = (amount, currency = "ZAR") =>
   `${currency} ${Number(amount || 0).toFixed(2)}`;
@@ -49,12 +54,13 @@ export const computePricing = ({
   tour,
   childAges = [],
   adultCount = 1,
-  currency = "ZAR",
+  currency: requested = "ZAR",
   selectedOption = null,
   selectedExtras = {},
   formData = {},
   kidsActivities = [],
 }) => {
+  const currency = resolveCurrency(requested);
   const adults = Math.max(0, Number(adultCount) || 0);
 
   // ── Age buckets ────────────────────────────────────────────────────

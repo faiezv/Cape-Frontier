@@ -2,8 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 
 import tours from "/src/data/tours.js";
-import TourSelect from "./TourSelect";
-import { resolveImage } from "/src/utils/ImageLoader.js";
 
 const FALLBACK_LOCATIONS = [
   "Cape Town",
@@ -13,6 +11,14 @@ const FALLBACK_LOCATIONS = [
   "Cape Peninsula",
   "Stellenbosch",
 ];
+
+// Slower than before (was 1200ms). Constant motion next to the headline
+// competes with the thing people are trying to read.
+const ROTATE_EVERY_MS = 2600;
+
+const prefersReducedMotion = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 const toCleanLocation = (value) => {
   if (!value) return "";
@@ -28,9 +34,7 @@ const DESTINATIONS = (() => {
   return unique.length ? unique.slice(0, 10) : FALLBACK_LOCATIONS;
 })();
 
-const RotatingLocationText = ({
-  locations = FALLBACK_LOCATIONS,
-}) => {
+const RotatingLocationText = ({ locations = FALLBACK_LOCATIONS }) => {
   const cleanLocations = useMemo(() => {
     const unique = Array.from(
       new Set(locations.map(toCleanLocation).filter(Boolean))
@@ -55,7 +59,6 @@ const RotatingLocationText = ({
 
     if (newWord === currentWordRef.current) return;
 
-    const oldWord = currentWordRef.current;
     currentWordRef.current = newWord;
 
     if (animationRef.current) {
@@ -139,11 +142,11 @@ const RotatingLocationText = ({
   }, [cleanLocations]);
 
   useEffect(() => {
-    if (cleanLocations.length <= 1) return;
+    if (cleanLocations.length <= 1 || prefersReducedMotion()) return;
 
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % cleanLocations.length);
-    }, 1200);
+    }, ROTATE_EVERY_MS);
 
     return () => clearInterval(interval);
   }, [cleanLocations]);
@@ -159,7 +162,7 @@ const RotatingLocationText = ({
   return (
     <span
       ref={containerRef}
-      className="inline-block rounded-full bg-[#eef4ff] px-2.5 py-1 font-black text-[#071f4f] will-change-transform sm:px-3"
+      className="inline-block rounded-full bg-blue-50 px-3 py-0.5 font-bold text-blue-800 will-change-transform"
     >
       <span className="inline-flex whitespace-pre">
         {letters.map((letter, idx) => (
@@ -177,63 +180,30 @@ const RotatingLocationText = ({
 };
 
 function ToursBanner() {
-  /*
-   * IMPORTANT:
-   * This image lives inside src/assets, so resolve it through Vite's
-   * import.meta.glob loader instead of using /src/assets/... directly.
-   */
-  const bannerImage = useMemo(
-    () =>
-      resolveImage(
-        "/src/assets/images/content/random/7.webp"
-      ),
-    []
-  );
-
   return (
-    <div className="mx-auto flex max-w-5xl flex-col pb- pt-8 sm:pb- sm:pt-12 lg:pt-30 ">
-      <header className="mx-4 max-w-4xl text-center font-bitter lg:mx-auto">
-        <p className="cf-tours-intro-item text-xs font-bold uppercase tracking-[0.28em] text-[#071f4f]/60">
-          Cape Frontier experiences
-        </p>
-
-        <h2 className="cf-tours-intro-item mt-3 text-[3rem] font-bold leading-[0.86] tracking-[-0.055em] text-neutral-950 sm:text-6xl 
-        md:text-7xl">
-          Book Your Adventure.
+    <div className="mx-auto flex max-w-5xl flex-col px-4 pb-6 pt-10 sm:pb-8 sm:pt-14 lg:pt-24">
+      {/*
+        Changes vs. the old version:
+        - removed the tracked-out "Cape Frontier experiences" eyebrow (said nothing new)
+        - "Book Your Adventure" + "Book a trip to" repeated "Book" -> subline now
+          starts with "Tours in"
+        - fixed broken utility classes (pb-, sm:pb-, mt-, lg:pt-30, max-w-1xl)
+        - headline tracking/leading loosened so it doesn't crowd itself
+        - dead commented-out image/TourSelect blocks removed
+      */}
+      <header className="cf-tours-intro-item mx-auto max-w-3xl text-center font-bitter">
+        <h2 className="text-4xl font-bold leading-[1.08] tracking-tight text-neutral-950 sm:text-5xl md:text-6xl">
+          Book your adventure.
         </h2>
 
-        <div className="cf-tours-intro-item mx-auto mt-4 max-w-1xl text-balance text-lg font-semibold leading-tight text-neutral-600 sm:min-h-0 sm:text-2xl">
-          <div className="block">
-            Book a trip to{" "}
-            <RotatingLocationText locations={DESTINATIONS} />
-          </div>
+        <p className="mt-5 text-xl font-semibold leading-snug text-neutral-800 sm:text-2xl">
+          Tours in <RotatingLocationText locations={DESTINATIONS} />
+        </p>
 
-          <div className="">
-            and experience more than just a tour.
-          </div>
-        </div>
+        <p className="mx-auto mt-3 max-w-xl text-base leading-relaxed text-neutral-600 sm:text-lg">
+          Small groups, local guides, and more than just a tour.
+        </p>
       </header>
-
-      {/* Two-column grid: image | TourSelect */}
-      {/* <div className="mt-7 grid items-stretch gap-4 md:mt-9 lg:grid-cols-[1fr_0fr]"> */}
-      <div className="mt- max-w-4xl flex items-center place-self-center gap">
-        {/* <figure className="cf-tours-intro-item relative hidden min-h-[330px] overflow-hidden rounded-[2rem] bg-[#071f4f] shadow-[0_24px_70px_rgba(7,31,79,0.12)] md:block">
-          <img
-            src={bannerImage}
-            alt="Cape Frontier scenic tour preview"
-            className="absolute inset-0 h-full w-full object-cover"
-            loading="lazy"
-            decoding="async"
-          />
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/24 to-transparent" />
-        </figure> */}
-
-        {/* <div className="cf-tours-intro-item relative z-10 mx-4 lg:mx-auto">
-          <TourSelect />
-        </div> */}
-      </div>
-
 
       <style>{`
         @media (min-width: 768px) {

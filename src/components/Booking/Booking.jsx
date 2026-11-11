@@ -14,6 +14,7 @@ import TourOptions from "../TourDetails/TourOptions.jsx";
 import KidsActivities from "../TourDetails/KidsActivities.jsx";
 import { KIDS_ACTIVITIES } from "../../data/kidsActivities.js";
 import SiteFooter from "../SiteFooter.jsx";
+import CurrencySelector from "../Tours/CurrencySelector.jsx";
 
 import {
   computePricing,
@@ -21,6 +22,7 @@ import {
   formatMoney,
   getFee,
 } from "../../utils/pricingEngine.js";
+import { useCurrency } from "../../utils/currency";
 
 import {
   ageToBand,
@@ -96,10 +98,8 @@ const Booking = ({ embeddedTour, bookingData }) => {
   const pickupFeedbackRef = useRef(null);
   const activeImageRef = useRef(null);
 
-  // ─── Currency ────────────────────────────────────────────────
-  const [currency, setCurrency] = useState(
-    location.state?.selectedCurrency || "ZAR",
-  );
+  // ─── Currency (global store shared with every CurrencySelector) ───
+  const { code: currency, setCode: setCurrency, live } = useCurrency();
 
   // ─── Gallery ─────────────────────────────────────────────────
   const gallery = useMemo(() => (tour ? getTourGallery(tour) : []), [tour]);
@@ -236,6 +236,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
         childAges,
         adultCount,
         currency,
+        live,
         selectedOption: formData.selectedOption,
         selectedExtras: formData.selectedExtras || {},
         formData,
@@ -564,8 +565,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
       prevTourSlugRef.current !== null && prevTourSlugRef.current !== tourSlug;
     if (isTourSwitch && tour.childFriendly === false) {
       setFormData((prev) => {
-        const current =
-          prev.seatAssignments || Array(MAX_GUESTS).fill(null);
+        const current = prev.seatAssignments || Array(MAX_GUESTS).fill(null);
         const next = current.map((b) => (b === "adult" ? "adult" : null));
         return syncSeatDerived(prev, next);
       });
@@ -974,7 +974,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
               }`}
             >
               <div className="relative z-10 w-full min-w-0">
-                
                 {/* Compact Tour Header */}
                 <div className="mb-6 flex flex-col items-center text-center">
                   <h2 className="max-w-3xl font-frank text-3xl font-bold leading-tight text-neutral-950 sm:text-4xl drop-shadow-sm">
@@ -982,9 +981,18 @@ const Booking = ({ embeddedTour, bookingData }) => {
                   </h2>
                   <div className="mt-2 flex flex-wrap items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-neutral-700">
                     {tour.duration && <span>{tour.duration}</span>}
-                    {tour.duration && tour.location && <span className="opacity-50 text-black">•</span>}
+                    {tour.duration && tour.location && (
+                      <span className="opacity-50 text-black">•</span>
+                    )}
                     {tour.location && <span>{tour.location}</span>}
                   </div>
+                </div>
+
+                <div className="mb-5 flex items-center justify-center gap-3">
+                  <span className="font-bitter text-xs font-semibold uppercase tracking-wider text-neutral-600">
+                    Currency
+                  </span>
+                  <CurrencySelector className="!w-auto" />
                 </div>
 
                 {Array.isArray(tour?.options) && tour.options.length > 0 && (
@@ -1101,7 +1109,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
             </div>
           </div>
         </div>
-        
+
         {!isEmbedded && (
           <div className="mx-auto mt-12 w-full min-w-0 max-w-7xl">
             <SiteFooter />

@@ -18,6 +18,7 @@ import { useLoadingNavigate } from "/src/components/useLoadingNavigate.jsx";
 import { resolveTourImage as resolveImage } from "../utils/ImageLoader";
 
 import { formatMoney } from "../components/Tours/Helpers.jsx";
+import { useCurrency } from "../utils/currency";
 
 // SEO
 import Seo from "../components/Seo.jsx";
@@ -27,6 +28,8 @@ import { site } from "../utils/siteConfig.js";
 import { getTourSeo } from "../utils/tourSeo.js";
 
 // Shared
+// imports
+import CurrencySelector from "../components/Tours/CurrencySelector.jsx";
 import TourHero from "../components/TourDetails/TourHero";
 import TourQuickInfo from "../components/TourDetails/TourQuickInfo";
 import TourPricing from "../components/TourDetails/TourPricing";
@@ -495,6 +498,14 @@ export default function TourDetails() {
   const { slug } = useParams();
   const navigate = useLoadingNavigate();
   const location = useLocation();
+  const { setCode: setCurrency } = useCurrency();
+
+  // Honour a currency passed via navigation state (e.g. coming back from checkout)
+  useEffect(() => {
+    const preferred = location.state?.selectedCurrency;
+    if (preferred) setCurrency(preferred);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const mobileBookingRef = useRef(null);
   const desktopBookingRef = useRef(null);
@@ -1006,8 +1017,6 @@ export default function TourDetails() {
           </button>
         </div>
 
-
-
         {/* TOUR CONTENT: PRICING,  */}
         <section
           ref={desktopContentSectionRef}
@@ -1030,7 +1039,14 @@ export default function TourDetails() {
             </ContentBlock>
             {/* PRICING */}
             <ContentBlock eyebrow="Pricing" title="Tour Pricing" icon="pricing">
-              <TourPricing pricing={tour.pricing} />
+              <div className="mb-4 flex justify-end">
+                <CurrencySelector />
+              </div>
+              <TourPricing
+                pricing={tour.pricing}
+                minAge={tour.minAge}
+                childFriendly={tour.childFriendly}
+              />
 
               {tour.additionalPricing?.length > 0 && (
                 <AdditionalPricing pricing={tour.additionalPricing} />

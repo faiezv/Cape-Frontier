@@ -22,14 +22,17 @@ export const TOUR_CATEGORIES_ICON = {
   wineRoutes: "/icons/wine-routes.svg",
 };
 
-export const SUPPORTED_CURRENCIES = ["ZAR", "USD", "EUR", "GBP", "AUD", "CAD", "JPY", "CHF", "CNY", "NZD", "NGN", "GHS","KES"];
-
+// supported currencies
 export const FX_RATES = {
   ZAR: 1,
   USD: 0.054,
   EUR: 0.05,
   GBP: 0.043,
+  CAD: 0.075,
+  AUD: 0.082,
+  // ...one entry per code in CURRENCIES
 };
+export const SUPPORTED_CURRENCIES = Object.keys(FX_RATES);
 
 export const DEFAULT_PICKUP_OPTIONS = [
   "Cape Town CBD",
@@ -1150,7 +1153,6 @@ export const tours = [
     priceBase: 2900,
     minPeople: 1,
     baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -1565,7 +1567,6 @@ export const tours = [
     priceBase: 6400,
     minPeople: 1,
     baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -1952,7 +1953,6 @@ export const tours = [
     priceBase: 4500,
     minPeople: 1,
     baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -2335,8 +2335,6 @@ export const tours = [
 
     priceBase: 2250,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -2622,8 +2620,6 @@ export const tours = [
 
     priceBase: 1900,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -2783,8 +2779,6 @@ export const tours = [
 
     priceBase: 1900,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -2951,8 +2945,6 @@ export const tours = [
 
     priceBase: 1300,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -3318,8 +3310,6 @@ export const tours = [
 
     priceBase: 1990,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -3581,8 +3571,6 @@ export const tours = [
 
     priceBase: 2500, // Price not specified in the brief
     minPeople: 4,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -4027,8 +4015,6 @@ export const tours = [
 
     priceBase: 1950,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -4701,8 +4687,6 @@ export const tours = [
 
     priceBase: 2500,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -4972,8 +4956,6 @@ export const tours = [
 
     priceBase: 2250,
     minPeople: 4,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -5270,8 +5252,6 @@ export const tours = [
 
     priceBase: 2300,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -5656,8 +5636,6 @@ export const tours = [
 
     priceBase: 1865,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -6018,8 +5996,6 @@ export const tours = [
 
     priceBase: 1950,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -6451,8 +6427,6 @@ export const tours = [
 
     priceBase: 3200,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -6972,8 +6946,6 @@ export const tours = [
 
     priceBase: 1950,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -7405,8 +7377,6 @@ export const tours = [
 
     priceBase: 3200,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -7928,8 +7898,6 @@ export const tours = [
 
   //   priceBase: 39500, // only known price; lower it if group discounts are confirmed
   //   minPeople: 2,
-  //   baseCurrency: "ZAR",
-  //   supportedCurrencies: SUPPORTED_CURRENCIES,
 
   //   pricing: [
   //     {
@@ -8438,8 +8406,6 @@ export const tours = [
 
     priceBase: 17000,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -9100,8 +9066,6 @@ export const tours = [
 
     priceBase: 12995,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -9982,8 +9946,6 @@ export const tours = [
 
     priceBase: 24000,
     minPeople: 2,
-    baseCurrency: "ZAR",
-    supportedCurrencies: SUPPORTED_CURRENCIES,
 
     pricing: [
       {
@@ -10606,8 +10568,6 @@ export default tours;
 
 //   priceBase: 0,
 //   minPeople: 1,
-//   baseCurrency: "ZAR",
-//   supportedCurrencies: SUPPORTED_CURRENCIES,
 
 //   pricing: [],
 

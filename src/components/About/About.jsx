@@ -1,433 +1,48 @@
-import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import React, { useRef } from "react";
 
-import PopularTours from "./PopularTours.jsx";
-import StripeSponsored from "./StripeSponsored.jsx";
+import Hero from "./Hero.jsx";
+import PaystackSupported from "./PaystackSupported.jsx";
 import WhatMakesUsDifferent from "./WhatMakesUsDifferent.jsx";
 import FeaturedTours from "./FeaturedTours.jsx";
 import Tours from "../Tours/Tours.jsx";
-import { site } from "../../utils/siteConfig.js";
 
-// -----------------------------------------------------------------------------
-// Import images (now inside src/assets/images/)
-// -----------------------------------------------------------------------------
-import slide1 from "/src/assets/images/content/random/1.webp";
-import slide5 from "/src/assets/images/content/random/5.webp";
-import slide6 from "/src/assets/images/content/random/7.webp";
 import bgPattern from "/assets/content/clip-art/section1-bg.png";
 
-// Icons (adjust paths if yours are elsewhere)
-import faqBlueIcon from "../../../public/icons/faqBlue.png";
+// <TourCategories /> is intentionally not rendered: the same four categories
+// are already the tabs inside <Tours />. Re-import it if you want it back.
 
-gsap.registerPlugin(ScrollTrigger);
-
-// -----------------------------------------------------------------------------
-// Per-site copy
-// -----------------------------------------------------------------------------
-const COPY = {
-  coza: {
-    slides: [
-      {
-        eyebrow: "Cape Town tours in rand",
-        title: "Cape Town tours, priced in rand.",
-        desc: "Small-group and private Cape Town tours with local pricing in rand, from iconic viewpoints to hidden local gems.",
-      },
-      {
-        eyebrow: "Scenic routes",
-        title: "Discover routes worth remembering.",
-        desc: "Coastlines, mountains, Winelands and culture-rich stops, with local pickup support and easy online booking.",
-      },
-      {
-        eyebrow: "Trusted local guides",
-        title: "See Cape Town with real local insight.",
-        desc: "Every journey is led with care and local knowledge, by a Cape Town team you can reach on WhatsApp, phone or email.",
-      },
-    ],
-    mobileDesc:
-      "Guided Cape Town routes with local insight, scenic stops and prices in rand.",
-    stats: [
-      { value: "100%", label: "Personalised Service" },
-      { value: "Local", label: "Travel Expertise" },
-      { value: "Tailored", label: "Tour Experiences" },
-    ],
-  },
-  com: {
-    slides: [
-      {
-        eyebrow: "Plan your South Africa trip",
-        title: "Your South Africa trip, planned from abroad.",
-        desc: "Guided Cape Town and Western Cape tours for international visitors, planned with our local team before you arrive.",
-      },
-      {
-        eyebrow: "Scenic routes",
-        title: "Discover routes worth remembering.",
-        desc: "Travel through coastlines, mountains and Winelands with tours that balance comfort, storytelling and adventure.",
-      },
-      {
-        eyebrow: "Trusted local guides",
-        title: "See Cape Town with real local insight.",
-        desc: "Every journey is led with local knowledge, and our Cape Town team is on hand before and during your trip.",
-      },
-    ],
-    mobileDesc:
-      "Guided Cape Town routes with local insight, planned before you arrive.",
-    stats: [
-      { value: "Pre-trip", label: "Planning Support" },
-      { value: "Local", label: "Travel Expertise" },
-      { value: "Global", label: "Cards Accepted" },
-    ],
-  },
-};
-
-const isZA = site.key === "coza";
-const copy = isZA ? COPY.coza : COPY.com;
-
-const slideImages = [slide1, slide5, slide6];
-
-const exploreSlides = copy.slides.map((item, index) => ({
-  ...item,
-  img: slideImages[index],
-}));
-
-const stats = copy.stats;
-
-const WORD_HOLD_TIME = 12.4;
-
-// -----------------------------------------------------------------------------
-// small local display components (unchanged)
-// -----------------------------------------------------------------------------
-const NumberBadge = ({ children }) => (
-  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[24px] bg-[linear-gradient(135deg,rgba(148,197,255,0.9)_0%,rgba(152,255,213,0.9)_100%)] font-frank text-5xl font-black text-white shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:h-24 sm:w-24 sm:text-6xl md:h-28 md:w-28">
-    {children}
-  </div>
-);
-
-const ArrowIcon = ({ className = "h-4 w-4" }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.4"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <path d="M5 12h14" />
-    <path d="m13 6 6 6-6 6" />
-  </svg>
-);
-
-const shouldReduceMotion = () => {
-  if (typeof window === "undefined") return true;
-  return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-};
-
-// -----------------------------------------------------------------------------
-// About component
-// -----------------------------------------------------------------------------
 const About = () => {
-  const textRefs = useRef([]);
-  const statsRef = useRef([]);
-  const linkStripRef = useRef(null);
-  const linkCardRefs = useRef([]);
-
   const toursSectionRef = useRef(null);
-  const [slideIndex, setSlideIndex] = useState(0);
-  const slide = exploreSlides[slideIndex];
-
-  const scrollToSection = useCallback((primaryId, fallbackId = null) => {
-    const target =
-      document.getElementById(primaryId) ||
-      (fallbackId ? document.getElementById(fallbackId) : null);
-    if (!target) return;
-    const y = target.getBoundingClientRect().top + window.scrollY;
-    if (window.lenis) {
-      window.lenis.scrollTo(y, { duration: 0.85, force: true });
-      return;
-    }
-    window.scrollTo({ top: y, behavior: "smooth" });
-  }, []);
-
-  const scrollToJourney = useCallback(() => {
-    scrollToSection("journey-start", "tours");
-  }, [scrollToSection]);
-
-  const scrollToContact = useCallback(() => {
-    scrollToSection("contact");
-  }, [scrollToSection]);
-
-  // ---------------------------------------------------------------------------
-  // rotating intro text animation (unchanged)
-  // ---------------------------------------------------------------------------
-  useLayoutEffect(() => {
-    const words = textRefs.current.filter(Boolean);
-    if (!words.length) return undefined;
-    if (shouldReduceMotion()) {
-      gsap.set(words, {
-        yPercent: 0,
-        opacity: 1,
-        scale: 1,
-        filter: "blur(0px)",
-      });
-      return undefined;
-    }
-    const tl = gsap.timeline({
-      defaults: { ease: "power2.out" },
-      onComplete: () =>
-        setSlideIndex((current) => (current + 1) % exploreSlides.length),
-    });
-    tl.set(
-      words,
-      { yPercent: 110, opacity: 0, scale: 0.98, filter: "blur(2px)" },
-      0,
-    )
-      .to(words, {
-        yPercent: 0,
-        opacity: 1,
-        scale: 1,
-        filter: "blur(0px)",
-        duration: 0.28,
-        stagger: 0.08,
-        ease: "power3.out",
-      })
-      .to(words, {
-        yPercent: 0,
-        opacity: 1,
-        scale: 1,
-        duration: WORD_HOLD_TIME,
-        ease: "none",
-      })
-      .to(words, {
-        yPercent: -110,
-        opacity: 0,
-        scale: 0.98,
-        filter: "blur(2px)",
-        duration: 0.26,
-        stagger: 0.06,
-        ease: "power2.in",
-      });
-    return () => tl.kill();
-  }, [slideIndex]);
-
-  // ---------------------------------------------------------------------------
-  // link strip entrance animation (unchanged – still commented out in JSX)
-  // ---------------------------------------------------------------------------
-  useLayoutEffect(() => {
-    const cards = linkCardRefs.current.filter(Boolean);
-    if (!cards.length || !linkStripRef.current || shouldReduceMotion())
-      return undefined;
-    gsap.set(cards, { yPercent: 100, opacity: 0 });
-    const tween = gsap.to(cards, {
-      yPercent: 0,
-      opacity: 1,
-      duration: 0.5,
-      stagger: 0.08,
-      ease: "power2.out",
-      scrollTrigger: {
-        trigger: linkStripRef.current,
-        start: "top 90%",
-        toggleActions: "play none none reverse",
-      },
-    });
-    return () => {
-      tween.scrollTrigger?.kill();
-      tween.kill();
-    };
-  }, []);
-
-  // ---------------------------------------------------------------------------
-  // stats animation (unchanged)
-  // ---------------------------------------------------------------------------
-  useLayoutEffect(() => {
-    const statItems = statsRef.current.filter(Boolean);
-    if (!statItems.length || shouldReduceMotion()) return undefined;
-    const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.35 });
-    tl.fromTo(
-      statItems,
-      { opacity: 0, y: 14 },
-      { opacity: 1, y: 0, duration: 0.38, stagger: 0.14, ease: "power2.out" },
-    )
-      .to({}, { duration: 0.7 })
-      .to(statItems, {
-        opacity: 0,
-        y: -8,
-        duration: 0.3,
-        stagger: 0.14,
-        ease: "power2.in",
-      });
-    return () => tl.kill();
-  }, []);
 
   return (
     <div className="relative flex w-full max-w-full flex-col bg-white">
-      {/* Background pattern – now using imported image */}
+      {/* Background pattern */}
       <img
         src={bgPattern}
         className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-70"
         alt=""
       />
 
-      <section className="relative z-20 w-full bg-white">
-        <div className="relative z-20 mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 pb-5 pt-8 sm:px-6 sm:pb-8 sm:pt-12 md:gap-8 md:pt-16 lg:px-4">
-          <div className="flex w-full flex-col items-stretch gap-6 md:flex-row md:gap-8">
-            <div className="relative hidden min-w-0 md:block md:w-1/2">
-              <div className="relative aspect-[4/4.15] w-full overflow-hidden rounded-[24px] bg-blue-100 shadow-[0_16px_40px_rgba(0,0,0,0.12)] lg:rounded-[28px]">
-                {exploreSlides.map((item, index) => (
-                  <img
-                    key={item.img}
-                    src={item.img}
-                    alt={item.title}
-                    loading={index === 0 ? "eager" : "lazy"}
-                    decoding="async"
-                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
-                      index === slideIndex ? "opacity-100" : "opacity-0"
-                    }`}
-                  />
-                ))}
+      <Hero />
 
-                <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(5,20,70,0.28)_0%,rgba(5,20,70,0.02)_40%,rgba(255,255,255,0.05)_100%)]" />
-
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-2xl border border-white/20 bg-white/14 px-4 py-3 text-white backdrop-blur-md">
-                  <div className="min-w-0">
-                    <p className="font-bitter text-[10px] uppercase tracking-[0.2em] text-white/75 sm:text-xs">
-                      {slide.eyebrow}
-                    </p>
-                    <p className="mt-1 truncate font-frank text-sm font-semibold sm:text-base">
-                      Cape Frontier Moments
-                    </p>
-                  </div>
-
-                  <div className="flex shrink-0 items-center gap-2">
-                    {exploreSlides.map((_, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        aria-label={`Go to slide ${index + 1}`}
-                        onClick={() => setSlideIndex(index)}
-                        className={`h-2.5 rounded-full transition-all ${
-                          index === slideIndex
-                            ? "w-7 bg-white"
-                            : "w-2.5 bg-white/45"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="flex min-w-0 flex-col justify-between gap-5 md:w-1/2 md:gap-8">
-              <div className="flex flex-col gap-3 md:gap-4 items-center">
-                <div className="overflow-hidden">
-                  <p
-                    ref={(el) => {
-                      textRefs.current[0] = el;
-                    }}
-                    className="font-bitter text-[10px] font-black uppercase tracking-[0.22em] text-blue-700/70 sm:text-xs md:text-sm"
-                  >
-                    {slide.eyebrow}
-                  </p>
-                </div>
-
-                <div className="flex justify-center overflow-hidden text-center">
-                  <h1
-                    ref={(el) => {
-                      textRefs.current[1] = el;
-                    }}
-                    className="font-bitter text-3xl font-bold leading-[0.95] text-black sm:text-5xl lg:text-6xl"
-                  >
-                    {slide.title}
-                  </h1>
-                </div>
-
-                <div className="overflow-hidden px-12 text-center">
-                  <p
-                    ref={(el) => {
-                      textRefs.current[2] = el;
-                    }}
-                    className="max-w-xl font-mont text-sm leading-6 text-black/60 sm:text-base sm:leading-7"
-                  >
-                    <span className="md:hidden">{copy.mobileDesc}</span>
-                    <span className="hidden md:inline">{slide.desc}</span>
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={scrollToJourney}
-                    className="hero-gradient inline-flex items-center gap-2 rounded-xl px-4 py-3 font-mont text-xs font-black uppercase tracking-[0.14em] text-white shadow-[0_12px_28px_rgba(15,10,113,0.16)] transition hover:opacity-90 sm:text-sm"
-                  >
-                    <span>Start your journey</span>
-                    <ArrowIcon />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={scrollToContact}
-                    className="inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 font-mont text-xs font-black uppercase tracking-[0.14em] text-blue-700 transition hover:bg-blue-100 sm:text-sm"
-                  >
-                    <img src={faqBlueIcon} className="h-4 sm:h-5" alt="" />
-                    <span>Contact</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 rounded-2xl border border-black/5 bg-white/75 p-3 shadow-[0_14px_34px_rgba(15,23,42,0.06)] backdrop-blur-sm sm:gap-4 sm:p-4">
-                {stats.map((item, index) => (
-                  <div
-                    key={item.label}
-                    ref={(el) => {
-                      statsRef.current[index] = el;
-                    }}
-                    className="min-w-0 text-center sm:text-left"
-                  >
-                    <p className="font-bitter text-2xl font-black leading-none text-blue-700 sm:text-3xl lg:text-4xl">
-                      {item.value}
-                    </p>
-                    <p className="mt-1 font-mont text-[10px] font-bold leading-tight text-black/50 sm:text-xs lg:text-sm">
-                      {item.label}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* -------------------------------------------------------------------
-          Tour browser + "browse all tours" CTA underneath it
-      ------------------------------------------------------------------- */}
-      <section id="tours" ref={toursSectionRef} className="relative z-26">
+      {/* Tour browser (single entry point for finding a tour) */}
+      <section id="tours" ref={toursSectionRef} className="relative z-30">
         <Tours />
       </section>
 
-      {/* -------------------------------------------------------------------
-          journey area – link strip still commented out
-      ------------------------------------------------------------------- */}
+      {/* Featured tours, then payment trust note, in one container */}
       <section className="relative z-20 w-full">
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 sm:gap-8 sm:px-6 lg:px-8">
-
-          <div id="journey-start" className="scroll-mt-24 my-12">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-12 sm:px-6 lg:px-8">
+          <div id="journey-start" className="scroll-mt-24">
             <FeaturedTours />
           </div>
 
+          <PaystackSupported />
         </div>
       </section>
 
-      {/* -------------------------------------------------------------------
-          trust + remaining sections (unchanged)
-      ------------------------------------------------------------------- */}
       <section className="relative z-20 w-full scroll-mt-24">
         <WhatMakesUsDifferent />
-        <div className="mx-auto flex w-full max-w-5xl flex-col px-4 sm:px-6 lg:px-8">
-          <PopularTours />
-          <StripeSponsored />
-        </div>
       </section>
     </div>
   );

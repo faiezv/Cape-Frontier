@@ -983,7 +983,8 @@ const TestimonialsSection = ({ NumberBadge, onSubmitReview }) => {
         {/* top reviews */}
         <div
           ref={topTrackRef}
-          className="mb-7 flex h-[32rem] snap-x snap-mandatory items-center gap-3 overflow-x-auto pb-3 [-ms-overflow-style:none] [scrollbar-width:none] md:mb-10 md:grid md:h-auto md:grid-cols-3 md:items-stretch md:gap-4 md:overflow-visible md:pb-0 [&::-webkit-scrollbar]:hidden"
+          className="flex -mt-28 mx-8 h-[32rem] snap-x snap-mandatory items-center gap-3 overflow-x-auto pb-3 [-ms-overflow-style:none] [scrollbar-width:none] 
+          md:grid md:h-auto md:grid-cols-3 md:items-stretch md:gap-4 md:overflow-visible md:pb-0 [&::-webkit-scrollbar]:hidden"
         >
           {topReviews.map((review, index) => {
             const isActiveMobile =
@@ -996,7 +997,8 @@ const TestimonialsSection = ({ NumberBadge, onSubmitReview }) => {
                   topCardRefs.current[index] = el;
                 }}
                 onClick={() => setActiveTopReviewIndex(index)}
-                className={`relative z-10 flex h-[30rem] snap-center flex-col overflow-hidden rounded-2xl bg-green-200 shadow-lg transition-all duration-500 ease-out hover:scale-[1.02] md:h-full md:min-w-0 ${
+                className={`relative z-10 flex h-[30rem] snap-center flex-col overflow-hidden rounded-2xl bg-green-200 shadow-lg transition-all 
+                  duration-500 ease-out hover:scale-[1.02] md:h-full md:min-w-0 ${
                   isMobileReviews
                     ? isActiveMobile
                       ? "min-w-[84vw] scale-100 opacity-100 shadow-xl"
@@ -1138,11 +1140,11 @@ const TestimonialsSection = ({ NumberBadge, onSubmitReview }) => {
         )}
 
         {/* leave your review */}
-        <LeaveReviewBlock
+        {/* <LeaveReviewBlock
           NumberBadge={NumberBadge}
           onSubmitReview={onSubmitReview}
           onOpenChange={setIsFormOpen}
-        />
+        /> */}
       </div>
 
       <ReviewModal review={selectedReview} onClose={closeModal} />

@@ -541,9 +541,17 @@ function BigTagline() {
 }
 
 // ─── Page ────────────────────────────────────────────────────────────────────
+import { useSearchParams } from "react-router-dom";
 
 function Tours() {
-  const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const [searchParams] = useSearchParams();
+  const typeParam = searchParams.get("type");
+
+  const [filters, setFilters] = useState(() => ({
+    ...DEFAULT_FILTERS,
+    type: CATEGORY_TYPES.includes(typeParam) ? typeParam : "all",
+  }));
+
   const [sheetOpen, setSheetOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [quickTour, setQuickTour] = useState(null);
@@ -769,7 +777,6 @@ function Tours() {
 
   return (
     <>
-
       {/* path is required: without it the canonical becomes `${origin}undefined` */}
       <Seo
         title={TOURS_TITLE}
