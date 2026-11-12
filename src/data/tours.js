@@ -22,17 +22,7 @@ export const TOUR_CATEGORIES_ICON = {
   wineRoutes: "/icons/wine-routes.svg",
 };
 
-// supported currencies
-export const FX_RATES = {
-  ZAR: 1,
-  USD: 0.054,
-  EUR: 0.05,
-  GBP: 0.043,
-  CAD: 0.075,
-  AUD: 0.082,
-  // ...one entry per code in CURRENCIES
-};
-export const SUPPORTED_CURRENCIES = Object.keys(FX_RATES);
+export { FX_RATES, SUPPORTED_CURRENCIES } from "./fxRates.js";
 
 export const DEFAULT_PICKUP_OPTIONS = [
   "Cape Town CBD",
@@ -8197,7 +8187,6 @@ export const tours = [
             availabilityNote:
               "Accommodation to be confirmed based on guest preference and availability.",
             options: ["3-star guesthouse or lodge", "Breakfast included"],
-            image: "/src/assets/images/accomodation/gondwana-game-reserve.webp", // TODO
           },
 
         },
@@ -10300,7 +10289,6 @@ export const tours = [
               duration: "",
               type: "transfer",
               optional: false,
-              image: "",
             },
             {
               id: "d1-zipline",
@@ -10311,7 +10299,6 @@ export const tours = [
               duration: "",
               type: "adventure",
               optional: false,
-              image: "",
             },
             {
               id: "d1-safari",
@@ -10322,7 +10309,6 @@ export const tours = [
               duration: "",
               type: "safari",
               optional: false,
-              image: "",
             },
             {
               id: "d1-lodge",
@@ -10333,11 +10319,9 @@ export const tours = [
               duration: "",
               type: "accommodation",
               optional: false,
-              image: "",
             },
           ],
 
-          // QUERY CLIENT: Day 1 meals not stated
           meals: { breakfast: false, lunch: false, dinner: false },
 
           accommodation: {
@@ -10346,10 +10330,9 @@ export const tours = [
             availabilityNote:
               "As quoted by Gondwana: 1 room available, the luxury Kwena room. Conservation levy included.",
             options: ["Luxury Kwena room", "Panoramic views", "Private suites"],
-            image: "",
+            image: "/src/assets/images/accomodation/gondwana-game-reserve.webp", // TODO
           },
 
-          images: [],
         },
 
         {
@@ -10369,7 +10352,6 @@ export const tours = [
               duration: "",
               type: "scenic",
               optional: false,
-              image: "",
             },
             {
               id: "d2-cango",
@@ -10380,7 +10362,6 @@ export const tours = [
               duration: "",
               type: "nature",
               optional: false,
-              image: "",
             },
             {
               id: "d2-ostrich",
@@ -10390,7 +10371,6 @@ export const tours = [
               duration: "",
               type: "wildlife",
               optional: true,
-              image: "",
             },
           ],
 
@@ -10401,10 +10381,8 @@ export const tours = [
             location: "Oudtshoorn, Klein Karoo",
             availabilityNote: "",
             options: ["Breakfast included"],
-            image: "",
+            image: "/src/assets/images/accomodation/de-zeekoe.webp", // TODO
           },
-
-          images: [],
         },
 
         {
@@ -10467,7 +10445,7 @@ export const tours = [
             location: "Knysna, Garden Route",
             availabilityNote: "",
             options: ["Breakfast included"],
-            image: "",
+            image: "/src/assets/images/accomodation/waterfront-lodge.webp", // TODO
           },
 
           images: [],
@@ -10490,7 +10468,6 @@ export const tours = [
               duration: "",
               type: "wildlife",
               optional: false,
-              image: "",
             },
             {
               id: "d4-jukani",
@@ -10501,7 +10478,6 @@ export const tours = [
               duration: "",
               type: "wildlife",
               optional: false,
-              image: "",
             },
             {
               id: "d4-tsitsikamma",
@@ -10512,7 +10488,6 @@ export const tours = [
               duration: "",
               type: "nature",
               optional: false,
-              image: "",
             },
             {
               id: "d4-adventure",
@@ -10522,7 +10497,6 @@ export const tours = [
               duration: "",
               type: "adventure",
               optional: true,
-              image: "",
             },
           ],
 
@@ -10534,10 +10508,8 @@ export const tours = [
             availabilityNote:
               "Also listed in the source: Tsitsikamma Village Inn and Tsitsikamma Manor.", // QUERY CLIENT
             options: ["Breakfast included"],
-            image: "",
+            image: "/src/assets/images/accomodation/at-the-woods.webp", // TODO
           },
-
-          images: [],
         },
 
         {
@@ -10557,7 +10529,6 @@ export const tours = [
               duration: "",
               type: "wildlife",
               optional: false,
-              image: "",
             },
             {
               id: "d5-benguela",
@@ -10568,7 +10539,6 @@ export const tours = [
               duration: "",
               type: "wine",
               optional: false,
-              image: "",
             },
             {
               id: "d5-penguins",
@@ -10578,7 +10548,6 @@ export const tours = [
               duration: "",
               type: "wildlife",
               optional: false,
-              image: "",
             },
             {
               id: "d5-clarence",
@@ -10588,7 +10557,6 @@ export const tours = [
               duration: "",
               type: "scenic",
               optional: false,
-              image: "",
             },
             {
               id: "d5-return",
@@ -10599,12 +10567,10 @@ export const tours = [
               duration: "",
               type: "transfer",
               optional: false,
-              image: "",
             },
           ],
 
           meals: { breakfast: true, lunch: false, dinner: false },
-          images: [],
         },
       ],
     },

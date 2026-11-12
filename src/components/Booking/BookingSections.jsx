@@ -7,7 +7,6 @@ import {
   BookingField,
   HomeIcon,
   MiniAssurance,
-  BandFlipSwitch,
   VehicleSeating,
   CheckIcon,
 } from "./BookingUi.jsx";
@@ -385,7 +384,6 @@ export function TravellerDetailsSection({
         </div>
       </div>
 
-      {/* FIXED: Added min-h-[3.25rem] to match other blocks */}
       {complete && !isEditing && (
         <div className="flex min-h-[3.25rem] w-full items-center justify-between gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-3">
           <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">
@@ -494,7 +492,6 @@ export function TravellerDetailsSection({
 export function GroupSizeSection({
   tour,
   seatAssignments,
-  activeBrush,
   bandCounts,
   participantCount,
   minPeople,
@@ -504,7 +501,7 @@ export function GroupSizeSection({
   isEditing,
   hasSnapshot,
   onSeatTap,
-  onBrushToggle,
+  onBandChange,
   onResetSeats,
   onOpenEditor,
   onCancelEdit,
@@ -512,10 +509,9 @@ export function GroupSizeSection({
 }) {
   const nav = useNavigate();
   const taken = participantCount;
-  const isFirstTap = taken === 0;
-  const canConfirm = taken >= Math.max(1, minPeople);
+  const floor = Math.max(1, minPeople);
+  const canConfirm = taken >= floor;
   const atLimit = Number.isFinite(maxGuests) && taken >= maxGuests;
-  const activeName = activeBrush ? BAND_COLORS[activeBrush]?.name : "—";
 
   return (
     <div className="w-full min-w-0 rounded-[1.75rem] border border-black/5 bg-white p-4 shadow-[0_12px_32px_rgba(0,0,0,0.04)] transition-all duration-500 group-hover/right:border-green-200/80 group-hover/right:shadow-[0_16px_42px_rgba(34,197,94,0.08)] sm:p-5">
@@ -528,13 +524,13 @@ export function GroupSizeSection({
             Group size
           </h3>
           <p className="mt-1 text-xs text-neutral-500">
-            Pick an age brush, then tap seats to add guests. Tap a filled seat
-            to remove.
+            Use + and − to add guests to the vehicle. Tap a filled seat to
+            remove it.
           </p>
         </div>
       </div>
 
-      {/* FIXED: Added min-h-[3.25rem] to match other blocks */}
+      {/* SUMMARY (collapsed) */}
       <div
         className={`transition-all duration-500 ease-out ${
           isEditing
@@ -543,7 +539,7 @@ export function GroupSizeSection({
         }`}
       >
         <div className="flex min-h-[3.25rem] w-full items-center justify-between gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-3">
-          <div className="flex flex-wrap gap-1.5 min-w-0">
+          <div className="flex min-w-0 flex-wrap gap-1.5">
             {GUEST_BANDS.filter((b) => bandCounts[b.key] > 0).map((b) => {
               const n = bandCounts[b.key];
               const c = BAND_COLORS[b.key];
@@ -568,6 +564,7 @@ export function GroupSizeSection({
         </div>
       </div>
 
+      {/* EDITOR */}
       <div
         className={`transition-all duration-500 ease-out ${
           isEditing
@@ -579,55 +576,89 @@ export function GroupSizeSection({
           <div className="mb-3 flex items-start gap-2 rounded-xl border border-amber-200/80 bg-amber-50/70 px-3 py-2 text-xs text-amber-800">
             <span aria-hidden="true">⚠️</span>
             <span className="min-w-0">
-              <b>This tour is not child-friendly.</b> Only adult seats can be
-              added.
+              <b>This tour is not child-friendly.</b> Only adults can be added.
             </span>
           </div>
         )}
 
-        <div className="mb-3">
-          <div className="mx-auto flex w-full min-w-0 max-w-md flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-2">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
+          {/* LEFT: + / - PER AGE GROUP */}
+          <div className="mx-auto w-full max-w-md shrink-0 space-y-2 lg:mx-0 lg:w-72 lg:max-w-none">
             {GUEST_BANDS.map((band) => {
-              const disabled = band.key !== "adult" && !childFriendly;
+              const count = bandCounts[band.key] || 0;
+              const c = BAND_COLORS[band.key];
+              const bandDisabled = band.key !== "adult" && !childFriendly;
+
+              const cannotAdd = bandDisabled || atLimit;
+              const cannotRemove =
+                count === 0 ||
+                taken - 1 < floor ||
+                (band.key === "adult" && count <= 1);
+
               return (
-                <BandFlipSwitch
+                <div
                   key={band.key}
-                  band={band}
-                  checked={activeBrush === band.key}
-                  disabled={disabled}
-                  onToggle={onBrushToggle}
-                />
+                  className={`flex items-center justify-between gap-3 rounded-2xl border border-neutral-200 bg-white px-3 py-2.5 ${
+                    bandDisabled ? "opacity-50" : ""
+                  }`}
+                >
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <span
+                      className={`h-3 w-3 shrink-0 rounded-full ${c.chipBg}`}
+                      aria-hidden="true"
+                    />
+                    <span className="truncate text-sm font-bold text-neutral-900">
+                      {band.label}
+                    </span>
+                  </div>
+
+                  <div className="flex shrink-0 items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onBandChange(band.key, -1)}
+                      disabled={cannotRemove}
+                      aria-label={`Remove ${band.singular}`}
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 bg-white text-lg font-bold text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-30"
+                    >
+                      −
+                    </button>
+                    <span className="w-6 text-center text-base font-bold tabular-nums text-neutral-900">
+                      {count}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => onBandChange(band.key, 1)}
+                      disabled={cannotAdd}
+                      aria-label={`Add ${band.singular}`}
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 bg-white text-lg font-bold text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-30"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
               );
             })}
+
+            {tourMaxPeople && (
+              <p className="pt-1 text-center text-[11px] text-neutral-500 lg:text-left">
+                This tour takes up to {tourMaxPeople} guests.
+              </p>
+            )}
+          </div>
+
+          {/* RIGHT: VEHICLES */}
+          <div className="min-w-0 flex-1">
+            <VehicleSeating
+              seatAssignments={seatAssignments}
+              onSeatTap={onSeatTap}
+              maxGuests={maxGuests}
+            />
           </div>
         </div>
 
-        {isFirstTap && (
-          <div className="mb-3 flex flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed border-neutral-200 bg-neutral-50 py-5 text-center">
-            <p className="font-frank text-xl font-bold text-neutral-800">
-              👆 Tap a seat
-            </p>
-            <p className="text-[11px] text-neutral-500">
-              Pick an age brush above, then tap any seat below
-            </p>
-          </div>
-        )}
-
-        {tourMaxPeople && (
-          <p className="mb-2 text-center text-[11px] text-neutral-500">
-            This tour takes up to {tourMaxPeople} guests.
-          </p>
-        )}
-
-        <VehicleSeating
-          seatAssignments={seatAssignments}
-          onSeatTap={onSeatTap}
-          maxGuests={maxGuests}
-        />
-
         {atLimit && (
           <p className="mt-3 rounded-xl border border-amber-200/80 bg-amber-50/70 px-3 py-2 text-center text-xs font-semibold text-amber-800">
-            Maximum group size reached ({maxGuests} guests). Remove a seat to
+            Maximum group size reached ({maxGuests} guests). Remove a guest to
             change who is coming.
           </p>
         )}
@@ -718,7 +749,6 @@ export function PickupLocationSection({
         </div>
       </div>
 
-      {/* FIXED: Added min-h-[3.25rem] to match other blocks */}
       {formData.pickupCoords && !showPicker && (
         <div
           ref={pickupFeedbackRef}

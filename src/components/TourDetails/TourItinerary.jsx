@@ -8,6 +8,7 @@ import React, {
 import { resolveImage } from "../../utils/ImageLoader";
 import {
   getItineraryPhoto,
+  getAccommodationPhoto,
   isItineraryPhotoPath,
 } from "../../utils/ItineraryPhotos";
 
@@ -25,7 +26,7 @@ import {
    without requiring one import per image.
 
    (Itinerary photos are found by folder convention instead, see
-   utils/itineraryPhotos.js:
+   utils/ItineraryPhotos.js:
    src/assets/images/tours/<tour.imageFolder>/ItineraryPhotos/d1/1.webp)
 ============================================================ */
 const tourImageAssets = import.meta.glob(
@@ -79,6 +80,8 @@ const ActivityIcon = ({ type, monochrome = false }) => {
         return "#0d9488";
       case "wildlife":
         return "#16a34a";
+      case "nature":
+        return "#15803d";
       default:
         return "#2563eb";
     }
@@ -170,6 +173,15 @@ const ActivityIcon = ({ type, monochrome = false }) => {
         </svg>
       );
 
+    case "nature":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke={stroke} className={common}>
+          <path d="M12 21v-6" />
+          <path d="M12 15c-4 0-6-3-6-6 3 0 6 1 6 6Z" />
+          <path d="M12 12c0-4 2-7 6-8 0 4-2 7-6 8Z" />
+        </svg>
+      );
+
     default:
       return (
         <svg viewBox="0 0 24 24" fill="none" stroke={stroke} className={common}>
@@ -196,6 +208,7 @@ const activityImages = {
   accommodation: null,
   leisure: null,
   wildlife: null,
+  nature: null,
 };
 
 /* ============================================================
@@ -709,6 +722,7 @@ const RouteTimeline = ({ route, labels }) => {
      used to find photos in .../ItineraryPhotos/d1/1.webp
 ============================================================ */
 const TourItinerary = ({ itinerary, imageFolder }) => {
+  console.log("[TourItinerary] imageFolder =", imageFolder);
   const days = itinerary?.days || [];
 
   const routeLabels = generateRouteLabels(itinerary?.route?.title, days);
@@ -1499,11 +1513,12 @@ function OverviewSlide({ day, mapsUrl, imageFolder }) {
   const hasRoute = routeStops.length > 0;
   const hasStay = Boolean(day.accommodation?.title);
 
-  /* accommodation.image wins; otherwise ItineraryPhotos/d<day>/stay.webp */
+  /* accommodation.image wins, then ItineraryPhotos/d<day>/stay.webp,
+     then the shared accomodation folder (matched by title) */
   const accommodationImage =
-    (day.accommodation?.image
-      ? resolveImage(day.accommodation.image)
-      : null) || getItineraryPhoto(imageFolder, day.day, "stay");
+    (day.accommodation?.image ? resolveImage(day.accommodation.image) : null) ||
+    getItineraryPhoto(imageFolder, day.day, "stay") ||
+    getAccommodationPhoto(day.accommodation?.title);
 
   if (!hasRoute && !hasStay) {
     return (
@@ -1838,6 +1853,10 @@ function getDayIcon(day) {
 
   if (types.includes("scenic")) {
     return "scenic";
+  }
+
+  if (types.includes("nature")) {
+    return "nature";
   }
 
   return "transfer";

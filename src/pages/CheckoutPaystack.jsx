@@ -10,7 +10,7 @@ import React, {
 import { useLocation, useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { FX_RATES } from "../data/tours.js";
+import { FX_RATES } from "../data/fxRates.js";
 import vehicles from "../data/vehicles.js";
 import { KIDS_ACTIVITIES } from "../data/kidsActivities";
 
@@ -20,35 +20,28 @@ import Seo from "../components/Seo.jsx";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ─── Constants ────────────────────────────────────────────────────────
-const DEFAULT_PRIVATE_TOUR_FEE_ZAR = 750;
-const DEFAULT_CUSTOM_TRIP_FEE_ZAR = 500;
+// ─── Config ───────────────────────────────────────────────────────────
+
+// Same list as SiteFooter. Flip `enabled` to show/hide a method.
+const paymentMethods = [
+  { label: "Visa", glyph: "visa", enabled: true },
+  { label: "Mastercard", glyph: "mastercard", enabled: true },
+  { label: "Apple Pay", glyph: "applepay", enabled: true },
+  { label: "Google Pay", glyph: "googlepay", enabled: true },
+  { label: "QR", glyph: "qr", enabled: true },
+  { label: "EFT", glyph: "bank", enabled: false },
+  { label: "Capitec Pay", glyph: null, enabled: false },
+];
+
+// Drop your policy images in /public/images/policies/ with these names.
+// If a file is missing, a tinted icon fallback is shown instead.
+const POLICY_IMAGES = {
+  booking: "/images/policies/booking.webp",
+  cancellation: "/images/policies/cancellation.webp",
+  weather: "/images/policies/weather.webp",
+};
 
 // ─── Helpers ──────────────────────────────────────────────────────────
-
-const getFee = (tour, type) => {
-  const defaults = {
-    private: 750,
-    custom: 500,
-  };
-
-  if (Array.isArray(tour?.additionalPricing)) {
-    const match = tour.additionalPricing.find((item) =>
-      item.category?.toLowerCase().includes(type),
-    );
-    if (match) {
-      const amount = match.pricePerPerson ?? match.price ?? match.amount ?? 0;
-      if (Number(amount) > 0) return Number(amount);
-    }
-  }
-
-  if (type === "private" && tour?.privateFee !== undefined)
-    return Number(tour.privateFee) || 0;
-  if (type === "custom" && tour?.customFee !== undefined)
-    return Number(tour.customFee) || 0;
-
-  return defaults[type] || 0;
-};
 
 const getTourReturnPath = (tour) => {
   const rawSlug =
@@ -180,12 +173,49 @@ const SummaryRow = ({ label, value, strong = false }) => (
   </div>
 );
 
-const PolicyNote = ({ title, children }) => (
-  <div className="rounded-2xl bg-white/72 p-4 shadow-[0_10px_24px_rgba(7,31,79,0.04)]">
-    <p className="text-sm font-bold text-[#071f4f]">{title}</p>
-    <p className="mt-1 text-xs leading-5 text-slate-500">{children}</p>
-  </div>
-);
+// Policy card with an image on top. Falls back to a tinted panel if the
+// image file is missing.
+const PolicyNote = ({ title, image, children }) => {
+  const [failed, setFailed] = useState(!image);
+
+  return (
+    <div className="overflow-hidden rounded-2xl bg-white/80 shadow-[0_10px_24px_rgba(7,31,79,0.05)]">
+      <div className="relative h-32 w-full overflow-hidden bg-gradient-to-br from-[#eef4ff] to-[#dce8fb]">
+        {!failed ? (
+          <img
+            src={resolveImage(image)}
+            alt={title}
+            loading="lazy"
+            onError={() => setFailed(true)}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-[#071f4f]/30">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-10 w-10"
+              aria-hidden="true"
+            >
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <circle cx="9" cy="10" r="1.6" />
+              <path d="m21 16-5-5-8 8" />
+            </svg>
+          </div>
+        )}
+      </div>
+
+      <div className="p-4">
+        <p className="text-sm font-bold text-[#071f4f]">{title}</p>
+        <p className="mt-1 text-xs leading-5 text-slate-500">{children}</p>
+      </div>
+    </div>
+  );
+};
 
 const VehicleOptionCard = ({ vehicle }) => (
   <div className="group overflow-hidden rounded-[1.35rem] bg-white shadow-[0_12px_28px_rgba(7,31,79,0.06)]">
@@ -279,6 +309,193 @@ const RevealPanel = ({ open, children }) => {
   );
 };
 
+// ─── Accepted payment methods (mirrors SiteFooter) ────────────────────
+
+const glyphProps = {
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.8,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  "aria-hidden": true,
+  className: "h-4 w-4 shrink-0",
+};
+
+const Glyph = ({ name }) => {
+  switch (name) {
+    case "mastercard":
+      return (
+        <svg
+          viewBox="0 0 32 20"
+          aria-hidden="true"
+          className="h-4 w-auto shrink-0"
+        >
+          <circle cx="11" cy="10" r="9" fill="#EB001B" />
+          <circle cx="21" cy="10" r="9" fill="#F79E1B" />
+          <path
+            d="M16 2.52A9 9 0 0 1 16 17.48A9 9 0 0 1 16 2.52z"
+            fill="#FF5F00"
+          />
+        </svg>
+      );
+    case "qr":
+      return (
+        <svg {...glyphProps}>
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" />
+        </svg>
+      );
+    case "bank":
+      return (
+        <svg {...glyphProps}>
+          <path d="M3 9l9-5 9 5M5 10v8M10 10v8M14 10v8M19 10v8M3 20h18" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+};
+
+const PaymentBadge = ({ label, glyph }) => {
+  if (glyph === "applepay") {
+    return (
+      <li
+        aria-label="Apple Pay"
+        className="flex h-8 items-center justify-center gap-1 rounded-md border border-black/15 bg-white px-2.5"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false"
+          className="h-4 w-4 shrink-0 text-black"
+          fill="currentColor"
+        >
+          <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
+        </svg>
+        <span className="text-[13px] font-semibold leading-none tracking-tight text-black">
+          Pay
+        </span>
+      </li>
+    );
+  }
+
+  if (glyph === "googlepay") {
+    return (
+      <li
+        aria-label="Google Pay"
+        className="flex h-8 items-center justify-center gap-1 rounded-md border border-black/15 bg-white px-3"
+      >
+        <span className="text-[13px] font-bold leading-none">
+          <span className="text-[#4285F4]">G</span>
+          <span className="text-[#EA4335]">o</span>
+          <span className="text-[#FBBC05]">o</span>
+          <span className="text-[#4285F4]">g</span>
+          <span className="text-[#34A853]">l</span>
+          <span className="text-[#EA4335]">e</span>
+        </span>
+        <span className="text-[12px] font-semibold text-neutral-600">Pay</span>
+      </li>
+    );
+  }
+
+  const textClass =
+    glyph === "visa"
+      ? "text-[12px] font-extrabold italic tracking-tight text-[#1A1F71]"
+      : "text-[11px] font-bold text-neutral-700";
+
+  return (
+    <li className="flex h-8 items-center justify-center gap-1.5 rounded-md border border-black/10 bg-white px-2.5 text-neutral-700">
+      <Glyph name={glyph} />
+      <span className={`whitespace-nowrap ${textClass}`}>
+        {glyph === "visa" ? "VISA" : label}
+      </span>
+    </li>
+  );
+};
+
+const AcceptedPayments = () => (
+  <div className="mt-1 rounded-2xl border border-black/5 bg-white/70 px-3 py-3">
+    <p className="text-center text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+      We accept
+    </p>
+
+    <ul
+      aria-label="Accepted payment methods"
+      className="mt-2 flex flex-wrap items-center justify-center gap-1.5"
+    >
+      {paymentMethods
+        .filter((method) => method.enabled)
+        .map((method) => (
+          <PaymentBadge key={method.label} {...method} />
+        ))}
+    </ul>
+  </div>
+);
+
+// ─── 3D Secure notice ─────────────────────────────────────────────────
+
+const ThreeDSNotice = () => (
+  <div
+    role="note"
+    className="mt-4 w-full overflow-hidden rounded-2xl border border-amber-300 bg-amber-50 shadow-[0_12px_30px_rgba(180,83,9,0.10)]"
+  >
+    <div className="flex items-start gap-3 bg-amber-100/80 px-4 py-3">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-amber-700 shadow-sm">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-5 w-5"
+          aria-hidden="true"
+        >
+          <path d="M12 3 4.5 6v5.5c0 4.6 3.1 8.2 7.5 9.5 4.4-1.3 7.5-4.9 7.5-9.5V6L12 3Z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      </span>
+
+      <div className="min-w-0">
+        <p className="text-sm font-black leading-5 text-amber-950">
+          Your bank may ask you to confirm this payment
+        </p>
+        <p className="mt-0.5 text-xs font-semibold leading-5 text-amber-900/80">
+          This is 3D Secure (3DS). It is normal for international cards and
+          protects you from fraud.
+        </p>
+      </div>
+    </div>
+
+    <ul className="space-y-2 px-4 py-3 text-xs leading-5 text-amber-950">
+      <li className="flex gap-2">
+        <span className="mt-0.5 font-black text-amber-700">✓</span>
+        <span>
+          <strong>Keep your phone nearby.</strong> You may get an SMS code or a
+          push notification from your banking app.
+        </span>
+      </li>
+      <li className="flex gap-2">
+        <span className="mt-0.5 font-black text-amber-700">✓</span>
+        <span>
+          <strong>Do not close or refresh this page</strong> until you are
+          returned to Cape Frontier.
+        </span>
+      </li>
+      <li className="flex gap-2">
+        <span className="mt-0.5 font-black text-amber-700">✓</span>
+        <span>
+          <strong>Payment declined?</strong> Call your bank to allow online
+          international payments, or try another card.
+        </span>
+      </li>
+    </ul>
+  </div>
+);
+
 // ─── Payment helpers ──────────────────────────────────────────────────
 
 const generateBookingReference = () => {
@@ -312,8 +529,6 @@ const buildPaystackBookingPayload = ({
   participantEmails: bookingDetails.participantEmails || [],
   ccParticipantEmails: bookingDetails.ccParticipantEmails || [],
   ccParticipants: Boolean(bookingDetails.ccParticipants),
-  isPrivate: Boolean(bookingDetails.isPrivate),
-  isCustom: Boolean(bookingDetails.isCustom),
   pricingOptions: bookingDetails.pricingOptions || {},
   pricingSummary,
   customerNotes: notes,
@@ -343,6 +558,7 @@ const CheckoutForm = ({
   priceToken = null,
   verifyState = "ready",
   verifyError = "",
+  zarEstimate = null,
 }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -431,6 +647,16 @@ const CheckoutForm = ({
         }),
       });
 
+      const contentType = res.headers.get("content-type") || "";
+
+      if (!contentType.includes("application/json")) {
+        throw new Error(
+          import.meta.env.DEV
+            ? "Payment API not reachable. Start `vercel dev --listen 3001` so /api/paystack-initialize returns JSON."
+            : "Payment service is unavailable. Please try again shortly.",
+        );
+      }
+
       const data = await res.json();
 
       if (!res.ok) {
@@ -513,15 +739,15 @@ const CheckoutForm = ({
 
       {verifyState === "bypassed" && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs font-semibold leading-5 text-amber-800">
-          Price verification is unavailable in this environment. In
-          production, the amount is re-verified server-side before charge.
+          Price verification is unavailable in this environment. In production,
+          the amount is re-verified server-side before charge.
         </div>
       )}
 
       {verifyState === "failed" && (
         <div className="rounded-xl border border-red-300 bg-red-50 px-3 py-2.5 text-xs font-semibold leading-5 text-red-700">
-          {verifyError || "Could not verify the current price."} Please go
-          back and try again.
+          {verifyError || "Could not verify the current price."} Please go back
+          and try again.
         </div>
       )}
 
@@ -557,14 +783,11 @@ const CheckoutForm = ({
           {loading
             ? "Redirecting..."
             : verifyState === "pending"
-            ? "Verifying…"
-            : "Pay"}
+              ? "Verifying…"
+              : "Pay"}
         </span>
       </button>
 
-      <p className="px-2 text-center text-[11px] font-semibold leading-5 text-slate-400">
-        You will return here after Paystack verifies the payment.
-      </p>
 
       {message && (
         <div className="rounded-2xl bg-red-500 px-4 py-3 text-sm text-white">
@@ -597,15 +820,14 @@ const CheckoutPaystack = () => {
   const rightRef = useRef(null);
   const infoMenuRef = useRef(null);
 
-  const [notes, setNotes] = useState(bookingDetails?.customerNotes || "");
+  const [notes] = useState(bookingDetails?.customerNotes || "");
   const [checkoutError, setCheckoutError] = useState("");
   const [loadingSession, setLoadingSession] = useState(true);
   const [paymentCompact, setPaymentCompact] = useState(false);
   const [showMobileBackTop, setShowMobileBackTop] = useState(false);
   const [openPanels, setOpenPanels] = useState({
     trip: false,
-    custom: false,
-    vehicles: false,
+    vehicles: true,
     summary: true,
     policies: false,
   });
@@ -1044,7 +1266,6 @@ const CheckoutPaystack = () => {
   let hasDiscount = false;
   let matchedGroupTier = null;
   let groupPricingType = null;
-  let isCustomQuote = false;
 
   if (
     tour?.groupPricing?.enabled &&
@@ -1152,8 +1373,6 @@ const CheckoutPaystack = () => {
         groupDiscountPercent = safeDiscountPercent;
         hasDiscount = groupDiscountAmount > 0;
       } else {
-        groupPricingType = "custom";
-        isCustomQuote = true;
         discountedSubtotal = originalSubtotal;
         groupDiscountAmount = 0;
         groupDiscountPercent = 0;
@@ -1163,19 +1382,6 @@ const CheckoutPaystack = () => {
       }
     }
   }
-
-  const isPrivate = Boolean(
-    bookingDetails?.isPrivate || bookingDetails?.pricingOptions?.isPrivate,
-  );
-  const isCustom = Boolean(
-    bookingDetails?.isCustom || bookingDetails?.pricingOptions?.isCustom,
-  );
-
-  const privateFeeZar = isPrivate ? getFee(tour, "private") : 0;
-  const privateFee = convertFromZar(privateFeeZar, currency);
-
-  const customFeeZar = isCustom ? getFee(tour, "custom") : 0;
-  const customFee = convertFromZar(customFeeZar, currency);
 
   const extrasTotal = useMemo(() => {
     const selectedExtras = bookingDetails?.selectedExtras || {};
@@ -1205,11 +1411,14 @@ const CheckoutPaystack = () => {
     return convertFromZar(total, currency);
   }, [bookingDetails, tour, currency]);
 
-  const totalPrice =
-    discountedSubtotal + privateFee + customFee + extrasTotal + kidsActivityFee;
+  const totalPrice = discountedSubtotal + extrasTotal + kidsActivityFee;
 
   const totalAmountLabel = formatMoney(totalPrice, currency);
   const totalMinorUnit = toMinorUnit(totalPrice, currency);
+
+  // Paystack charges in ZAR; show the customer what they will actually pay.
+  const zarEstimate =
+    currency === "ZAR" ? null : totalPrice / (Number(FX_RATES[currency]) || 1);
 
   const breakdownItems = [
     {
@@ -1293,8 +1502,6 @@ const CheckoutPaystack = () => {
       ...bookingDetails,
       participantEmails,
       ccParticipantEmails,
-      isPrivate,
-      isCustom,
       pickupTimeLabel,
       pricingOptions: {
         ...bookingDetails?.pricingOptions,
@@ -1314,10 +1521,6 @@ const CheckoutPaystack = () => {
         discountedTourSubtotal: discountedSubtotal,
         extrasTotal,
         kidsActivityFee,
-        isPrivate,
-        privateFee,
-        isCustom,
-        customFee,
         totalPrice,
         totalMinorUnit,
         totalAmountLabel,
@@ -1327,8 +1530,6 @@ const CheckoutPaystack = () => {
       bookingDetails,
       participantEmails,
       ccParticipantEmails,
-      isPrivate,
-      isCustom,
       pickupTimeLabel,
       currency,
       effectiveAdults,
@@ -1346,8 +1547,6 @@ const CheckoutPaystack = () => {
       discountedSubtotal,
       extrasTotal,
       kidsActivityFee,
-      privateFee,
-      customFee,
       totalPrice,
       totalMinorUnit,
       totalAmountLabel,
@@ -1372,10 +1571,6 @@ const CheckoutPaystack = () => {
       discountedTourSubtotal: discountedSubtotal,
       extrasTotal,
       kidsActivityFee,
-      isPrivate,
-      privateFee,
-      isCustom,
-      customFee,
       totalPrice,
       totalMinorUnit,
       totalAmountLabel,
@@ -1397,10 +1592,6 @@ const CheckoutPaystack = () => {
       discountedSubtotal,
       extrasTotal,
       kidsActivityFee,
-      isPrivate,
-      privateFee,
-      isCustom,
-      customFee,
       totalPrice,
       totalMinorUnit,
       totalAmountLabel,
@@ -1434,8 +1625,6 @@ const CheckoutPaystack = () => {
             currency,
             selectedOption: bookingDetails.selectedOption || null,
             selectedExtras: bookingDetails.selectedExtras || {},
-            isPrivate,
-            isCustom,
             selectedKidsActivity: bookingDetails.selectedKidsActivity || null,
           }),
         });
@@ -1470,11 +1659,6 @@ const CheckoutPaystack = () => {
         const data = await res.json();
         if (cancelled) return;
 
-        if (data?.isCustomQuote) {
-          setVerifyState("bypassed");
-          return;
-        }
-
         setVerifiedPriceToken(data?.token || null);
         setVerifyState(data?.token ? "ready" : "bypassed");
       } catch (err) {
@@ -1497,8 +1681,6 @@ const CheckoutPaystack = () => {
     effectiveAdults,
     childAges,
     currency,
-    isPrivate,
-    isCustom,
   ]);
 
   // ─── Validation ──────────────────────────────────────────────────
@@ -1668,6 +1850,71 @@ const CheckoutPaystack = () => {
                 </div>
 
                 <div className="space-y-4 p-4 md:p-6 lg:p-7">
+                  {/* Pickup + main participant (moved from payment panel) */}
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="flex items-center gap-3 rounded-[1.35rem] border border-[#071f4f]/10 bg-[#f7faff] p-4">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#071f4f]/10">
+                        <svg
+                          className="h-5 w-5 text-[#071f4f]"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      </span>
+
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                          Pickup
+                        </p>
+                        <p className="text-sm font-bold leading-5 text-slate-900">
+                          {pickupTimeLabel}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {bookingDetails.date || "Date TBC"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 rounded-[1.35rem] border border-[#071f4f]/10 bg-[#f7faff] p-4">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#071f4f]/10">
+                        <svg
+                          className="h-5 w-5 text-[#071f4f]"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
+                        </svg>
+                      </span>
+
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                          Main participant
+                        </p>
+                        <p className="truncate text-sm font-bold leading-5 text-slate-900">
+                          {bookingDetails.fullName || "Not provided"}
+                        </p>
+                        <p className="truncate text-xs text-slate-500">
+                          {bookingDetails.email || "No email"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   {Object.values(openPanels).some(Boolean) && (
                     <div className="rounded-2xl border border-green-200 bg-green-50 p-3 text-center text-xs font-bold leading-5 text-green-900 sm:hidden">
                       Details open underneath the menu. Choose a card, then
@@ -1677,19 +1924,13 @@ const CheckoutPaystack = () => {
 
                   <div
                     ref={infoMenuRef}
-                    className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5"
+                    className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4"
                   >
                     <RevealButton
                       active={openPanels.trip}
                       title="Trip details"
                       detail="Pickup, booking tags"
                       onClick={() => togglePanel("trip")}
-                    />
-                    <RevealButton
-                      active={openPanels.custom}
-                      title="Custom notes"
-                      detail={isCustom ? "Editable" : "Custom off"}
-                      onClick={() => togglePanel("custom")}
                     />
                     <RevealButton
                       active={openPanels.vehicles}
@@ -1712,7 +1953,7 @@ const CheckoutPaystack = () => {
                   </div>
 
                   <RevealPanel open={openPanels.trip}>
-                    <div className="grid gap-4 lg:grid-cols-[1fr_0.8fr]">
+                    <div className="grid gap-4 lg:grid-cols-[1fr]">
                       <div className="rounded-[1.5rem] bg-stone-50 p-5">
                         <div className="flex flex-wrap items-center justify-between gap-3">
                           <div className="flex items-center gap-2">
@@ -1783,75 +2024,6 @@ const CheckoutPaystack = () => {
                           payment.
                         </p>
                       </div>
-
-                      <div className="rounded-[1.5rem] bg-white p-5 shadow-[0_14px_34px_rgba(7,31,79,0.05)]">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                          Related booking info
-                        </p>
-
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          <InfoPill tone="blue">{currency}</InfoPill>
-                          {isPrivate && (
-                            <InfoPill tone="green">
-                              Private tour selected
-                            </InfoPill>
-                          )}
-                          {isCustom && (
-                            <InfoPill tone="green">
-                              Custom trip selected
-                            </InfoPill>
-                          )}
-                          {ccParticipantEmails.length > 0 && (
-                            <InfoPill tone="dark">
-                              {ccParticipantEmails.length} CC email(s)
-                            </InfoPill>
-                          )}
-                          {!isPrivate &&
-                            !isCustom &&
-                            ccParticipantEmails.length === 0 && (
-                              <InfoPill tone="stone">Standard booking</InfoPill>
-                            )}
-                        </div>
-
-                        <p className="mt-3 text-xs leading-5 text-slate-500">
-                          These options affect what Cape Frontier needs to
-                          confirm after payment.
-                        </p>
-                      </div>
-                    </div>
-                  </RevealPanel>
-
-                  <RevealPanel open={openPanels.custom}>
-                    <div
-                      className={`rounded-[1.5rem] p-5 shadow-[0_14px_34px_rgba(7,31,79,0.05)] ${
-                        isCustom ? "bg-white" : "bg-stone-50"
-                      }`}
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                          Custom trip request notes
-                        </p>
-
-                        <InfoPill tone={isCustom ? "green" : "stone"}>
-                          {isCustom ? "Enabled" : "Custom tour not selected"}
-                        </InfoPill>
-                      </div>
-
-                      {isCustom ? (
-                        <textarea
-                          value={notes}
-                          onChange={(e) => setNotes(e.target.value)}
-                          rows="4"
-                          className="mt-3 w-full resize-none rounded-2xl bg-stone-50 p-3 text-sm text-slate-700 outline-none transition focus:bg-white focus:ring-2 focus:ring-[#071f4f]/20"
-                          placeholder="Custom route requests, special pickup timing, accessibility needs, dietary restrictions, allergies, luggage notes..."
-                        />
-                      ) : (
-                        <p className="mt-3 rounded-2xl bg-white/80 p-3 text-sm leading-6 text-slate-500">
-                          Special request notes are only available when the
-                          customer selected the custom trip option on the
-                          booking form.
-                        </p>
-                      )}
                     </div>
                   </RevealPanel>
 
@@ -1890,30 +2062,7 @@ const CheckoutPaystack = () => {
                   </RevealPanel>
 
                   <RevealPanel open={openPanels.summary}>
-                    <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-                      <div className="rounded-[1.5rem] bg-[#071f4f] p-5 text-white">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/45">
-                          Customer service brief
-                        </p>
-
-                        <div className="mt-4 space-y-3 text-xs leading-5 text-white/72">
-                          <p>
-                            Customer is booking their own group only.
-                            Participants must match the customer's own party
-                            size.
-                          </p>
-                          <p>
-                            If fewer guests arrive than booked, the original
-                            booking total still applies.
-                          </p>
-                          <p>
-                            Vehicle is confirmed after purchase and selected by
-                            Cape Frontier based on group size, luggage, route,
-                            and operational needs.
-                          </p>
-                        </div>
-                      </div>
-
+                    <div className="grid gap-4 lg:grid-cols-[1fr]">
                       <div className="rounded-[1.5rem] bg-white p-5 shadow-[0_14px_34px_rgba(7,31,79,0.05)]">
                         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                           Checkout summary
@@ -1994,23 +2143,6 @@ const CheckoutPaystack = () => {
                               </span>
                             </div>
                           )}
-
-                          <SummaryRow
-                            label="Private tour fee"
-                            value={
-                              isPrivate
-                                ? formatMoney(privateFee, currency)
-                                : "Not added"
-                            }
-                          />
-                          <SummaryRow
-                            label="Custom trip fee"
-                            value={
-                              isCustom
-                                ? formatMoney(customFee, currency)
-                                : "Not added"
-                            }
-                          />
 
                           {selectedKidsActivity && kidsActivityFee > 0 && (
                             <div className="mt-2 rounded-xl border border-blue-100 bg-blue-50 p-3">
@@ -2162,25 +2294,29 @@ const CheckoutPaystack = () => {
                     </div>
 
                     <div className="grid gap-3 md:grid-cols-2">
-                      <PolicyNote title="Booking policy reminder">
+                      <PolicyNote
+                        title="Booking policy reminder"
+                        image={POLICY_IMAGES.booking}
+                      >
                         Lower per-person rates apply only when the selected
                         participant count is booked and paid for in full.
                       </PolicyNote>
 
-                      <PolicyNote title="Cancellation reminder">
+                      <PolicyNote
+                        title="Cancellation reminder"
+                        image={POLICY_IMAGES.cancellation}
+                      >
                         Cancellation within 24 hours after booking allows a full
                         refund. 2–3 days before trip has a 20% penalty. Within
                         24 hours before the trip has no refund.
                       </PolicyNote>
 
-                      <PolicyNote title="Weather policy">
+                      <PolicyNote
+                        title="Weather policy"
+                        image={POLICY_IMAGES.weather}
+                      >
                         Weather-related cancellations may allow a refund or
                         reschedule, depending on availability.
-                      </PolicyNote>
-
-                      <PolicyNote title="Private/custom handling">
-                        Private and custom requests require final operational
-                        confirmation from Cape Frontier after payment.
                       </PolicyNote>
                     </div>
                   </RevealPanel>
@@ -2195,76 +2331,20 @@ const CheckoutPaystack = () => {
                   <aside
                     ref={rightRef}
                     onWheel={handlePaymentPanelWheel}
-                    className="h-fit max-h-[calc(100svh-1rem)] overflow-visible border border-white/75 bg-white/95 shadow-[0_20px_56px_rgba(7,31,79,0.085)] backdrop-blur-xl 
-                  lg:rounded-[2rem]"
+                    className="h-fit max-h-[calc(100svh-1rem)] overflow-visible rounded-[1.65rem] border border-white/75 bg-white/95 shadow-[0_20px_56px_rgba(7,31,79,0.085)] backdrop-blur-xl lg:rounded-[2rem]"
                   >
-                    <div className="border-b border-slate-100/90 bg-white/80 px-4 py-3 sm:px-5 sm:py-4 rounded-full">
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#071f4f]/10">
-                            <svg
-                              className="h-4 w-4 text-[#071f4f]"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                          </span>
-                          <div>
-                            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
-                              Pickup
-                            </p>
-                            <p className="text-sm font-bold leading-none text-slate-900">
-                              {pickupTimeLabel}
-                            </p>
-                            <p className="text-xs text-slate-500">
-                              {bookingDetails.date || "Date TBC"}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-center gap-3 px-1">
-                          <img
-                            src="/icons/paystack-logo.svg"
-                            alt="Paystack"
-                            className="h-8 shrink-0"
-                            loading="lazy"
-                          />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#071f4f]/10">
-                            <svg
-                              className="h-4 w-4 text-[#071f4f]"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                              />
-                            </svg>
-                          </span>
-                          <div className="min-w-0">
-                            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
-                              Main participant
-                            </p>
-                            <p className="truncate text-sm font-bold leading-none text-slate-900">
-                              {bookingDetails.fullName || "Not provided"}
-                            </p>
-                            <p className="truncate text-xs text-slate-500">
-                              {bookingDetails.email || "No email"}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                    <div className="flex flex-col items-center justify-center gap-3 border-b border-slate-100/90 px-4 py-3 sm:px-5 sm:py-4">
+                      <img
+                        src="/icons/paystack-logo.svg"
+                        alt="Paystack"
+                        className="h-8 shrink-0"
+                        loading="lazy"
+                      />
+
+                      <p className="px-2 text-center text-[11px] font-semibold leading-5 text-slate-400">
+                        You will return here after Paystack verifies the
+                        payment.
+                      </p>
                     </div>
 
                     <div
@@ -2278,38 +2358,20 @@ const CheckoutPaystack = () => {
                         currency={currency}
                         tour={tour}
                         bookingDetails={enrichedBookingDetails}
-                        notes={isCustom ? notes : ""}
+                        notes={notes}
                         pricingSummary={pricingSummary}
                         checkoutStops={checkoutStops}
                         priceToken={verifiedPriceToken}
                         verifyState={verifyState}
                         verifyError={verifyError}
+                        zarEstimate={zarEstimate}
                       />
+
+                      <AcceptedPayments />
                     </div>
                   </aside>
 
-                  <div className="w-full rounded-2xl border border-blue-100 bg-blue-400/20 px-4 py-4 mt-4">
-                    <div className="flex items-center gap-6">
-                      <div className="flex p-3 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
-                        <img
-                          src="/icons/disclaimer.png"
-                          alt="Payment security"
-                          className="h-10 w-10 object-contain"
-                        />
-                      </div>
-
-                      <div className="min-w-0">
-                        <p className="text-lg font-bold leading-5 text-blue-950">
-                          International payment verification
-                        </p>
-
-                        <p className="mt-1 text-xs leading-4 text-blue-900/70">
-                          Your bank may require <strong>3D Secure (3DS)</strong>{" "}
-                          verification before your payment can be completed.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <ThreeDSNotice />
                 </div>
               </div>
             </div>

@@ -95,7 +95,7 @@ const TourHero = ({ tour }) => {
 
       <div
         className="relative mx-auto max-w-[1600px] overflow-hidden rounded-3xl shadow-2xl 
-        h-[20vh] sm:h-[65vh] min-h-[200px] sm:min-h-[400px] lg:h-[50vh] 
+        h-[24vh] sm:h-[75vh] min-h-[280px] sm:min-h-[400px] lg:h-[50vh] 
         md:rounded-[2.5rem]"
         style={{ backgroundColor: bgColor }}
       >

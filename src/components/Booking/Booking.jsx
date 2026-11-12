@@ -58,6 +58,13 @@ const buildSeatAssignments = (adults, childAges, maxGuests = MAX_GUESTS) => {
   return assignments;
 };
 
+/* Pack filled seats to the front so there are never gaps.
+   Removing a seat shifts every seat behind it forward. */
+const compactSeats = (assignments, maxGuests = MAX_GUESTS) => {
+  const filled = (assignments || []).filter(Boolean).slice(0, maxGuests);
+  return [...filled, ...Array(maxGuests - filled.length).fill(null)];
+};
+
 const deriveSeatState = (assignments) => {
   const bandCounts = { adult: 0, teen: 0, child: 0, toddler: 0 };
   const childAgesArr = [];
@@ -78,18 +85,6 @@ const deriveSeatState = (assignments) => {
     toddlers: bandCounts.toddler,
     participantCount,
   };
-};
-
-const clampAssignments = (assignments, limit) => {
-  let kept = 0;
-  return (assignments || []).map((band) => {
-    if (!band) return null;
-    if (kept < limit) {
-      kept++;
-      return band;
-    }
-    return null;
-  });
 };
 
 const Booking = ({ embeddedTour, bookingData }) => {
@@ -141,8 +136,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
     selectedOption: null,
   });
 
-  const [activeBrush, setActiveBrush] = useState("adult");
-
   const [travellerSnapshot, setTravellerSnapshot] = useState(null);
   const [groupSnapshot, setGroupSnapshot] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -181,7 +174,9 @@ const Booking = ({ embeddedTour, bookingData }) => {
   const maxPeople = Math.min(MAX_GUESTS, tourMaxPeople ?? MAX_GUESTS);
 
   // ─── Seat helpers ────────────────────────────────────────────
-  const syncSeatDerived = (prev, assignments) => {
+  // Every seat change goes through here, so seats are always compacted.
+  const syncSeatDerived = (prev, rawAssignments) => {
+    const assignments = compactSeats(rawAssignments);
     const d = deriveSeatState(assignments);
     const maxEmails = Math.max(d.participantCount - 1, 0);
     return {
@@ -196,46 +191,51 @@ const Booking = ({ embeddedTour, bookingData }) => {
     };
   };
 
+  const canRemoveBand = (band) => {
+    if (participantCount - 1 < Math.max(minPeople, 1)) return false;
+    if (band === "adult" && bandCounts.adult <= 1) return false;
+    return true;
+  };
+
+  // Tapping a filled seat removes it; the seats behind it shift forward.
   const handleSeatTap = (seatIndex) => {
     if (seatIndex < 0 || seatIndex >= MAX_GUESTS) return;
 
-    const assignments =
-      formData.seatAssignments || Array(MAX_GUESTS).fill(null);
-    const current = assignments[seatIndex];
+    const current = (formData.seatAssignments || [])[seatIndex];
+    if (!current || !canRemoveBand(current)) return;
 
-    if (current) {
-      if (participantCount - 1 < Math.max(minPeople, 1)) return;
-      if (current === "adult") {
-        const adultSeats = assignments.filter((a) => a === "adult").length;
-        if (adultSeats <= 1) return;
-      }
+    setFormData((prev) => {
+      const next = [...(prev.seatAssignments || [])];
+      next[seatIndex] = null;
+      return syncSeatDerived(prev, next); // compacts the gap
+    });
+  };
+
+  // + / - per age group
+  const handleBandChange = (band, delta) => {
+    if (delta > 0) {
+      if (band !== "adult" && !childFriendly) return;
 
       setFormData((prev) => {
-        const p = prev.seatAssignments || Array(MAX_GUESTS).fill(null);
-        if (p.filter(Boolean).length >= maxPeople) return prev;
-        const next = [...p];
-        next[seatIndex] = band;
-        return syncSeatDerived(prev, next);
+        const filled = (prev.seatAssignments || []).filter(Boolean);
+        if (filled.length >= maxPeople) return prev;
+        return syncSeatDerived(prev, [...filled, band]);
       });
       return;
     }
 
-    const band =
-      activeBrush === "adult" || (activeBrush && childFriendly)
-        ? activeBrush
-        : "adult";
-
     setFormData((prev) => {
-      const p = prev.seatAssignments || Array(MAX_GUESTS).fill(null);
-      const next = [...p];
-      next[seatIndex] = band;
+      const filled = (prev.seatAssignments || []).filter(Boolean);
+      const idx = filled.lastIndexOf(band);
+      if (idx === -1) return prev;
+      if (filled.length - 1 < Math.max(minPeople, 1)) return prev;
+      if (band === "adult" && filled.filter((b) => b === "adult").length <= 1)
+        return prev;
+
+      const next = [...filled];
+      next.splice(idx, 1); // later seats slide forward
       return syncSeatDerived(prev, next);
     });
-  };
-
-  const handleBrushToggle = (bandKey) => {
-    if (bandKey !== "adult" && !childFriendly) return;
-    setActiveBrush((prev) => (prev === bandKey ? null : bandKey));
   };
 
   const handleResetSeats = () => {
@@ -243,14 +243,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
     const assignments = Array(MAX_GUESTS).fill(null);
     for (let i = 0; i < start; i++) assignments[i] = "adult";
     setFormData((prev) => syncSeatDerived(prev, assignments));
-    setActiveBrush("adult");
   };
-
-  useEffect(() => {
-    if (!childFriendly && activeBrush && activeBrush !== "adult") {
-      setActiveBrush("adult");
-    }
-  }, [childFriendly, activeBrush]);
 
   // ─── Pricing ─────────────────────────────────────────────────
   const pricing = useMemo(
@@ -271,6 +264,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
       childAges,
       adultCount,
       currency,
+      live,
       formData.selectedOption,
       formData.selectedExtras,
       formData.isPrivate,
@@ -593,7 +587,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
         const next = current.map((b) => (b === "adult" ? "adult" : null));
         return syncSeatDerived(prev, next);
       });
-      setActiveBrush("adult");
     }
     prevTourSlugRef.current = tourSlug;
   }, [tour]);
@@ -619,9 +612,11 @@ const Booking = ({ embeddedTour, bookingData }) => {
 
     let nextAssignments = null;
     if (Array.isArray(bd.seatAssignments)) {
-      nextAssignments = Array(MAX_GUESTS)
-        .fill(null)
-        .map((_, i) => bd.seatAssignments[i] || null);
+      nextAssignments = compactSeats(
+        Array(MAX_GUESTS)
+          .fill(null)
+          .map((_, i) => bd.seatAssignments[i] || null),
+      );
     } else if (
       bd.adults !== undefined ||
       Array.isArray(bd.childAges) ||
@@ -1052,7 +1047,6 @@ const Booking = ({ embeddedTour, bookingData }) => {
                   <GroupSizeSection
                     tour={tour}
                     seatAssignments={formData.seatAssignments}
-                    activeBrush={activeBrush}
                     bandCounts={bandCounts}
                     participantCount={participantCount}
                     minPeople={minPeople}
@@ -1062,7 +1056,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
                     isEditing={showGroupEditor}
                     hasSnapshot={Boolean(groupSnapshot)}
                     onSeatTap={handleSeatTap}
-                    onBrushToggle={handleBrushToggle}
+                    onBandChange={handleBandChange}
                     onResetSeats={handleResetSeats}
                     onOpenEditor={openGroupEditor}
                     onCancelEdit={cancelGroupEdit}
@@ -1086,7 +1080,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
                     pickupFeedbackRef={pickupFeedbackRef}
                   />
 
-                  {/* MOVED HERE: KidsActivities as the 4th block */}
+                  {/* KidsActivities as the 4th block */}
                   <KidsActivities
                     childFriendly={tour?.childFriendly === true}
                     adultCount={adultCount}
@@ -1109,6 +1103,7 @@ const Booking = ({ embeddedTour, bookingData }) => {
                     childCount={childCount}
                     toddlerCount={toddlers}
                     currency={currency}
+                    live={live}
                     selectedOption={formData?.selectedOption}
                     selectedExtras={formData.selectedExtras}
                     formData={formData}

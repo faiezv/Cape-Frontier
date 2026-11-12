@@ -1407,7 +1407,7 @@ export default function TourDetails() {
             </div>
           </section>
         ) : tour.itinerary ? (
-          <TourItinerary itinerary={tour.itinerary} />
+          <TourItinerary itinerary={tour.itinerary} imageFolder={tour.imageFolder}/>
         ) : null}
 
         {/* BOOKING FORM AT BOTTOM */}

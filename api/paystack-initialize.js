@@ -1,8 +1,13 @@
 // api/paystack-initialize.js
 import { verifyPriceToken } from "./_lib/verifyPriceToken.js";
 import { getSite } from "./_lib/site.js";
+import { FX_RATES } from "../src/data/fxRates.js";
 
 const PAYSTACK_BASE_URL = "https://api.paystack.co";
+
+// Paystack can only charge currencies enabled on the account.
+// Customers see prices in their chosen currency; we charge in this one.
+const CHARGE_CURRENCY = "ZAR";
 
 const ZERO_DECIMAL = new Set(["JPY", "KRW"]);
 
@@ -17,6 +22,17 @@ const toMinorUnit = (amount, currency) => {
   return ZERO_DECIMAL.has(String(currency).toUpperCase())
     ? Math.round(n)
     : Math.round(n * 100);
+};
+
+// FX_RATES are ZAR -> display currency, so converting back is a division.
+const toChargeAmount = (amount, fromCurrency) => {
+  const code = String(fromCurrency || CHARGE_CURRENCY).toUpperCase();
+  if (code === CHARGE_CURRENCY) return Number(amount);
+
+  const rate = Number(FX_RATES[code]);
+  if (!Number.isFinite(rate) || rate <= 0) return NaN;
+
+  return Number(amount) / rate;
 };
 
 const buildCallbackUrl = (raw, origin) => {
@@ -87,46 +103,49 @@ export default async function handler(req, res) {
       });
     }
 
-    // Amount comes ONLY from the signed payload. The client-supplied
-    // `amount` field is ignored outright.
-    let amountInSubunit;
-    let chargeCurrency;
+    // Amount comes ONLY from the signed payload when a token exists.
+    // The client-supplied `amount` is used only in the dev fallback.
+    let displayCurrency;
+    let displayTotal;
 
     if (verified) {
-      const tokenCurrency = String(verified.currency || "ZAR").toUpperCase();
+      displayCurrency = String(verified.currency || "ZAR").toUpperCase();
       const requestCurrency = String(currency || "ZAR").toUpperCase();
 
-      if (tokenCurrency !== requestCurrency) {
+      if (displayCurrency !== requestCurrency) {
         return res.status(400).json({
           error: "Currency mismatch between token and request",
         });
       }
 
-      amountInSubunit = toMinorUnit(verified.finalTotal, tokenCurrency);
-      chargeCurrency = tokenCurrency;
-
-      if (!amountInSubunit || amountInSubunit < 1) {
-        return res
-          .status(400)
-          .json({ error: "Token contains an invalid amount" });
-      }
+      displayTotal = Number(verified.finalTotal);
     } else {
-      // Dev-only fallback.
-      amountInSubunit = toMinorUnit(req.body?.amount, currency);
-      chargeCurrency = String(currency || "ZAR").toUpperCase();
-      if (!amountInSubunit || amountInSubunit < 1) {
-        return res.status(400).json({ error: "Invalid payment amount" });
-      }
+      // Dev-only fallback. Client amount is in minor units of `currency`.
+      displayCurrency = String(currency || "ZAR").toUpperCase();
+      displayTotal =
+        Number(req.body?.amount) /
+        (ZERO_DECIMAL.has(displayCurrency) ? 1 : 100);
+    }
+
+    // Convert the display total into the currency we actually charge.
+    const chargeCurrency = CHARGE_CURRENCY;
+    const chargeTotal = toChargeAmount(displayTotal, displayCurrency);
+
+    if (!Number.isFinite(chargeTotal) || chargeTotal <= 0) {
+      return res.status(400).json({ error: "Invalid payment amount" });
+    }
+
+    const amountInSubunit = toMinorUnit(chargeTotal, chargeCurrency);
+
+    if (!amountInSubunit || amountInSubunit < 1) {
+      return res.status(400).json({ error: "Invalid payment amount" });
     }
 
     const paystackReference = `PSK-${safeBookingReference}-${Date.now()}`;
 
-    // Stash the verified amount in metadata so /paystack-verify can
-    // cross-check after the transaction succeeds.
-    const verifiedTotalMajor = verified
-      ? Number(verified.finalTotal)
-      : Number(req.body?.amount) / (ZERO_DECIMAL.has(chargeCurrency) ? 1 : 100);
-
+    // Stash the amounts in metadata so /paystack-verify can cross-check
+    // after the transaction succeeds. verifiedTotalMajor is in ZAR
+    // (what Paystack actually charges).
     const payload = {
       email: customerEmail,
       amount: amountInSubunit,
@@ -139,10 +158,12 @@ export default async function handler(req, res) {
         verifiedTourId: verified?.tourId || null,
         verifiedAdultCount: verified?.adultCount ?? null,
         verifiedChildAges: verified?.childAges ?? null,
-        verifiedTotalMajor,
+        verifiedTotalMajor: chargeTotal,
+        chargeCurrency,
+        displayCurrency,
+        displayTotal,
       },
     };
-
 
     const callback = buildCallbackUrl(callbackUrl, getSite(req).origin);
     if (callback) payload.callback_url = callback;
@@ -179,6 +200,8 @@ export default async function handler(req, res) {
       bookingReference: safeBookingReference,
       amountCharged: amountInSubunit,
       currency: chargeCurrency,
+      displayCurrency,
+      displayTotal,
     });
   } catch (error) {
     console.error("Paystack initialize error:", error);

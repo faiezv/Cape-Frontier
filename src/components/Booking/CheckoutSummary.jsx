@@ -15,6 +15,7 @@ const CheckoutSummary = ({
   toddlerCount = 0,
 
   currency = "ZAR",
+  live,
 
   selectedOption,
   selectedExtras = {},
@@ -64,6 +65,7 @@ const CheckoutSummary = ({
         childAges,
         adultCount: Math.max(0, Number(adultCount) || 0),
         currency,
+        live,
         selectedOption,
         selectedExtras,
         formData,
@@ -75,6 +77,7 @@ const CheckoutSummary = ({
       JSON.stringify(childAges),
       adultCount,
       currency,
+      live,
       selectedOption,
       JSON.stringify(selectedExtras),
       formData?.isPrivate,
@@ -347,7 +350,7 @@ const CheckoutSummary = ({
       case "pickup":
         return (
           <div className="text-center lg:text-left">
-            <p className="text-sm font-medium text-slate-900">
+            <p className="break-words text-sm font-medium text-slate-900">
               {formData?.pickupLocation || "Choose pickup location"}
             </p>
           </div>
@@ -463,9 +466,9 @@ const CheckoutSummary = ({
   return (
     <div
       ref={checkoutRef}
-      className={`bg-white ${stacked ? "rounded-t-2xl" : ""}`}
+      className={`min-w-0 bg-white ${stacked ? "rounded-t-2xl" : ""}`}
     >
-      <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
+      <div className="min-w-0 rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
         {/* HEADER */}
         <div className="mb-5 flex items-center gap-2.5">
           {CheckoutCartIcon && (
@@ -477,7 +480,7 @@ const CheckoutSummary = ({
         </div>
 
         {/* BOOKING DETAILS */}
-        <div className={`mb-6 flex flex-col gap-3 ${stacked ? "" : "lg:flex-row lg:items-stretch"}`}>
+        <div className={`mb-6 flex min-w-0 flex-col gap-3 ${stacked ? "" : "lg:flex-row lg:items-stretch"}`}>
           <div
             ref={iconButtonsContainerRef}
             className={`scroll-smooth overflow-x-auto pb-1 ${
@@ -528,9 +531,9 @@ const CheckoutSummary = ({
             </div>
           </div>
 
-          <div className={`flex-1 ${stacked ? "" : "lg:flex"}`}>
+          <div className={`min-w-0 flex-1 ${stacked ? "" : "lg:flex"}`}>
             <div
-              className={`flex w-full flex-col justify-center rounded-lg border p-4 ${
+              className={`flex w-full min-w-0 flex-col justify-center rounded-lg border p-4 ${
                 activeDetailData.complete
                   ? "border-slate-200 bg-slate-50"
                   : "border-amber-200 bg-amber-50"
@@ -539,7 +542,7 @@ const CheckoutSummary = ({
               <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                 {activeDetailData.label}
               </p>
-              <div className="mt-1.5">{renderDetailContent(activeDetailData.key)}</div>
+              <div className="mt-1.5 min-w-0">{renderDetailContent(activeDetailData.key)}</div>
               {!activeDetailData.complete && (
                 <p className="mt-2 text-xs font-medium text-amber-700">
                   This field is incomplete
@@ -549,12 +552,14 @@ const CheckoutSummary = ({
           </div>
         </div>
 
-        {/* PRICE BREAKDOWN + TOTAL */}
-        <div className={`grid gap-5 ${stacked ? "" : "lg:grid-cols-5"}`}>
-          
+        {/* PRICE BREAKDOWN + TOTAL
+            grid-cols-1 gives mobile a real minmax(0,1fr) column; without it
+            long labels (e.g. extras) widen the column past the screen. */}
+        <div className={`grid grid-cols-1 gap-5 ${stacked ? "" : "lg:grid-cols-5"}`}>
+
           {/* LEFT COLUMN: BREAKDOWN & EXTRAS */}
-          <div className={`space-y-3 ${stacked ? "" : "lg:col-span-3"}`}>
-            
+          <div className={`min-w-0 space-y-3 ${stacked ? "" : "lg:col-span-3"}`}>
+
             {/* Price Breakdown Card */}
             <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
               <div className="mb-4 flex items-center justify-between">
@@ -578,7 +583,7 @@ const CheckoutSummary = ({
                   return (
                     <div
                       key={item.label}
-                      className={`flex items-center justify-between rounded-lg px-3 py-2.5 ${
+                      className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 ${
                         hasItemDiscount ? "bg-emerald-50/70" : ""
                       }`}
                     >
@@ -627,8 +632,8 @@ const CheckoutSummary = ({
               </div>
 
               {/* Tour subtotal */}
-              <div className="mt-3 flex items-end justify-between border-t border-slate-200 pt-3">
-                <div>
+              <div className="mt-3 flex items-end justify-between gap-3 border-t border-slate-200 pt-3">
+                <div className="min-w-0">
                   <p className="text-sm font-semibold text-slate-900">
                     Tour subtotal
                   </p>
@@ -638,7 +643,7 @@ const CheckoutSummary = ({
                     </p>
                   )}
                 </div>
-                <div className="text-right">
+                <div className="shrink-0 text-right">
                   {hasGroupAdjustment && (
                     <p className="text-xs tabular-nums text-slate-400 line-through">
                       {formatCurrency(baseTourSubtotal)}
@@ -656,7 +661,7 @@ const CheckoutSummary = ({
 
               {/* Group rate detail */}
               {hasGroupAdjustment && groupAdjustmentIsSaving && (
-                <div className="mt-3 flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5">
+                <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5">
                   <div className="min-w-0">
                     <p className="text-xs font-semibold text-emerald-900">
                       Group rate applied
@@ -691,21 +696,21 @@ const CheckoutSummary = ({
               {(privateFee > 0 || customFee > 0) && (
                 <div className="mt-3 space-y-1.5 border-t border-slate-200 pt-3">
                   {privateFee > 0 && (
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-3">
                       <span className="text-sm text-slate-700">
                         Private tour fee
                       </span>
-                      <span className="text-sm font-semibold tabular-nums text-slate-900">
+                      <span className="shrink-0 text-sm font-semibold tabular-nums text-slate-900">
                         {displayActivePrivateFee}
                       </span>
                     </div>
                   )}
                   {customFee > 0 && (
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-3">
                       <span className="text-sm text-slate-700">
                         Custom trip fee
                       </span>
-                      <span className="text-sm font-semibold tabular-nums text-slate-900">
+                      <span className="shrink-0 text-sm font-semibold tabular-nums text-slate-900">
                         {displayActiveCustomFee}
                       </span>
                     </div>
@@ -741,7 +746,7 @@ const CheckoutSummary = ({
                       ["Children", effectiveChildren, kidsActivityChildPrice, kidsActivityChildTotal],
                       ["Toddlers", effectiveToddlers, kidsActivityToddlerPrice, kidsActivityToddlerTotal],
                     ].map(([label, count, price, total]) => (
-                      <div key={label}>
+                      <div key={label} className="min-w-0">
                         <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
                           {label}
                         </p>
@@ -757,7 +762,7 @@ const CheckoutSummary = ({
                 </div>
               )}
 
-              {/* INTERACTIVE OPTIONAL EXTRAS (Built directly here) */}
+              {/* INTERACTIVE OPTIONAL EXTRAS */}
               {renderExtras()}
 
             </div>
@@ -791,7 +796,7 @@ const CheckoutSummary = ({
           </div>
 
           {/* RIGHT COLUMN: TOTAL + PAY */}
-          <div className={stacked ? "" : "lg:col-span-2"}>
+          <div className={`min-w-0 ${stacked ? "" : "lg:col-span-2"}`}>
             <div
               className={`rounded-xl bg-blue-700 p-5 text-white sm:p-6 ${
                 stacked ? "mx-auto max-w-xl" : "sticky top-4"
@@ -800,7 +805,7 @@ const CheckoutSummary = ({
               <p className="text-xs font-medium uppercase tracking-wider text-blue-200">
                 Total due
               </p>
-              <p className="mt-1.5 text-3xl font-bold tabular-nums sm:text-4xl">
+              <p className="mt-1.5 break-words text-3xl font-bold tabular-nums sm:text-4xl">
                 {isCustomQuote ? "Custom quote" : displayTotal}
               </p>
 
