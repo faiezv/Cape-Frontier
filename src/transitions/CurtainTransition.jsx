@@ -13,6 +13,7 @@ const EASE = [0.65, 0, 0.35, 1]
 const LABELS = {
   '/': 'Home',
   '/tours': 'Tours',
+  '/gallery': 'Gallery',
   '/policies': 'Policies',
   '/checkout': 'Checkout',
   '/success': 'Booking confirmed',

@@ -834,20 +834,11 @@ export const tours = [
         note: "All-inclusive per person",
       },
       {
-        category: "Teens",
+        category: "Teens 12+",
         pricePerPerson: 2600,
         note: "All-inclusive per child",
       },
-      {
-        category: "Children ",
-        pricePerPerson: 2600,
-        note: "All-inclusive per child",
-      },
-      {
-        category: "Toddler",
-        pricePerPerson: 0,
-        note: "All-inclusive per child",
-      },
+
     ],
 
     additionalPricing: [
@@ -7810,15 +7801,13 @@ export const tours = [
   },
   // 3-Day / 2-Night Garden Route & Safari Escape
   {
-    id: 27, // assign
+    id: 27, 
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.MULTI_DAY,
 
     title: "3-Day Garden Route & Safari Escape",
     slug: "3-day-garden-route-safari-escape",
     canonicalPath: "/tours/3-day-garden-route-safari-escape",
-    childFriendly: true, // family packages offered for children 3–11 (QUERY CLIENT: minimum age)
-    daysInAdvance: 30, // QUERY CLIENT (booking cut-off)
 
     seo: {
       title:
@@ -7844,8 +7833,8 @@ export const tours = [
     workflow: defaultWorkflow,
 
     image:
-      "/src/assets/images/tours/packages/3-day-garden-route-safari-escape/4.webp", // TODO
-    images: getTourImages("packages/3-day-garden-route-safari-escape", 5), // TODO
+      "/src/assets/images/tours/packages/3-day-garden-route-safari-escape/4.webp", 
+    images: getTourImages("packages/3-day-garden-route-safari-escape", 4), 
     imageFolder: "packages/3-day-garden-route-safari-escape",
     videos: [],
 
@@ -7855,6 +7844,8 @@ export const tours = [
 
     priceBase: 17000,
     minPeople: 2,
+    childFriendly: true, // family packages offered for children 3–11 (QUERY CLIENT: minimum age)
+    daysInAdvance: 30,
 
     pricing: [
       {
@@ -8508,8 +8499,6 @@ export const tours = [
     title: "4-Day Cape Town Signature Explorer",
     slug: "4-day-cape-town-signature-explorer",
     canonicalPath: "/tours/4-day-cape-town-signature-explorer",
-    childFriendly: true, // family pricing offered (QUERY CLIENT: child age range; Day 4 includes wine tastings)
-    daysInAdvance: 30,
 
     seo: {
       title:
@@ -8536,7 +8525,7 @@ export const tours = [
 
     image:
       "/src/assets/images/tours/packages/4-day-cape-town-signature-explorer/1.webp", // TODO
-    images: getTourImages("packages/4-day-cape-town-signature-explorer", 5),
+    images: getTourImages("packages/4-day-cape-town-signature-explorer", 4),
     imageFolder: "packages/4-day-cape-town-signature-explorer",
     videos: [],
 
@@ -8546,6 +8535,8 @@ export const tours = [
 
     priceBase: 12995,
     minPeople: 2,
+    childFriendly: true,
+    daysInAdvance: 30,
 
     pricing: [
       {
@@ -8595,10 +8586,7 @@ export const tours = [
 
     rating: null,
     stars: null,
-    mainReviewerName: "",
-    mainReviewerCountry: "",
-    reviewYear: null,
-    otherReviews: null,
+
     mainReview: "",
 
     description:
@@ -8763,7 +8751,6 @@ export const tours = [
               duration: "30 min",
               type: "transfer",
               optional: false,
-              image: "",
             },
             {
               id: "d1-bokaap",
@@ -8774,7 +8761,6 @@ export const tours = [
               duration: "45 min",
               type: "culture",
               optional: false,
-              image: "",
             },
             {
               id: "d1-signal-hill",
@@ -8876,7 +8862,6 @@ export const tours = [
           ],
 
           meals: { breakfast: false, lunch: true, dinner: false },
-          images: [],
         },
 
         {
@@ -9034,7 +9019,6 @@ export const tours = [
           ],
 
           meals: { breakfast: false, lunch: true, dinner: false },
-          images: [],
         },
 
         {
@@ -9157,7 +9141,6 @@ export const tours = [
           ],
 
           meals: { breakfast: false, lunch: true, dinner: false },
-          images: [],
         },
 
         {
@@ -9278,7 +9261,6 @@ export const tours = [
           ],
 
           meals: { breakfast: false, lunch: true, dinner: false },
-          images: [],
         },
       ],
     },
@@ -9419,8 +9401,6 @@ export const tours = [
     title: "4-Day Garden Route & Safari Explorer",
     slug: "4-day-garden-route-safari-explorer",
     canonicalPath: "/tours/4-day-garden-route-safari-explorer",
-    childFriendly: true, // children aged 4–11 priced (QUERY CLIENT: other ages)
-    daysInAdvance: 30,
 
     seo: {
       title:
@@ -9458,6 +9438,8 @@ export const tours = [
     priceBase: 24000,
     minPeople: 2,
     minAge: 5,
+    childFriendly: true, 
+    daysInAdvance: 30,
 
     pricing: [
       {
@@ -9770,10 +9752,8 @@ export const tours = [
               "Private en-suite",
               "Dinner & breakfast",
             ],
-            image: "",
+            image: "src/assets/images/accomodation/karoo-sun.webp",
           },
-
-          images: [],
         },
 
         {
@@ -9793,7 +9773,6 @@ export const tours = [
               duration: "",
               type: "scenic",
               optional: false,
-              image: "",
             },
             {
               id: "d2-heads",
@@ -9804,7 +9783,6 @@ export const tours = [
               duration: "",
               type: "scenic",
               optional: false,
-              image: "",
             },
             {
               id: "d2-waterfront",
@@ -9815,7 +9793,6 @@ export const tours = [
               duration: "",
               type: "leisure",
               optional: false,
-              image: "",
             },
           ],
 
@@ -9830,10 +9807,8 @@ export const tours = [
               "Private en-suite",
               "Breakfast",
             ],
-            image: "",
+            image: "src/assets/images/accomodation/waterfront-lodge.webp",
           },
-
-          images: [],
         },
 
         {
@@ -9890,7 +9865,7 @@ export const tours = [
               "Private en-suite",
               "Breakfast",
             ],
-            image: "",
+            image: "src/assets/images/accomodation/waterfront-lodge.webp",
           },
 
           images: [],
@@ -10503,12 +10478,12 @@ export const tours = [
           meals: { breakfast: true, lunch: false, dinner: false },
 
           accommodation: {
-            title: "At the Woods Guest House",
+            title: "Tsitsikama Manor",
             location: "Tsitsikamma, Garden Route",
             availabilityNote:
-              "Also listed in the source: Tsitsikamma Village Inn and Tsitsikamma Manor.", // QUERY CLIENT
+              "Also listed in the source: Tsitsikamma Village Inn.", 
             options: ["Breakfast included"],
-            image: "/src/assets/images/accomodation/at-the-woods.webp", // TODO
+            image: "/src/assets/images/accomodation/tsitsikama-manor.webp", 
           },
         },
 

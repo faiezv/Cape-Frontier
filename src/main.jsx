@@ -11,6 +11,7 @@ import Home from './pages/Home.jsx'
 import Tour from './pages/Tours.jsx'
 import TourDetails from './pages/TourDetails'
 import Policies from './pages/Policies.jsx'
+import Gallery from './pages/Gallery.jsx'
 import PageNotFound from './pages/PageNotFound.jsx'
 import CheckoutPaystack from './pages/CheckoutPaystack'
 import CheckoutSuccessPaystack from './pages/CheckoutSuccessPaystack'
@@ -23,6 +24,7 @@ const routes = [
       { index: true, element: <Home /> },
       { path: 'tours/:slug', element: <TourDetails /> },
       { path: 'tours', element: <Tour /> },
+      { path: 'gallery', element: <Gallery /> },
       { path: 'policies', element: <Policies /> },
       { path: 'checkout', element: <CheckoutPaystack /> },
       { path: 'success', element: <CheckoutSuccessPaystack /> },

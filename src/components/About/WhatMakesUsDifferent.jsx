@@ -18,7 +18,7 @@ import {
   useDialog,
   focusRing,
   hoverZoom,
-} from "../Stories/Gallery";
+} from "../../pages/Gallery.jsx";
 
 gsap.registerPlugin(ScrollTrigger);
 

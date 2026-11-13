@@ -301,7 +301,7 @@ function SiteFooter({ showDetails = true, showBackToTop }) {
   const location = useLocation();
   const [showQrPopup, setShowQrPopup] = useState(false);
 
-  const isTours = location.pathname.includes("/tours");
+  const isTours = location.pathname.includes("/tours") || location.pathname.includes("/gallery");
   const backToTopVisible = showBackToTop ?? true;
 
   const showNav = showDetails && !isTours;

@@ -19,7 +19,7 @@ const navItems = [
   { label: "Home", target: "Home" },
   { label: "About", target: "About" },
   { label: "Stories", target: "Stories" },
-  { label: "Gallery", target: "Gallery" },
+  { label: "Gallery", target: "/gallery" },
   { label: "Tours", target: "/tours" }, // Routes to /tours page
   { label: "FAQ", target: "/policies" },
 ];
@@ -274,7 +274,7 @@ const Navbar = ({ displayedPath }) => {
   const location = useLocation();
   const shownPath = displayedPath ?? location.pathname;
   const onToursNow =
-    location.pathname === "/tours" 
+    location.pathname === "/tours" || location.pathname === "/gallery"
 
   const mode = useTransitionMode();
   const reduceMotion = useReducedMotion();
