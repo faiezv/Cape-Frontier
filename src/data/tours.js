@@ -2564,6 +2564,408 @@ export const tours = [
       "Beginner Friendly",
     ],
   },
+  // Witzands Dunes
+  {
+    id: 29, // assign
+    type: TOUR_TYPES.ADRENALINE,
+    category: TOUR_MODIFIERS.DAY_TOUR, // QUERY: use a half-day modifier here if one exists (3-hour experience)
+
+    title: "Witzands Premium Dune Adventure Experience",
+    slug: "witzands-premium-dune-adventure-experience",
+    canonicalPath: "/tours/witzands-premium-dune-adventure-experience",
+    minAge: 8,
+    childFriendly: true,
+
+    seo: {
+      title:
+        "Witzands Premium Dune Adventure: 4x4 Jeep Dunes, Sandboarding & Lunch from Cape Town",
+      description:
+        "A 3-hour premium 4x4 dune adventure in the Witzands Aquifer Nature Reserve near Cape Town, with sandboarding, professional jump photographs, lunch, bottled water and accommodation pick-up and drop-off.",
+      keywords: [
+        "Witzands dune adventure",
+        "Witzands Aquifer Nature Reserve",
+        "Cape Town dunes tour",
+        "Cape Town sandboarding",
+        "4x4 dune driving Cape Town",
+        "Witzands sandboarding",
+        "Cape Town off-road experience",
+        "Cape Town jeep adventure",
+        "Cape Town adventure activity",
+        "Atlantis dunes tour",
+        "Cape Town desert experience",
+        "Cape Town family adventure",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "/src/assets/images/tours/adrenaline/witzands-dunes/1.webp", // TODO
+    images: ["/src/assets/images/tours/adrenaline/witzands-dunes/1.webp"],
+    imageFolder: "adrenaline/witzands-dunes",
+    videos: [],
+
+    location: "Witzands Aquifer Nature Reserve, Cape Town, Western Cape, South Africa",
+
+    duration: "3 hours",
+
+    priceBase: 3950,
+    minPeople: 2,
+
+    pricing: [
+      {
+        category: "Adult",
+        pricePerPerson: 3950,
+        note: "Per person for 2 guests. Per-person rates reduce for larger groups.",
+      },
+
+      // QUERY CLIENT: no child rate or child age band supplied. Left out on purpose
+      // (null would render "R0.00" or "RNaN"). Children are priced through the family
+      // packages below (minimum age 8).
+    ],
+
+    /*
+     * FAMILY PACKAGE TOTALS (supplied by client, ZAR):
+     *   2 Adults + 1 Child       R10,500
+     *   2 Adults + 2 Children    R12,500
+     *   2 Adults + 3 Children    R14,500
+     * Not a flat per-child rate (first child R2,600, each further child R2,000), so kept
+     * in familyPricing. QUERY CLIENT: age band for "Child" (minimum age is 8).
+     */
+    familyPricing: {
+      enabled: true,
+      icon: "",
+      packages: [
+        { adults: 2, children: 1, total: 10500, label: "2 Adults + 1 Child" },
+        { adults: 2, children: 2, total: 12500, label: "2 Adults + 2 Children" },
+        { adults: 2, children: 3, total: 14500, label: "2 Adults + 3 Children" },
+      ],
+      note: "Minimum age is 8 years.",
+    },
+
+    additionalPricing: [],
+
+    /*
+     * Rates supplied for 2, 4, 6 and 8 guests; "+8 guests" is quote on request.
+     * Totals not supplied. QUERY CLIENT: rates for 3, 5 and 7 guests.
+     */
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        { minPeople: 2, maxPeople: 2, perPerson: 3950, label: "2 guests", note: "Rate per person." },
+        { minPeople: 4, maxPeople: 4, perPerson: 3450, label: "4 guests", note: "Rate per person." },
+        { minPeople: 6, maxPeople: 6, perPerson: 3050, label: "6 guests", note: "Rate per person." },
+        { minPeople: 8, maxPeople: 8, perPerson: 2850, label: "8 guests", note: "Rate per person." },
+        {
+          minPeople: 9,
+          maxPeople: null,
+          perPerson: null,
+          label: "9+ guests",
+          note: "Quote on request. Special group rates are available for bookings of four or more guests.",
+        },
+      ],
+    },
+
+    description:
+      "Discover the Witzands Aquifer Nature Reserve on a premium three-hour 4x4 dune adventure. Traverse towering white sand dunes in a premium 4x4 vehicle with an experienced local guide, try sandboarding with equipment provided, capture professional jump photographs and enjoy a light lunch surrounded by one of Cape Town's most spectacular natural landscapes. Includes accommodation pick-up and drop-off, reserve entry permit and bottled water.",
+
+    highlights: [
+      { text: "Guided off-road 4x4 Jeep adventure through towering white sand dunes" },
+      { text: "Sandboarding with board and equipment provided" },
+      { text: "Professional jump photographs" },
+      { text: "Light lunch included" },
+      { text: "Witzands Aquifer Nature Reserve entry permit included" },
+      { text: "Experienced local guide and driver" },
+      { text: "Complimentary bottled water" },
+      { text: "Accommodation pick-up and drop-off" },
+      { text: "Departs daily" },
+    ],
+
+    included: [
+      { text: "Pick-up from your accommodation to the site" },
+      { text: "Guided off-road Jeep experience through the dunes" },
+      { text: "Sandboard and equipment" },
+      { text: "Experienced local guide and driver" },
+      { text: "Light lunch" },
+      { text: "Complimentary bottled water" },
+      { text: "Professional jump photographs" },
+      { text: "Witzands Aquifer Nature Reserve entry permit" },
+      { text: "Drop-off from the site to your accommodation" },
+    ],
+
+    excluded: [
+      { text: "Additional beverages (soft drinks, energy drinks, alcohol)" },
+      { text: "Personal purchases, souvenirs and personal expenses" },
+      { text: "Gratuities for the guide and driver (optional)" },
+      { text: "Travel insurance" },
+    ],
+
+    pickupOptions: [
+      {
+        type: "hotel",
+        label: "Cape Town accommodation",
+        description:
+          "Pick-up from your accommodation to the site and drop-off back to your accommodation after the experience.", // QUERY CLIENT: pickup areas and departure time
+      },
+    ],
+
+    requirements: [
+      "Minimum age is 8 years.",
+      "Guests must be medically fit to take part and participate at their own risk.",
+      "Guests must follow the safety instructions of the guide and reserve.",
+      "Participation may be refused for guests under the influence of alcohol or drugs.",
+    ],
+
+    notSuitableFor: [
+      { group: "Pregnant women", reason: "Uneven terrain, dune driving and the physical nature of sandboarding." },
+      { group: "Guests with serious back, neck or spinal conditions", reason: "Off-road driving may aggravate existing injuries or medical conditions." },
+      { group: "Guests with severe mobility limitations", reason: "Accessing the dunes and sandboarding require moderate mobility." },
+      { group: "Individuals with serious heart conditions", reason: "Physical exertion and adventure activities may not be suitable." },
+      { group: "Guests recovering from recent surgery", reason: "The terrain and activities may place strain on the body." },
+      { group: "Children under 8 years old", reason: "For safety reasons and to ensure they can participate comfortably." },
+      { group: "Guests under the influence of alcohol or drugs", reason: "Participation may be refused for safety reasons." },
+      { group: "Anyone unable to follow safety instructions", reason: "Participation is subject to compliance with guide and reserve safety requirements." },
+    ],
+
+    arrangements: {
+      availability: "Departs daily.",
+      duration: "3 hours",
+      operatingTime: "", // QUERY CLIENT: departure time
+      departure: "Cape Town accommodation pick-up",
+      return: "Cape Town accommodation drop-off",
+      location:
+        "Cape Town accommodation → Witzands Aquifer Nature Reserve → Cape Town accommodation",
+
+      clothing: ["Closed shoes"],
+
+      thingsToBring: ["Sunscreen", "Hat", "Sunglasses", "Closed shoes"],
+
+      passengerPolicy:
+        "Guests must follow the instructions of the guide and reserve staff. Cape Frontier Travel & Tours reserves the right to refuse participation where guest safety may be compromised.",
+
+      notes: [
+        "Minimum age is 8 years.",
+        "A light lunch and bottled water are included; additional beverages are not.",
+        "Participants undertake all activities at their own risk and are responsible for ensuring they are medically fit to participate.",
+        "This tour may not be suitable for pregnant women, guests with serious back, neck, spinal or heart conditions, severe mobility limitations or recent surgery.",
+      ],
+    },
+
+    paymentTerms: {
+      summary: "A 30% deposit secures your booking.",
+      items: [
+        { text: "A 30% deposit is required to secure your booking." },
+        { text: "Booking is confirmed on receipt of the deposit and written confirmation from Cape Frontier Travel & Tours." },
+        { text: "The remaining balance is due 7 days prior to departure." },
+        { text: "Bookings made within 7 days of departure require full payment." },
+        { text: "Accepted payments: EFT, bank transfer and credit card." },
+        { text: "All prices are quoted in South African Rand (ZAR)." },
+        { text: "Amendments are subject to availability and supplier approval." },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary: "Refunds depend on how far ahead of departure you cancel.",
+      items: [
+        { notice: "30+ days prior", refund: "Full refund less applicable administration fees" },
+        { notice: "15–29 days prior", refund: "75% refund of the total booking value" },
+        { notice: "8–14 days prior", refund: "50% refund of the total booking value" },
+        { notice: "3–7 days prior", refund: "25% refund of the total booking value" },
+        { notice: "Less than 72 hours prior", refund: "No refund" },
+        { notice: "No-show", refund: "No refund" },
+      ],
+    },
+
+    weatherPolicy: {
+      summary:
+        "If the operator cancels for weather, safety concerns or unforeseen circumstances, you will be offered an alternative date or a full refund.",
+      items: [
+        {
+          text: "Operator cancellations due to weather, safety concerns or unforeseen circumstances: alternative date offered or full refund.",
+        },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Guests take part at their own risk and must follow the safety requirements of the guide and the reserve.",
+      items: [
+        { text: "Guests must follow the instructions of the guide and reserve staff." },
+        { text: "Participation may be refused for guests under the influence of alcohol or drugs." },
+        { text: "Cape Frontier Travel & Tours reserves the right to refuse participation where guest safety may be compromised." },
+        { text: "Guests are responsible for ensuring they are medically fit to participate." },
+      ],
+    },
+
+    /*
+     * SHORT EXPERIENCE
+     * Uses stops rather than the multi-day itinerary structure. No timings were supplied,
+     * so the order below is assumed. QUERY CLIENT: confirm order and timings.
+     */
+    itinerary: null,
+
+    stops: [
+      {
+        name: "Accommodation Pick-Up",
+        description: "Pick-up from your accommodation and transfer to the site.",
+        time: "",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Witzands Dune Jeep Adventure",
+        description:
+          "A guided off-road drive through the towering white sand dunes of the Witzands Aquifer Nature Reserve in a premium 4x4 vehicle, with an experienced local guide and driver.",
+        time: "",
+        duration: "",
+        type: "adventure",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Sandboarding",
+        description: "Sandboard down the dunes, with a board and equipment provided.",
+        time: "",
+        duration: "",
+        type: "adventure",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Professional Jump Photography",
+        description: "Professional jump photographs captured during the experience.",
+        time: "",
+        duration: "",
+        type: "photo",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Lunch",
+        description: "A light lunch surrounded by the dunes, with complimentary bottled water.",
+        time: "",
+        duration: "",
+        type: "meal",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Return to Accommodation",
+        description: "Drop-off from the site back at your accommodation.",
+        time: "",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+    ],
+
+    needToKnow: [
+      { text: "The experience lasts 3 hours and departs daily." },
+      { text: "Minimum age is 8 years." },
+      { text: "Adult pricing is R3,950 pp for 2 guests, R3,450 pp for 4, R3,050 pp for 6 and R2,850 pp for 8; larger groups on request." },
+      { text: "Family packages: 2 adults + 1 child R10,500, + 2 children R12,500 and + 3 children R14,500." },
+      { text: "A light lunch, bottled water, sandboarding equipment, jump photographs and the reserve entry permit are included." },
+      { text: "Additional beverages, personal purchases, gratuities and travel insurance are not included." },
+      { text: "Bring sunscreen, a hat, sunglasses and closed shoes." },
+      { text: "Not suitable for pregnant women, guests with serious back, neck, spinal or heart conditions, severe mobility limitations or recent surgery." },
+      { text: "A 30% deposit secures your booking, with the balance due 7 days before departure." },
+      { text: "Cancellations: 30+ days full refund less admin fees; 15–29 days 75%; 8–14 days 50%; 3–7 days 25%; less than 72 hours and no-shows no refund." },
+      { text: "If the operator cancels for weather or safety, you are offered an alternative date or a full refund." },
+    ],
+
+    faqs: [
+      {
+        question: "What is included in the experience?",
+        answer:
+          "Pick-up and drop-off from your accommodation, a guided off-road Jeep experience through the dunes, a sandboard and equipment, an experienced local guide and driver, a light lunch, bottled water, professional jump photographs and the Witzands Aquifer Nature Reserve entry permit.",
+      },
+
+      {
+        question: "How long does the experience take?",
+        answer: "The experience lasts approximately 3 hours.",
+      },
+
+      {
+        question: "Do you depart every day?",
+        answer: "Yes. The experience departs daily.",
+      },
+
+      {
+        question: "Is there a minimum age?",
+        answer:
+          "Yes. The minimum age is 8 years, for safety reasons and to make sure children can take part comfortably.",
+      },
+
+      {
+        question: "Do I need sandboarding experience?",
+        answer:
+          "The tour includes a sandboard and equipment with an experienced local guide. Sandboarding requires moderate mobility and some physical effort.",
+      },
+
+      {
+        question: "Who is the experience not suitable for?",
+        answer:
+          "It may not suit pregnant women, guests with serious back, neck, spinal or heart conditions, guests with severe mobility limitations, guests recovering from recent surgery, children under 8 or anyone unable to follow safety instructions. Participation may also be refused for guests under the influence of alcohol or drugs.",
+      },
+
+      {
+        question: "Is lunch included?",
+        answer:
+          "Yes. A light lunch and complimentary bottled water are included. Additional beverages such as soft drinks, energy drinks and alcohol are not.",
+      },
+
+      {
+        question: "What should I bring?",
+        answer: "Sunscreen, a hat, sunglasses and closed shoes.",
+      },
+
+      {
+        question: "What group rates are available?",
+        answer:
+          "Per-person rates are R3,950 for 2 guests, R3,450 for 4, R3,050 for 6 and R2,850 for 8. Larger groups are quoted on request, and special rates are available for groups of four or more.",
+      },
+
+      {
+        question: "What are the family package prices?",
+        answer:
+          "2 adults + 1 child: R10,500. 2 adults + 2 children: R12,500. 2 adults + 3 children: R14,500.",
+      },
+
+      {
+        question: "What happens if the weather is bad?",
+        answer:
+          "If the operator cancels due to weather, safety concerns or unforeseen circumstances, you will be offered an alternative date or a full refund.",
+      },
+
+      {
+        question: "What is the cancellation policy?",
+        answer:
+          "30+ days prior: full refund less administration fees. 15–29 days: 75% refund. 8–14 days: 50% refund. 3–7 days: 25% refund. Less than 72 hours and no-shows: no refund.",
+      },
+    ],
+
+    tags: [
+      "witzands",
+      "dune-adventure",
+      "sandboarding",
+      "4x4",
+      "off-road",
+      "nature-reserve",
+      "adventure",
+      "photography",
+      "cape-town",
+      "half-day",
+      "family-friendly",
+    ],
+  },
   // =========================================== HIKING
   // Lions-Head
   {
@@ -4613,6 +5015,692 @@ export const tours = [
       "Culture",
       "Family Friendly",
       "Wheelchair Accessible",
+      "Sightseeing",
+    ],
+  },
+  // Cape Town Heritage, Culture & Culinary City Tour
+  {
+    id: null, // assign
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.FULL_DAY,
+    childFriendly: true, // children are priced (QUERY CLIENT: age range)
+
+    title: "Cape Town Heritage, Culture & Culinary City Tour",
+    slug: "cape-town-heritage-culture-culinary-city-tour",
+    canonicalPath: "/tours/cape-town-heritage-culture-culinary-city-tour",
+
+    seo: {
+      title:
+        "Cape Town Heritage, Culture & Culinary City Tour | Cape Frontier Tours",
+      description:
+        "Private full-day Cape Town city tour: Truth Coffee breakfast, Company's Garden, Bo-Kaap, a Cape Malay lunch, Greenmarket Square and the V&A Waterfront.",
+      keywords: [
+        "Cape Town city tour",
+        "Cape Town private city tour",
+        "Cape Town heritage tour",
+        "Cape Town culinary tour",
+        "Bo-Kaap walking tour",
+        "Truth Coffee Cape Town",
+        "Company's Garden Cape Town",
+        "Greenmarket Square tour",
+        "V&A Waterfront tour",
+        "Cape Malay lunch Cape Town",
+        "Cape Town full day tour",
+        "Cape Town cultural tour",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image:
+      "/src/assets/images/tours/packages/cape-town-heritage-culture-culinary-city-tour/1.webp", // TODO
+    images: getTourImages(
+      "packages/cape-town-heritage-culture-culinary-city-tour",
+      5, // TODO: number of hero images in the folder
+    ),
+    imageFolder: "packages/cape-town-heritage-culture-culinary-city-tour",
+    videos: [],
+
+    location: "Cape Town, South Africa",
+    duration: "Full Day / Approximately 9–10 Hours",
+
+    priceBase: 2750, // R5,500 for 2 adults
+    minPeople: 2, // QUERY CLIENT: no solo rate supplied
+    maxPeople: 12, // QUERY CLIENT: largest quoted group is 8 adults + 4 children
+
+    /*
+     * The client quoted TOTAL prices per group make-up, not per-person rates:
+     *   2 adults                 R5,500
+     *   2 adults + 1 child       R5,900
+     *   2 adults + 2 children    R6,300
+     *   2 adults + 3 children    R6,700
+     *   2 adults + 4 children    R7,100
+     *   4 adults                 R7,000
+     *   4 adults + 2 children    R7,800
+     *   6 adults + 2 children    R9,300
+     *   8 adults + 4 children    R11,900
+     * The per-person rates below are DERIVED from those totals. QUERY CLIENT:
+     * confirm them, especially the 6 and 8 guest rows (see groupPricing).
+     */
+    pricing: [
+      {
+        category: "Adult",
+        pricePerPerson: 2750,
+        note: "Per person, based on 2 adults sharing (R5,500 total). Private tour.",
+      },
+      {
+        category: "Child (age range to be confirmed)", // QUERY CLIENT
+        pricePerPerson: 400,
+        note: "Child supplement when travelling with 2 adults.",
+      },
+    ],
+
+    additionalPricing: [
+      {
+        type: "external",
+        category: "Dinner at Harbour House (V&A Waterfront)",
+        pricePerPerson: null,
+        note: "Optional. Entirely for your own account and must be arranged in advance.",
+      },
+      {
+        type: "request",
+        category: "Additional hotel return transfer after dinner",
+        price: null,
+        unit: "per booking",
+        currency: "ZAR",
+        note: "Optional. Available at an additional cost.",
+      },
+    ],
+
+    /*
+     * Derived per-adult rates from the client's totals (child supplement of R400
+     * taken out first):
+     *   4 adults:                 R7,000 / 4           = R1,750
+     *   6 adults + 2 children:    (R9,300 - R800) / 6  = R1,416.67  (rounded up to R1,417)
+     *   8 adults + 4 children:    (R11,900 - R1,600) / 8 = R1,287.50 (rounded up to R1,288)
+     * The 6 and 8 guest rows do not follow a clean pattern. QUERY CLIENT: confirm.
+     */
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        {
+          minPeople: 2,
+          maxPeople: 3,
+          perPerson: 2750,
+          label: "2–3 guests",
+          note: "Adult rate. Based on R5,500 for 2 adults.",
+        },
+        {
+          minPeople: 4,
+          maxPeople: 5,
+          perPerson: 1750,
+          label: "4–5 guests",
+          note: "Adult rate. Based on R7,000 for 4 adults.",
+        },
+        {
+          minPeople: 6,
+          maxPeople: 7,
+          perPerson: 1417, // QUERY CLIENT: derived
+          label: "6–7 guests",
+          note: "Adult rate for groups of 6–7 guests.",
+        },
+        {
+          minPeople: 8,
+          maxPeople: 12,
+          perPerson: 1288, // QUERY CLIENT: derived
+          label: "8–12 guests",
+          note: "Adult rate for groups of 8–12 guests.",
+        },
+      ],
+    },
+
+    description:
+      "Discover the heart of Cape Town on a full-day private sightseeing and cultural experience. From the city's historic landmarks and beautiful gardens to the colourful streets of Bo-Kaap, enjoy Cape Town's diverse heritage, local cuisine and vibrant atmosphere. Start with a light breakfast at the famous Truth Coffee Roasting, explore the historic Company's Garden, learn about the culture of Bo-Kaap over a Cape Malay-inspired lunch, browse local crafts at Greenmarket Square and enjoy the harbour surroundings of the V&A Waterfront. The day ends with a return to your hotel, or an optional seafood dinner at Harbour House.",
+
+    highlights: [
+      {
+        text: "Truth Coffee Roasting: breakfast in an iconic steampunk-inspired setting",
+      },
+      {
+        text: "Company's Garden: one of Cape Town's oldest public gardens, with views of Table Mountain",
+      },
+      {
+        text: "City centre landmarks: Houses of Parliament, St George's Cathedral and the Castle of Good Hope (exterior)",
+      },
+      {
+        text: "Bo-Kaap cultural and heritage walking experience, with the Auwal Mosque (exterior)",
+      },
+      {
+        text: "Lunch at Bo-Kaap Deli with Cape Malay-inspired flavours",
+      },
+      {
+        text: "Greenmarket Square: local crafts, jewellery and souvenirs",
+      },
+      {
+        text: "V&A Waterfront harbour walk and free time",
+      },
+      {
+        text: "Optional seafood dinner at Harbour House",
+      },
+      {
+        text: "Private air-conditioned transport with a dedicated driver-guide",
+      },
+    ],
+
+    included: [
+      {
+        text: "Hotel collection and return transfer",
+      },
+      {
+        text: "Private, air-conditioned transportation",
+      },
+      {
+        text: "Bottled water",
+      },
+      {
+        text: "Dedicated professional driver-guide",
+      },
+      {
+        text: "Light snack at Truth Coffee Roasting",
+      },
+      {
+        text: "Lunch at Bo-Kaap Deli",
+      },
+      {
+        text: "Guided historical and cultural commentary",
+      },
+      {
+        text: "Guided walking experience through Company's Garden",
+      },
+      {
+        text: "Bo-Kaap cultural and heritage walking experience",
+      },
+      {
+        text: "Visits to all scheduled sightseeing destinations",
+      },
+      {
+        text: "Transport between all scheduled destinations",
+      },
+      {
+        text: "Free time for sightseeing, photography and shopping",
+      },
+    ],
+
+    excluded: [
+      {
+        text: "Beverages with breakfast and lunch (coffee, tea, soft drinks, bottled water and alcoholic beverages)",
+      },
+      {
+        text: "Desserts at the breakfast and lunch restaurants",
+      },
+      {
+        text: "Dinner at Harbour House or any other restaurant",
+      },
+      {
+        text: "Personal shopping and souvenirs",
+      },
+      {
+        text: "Personal expenses and additional refreshments",
+      },
+      {
+        text: "Entrance fees to optional attractions and museums",
+      },
+      {
+        text: "Optional activities at the V&A Waterfront, including boat trips, Cape Wheel rides and aquarium admission",
+      },
+      {
+        text: "Gratuities and tips",
+      },
+      {
+        text: "Additional destinations or itinerary changes outside the agreed programme (additional charges may apply)",
+      },
+      {
+        text: "Extended driver waiting time and additional transfers beyond the standard tour schedule (additional charges may apply)",
+      },
+    ],
+
+    pickupOptions: ["Cape Town hotel or accommodation"], // QUERY CLIENT: pickup areas, if limited
+
+    requirements: [],
+
+    arrangements: {
+      availability: "Daily, subject to availability",
+      duration: "Approximately 9–10 hours",
+      operatingTime: "08:30 – 18:30",
+      departure: "08:30",
+      return: "Approximately 18:30",
+      location: "Cape Town City Centre, Bo-Kaap and the V&A Waterfront",
+
+      clothing: [],
+
+      thingsToBring: [],
+
+      passengerPolicy: "",
+
+      notes: [
+        "Private guided experience with a dedicated driver-guide.",
+        "The standard tour ends with a hotel drop-off at approximately 18:30.",
+        "The optional Harbour House dinner extends the day to approximately 20:00–21:00, depending on the dinner arrangements.",
+        "Dinner must be arranged in advance.",
+        "Lunch timing is subject to restaurant opening hours and reservation confirmation.",
+        "The Castle of Good Hope is seen from the exterior, subject to the route and available time.",
+        "The Auwal Mosque is an exterior visit.",
+      ],
+    },
+
+    weatherPolicy: null, // not supplied
+
+    cancellationPolicy: {
+      summary:
+        "A 30% non-refundable deposit confirms your booking, with the balance payable 7 days before departure. Refunds depend on how far ahead you cancel.",
+      items: [
+        {
+          text: "More than 14 days before departure: 100% refund, less any non-refundable booking fees",
+        },
+        { text: "8–14 days before departure: 75% refund" },
+        { text: "4–7 days before departure: 50% refund" },
+        { text: "48–72 hours before departure: 25% refund" },
+        { text: "Less than 48 hours before departure: no refund" },
+        { text: "No-show on the day of the tour: no refund" },
+        {
+          text: "Non-refundable restaurant deposits already paid for breakfast and lunch are deducted from any refund",
+        },
+        {
+          text: "If we cannot operate the tour (vehicle breakdown, severe weather, safety concerns, government restrictions or circumstances beyond our control), you are offered an alternative date or a full refund",
+        },
+      ],
+    },
+
+    safetyPolicy: null, // not supplied
+
+    /*
+     * FULL-DAY TOUR
+     * Uses stops rather than the multi-day itinerary structure.
+     */
+    itinerary: null,
+
+    stops: [
+      {
+        id: "pickup",
+        name: "Hotel Collection & Transfer",
+        time: "08:30",
+        duration: "30 min",
+        note: "Air-conditioned transfer",
+        description:
+          "Your day begins with collection from your Cape Town hotel or accommodation. Meet your dedicated driver-guide before departing for the city centre.",
+        exactLocation: mapLocation({
+          label: "Cape Town Pickup Area",
+          address: "Cape Town, South Africa",
+          query: "Cape Town",
+        }),
+        images: [],
+        touristComments: [],
+      },
+
+      {
+        id: "truth-coffee",
+        title: "Truth Coffee Roasting",
+        name: "Truth Coffee Roasting: Breakfast & Coffee",
+        description:
+          "Begin your morning at one of Cape Town's most distinctive coffee establishments. Famous for its steampunk-inspired interior and artisan coffee, Truth Coffee is an unforgettable introduction to the city's vibrant coffee culture. Enjoy the atmosphere, take photographs and relax over a light breakfast before the sightseeing begins.",
+
+        time: "09:00",
+        duration: "1 hour",
+
+        type: "food",
+        optional: false,
+
+        image: "",
+
+        exactLocation: mapLocation({
+          label: "Truth Coffee Roasting",
+          address: "36 Buitenkant Street, Cape Town",
+          query: "Truth Coffee Roasting 36 Buitenkant Street Cape Town",
+        }),
+
+        highlights: [
+          "Artisan coffee culture and a steampunk-inspired interior",
+          "Light snack included in the tour price",
+          "Photo opportunities",
+        ],
+
+        notes: ["Beverages and desserts are not included."],
+      },
+
+      {
+        id: "companys-garden",
+        title: "Company's Garden",
+        name: "Company's Garden",
+        description:
+          "Explore one of Cape Town's oldest public gardens, originally established during the Dutch colonial period. Enjoy a leisurely walk through the gardens, discover historical monuments and admire the surrounding heritage architecture, mature trees and views of Table Mountain.",
+
+        time: "10:15",
+        duration: "1 hour",
+
+        type: "heritage",
+        optional: false,
+
+        image: "",
+
+        exactLocation: mapLocation({
+          label: "Company's Garden",
+          address: "Government Avenue, Cape Town",
+          query: "Company's Garden Government Avenue Cape Town",
+        }),
+
+        highlights: [
+          "Guided walk through the historic gardens",
+          "Historical monuments and heritage architecture",
+          "Mature trees and views of Table Mountain",
+        ],
+      },
+
+      {
+        id: "city-centre",
+        title: "Cape Town City Centre",
+        name: "Cape Town City Centre: Historical Orientation",
+        description:
+          "Discover the historical heart of Cape Town as your guide introduces you to some of the city's most significant landmarks and architectural attractions.",
+
+        time: "11:15",
+        duration: "45 min",
+
+        type: "heritage",
+        optional: false,
+
+        image: "",
+
+        highlights: [
+          "Houses of Parliament",
+          "St George's Cathedral",
+          "Historic city architecture",
+          "Castle of Good Hope from the exterior, subject to the route and available time",
+        ],
+      },
+
+      {
+        id: "bo-kaap",
+        title: "Bo-Kaap Walking Experience",
+        name: "Bo-Kaap: Cultural & Heritage Walking Experience",
+        description:
+          "Discover the colourful streets and rich cultural heritage of one of Cape Town's most recognisable neighbourhoods. Learn about the history of the Cape Malay community, traditional architecture, Islamic heritage and the area's historical significance.",
+
+        time: "12:15",
+        duration: "1 hour",
+
+        type: "culture",
+        optional: false,
+
+        image: "",
+
+        exactLocation: mapLocation({
+          label: "Bo-Kaap",
+          address: "Bo-Kaap, Cape Town",
+          query: "Bo-Kaap Cape Town",
+        }),
+
+        highlights: [
+          "Colourful traditional houses",
+          "Cobblestone streets",
+          "Historic Auwal Mosque (exterior visit)",
+          "Cape Malay cultural heritage",
+          "Photography opportunities",
+        ],
+      },
+
+      {
+        id: "lunch",
+        title: "Lunch at Bo-Kaap Deli",
+        name: "Lunch at Bo-Kaap Deli",
+        description:
+          "Enjoy a relaxed lunch featuring Cape Malay-inspired flavours and open-fire grilled cuisine, then recharge before the afternoon's sightseeing. Lunch timing is subject to restaurant opening hours and reservation confirmation.", // QUERY CLIENT: the meal table calls this venue Bo-Kaap Grill
+
+        time: "13:15",
+        duration: "1 hr 15 min",
+
+        type: "meal",
+        optional: false,
+
+        image: "",
+
+        exactLocation: mapLocation({
+          label: "Bo-Kaap Deli",
+          address: "102 Wale Street, Bo-Kaap, Cape Town",
+          query: "Bo-Kaap Deli 102 Wale Street Cape Town",
+        }),
+
+        highlights: [
+          "Cape Malay-inspired flavours and open-fire grilled cuisine",
+          "Lunch included in the tour price",
+          "Welcoming restaurant atmosphere",
+        ],
+
+        notes: ["Beverages and desserts are not included."],
+      },
+
+      {
+        id: "greenmarket-square",
+        title: "Greenmarket Square",
+        name: "Greenmarket Square: Local Crafts & Shopping",
+        description:
+          "Visit one of Cape Town's historic public squares, known for its lively outdoor craft market. Browse locally produced artwork, handmade jewellery, African-inspired crafts, clothing and souvenirs, and meet the local traders.",
+
+        time: "14:45",
+        duration: "45 min",
+
+        type: "shopping",
+        optional: false,
+
+        image: "",
+
+        exactLocation: mapLocation({
+          label: "Greenmarket Square",
+          address: "Cape Town CBD",
+          query: "Greenmarket Square Cape Town",
+        }),
+
+        highlights: [
+          "Locally produced artwork and handmade jewellery",
+          "African-inspired crafts, clothing and souvenirs",
+          "Time to meet local traders",
+        ],
+      },
+
+      {
+        id: "va-waterfront",
+        title: "V&A Waterfront",
+        name: "V&A Waterfront: Harbour Walk & Sightseeing",
+        description:
+          "Conclude the sightseeing portion of your day at the iconic V&A Waterfront. Enjoy a leisurely walk around the historic harbour precinct, admire the boats and ocean views, explore the shopping areas and take in the vibrant atmosphere, with free time to take photographs and enjoy the scenery.",
+
+        time: "16:00",
+        duration: "2 hr 15 min",
+
+        type: "leisure",
+        optional: false,
+
+        image: "",
+
+        exactLocation: mapLocation({
+          label: "V&A Waterfront",
+          address: "V&A Waterfront, Cape Town",
+          query: "V&A Waterfront Cape Town",
+        }),
+
+        highlights: [
+          "Leisurely walk around the historic harbour precinct",
+          "Boats and ocean views",
+          "Shopping areas and waterfront attractions",
+          "Free time for photographs",
+        ],
+
+        notes: [
+          "Optional Waterfront activities such as boat trips, Cape Wheel rides and aquarium admission are not included.",
+        ],
+      },
+
+      {
+        id: "return-transfer",
+        name: "Hotel Return Transfer",
+        title: "Hotel Return Transfer",
+        description:
+          "For guests on the standard tour, your driver-guide provides a comfortable return transfer to your hotel or accommodation.",
+
+        time: "18:15",
+        duration: "15 min",
+
+        type: "transfer",
+        optional: false,
+
+        image: "",
+      },
+
+      {
+        id: "dinner",
+        title: "Dinner at Harbour House",
+        name: "Optional Dinner at Harbour House",
+        description:
+          "Extend your day with an optional seafood dinner at Harbour House, overlooking the harbour at the V&A Waterfront. Dinner is optional, is entirely for your own account and must be arranged in advance. The day then ends at approximately 20:00–21:00, depending on the dinner arrangements.",
+
+        time: "18:30",
+        duration: "",
+
+        type: "meal",
+        optional: true,
+
+        image: "",
+
+        exactLocation: mapLocation({
+          label: "Harbour House",
+          address: "Quay Four, V&A Waterfront, Cape Town",
+          query: "Harbour House Quay Four V&A Waterfront Cape Town",
+        }),
+
+        options: [
+          "Be dropped off at Harbour House and make your own return arrangements",
+          "Arrange an additional hotel return transfer with Cape Frontier Travel & Tours (additional cost)",
+        ],
+
+        highlights: [
+          "Fresh seafood overlooking the harbour",
+          "Memorable dining setting to end the day",
+        ],
+      },
+    ],
+
+    accommodation: {
+      included: false,
+      type: "",
+      description: "",
+    },
+
+    needToKnow: [
+      {
+        text: "Adults are R2,750 per person based on 2 adults sharing (R5,500 total), and children are R400 each when travelling with 2 adults.",
+      },
+      {
+        text: "Group totals: R5,900 for 2 adults + 1 child, R6,300 with 2 children, R6,700 with 3 children, R7,100 with 4 children, R7,000 for 4 adults, R7,800 for 4 adults + 2 children, R9,300 for 6 adults + 2 children and R11,900 for 8 adults + 4 children.",
+      },
+      {
+        text: "Collection is at 08:30 and the standard drop-off is at approximately 18:30.",
+      },
+      {
+        text: "A light snack at Truth Coffee and lunch at Bo-Kaap Deli are included; all beverages and desserts are at your own cost.",
+      },
+      {
+        text: "Dinner at Harbour House is optional, entirely for your own account and must be arranged in advance.",
+      },
+      {
+        text: "An additional hotel return transfer after dinner is available at an extra cost.",
+      },
+      {
+        text: "Lunch timing is subject to restaurant opening hours and reservation confirmation.",
+      },
+      {
+        text: "Additional destinations, itinerary changes, extended driver waiting time and extra transfers may cost extra.",
+      },
+      {
+        text: "A 30% non-refundable deposit confirms your booking, with the balance payable 7 days before departure.",
+      },
+    ],
+
+    faqs: [
+      {
+        question: "How long is the tour?",
+        answer:
+          "The tour takes approximately 9–10 hours. Collection is at 08:30 and the standard hotel drop-off is at about 18:30. The optional dinner extension runs until about 20:00–21:00.",
+      },
+
+      {
+        question: "What is included in the tour price?",
+        answer:
+          "The tour includes hotel collection and return, a private air-conditioned vehicle, a dedicated professional driver-guide, bottled water, a light snack at Truth Coffee Roasting, lunch at Bo-Kaap Deli, guided commentary, the walking experiences in Company's Garden and Bo-Kaap, and free time at Greenmarket Square and the V&A Waterfront.",
+      },
+
+      {
+        question: "Are breakfast and lunch included?",
+        answer:
+          "Yes. A light snack at Truth Coffee Roasting and lunch at Bo-Kaap Deli are included. Beverages and desserts at both venues are for your own account.",
+      },
+
+      {
+        question: "Is dinner included?",
+        answer:
+          "No. Dinner at Harbour House is optional, entirely for your own account and must be arranged in advance. You can be dropped off at the restaurant and make your own way back, or we can arrange an additional hotel transfer for an extra cost.",
+      },
+
+      {
+        question: "Is this a private tour?",
+        answer:
+          "Yes. This is a private guided experience with a dedicated driver-guide and private air-conditioned transport.",
+      },
+
+      {
+        question: "How much does the tour cost?",
+        answer:
+          "Two adults pay R5,500 in total, which is R2,750 each. Each child adds R400 when travelling with 2 adults, so 2 adults and 1 child are R5,900. Larger groups are priced on request, for example R7,000 for 4 adults.",
+      },
+
+      {
+        question: "Which days does the tour run?",
+        answer: "The tour departs daily, subject to availability.",
+      },
+
+      {
+        question: "Do we go inside the Castle of Good Hope and the Auwal Mosque?",
+        answer:
+          "The Castle of Good Hope is seen from the exterior, subject to the route and available time, and the Auwal Mosque is an exterior visit.",
+      },
+
+      {
+        question: "What is the cancellation policy?",
+        answer:
+          "You get a 100% refund (less any non-refundable booking fees) more than 14 days before departure, 75% at 8–14 days, 50% at 4–7 days and 25% at 48–72 hours. There is no refund within 48 hours or for a no-show. A 30% non-refundable deposit confirms your booking.",
+      },
+
+      {
+        question: "What if the tour cannot run?",
+        answer:
+          "If we cannot operate the tour because of a vehicle breakdown, severe weather, safety concerns, government restrictions or circumstances beyond our control, you can choose an alternative date or a full refund.",
+      },
+    ],
+
+    tags: [
+      "Cape Town",
+      "Cape Town City Tour",
+      "Full Day",
+      "Private Tour",
+      "Heritage",
+      "Culture",
+      "Culinary",
+      "Bo-Kaap",
+      "Company's Garden",
+      "Truth Coffee",
+      "Greenmarket Square",
+      "V&A Waterfront",
+      "Cape Malay",
+      "Family Friendly",
       "Sightseeing",
     ],
   },
@@ -7799,6 +8887,1829 @@ export const tours = [
       "family-friendly",
     ],
   },
+  // Hermanus Whale Watching, Penguins & Coastal Explorer
+  {
+    id: 26,
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.DAY_TOUR,
+
+    title: "Hermanus Whale Watching, Penguins & Coastal Explorer",
+    slug: "hermanus-whale-watching-penguins-coastal-explorer-tour",
+    canonicalPath:
+      "/tours/hermanus-whale-watching-penguins-coastal-explorer-tour",
+    childFriendly: true,
+
+    seo: {
+      title:
+        "Hermanus Whale Watching, Penguins & Coastal Explorer Private Full-Day Tour",
+      description:
+        "Enjoy a private full-day tour from Cape Town along scenic Clarence Drive to Hermanus for a Walker Bay whale watching boat trip, then visit the African Penguin colony at Stony Point, Harold Porter Botanical Garden and Kleinmond.",
+      keywords: [
+        "Hermanus whale watching tour",
+        "Hermanus day tour from Cape Town",
+        "Cape Whale Coast tour",
+        "Walker Bay whale watching",
+        "Clarence Drive tour",
+        "Stony Point penguin colony tour",
+        "Betty's Bay penguins tour",
+        "Harold Porter Botanical Garden tour",
+        "Kleinmond tour",
+        "Cape Town private day tour",
+        "Southern Right Whale tour",
+        "Hermanus boat-based whale watching",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "/src/assets/images/tours/packages/hermanus-whale-coast/1.webp",
+    images: ["/src/assets/images/tours/packages/hermanus-whale-coast/1.webp"],
+    imageFolder: "packages/hermanus-whale-coast",
+    videos: [],
+
+    location:
+      "Hermanus, Stony Point, Harold Porter Botanical Garden & Kleinmond, Western Cape, South Africa",
+
+    duration: "Full day",
+
+    priceBase: 4850,
+    minPeople: 2,
+
+    pricing: [
+      {
+        category: "Adult: 12 Years & Older",
+        pricePerPerson: 4850,
+        note: "Adult rate applies to guests aged 12 years and older.",
+      },
+      {
+        category: "Child: 4–11 Years",
+        pricePerPerson: 2350,
+        note: "Child rate for guests aged 4–11 years.",
+      },
+      {
+        category: "Toddler: 0–3 Years",
+        pricePerPerson: 0,
+        note: "Free*",
+      },
+    ],
+
+    additionalPricing: [],
+
+    groupPricing: {
+      enabled: true,
+      icon: "",
+      tiers: [
+        {
+          minPeople: 2,
+          maxPeople: 2,
+          perPerson: 4850,
+          label: "2 guests",
+          note: "Total group price: R9,700.",
+        },
+        {
+          minPeople: 3,
+          maxPeople: 3,
+          perPerson: 4650,
+          label: "3 guests",
+          note: "Total group price: R13,950.",
+        },
+        {
+          minPeople: 4,
+          maxPeople: 4,
+          perPerson: 4450,
+          label: "4 guests",
+          note: "Total group price: R17,800.",
+        },
+        {
+          minPeople: 5,
+          maxPeople: 5,
+          perPerson: 4250,
+          label: "5 guests",
+          note: "Total group price: R21,250.",
+        },
+        {
+          minPeople: 6,
+          maxPeople: 6,
+          perPerson: 4050,
+          label: "6 guests",
+          note: "Total group price: R24,300.",
+        },
+        {
+          minPeople: 7,
+          maxPeople: 7,
+          perPerson: 3950,
+          label: "7 guests",
+          note: "Total group price: R27,650.",
+        },
+        {
+          minPeople: 8,
+          maxPeople: 8,
+          perPerson: 3850,
+          label: "8 guests",
+          note: "Total group price: R30,800.",
+        },
+        {
+          minPeople: 9,
+          maxPeople: 9,
+          perPerson: 3750,
+          label: "9 guests",
+          note: "Total group price: R33,750.",
+        },
+        {
+          minPeople: 10,
+          maxPeople: 10,
+          perPerson: 3650,
+          label: "10 guests",
+          note: "Total group price: R36,500.",
+        },
+        {
+          minPeople: 11,
+          maxPeople: null,
+          perPerson: null,
+          label: "11+ guests",
+          note: "Custom quote based on group size and requirements.",
+        },
+      ],
+    },
+
+    familyPricing: {
+      enabled: true,
+      icon: "",
+      packages: [
+        {
+          adults: 2,
+          children: 1,
+          total: 10900,
+          label: "2 Adults + 1 Child",
+        },
+        {
+          adults: 2,
+          children: 2,
+          total: 13250,
+          label: "2 Adults + 2 Children",
+        },
+        {
+          adults: 2,
+          children: 3,
+          total: 15600,
+          label: "2 Adults + 3 Children",
+        },
+        {
+          adults: 2,
+          children: 4,
+          total: 17950,
+          label: "2 Adults + 4 Children",
+        },
+      ],
+      note: "Family package totals apply to children aged 4–11 years.",
+    },
+
+    description:
+      "A full-day marine and coastal adventure from Cape Town to the Cape Whale Coast. Travel along the scenic Clarence Drive route to Hermanus, then board a dedicated whale watching vessel in Walker Bay, one of the world's premier whale watching destinations. After leisure time in Hermanus, visit the African Penguin colony at Stony Point Nature Reserve, explore Harold Porter National Botanical Garden and enjoy a scenic stop in Kleinmond before returning to Cape Town. The experience includes a private air-conditioned vehicle, a professional driver-guide, your whale watching boat ticket and bottled water.",
+
+    highlights: [
+      {
+        text: "Scenic Clarence Drive coastal route with a viewpoint photo stop",
+      },
+      {
+        text: "Whale watching boat excursion in Walker Bay, Hermanus",
+      },
+      {
+        text: "Possible sightings of Southern Right Whales (seasonal), Humpback Whales and Bryde's Whales",
+      },
+      {
+        text: "Dolphins, Cape Fur Seals and seabirds on the water",
+      },
+      {
+        text: "Leisure time in Hermanus with optional lunch",
+      },
+      {
+        text: "Stony Point Nature Reserve, home to one of Africa's largest colonies of endangered African Penguins",
+      },
+      {
+        text: "Harold Porter National Botanical Garden and Kogelberg Biosphere scenery",
+      },
+      {
+        text: "Scenic stop in Kleinmond",
+      },
+      {
+        text: "Private air-conditioned vehicle and professional driver-guide",
+      },
+      {
+        text: "Whale watching boat ticket included",
+      },
+    ],
+
+    included: [
+      {
+        text: "Accommodation pick-up and drop-off in Cape Town",
+      },
+      {
+        text: "Professional driver-guide",
+      },
+      {
+        text: "Private air-conditioned vehicle",
+      },
+      {
+        text: "Whale watching boat ticket",
+      },
+      {
+        text: "Bottled water during transportation",
+      },
+      {
+        text: "Bottled water onboard the vessel",
+      },
+      {
+        text: "Clarence Drive scenic coastal route",
+      },
+      {
+        text: "Hermanus visit and free time",
+      },
+      {
+        text: "Stony Point penguin colony visit",
+      },
+      {
+        text: "Harold Porter Botanical Garden visit",
+      },
+      {
+        text: "Kleinmond coastal and cultural stop",
+      },
+    ],
+
+    excluded: [
+      {
+        text: "Lunch and beverages",
+      },
+      {
+        text: "Personal purchases and souvenirs",
+      },
+      {
+        text: "Gratuities / tips",
+      },
+      {
+        text: "Travel insurance",
+      },
+      {
+        text: "Additional snacks and refreshments",
+      },
+      {
+        text: "Optional activities not mentioned",
+      },
+      {
+        text: "Items of a personal nature",
+      },
+      {
+        text: "Alcoholic beverages",
+      },
+      {
+        text: "Medical expenses",
+      },
+      {
+        text: "Any item not listed under inclusions",
+      },
+    ],
+
+    pickupOptions: [
+      {
+        type: "hotel",
+        label: "Cape Town accommodation",
+        description:
+          "Private pick-up and drop-off from your accommodation in Cape Town. Collection is at 07:00.",
+      },
+    ],
+
+    requirements: [
+      "Guests should carry identification if required by the operator.",
+      "Guests must listen to the marine guide's safety briefing before boarding.",
+      "Guests should inform the guide of any mobility concerns.",
+      "Guests must follow all instructions from boat crew and reserve staff.",
+    ],
+
+    arrangements: {
+      availability:
+        "Whale watching departures are subject to sea and weather conditions and operator availability.",
+      duration: "Full day",
+      operatingTime: "07:00 – 18:15",
+      departure: "Cape Town accommodation (07:00)",
+      return: "Cape Town accommodation (approx. 17:45 – 18:15)",
+      location:
+        "Cape Town → Gordon's Bay → Clarence Drive → Hermanus (Walker Bay) → Stony Point Nature Reserve → Harold Porter Botanical Garden → Kleinmond → Cape Town",
+
+      clothing: [
+        "Comfortable walking shoes",
+        "Light windbreaker or jacket",
+        "Warm jersey or fleece (recommended year-round)",
+        "Weather-appropriate clothing",
+        "Layered clothing, as conditions can change quickly",
+      ],
+
+      thingsToBring: [
+        "Sunglasses",
+        "Sunscreen",
+        "Hat or cap",
+        "Camera or smartphone (fully charged)",
+        "Small daypack",
+        "Binoculars (optional)",
+        "Motion sickness tablets (if prone to seasickness)",
+        "Spending money for lunch or souvenirs",
+      ],
+
+      passengerPolicy:
+        "Guests are expected to follow the instructions of the professional driver-guide, the boat crew and reserve staff.",
+
+      notes: [
+        "Lunch and beverages are not included and are guest-paid.",
+        "Southern Right Whale sightings are seasonal; sightings of all species depend on migration patterns and cannot be guaranteed.",
+        "Enjoy a light breakfast before departure.",
+        "Stay hydrated throughout the day.",
+        "Keep your camera ready, as whale sightings can happen unexpectedly.",
+        "Motion sickness medication is recommended for sensitive guests.",
+        "Children aged 0–3 years travel free*.",
+      ],
+    },
+
+    cancellationPolicy: {
+      summary: "Refunds depend on how far in advance the booking is cancelled.",
+      items: [
+        {
+          notice: "More than 30 days prior",
+          refund: "100% refund less administration fees",
+        },
+        {
+          notice: "15–30 days prior",
+          refund: "75% refund",
+        },
+        {
+          notice: "7–14 days prior",
+          refund: "50% refund",
+        },
+        {
+          notice: "Less than 7 days prior",
+          refund: "No refund",
+        },
+        {
+          notice: "No-show",
+          refund: "No refund",
+        },
+      ],
+    },
+
+    weatherPolicy: {
+      summary:
+        "Whale watching departures are subject to sea and weather conditions.",
+      items: [
+        {
+          text: "If the boat operator cancels the excursion for safety reasons, guests receive a refund applicable to the whale watching ticket portion or may reschedule, subject to operator availability.",
+        },
+        {
+          text: "Cape Frontier Travel & Tours cannot be held liable for cancellations caused by adverse weather conditions.",
+        },
+        {
+          text: "Wildlife and seasonal sightings depend on migration patterns and cannot be guaranteed.",
+        },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "Guests must follow the safety requirements of the boat operator and the reserves visited.",
+      items: [
+        {
+          text: "Listen to the marine guide's safety briefing before boarding.",
+        },
+        {
+          text: "Follow all instructions from boat crew and reserve staff.",
+        },
+        {
+          text: "Respect wildlife and natural habitats.",
+        },
+        {
+          text: "Inform your guide of any mobility concerns.",
+        },
+      ],
+    },
+
+    /*
+     * FULL-DAY TOUR
+     * Uses stops rather than the multi-day itinerary structure.
+     */
+    itinerary: null,
+
+    stops: [
+      {
+        name: "Collection from Cape Town accommodation",
+        description:
+          "Private collection from your Cape Town accommodation to begin the day.",
+        time: "07:00",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Scenic Drive via Gordon's Bay",
+        description:
+          "Travel along the False Bay coastline via Gordon's Bay towards the Cape Whale Coast.",
+        time: "07:00 – 08:15",
+        duration: "",
+        type: "scenic",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Clarence Drive Viewpoint",
+        description:
+          "Photo stop on Clarence Drive, one of South Africa's most spectacular coastal roads, with views of False Bay, rugged mountains, dramatic cliffs and rocky shorelines.",
+        time: "08:15 – 08:30",
+        duration: "15 minutes",
+        type: "scenic",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Cape Whale Coast to Hermanus",
+        description:
+          "Continue along the Cape Whale Coast to Hermanus.",
+        time: "08:30 – 09:15",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Whale Watching Check-In",
+        description: "Check in for your whale watching boat excursion.",
+        time: "09:30",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Walker Bay Whale Watching Boat Experience",
+        description:
+          "Board a purpose-built whale watching vessel and venture into Walker Bay. Depending on seasonal migration patterns, you may see Southern Right Whales, Humpback Whales, Bryde's Whales, Common Dolphins, Cape Fur Seals and various seabirds, with commentary from knowledgeable marine guides.",
+        time: "10:00 – 12:00",
+        duration: "2 hours",
+        type: "wildlife",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Hermanus Town & Waterfront",
+        description:
+          "Leisure time to stroll the waterfront and cliff-top pathways, browse boutique shops and art galleries, and enjoy an optional lunch overlooking the ocean (guest-paid).",
+        time: "12:15 – 13:45",
+        duration: "1 hour 30 minutes",
+        type: "town",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Stony Point Nature Reserve",
+        description:
+          "Visit one of Africa's largest breeding colonies of endangered African Penguins in Betty's Bay. Elevated boardwalks allow close views of the penguins, cormorants, dassies (rock hyrax) and other coastal wildlife.",
+        time: "13:45 – 14:55",
+        duration: "45 minutes at the colony (travel from 13:45)",
+        type: "wildlife",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Harold Porter National Botanical Garden",
+        description:
+          "Explore one of South Africa's most beautiful botanical gardens, set between mountain and sea, with indigenous fynbos, gentle walking trails, seasonal wildflowers, mountain streams and Kogelberg Biosphere landscapes.",
+        time: "15:00 – 16:00",
+        duration: "1 hour",
+        type: "nature",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Kleinmond Scenic Stop",
+        description:
+          "Scenic stop in the seaside village of Kleinmond, whose name means \"small mouth\" in Afrikaans. The village lies within the UNESCO-recognised Kogelberg Biosphere Reserve and has links to the indigenous Khoi people and a fishing and maritime heritage.",
+        time: "16:00 – 16:15",
+        duration: "15 minutes",
+        type: "scenic",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Return to Cape Town",
+        description:
+          "Comfortable private journey back to Cape Town, with drop-off at your accommodation.",
+        time: "16:15 – 18:15",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+    ],
+
+    needToKnow: [
+      {
+        text: "Pick-up from Cape Town accommodation is at 07:00 and drop-off is between 17:45 and 18:15.",
+      },
+      {
+        text: "Adult pricing starts at R4,850 pp for 2 guests and reduces to R3,650 pp for 10 guests.",
+      },
+      {
+        text: "The child rate is R2,350 pp for ages 4–11. Guests aged 12 and older pay the adult rate. Ages 0–3 are free*.",
+      },
+      {
+        text: "Family packages: 2 adults + 1 child R10,900; + 2 children R13,250; + 3 children R15,600; + 4 children R17,950.",
+      },
+      {
+        text: "The whale watching boat ticket is included.",
+      },
+      {
+        text: "Lunch and beverages are not included.",
+      },
+      {
+        text: "Whale watching is subject to sea and weather conditions. If the operator cancels for safety reasons, the whale watching ticket portion is refunded or can be rescheduled subject to availability.",
+      },
+      {
+        text: "Southern Right Whale sightings are seasonal.",
+      },
+      {
+        text: "Cancellations: more than 30 days prior 100% refund less admin fees; 15–30 days 75%; 7–14 days 50%; less than 7 days and no-shows no refund.",
+      },
+      {
+        text: "Motion sickness medication is recommended for guests prone to seasickness.",
+      },
+      {
+        text: "Layered clothing and a warm jersey or fleece are recommended year-round.",
+      },
+    ],
+
+    faqs: [
+      {
+        question: "What is included in the tour?",
+        answer:
+          "The tour includes accommodation pick-up and drop-off in Cape Town, a professional driver-guide, a private air-conditioned vehicle, the whale watching boat ticket, bottled water during transportation and onboard the vessel, and visits to Clarence Drive, Hermanus, Stony Point, Harold Porter Botanical Garden and Kleinmond.",
+      },
+
+      {
+        question: "Is the whale watching boat ticket included?",
+        answer: "Yes. The whale watching boat ticket is included in the tour price.",
+      },
+
+      {
+        question: "Is lunch included?",
+        answer:
+          "No. Lunch and beverages are guest-paid. You will have free time in Hermanus to enjoy lunch at one of the local restaurants.",
+      },
+
+      {
+        question: "What whales and wildlife can we see?",
+        answer:
+          "Depending on seasonal migration patterns, you may see Southern Right Whales (seasonal), Humpback Whales, Bryde's Whales, Common Dolphins, Cape Fur Seals and seabirds. At Stony Point you can see African Penguins, cormorants and dassies.",
+      },
+
+      {
+        question: "What happens if the whale watching trip is cancelled?",
+        answer:
+          "Whale watching departures are subject to sea and weather conditions. If the boat operator cancels for safety reasons, you will receive a refund for the whale watching ticket portion or can reschedule, subject to operator availability.",
+      },
+
+      {
+        question: "What is the cancellation policy?",
+        answer:
+          "More than 30 days prior: 100% refund less administration fees. 15–30 days prior: 75% refund. 7–14 days prior: 50% refund. Less than 7 days prior and no-shows: no refund.",
+      },
+
+      {
+        question: "Is this tour suitable for children?",
+        answer:
+          "Yes. Children aged 4–11 pay a reduced rate, children aged 0–3 travel free*, and family packages are available. Guests aged 12 and older pay the adult rate.",
+      },
+
+      {
+        question: "Do we need motion sickness tablets?",
+        answer:
+          "Motion sickness medication is recommended for sensitive guests and anyone prone to seasickness, as the whale watching trip takes place on the open waters of Walker Bay.",
+      },
+
+      {
+        question: "What should we wear and bring?",
+        answer:
+          "Wear comfortable walking shoes and layered clothing, including a light windbreaker or jacket and a warm jersey or fleece. Bring sunglasses, sunscreen, a hat, a camera or smartphone, a small daypack and optionally binoculars.",
+      },
+
+      {
+        question: "What time does the tour start and end?",
+        answer:
+          "Collection from your Cape Town accommodation is at 07:00, with drop-off between approximately 17:45 and 18:15.",
+      },
+
+      {
+        question: "Is this a private tour?",
+        answer:
+          "The tour includes a private air-conditioned vehicle and a professional driver-guide for the full day.",
+      },
+
+      {
+        question: "What is the Clarence Drive route?",
+        answer:
+          "Clarence Drive is one of South Africa's most scenic coastal roads, winding along dramatic cliffs between Gordon's Bay and Betty's Bay with views of False Bay and rugged mountain ranges.",
+      },
+    ],
+
+    tags: [
+      "hermanus",
+      "whale-watching",
+      "whale-coast",
+      "walker-bay",
+      "clarence-drive",
+      "stony-point",
+      "penguins",
+      "harold-porter",
+      "botanical-garden",
+      "kleinmond",
+      "boat-trip",
+      "wildlife",
+      "cape-town",
+      "private-tour",
+      "day-tour",
+      "family-friendly",
+    ],
+  },
+  // Cape Peninsula Penguin Kayaking & Cape Point Explorer
+  {
+    id: 27,
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.DAY_TOUR,
+
+    title: "Cape Peninsula Penguin Kayaking & Cape Point Explorer",
+    slug: "cape-peninsula-penguin-kayaking-cape-point-explorer-tour",
+    canonicalPath:
+      "/tours/cape-peninsula-penguin-kayaking-cape-point-explorer-tour",
+    childFriendly: false,
+
+    seo: {
+      title:
+        "Cape Peninsula Penguin Kayaking, Cape Point & Chapman's Peak Full-Day Tour",
+      description:
+        "Paddle alongside African penguins in Simon's Town, visit Boulders Beach, ride the Flying Dutchman Funicular at Cape Point, stand at the Cape of Good Hope and drive Chapman's Peak on a full-day tour from Cape Town.",
+      keywords: [
+        "Cape Peninsula tour",
+        "Cape Point tour from Cape Town",
+        "Simon's Town kayaking",
+        "penguin kayaking Cape Town",
+        "Boulders Beach penguin tour",
+        "Cape of Good Hope tour",
+        "Flying Dutchman Funicular tour",
+        "Chapman's Peak Drive tour",
+        "Cape Town full-day tour",
+        "Cape Peninsula day tour",
+        "Cape Town kayaking tour",
+        "Cape Point and penguins tour",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "/src/assets/images/tours/packages/cape-peninsula-kayaking/1.webp",
+    images: [
+      "/src/assets/images/tours/packages/cape-peninsula-kayaking/1.webp",
+    ],
+    imageFolder: "packages/cape-peninsula-kayaking",
+    videos: [],
+
+    location:
+      "Simon's Town, Boulders Beach, Cape Point Nature Reserve & Chapman's Peak, Western Cape, South Africa",
+
+    duration: "Approximately 10.5 hours",
+
+    priceBase: 5995,
+    minPeople: 2,
+
+    pricing: [
+      {
+        category: "Adult",
+        pricePerPerson: 5995,
+        note: "Standard rate for 2 guests. Per-person rates reduce for larger groups.",
+      },
+      {
+        category: "Child",
+        pricePerPerson: null,
+        note: "Child rate not specified. Children must be accompanied by an adult. Please enquire.",
+      },
+    ],
+
+    additionalPricing: [],
+
+    groupPricing: {
+      enabled: true,
+      icon: "",
+      tiers: [
+        {
+          minPeople: 2,
+          maxPeople: 2,
+          perPerson: 5995,
+          label: "2 guests",
+          note: "Total group price: R11,990.",
+        },
+        {
+          minPeople: 3,
+          maxPeople: 3,
+          perPerson: 5495,
+          label: "3 guests",
+          note: "Total group price: R16,485.",
+        },
+        {
+          minPeople: 4,
+          maxPeople: 4,
+          perPerson: 4995,
+          label: "4 guests",
+          note: "Total group price: R19,980.",
+        },
+        {
+          minPeople: 5,
+          maxPeople: 5,
+          perPerson: 4850,
+          label: "5 guests",
+          note: "Total group price: R24,250.",
+        },
+        {
+          minPeople: 6,
+          maxPeople: 6,
+          perPerson: 4750,
+          label: "6 guests",
+          note: "Total group price: R28,500.",
+        },
+        {
+          minPeople: 7,
+          maxPeople: 7,
+          perPerson: 4650,
+          label: "7 guests",
+          note: "Total group price: R32,550.",
+        },
+        {
+          minPeople: 8,
+          maxPeople: 8,
+          perPerson: 4500,
+          label: "8 guests",
+          note: "Total group price: R36,000.",
+        },
+        {
+          minPeople: 9,
+          maxPeople: null,
+          perPerson: null,
+          label: "9+ guests",
+          note: "Custom quote based on group size and requirements.",
+        },
+      ],
+    },
+
+    description:
+      "A full-day adventure through the best of the Cape Peninsula. Paddle alongside African penguins on a guided ocean kayaking excursion in Simon's Town, visit the famous Boulders Beach penguin colony, explore Cape Point Nature Reserve, ride the Flying Dutchman Funicular to the historic lighthouse, visit the iconic Cape of Good Hope and finish with a drive along Chapman's Peak. The tour includes a private air-conditioned vehicle, a professional driver-guide, all kayaking equipment and safety gear, all listed entry fees and Chapman's Peak toll fees.",
+
+    highlights: [
+      {
+        text: "Guided 2-hour Simon's Town kayaking experience with opportunities to view penguins, seals and marine life",
+      },
+      {
+        text: "No previous kayaking experience required",
+      },
+      {
+        text: "Boulders Beach African Penguin colony and boardwalks",
+      },
+      {
+        text: "Cape Point Nature Reserve through indigenous fynbos and wildlife areas",
+      },
+      {
+        text: "Flying Dutchman Funicular ride and Cape Point Lighthouse visit",
+      },
+      {
+        text: "Cape of Good Hope viewing points and iconic sign photo",
+      },
+      {
+        text: "Scenic coastal route via Scarborough and Misty Cliffs",
+      },
+      {
+        text: "Chapman's Peak Drive with multiple photo stops over the Atlantic Ocean",
+      },
+      {
+        text: "Hotel pick-up and drop-off in a private air-conditioned vehicle",
+      },
+      {
+        text: "All listed entry fees, funicular ticket and Chapman's Peak toll fees included",
+      },
+    ],
+
+    included: [
+      {
+        text: "Hotel pick-up and drop-off",
+      },
+      {
+        text: "Private air-conditioned vehicle",
+      },
+      {
+        text: "Professional driver-guide",
+      },
+      {
+        text: "Guided Simon's Town kayaking experience",
+      },
+      {
+        text: "Kayaking equipment and safety gear",
+      },
+      {
+        text: "Life jacket and safety briefing",
+      },
+      {
+        text: "Boulders Beach penguin colony entry fee",
+      },
+      {
+        text: "Cape Point Nature Reserve entry fee",
+      },
+      {
+        text: "Flying Dutchman Funicular ticket",
+      },
+      {
+        text: "Chapman's Peak toll fees",
+      },
+      {
+        text: "Bottled water",
+      },
+      {
+        text: "Scenic coastal drive",
+      },
+      {
+        text: "Cape Point Lighthouse visit",
+      },
+      {
+        text: "Cape of Good Hope visit",
+      },
+      {
+        text: "Boulders Beach visit",
+      },
+      {
+        text: "Professional guided experience",
+      },
+    ],
+
+    excluded: [
+      {
+        text: "Lunch and beverages",
+      },
+      {
+        text: "Additional snacks",
+      },
+      {
+        text: "Personal expenses",
+      },
+      {
+        text: "Travel insurance",
+      },
+      {
+        text: "Souvenirs and curio purchases",
+      },
+      {
+        text: "Optional gratuities",
+      },
+      {
+        text: "Additional activities not listed",
+      },
+      {
+        text: "Alcoholic beverages",
+      },
+      {
+        text: "Medical expenses",
+      },
+      {
+        text: "Items of a personal nature",
+      },
+    ],
+
+    pickupOptions: [
+      {
+        type: "hotel",
+        label: "Cape Town CBD, V&A Waterfront, Sea Point, Green Point, Camps Bay & surrounds",
+        description:
+          "Hotel collection between 07:45 and 08:00 from Cape Town CBD, V&A Waterfront, Sea Point, Green Point, Camps Bay and surrounding areas, with drop-off at your accommodation at the end of the tour.",
+      },
+    ],
+
+    requirements: [
+      "No previous kayaking experience is required.",
+      "Children must be accompanied by an adult.",
+      "Life jackets are compulsory during kayaking.",
+      "Guests must attend the safety briefing before the kayaking activity.",
+      "Guests should carry valid identification or a passport where required.",
+      "Any medical conditions, mobility limitations or special requirements must be disclosed at the time of booking.",
+      "Guests are responsible for arriving at the collection point on time.",
+    ],
+
+    arrangements: {
+      availability:
+        "Subject to availability. The kayaking activity is subject to weather and sea conditions.",
+      duration: "Approximately 10.5 hours",
+      operatingTime: "07:45 – 18:30",
+      departure: "Cape Town hotel collection (07:45 – 08:00)",
+      return: "Cape Town accommodation (approx. 18:30)",
+      location:
+        "Cape Town → Simon's Town → Boulders Beach → Cape Point Nature Reserve → Two Oceans Restaurant → Cape Point Lighthouse → Cape of Good Hope → Scarborough → Misty Cliffs → Kommetjie → Noordhoek → Chapman's Peak Drive → Hout Bay → Cape Town",
+
+      clothing: [
+        "Comfortable walking shoes",
+        "Light jacket or windbreaker",
+        "Quick-dry clothing",
+        "Spare T-shirt",
+      ],
+
+      thingsToBring: [
+        "Hat or cap",
+        "Sunglasses",
+        "Sunscreen",
+        "Mobile phone",
+        "Waterproof phone pouch",
+        "Camera",
+        "Identification / passport",
+        "Bank card or cash for lunch",
+        "Personal medication",
+        "Small day backpack",
+        "Lightweight towel",
+      ],
+
+      passengerPolicy:
+        "Guests are expected to follow the instructions of the professional driver-guide, kayaking guides and venue staff.",
+
+      notes: [
+        "Total route distance is approximately 180 km.",
+        "Activity level is easy to moderate, with comfortable walking required at several attractions.",
+        "Lunch at Two Oceans Restaurant is on the guest's own account.",
+        "Wildlife sightings cannot be guaranteed.",
+        "Cape Point weather can change rapidly.",
+        "Routes, timings and attractions may be amended for operational, safety, weather-related or conservation reasons.",
+      ],
+    },
+
+    paymentTerms: {
+      summary:
+        "All prices are quoted in South African Rand (ZAR). Bookings are subject to availability.",
+      items: [
+        {
+          text: "A 30% deposit is required to secure and confirm your booking.",
+        },
+        {
+          text: "The remaining balance must be paid no later than 7 days prior to departure.",
+        },
+        {
+          text: "Bookings made within 7 days of departure require full payment at the time of booking.",
+        },
+        {
+          text: "Accepted payment methods: EFT bank transfer, credit/debit card, secure online payment link and approved electronic payment methods.",
+        },
+        {
+          text: "Special rates are available for groups of 5 or more guests.",
+        },
+        {
+          text: "Private tour rates are available on request, subject to availability.",
+        },
+      ],
+    },
+
+    cancellationPolicy: {
+      summary:
+        "Cancellation fees depend on how far in advance the booking is cancelled.",
+      items: [
+        {
+          notice: "More than 30 days before departure",
+          refund: "Deposit forfeited (30% of total booking value)",
+        },
+        {
+          notice: "15–30 days before departure",
+          refund: "50% of total tour cost payable",
+        },
+        {
+          notice: "8–14 days before departure",
+          refund: "75% of total tour cost payable",
+        },
+        {
+          notice: "7 days or less before departure",
+          refund: "100% of total tour cost payable",
+        },
+        {
+          notice: "No-show on departure day",
+          refund: "100% cancellation fee applies",
+        },
+        {
+          notice: "Late arrival resulting in missed departure",
+          refund: "No refund",
+        },
+        {
+          notice: "Voluntary tour curtailment",
+          refund: "No refunds for unused services, activities, accommodation or transport",
+        },
+      ],
+      refundProcessing:
+        "Approved refunds are processed within 7–14 business days, less any applicable supplier charges and administration fees.",
+    },
+
+    weatherPolicy: {
+      summary:
+        "Safety is the highest priority. Kayaking is subject to weather and sea conditions.",
+      items: [
+        {
+          text: "If conditions are unsuitable due to strong wind, large ocean swells or rough seas, the kayaking operator may adjust departure times, modify the route or postpone the activity for safety reasons.",
+        },
+        {
+          text: "Activities affected by unsafe weather may be substituted, rescheduled or partially refunded, subject to supplier policies and availability.",
+        },
+        {
+          text: "Cape Point weather can change rapidly.",
+        },
+        {
+          text: "Cape Frontier Travel & Tours is not responsible for cancellations, delays, route changes or service interruptions caused by circumstances beyond its control, including adverse weather, road closures, natural disasters, strikes, government restrictions or supplier failures.",
+        },
+      ],
+    },
+
+    safetyPolicy: {
+      summary:
+        "All kayaking is conducted by qualified guides, with safety equipment provided.",
+      items: [
+        {
+          text: "A safety briefing and equipment are provided before departure.",
+        },
+        {
+          text: "Life jackets are compulsory.",
+        },
+        {
+          text: "Routes may be adjusted according to sea and weather conditions.",
+        },
+        {
+          text: "Participation in all activities is at the guest's own risk.",
+        },
+        {
+          text: "Comprehensive travel insurance is strongly recommended for all guests.",
+        },
+      ],
+    },
+
+    /*
+     * FULL-DAY TOUR
+     * Uses stops rather than the multi-day itinerary structure.
+     */
+    itinerary: null,
+
+    stops: [
+      {
+        name: "Hotel Collection",
+        description:
+          "Collection from Cape Town CBD, V&A Waterfront, Sea Point, Green Point, Camps Bay and surrounding areas.",
+        time: "07:45 – 08:00",
+        duration: "",
+        distance: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Scenic Transfer to Simon's Town",
+        description:
+          "Travel via Muizenberg, Kalk Bay, Fish Hoek and the False Bay coastline.",
+        time: "08:00 – 09:15",
+        duration: "1 hour 15 minutes",
+        distance: "42 km",
+        type: "scenic",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Simon's Town Penguin Kayaking",
+        description:
+          "A guided 2-hour kayaking experience covering approximately 7 km of paddling, with opportunities to view penguins, seals and marine life. No previous experience is required, and all equipment and safety gear are provided.",
+        time: "09:15 – 11:15",
+        duration: "2 hours",
+        distance: "±7 km paddling",
+        type: "activity",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Comfort & Refreshment Break",
+        description:
+          "Change clothes, enjoy refreshments and prepare for the next stop.",
+        time: "11:15 – 11:30",
+        duration: "15 minutes",
+        distance: "",
+        type: "break",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Boulders Beach Penguin Colony",
+        description:
+          "Visit the famous African Penguin colony and walk the boardwalks.",
+        time: "11:30 – 12:15",
+        duration: "45 minutes",
+        distance: "3 km",
+        type: "wildlife",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Drive to Cape Point Nature Reserve",
+        description:
+          "Scenic drive through indigenous fynbos and wildlife areas.",
+        time: "12:15 – 12:45",
+        duration: "30 minutes",
+        distance: "18 km",
+        type: "scenic",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Lunch Stop",
+        description:
+          "Lunch at Two Oceans Restaurant, on your own account.",
+        time: "12:45 – 13:45",
+        duration: "1 hour",
+        distance: "2 km",
+        type: "meal",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Flying Dutchman Funicular & Cape Point Lighthouse",
+        description:
+          "Ride the Flying Dutchman Funicular and visit the historic Cape Point Lighthouse.",
+        time: "13:45 – 14:45",
+        duration: "1 hour",
+        distance: "2 km",
+        type: "attraction",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Cape of Good Hope",
+        description:
+          "Explore the viewing points and photograph the iconic Cape of Good Hope sign.",
+        time: "14:45 – 15:30",
+        duration: "45 minutes",
+        distance: "7 km",
+        type: "scenic",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Scarborough & Misty Cliffs Coastal Route",
+        description:
+          "Scenic drive along the western Peninsula coastline.",
+        time: "15:30 – 16:15",
+        duration: "45 minutes",
+        distance: "30 km",
+        type: "scenic",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Chapman's Peak Drive",
+        description:
+          "Drive Chapman's Peak with multiple photo stops overlooking the Atlantic Ocean.",
+        time: "16:15 – 17:15",
+        duration: "1 hour",
+        distance: "15 km",
+        type: "scenic",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Return to Cape Town",
+        description:
+          "Travel back via Hout Bay, Camps Bay and the Atlantic Seaboard, with drop-off at your accommodation.",
+        time: "17:15 – 18:30",
+        duration: "1 hour 15 minutes",
+        distance: "35 km",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+    ],
+
+    needToKnow: [
+      {
+        text: "Hotel collection is between 07:45 and 08:00, with drop-off at approximately 18:30.",
+      },
+      {
+        text: "The tour lasts approximately 10.5 hours and covers about 180 km.",
+      },
+      {
+        text: "Adult pricing starts at R5,995 pp for 2 guests, R5,495 pp for 3 guests and R4,995 pp for 4 guests, reducing further for groups of 5 to 8.",
+      },
+      {
+        text: "Entry fees for Boulders Beach and Cape Point, the Flying Dutchman Funicular ticket and Chapman's Peak toll fees are included.",
+      },
+      {
+        text: "Lunch at Two Oceans Restaurant is not included and is on the guest's own account.",
+      },
+      {
+        text: "No previous kayaking experience is required, and life jackets are compulsory.",
+      },
+      {
+        text: "Kayaking is subject to weather and sea conditions and may be adjusted, modified or postponed for safety.",
+      },
+      {
+        text: "Children must be accompanied by an adult.",
+      },
+      {
+        text: "Activity level is easy to moderate, with comfortable walking at several attractions.",
+      },
+      {
+        text: "A 30% deposit secures your booking, with the balance due 7 days before departure.",
+      },
+      {
+        text: "Cancellation fees: more than 30 days, deposit forfeited; 15–30 days, 50%; 8–14 days, 75%; 7 days or less and no-shows, 100%.",
+      },
+      {
+        text: "Wildlife sightings cannot be guaranteed and Cape Point weather can change rapidly.",
+      },
+    ],
+
+    faqs: [
+      {
+        question: "What is included in the tour?",
+        answer:
+          "The tour includes hotel pick-up and drop-off, a private air-conditioned vehicle, a professional driver-guide, the guided Simon's Town kayaking experience with equipment, life jacket and safety briefing, Boulders Beach and Cape Point Nature Reserve entry fees, the Flying Dutchman Funicular ticket, Chapman's Peak toll fees and bottled water.",
+      },
+
+      {
+        question: "Do I need kayaking experience?",
+        answer:
+          "No. No previous kayaking experience is required. A safety briefing and equipment are provided, and the activity is led by qualified guides.",
+      },
+
+      {
+        question: "How long is the kayaking?",
+        answer:
+          "The guided kayaking experience is approximately 2 hours and covers about 7 km of paddling, with opportunities to see penguins, seals and marine life.",
+      },
+
+      {
+        question: "Will we definitely see penguins while kayaking?",
+        answer:
+          "Wildlife sightings cannot be guaranteed. You will also visit the Boulders Beach penguin colony and its boardwalks later in the day.",
+      },
+
+      {
+        question: "What happens if the weather is bad?",
+        answer:
+          "If strong wind, large swells or rough seas make kayaking unsafe, the kayaking operator may adjust departure times, modify the route or postpone the activity. Activities affected by unsafe weather may be substituted, rescheduled or partially refunded, subject to supplier policies and availability.",
+      },
+
+      {
+        question: "Is lunch included?",
+        answer:
+          "No. Lunch is at Two Oceans Restaurant in Cape Point Nature Reserve on your own account. Please bring a bank card or cash.",
+      },
+
+      {
+        question: "Are entry fees and toll fees included?",
+        answer:
+          "Yes. The Boulders Beach and Cape Point Nature Reserve entry fees, the Flying Dutchman Funicular ticket and the Chapman's Peak toll fees are included.",
+      },
+
+      {
+        question: "What should we wear and bring?",
+        answer:
+          "Wear comfortable walking shoes and quick-dry clothing, and bring a light jacket or windbreaker, a spare T-shirt, a lightweight towel, a hat, sunglasses, sunscreen, a camera, a waterproof phone pouch, identification or passport, and a bank card or cash for lunch.",
+      },
+
+      {
+        question: "Can children join the tour?",
+        answer:
+          "Children must be accompanied by an adult. A child rate is not specified, so please contact us to confirm suitability and pricing for your group.",
+      },
+
+      {
+        question: "Where do you pick us up?",
+        answer:
+          "Collection is between 07:45 and 08:00 from Cape Town CBD, V&A Waterfront, Sea Point, Green Point, Camps Bay and surrounding areas.",
+      },
+
+      {
+        question: "How do I book and pay?",
+        answer:
+          "A 30% deposit confirms your booking and the balance is due at least 7 days before departure. Bookings within 7 days of departure require full payment. We accept EFT, credit/debit card and secure online payment links.",
+      },
+
+      {
+        question: "What is the cancellation policy?",
+        answer:
+          "More than 30 days before departure: deposit forfeited (30%). 15–30 days: 50% payable. 8–14 days: 75% payable. 7 days or less and no-shows: 100% payable. Late arrival resulting in a missed departure is non-refundable.",
+      },
+    ],
+
+    tags: [
+      "cape-peninsula",
+      "simons-town",
+      "kayaking",
+      "penguins",
+      "boulders-beach",
+      "cape-point",
+      "cape-of-good-hope",
+      "funicular",
+      "chapmans-peak",
+      "scenic-drive",
+      "wildlife",
+      "adventure",
+      "cape-town",
+      "day-tour",
+    ],
+  },
+  // Aquila Private Game Reserve Full Day Safari
+  {
+    id: null, // assign
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.FULL_DAY, // West Coast uses DAY_TOUR; swap if that is now in your enum
+    childFriendly: true, // child rate supplied (QUERY CLIENT: minimum age for the game drive)
+
+    title: "Aquila Private Game Reserve Full Day Safari",
+    slug: "aquila-private-game-reserve-full-day-safari",
+    canonicalPath: "/tours/aquila-private-game-reserve-full-day-safari",
+
+    seo: {
+      title:
+        "Aquila Big 5 Safari Full-Day Tour from Cape Town | Cape Frontier Tours",
+      description:
+        "Full-day Big 5 safari at Aquila Private Game Reserve from Cape Town: scenic Winelands drive, open-vehicle game drive and buffet lunch. Malaria-free.",
+      keywords: [
+        "Aquila safari",
+        "Aquila Private Game Reserve",
+        "Aquila Big 5 safari day tour",
+        "Cape Town safari day trip",
+        "Big 5 safari from Cape Town",
+        "malaria-free safari Cape Town",
+        "Cape Town full day safari",
+        "Aquila game reserve tour",
+        "Cape Winelands and safari tour",
+        "Cape Town Big 5 day tour",
+        "Cape Town family safari",
+        "Karoo safari tour",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image: "/src/assets/images/tours/packages/aquila-safari/1.webp", // TODO
+    images: getTourImages("packages/aquila-safari", 5), // TODO: number of hero images in the folder
+    imageFolder: "packages/aquila-safari",
+    videos: [],
+
+    location: "Aquila Private Game Reserve, Western Cape, South Africa",
+
+    duration: "Full day (approximately 10 hours)", // QUERY CLIENT: 06:00 collection to 18:30 return is closer to 12 hours
+
+    priceBase: 4900,
+    minPeople: 2, // QUERY CLIENT: the group rates start at 2 guests
+
+    pricing: [
+      {
+        category: "Adult",
+        pricePerPerson: 4900,
+        note: "",
+      },
+      {
+        category: "Child (age range to be confirmed)", // QUERY CLIENT
+        pricePerPerson: 2450,
+        note: "Child rate per person.",
+      },
+
+      // QUERY CLIENT: left out on purpose (no rate supplied; null would render "R0.00" or "RNaN")
+      // { category: "Toddler", pricePerPerson: ???, note: "" },
+    ],
+
+    additionalPricing: [],
+
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        {
+          minPeople: 2,
+          maxPeople: 3,
+          perPerson: 4900,
+          label: "2–3 guests",
+          note: "Adult rate for groups of 2–3 guests.",
+        },
+        {
+          minPeople: 4,
+          maxPeople: 6,
+          perPerson: 4650,
+          label: "4–6 guests",
+          note: "Adult rate for groups of 4–6 guests.",
+        },
+        {
+          minPeople: 7,
+          maxPeople: 10,
+          perPerson: 4450,
+          label: "7–10 guests",
+          note: "Adult rate for groups of 7–10 guests.",
+        },
+        {
+          minPeople: 11,
+          maxPeople: 15,
+          perPerson: 4250,
+          label: "11–15 guests",
+          note: "Adult rate for groups of 11–15 guests.",
+        },
+        {
+          minPeople: 16,
+          maxPeople: null,
+          perPerson: null,
+          label: "16+ guests",
+          note: "Price on request.",
+        },
+      ],
+    },
+
+    description:
+      "A full-day Big 5 safari experience at Aquila Private Game Reserve, starting with collection from your Cape Town hotel or accommodation. Travel through the Cape Winelands, past Paarl and Worcester, the Breede River Valley and the Hex River Mountains into the Karoo, with commentary from your guide on the region's history, agriculture, wine production and culture. At Aquila, enjoy a welcome drink, a buffet lunch with local and international dishes, leisure time at the lodge and a guided open-vehicle game drive with a professional ranger, keeping watch for lion, elephant, rhino, buffalo and leopard. It is a malaria-free safari, with a scenic return journey to Cape Town in the early evening.",
+
+    highlights: [
+      {
+        text: "Full-day Big 5 safari experience at Aquila Private Game Reserve",
+      },
+      {
+        text: "Scenic Cape Winelands route through Paarl, Worcester and the Hex River Valley",
+      },
+      {
+        text: "Guided open-vehicle game drive with a professional safari ranger",
+      },
+      {
+        text: "Buffet lunch with local and international dishes included",
+      },
+      {
+        text: "Welcome drink on arrival at the lodge",
+      },
+      {
+        text: "Wildlife photography opportunities in a luxury game reserve setting",
+      },
+      {
+        text: "Malaria-free safari experience",
+      },
+      {
+        text: "Return transfers from your Cape Town accommodation",
+      },
+    ],
+
+    included: [
+      {
+        text: "Return hotel or accommodation transfers from Cape Town",
+      },
+      {
+        text: "Air-conditioned vehicle transportation",
+      },
+      {
+        text: "Professional driver-guide",
+      },
+      {
+        text: "Scenic drive through the Cape Winelands, Paarl and Worcester",
+      },
+      {
+        text: "Welcome drink on arrival at Aquila",
+      },
+      {
+        text: "Aquila Private Game Reserve entrance fees",
+      },
+      {
+        text: "Guided Big 5 safari game drive in an open safari vehicle",
+      },
+      {
+        text: "Professional safari ranger",
+      },
+      {
+        text: "Buffet lunch at Aquila Lodge",
+      },
+      {
+        text: "Free time to enjoy the lodge facilities",
+      },
+      {
+        text: "Wildlife viewing opportunities (Big 5 and other species)",
+      },
+      {
+        text: "Educational commentary on wildlife, conservation and the Karoo ecosystem",
+      },
+      {
+        text: "Malaria-free safari experience",
+      },
+    ],
+
+    excluded: [
+      {
+        text: "Personal expenses",
+      },
+      {
+        text: "Gratuities and tips (optional)",
+      },
+      {
+        text: "Additional beverages not included with lunch",
+      },
+      {
+        text: "Snacks purchased outside the lodge",
+      },
+      {
+        text: "Personal travel insurance",
+      },
+      {
+        text: "Souvenirs and curio purchases",
+      },
+      {
+        text: "Additional activities not specified in the itinerary",
+      },
+      {
+        text: "Alcoholic beverages (unless specifically included by Aquila)",
+      },
+      {
+        text: "Breakfast before departure",
+      },
+      {
+        text: "Dinner after returning to Cape Town",
+      },
+      {
+        text: "Items of a personal nature",
+      },
+      {
+        text: "Medical expenses",
+      },
+      {
+        text: "Any services not specifically listed as included",
+      },
+    ],
+
+    pickupOptions: [
+      {
+        type: "hotel",
+        label: "Cape Town hotel or accommodation",
+        description:
+          "Collection from your Cape Town hotel or accommodation between 06:00 and 06:30, with a return transfer in the evening.",
+      },
+    ],
+
+    requirements: [], // QUERY CLIENT: minimum age, ID or other requirements
+
+    arrangements: {
+      availability: "", // QUERY CLIENT: operating days, or on request?
+      duration: "Full day (approximately 10 hours)",
+      operatingTime: "Collection 06:00–06:30, return 18:00–18:30",
+      departure: "Cape Town hotel or accommodation, 06:00–06:30",
+      return: "Cape Town hotel or accommodation, 18:00–18:30",
+      location:
+        "Cape Town → Paarl → Worcester → Hex River Valley → Aquila Private Game Reserve → Cape Town",
+
+      clothing: [],
+
+      thingsToBring: [],
+
+      passengerPolicy: "",
+
+      notes: [
+        "Arrival at Aquila Private Game Reserve is at approximately 10:30, and the return journey starts at approximately 15:30.",
+        "A welcome drink is served on arrival.",
+        "The buffet lunch at Aquila Lodge is included; additional beverages are not.",
+        "The game drive is in an open safari vehicle with a professional ranger.",
+        "This is a malaria-free safari.",
+        "Breakfast before departure and dinner after the return are not included.",
+      ],
+    },
+
+    weatherPolicy: null, // not supplied
+
+    cancellationPolicy: {
+      summary:
+        "Refunds depend on how far ahead of departure you cancel. Late cancellations and no-shows are not refunded.",
+      items: [
+        { text: "10–14 days before departure: 100% refund" },
+        { text: "7 days before departure: 75% refund" },
+        { text: "48–72 hours before departure: 50% refund" },
+        { text: "Less than 48 hours before departure: no refund" },
+        { text: "No-show: no refund" },
+      ],
+    },
+
+    safetyPolicy: null, // not supplied
+
+    /*
+     * FULL-DAY TOUR
+     * Uses stops rather than the multi-day itinerary structure.
+     */
+    itinerary: null,
+
+    stops: [
+      {
+        name: "Cape Town Collection",
+        description:
+          "Collection from your Cape Town hotel or accommodation between 06:00 and 06:30, with a welcome briefing as you leave the city behind.",
+        time: "06:00–06:30",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Scenic Journey through the Cape Winelands",
+        description:
+          "Travel through the Cape Winelands, passing the historic towns of Paarl and Worcester, with views of Paarl Rock, world-renowned vineyards and wine estates, the fertile Breede River Valley, the dramatic Hex River Mountains and expansive Karoo landscapes and fynbos. Your guide shares insights into the region's history, agriculture, wine production and local culture.",
+        time: "",
+        duration: "±2.5 hours",
+        type: "scenic",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Arrival & Welcome Drink",
+        description:
+          "Arrive at Aquila Private Game Reserve at approximately 10:30, where a welcome drink awaits before you settle into the lodge surroundings.",
+        time: "10:30",
+        duration: "",
+        type: "nature",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Buffet Lunch at Aquila Lodge",
+        description:
+          "A buffet lunch with a variety of local and international dishes, included in the tour price. Additional beverages are at your own cost.",
+        time: "",
+        duration: "",
+        type: "meal",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Leisure Time at the Lodge",
+        description:
+          "Free time to enjoy the lodge facilities and views.",
+        time: "",
+        duration: "",
+        type: "leisure",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Big 5 Safari Game Drive",
+        description:
+          "A guided open-vehicle game drive with a professional ranger. Keep watch for lion, elephant, rhino, buffalo and leopard, as well as giraffe, zebra, wildebeest, springbok, ostrich, baboons and many other species. Your ranger shares information about the animals, conservation efforts and the unique Karoo ecosystem.",
+        time: "",
+        duration: "",
+        type: "safari",
+        optional: false,
+        image: "",
+      },
+
+      {
+        name: "Return Journey to Cape Town",
+        description:
+          "Depart Aquila at approximately 15:30 and travel back through the Hex River Valley, magnificent mountain passes, Worcester's fruit-growing region, the Cape Winelands, and Paarl. Arrive at your accommodation between 18:00 and 18:30.",
+        time: "15:30",
+        duration: "",
+        type: "transport",
+        optional: false,
+        image: "",
+      },
+    ],
+
+    needToKnow: [
+      {
+        text: "Adults are R4,900 per person for 2–3 guests, R4,650 for 4–6 guests, R4,450 for 7–10 guests and R4,250 for 11–15 guests.",
+      },
+      {
+        text: "Groups of 16 or more are priced on request.",
+      },
+      {
+        text: "The child rate is R2,450 per person.",
+      },
+      {
+        text: "Collection from your Cape Town accommodation is between 06:00 and 06:30, with a return between 18:00 and 18:30.",
+      },
+      {
+        text: "The buffet lunch at Aquila Lodge and a welcome drink are included.",
+      },
+      {
+        text: "Additional beverages, snacks, souvenirs and gratuities are not included.",
+      },
+      {
+        text: "Breakfast before departure and dinner after the return are not included.",
+      },
+      {
+        text: "Aquila is a malaria-free safari destination.",
+      },
+      {
+        text: "Cancellation: 100% refund 10–14 days before departure, 75% at 7 days, 50% at 48–72 hours, and no refund less than 48 hours before departure or for a no-show.",
+      },
+    ],
+
+    faqs: [
+      {
+        question: "What is included in the tour?",
+        answer:
+          "The tour includes return transfers from your Cape Town hotel or accommodation, an air-conditioned vehicle with a professional driver-guide, a scenic Winelands drive, a welcome drink, Aquila Private Game Reserve entrance fees, a guided Big 5 game drive in an open vehicle with a professional ranger, and a buffet lunch at Aquila Lodge.",
+      },
+
+      {
+        question: "Is lunch included?",
+        answer:
+          "Yes. A buffet lunch with local and international dishes is included at Aquila Lodge. Additional beverages are not included.",
+      },
+
+      {
+        question: "Which animals can we see?",
+        answer:
+          "Keep watch for lion, elephant, rhino, buffalo and leopard, as well as giraffe, zebra, wildebeest, springbok, ostrich, baboons and many other species.",
+      },
+
+      {
+        question: "Is this a malaria-free safari?",
+        answer: "Yes. Aquila Private Game Reserve is a malaria-free safari experience.",
+      },
+
+      {
+        question: "What time do we leave and return?",
+        answer:
+          "Collection is between 06:00 and 06:30 from your Cape Town accommodation. You arrive at Aquila at about 10:30, leave at about 15:30 and are back between 18:00 and 18:30.",
+      },
+
+      {
+        question: "How long is the drive to the reserve?",
+        answer:
+          "The scenic drive through the Cape Winelands to Aquila takes approximately 2.5 hours, through Paarl, Worcester and the Hex River Valley.",
+      },
+
+      {
+        question: "Is the game drive in an open vehicle?",
+        answer:
+          "Yes. The game drive is in an open safari vehicle with a professional ranger.",
+      },
+
+      {
+        question: "Is this tour suitable for children?",
+        answer:
+          "Yes. A child rate of R2,450 per person is available. Please contact us for the age range.",
+      },
+
+      {
+        question: "How much does the tour cost?",
+        answer:
+          "Adults are R4,900 per person for 2–3 guests, R4,650 for 4–6, R4,450 for 7–10 and R4,250 for 11–15 guests. Children are R2,450 per person, and groups of 16 or more are priced on request.",
+      },
+
+      {
+        question: "What is the cancellation policy?",
+        answer:
+          "You get a 100% refund 10–14 days before departure, 75% at 7 days, 50% at 48–72 hours, and no refund less than 48 hours before departure or for a no-show.",
+      },
+
+      {
+        question: "Where can you pick us up?",
+        answer:
+          "We collect you from your Cape Town hotel or accommodation between 06:00 and 06:30 and bring you back in the evening.",
+      },
+    ],
+
+    tags: [
+      "aquila",
+      "aquila-private-game-reserve",
+      "big-5",
+      "safari",
+      "game-drive",
+      "malaria-free",
+      "karoo",
+      "cape-winelands",
+      "wildlife",
+      "cape-town",
+      "day-tour",
+      "family-friendly",
+    ],
+  },
   // 3-Day / 2-Night Garden Route & Safari Escape
   {
     id: 27, 
@@ -8492,7 +11403,7 @@ export const tours = [
   },
   // 4-Day Cape Town Signature Explorer
   {
-    id: null, // assign
+    id: 28, // assign
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.MULTI_DAY,
 
@@ -10034,7 +12945,7 @@ export const tours = [
   },
   // 5-Day Garden Route & Gondwana Big 5 Safari Tour
   {
-    id: null, // assign
+    id: 30, // assign
     type: TOUR_TYPES.PACKAGES,
     category: TOUR_MODIFIERS.MULTI_DAY,
 
@@ -10650,6 +13561,1539 @@ export const tours = [
       "Wine Tasting",
       "Wildlife",
       "Luxury Safari",
+      "South Africa",
+    ],
+  },
+  // 5-Day Botlierskop Safari & Cape Agulhas Discovery Tour
+  {
+    id: null, // assign
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.MULTI_DAY,
+
+    title: "5-Day Botlierskop Safari & Cape Agulhas Discovery Tour",
+    slug: "5-day-botlierskop-safari-cape-agulhas-discovery-tour",
+    canonicalPath:
+      "/tours/5-day-botlierskop-safari-cape-agulhas-discovery-tour",
+    // daysInAdvance: ???, // QUERY CLIENT (booking cut-off)
+
+    seo: {
+      title:
+        "5-Day Botlierskop Safari & Cape Agulhas Tour from Cape Town | Cape Frontier Tours",
+      description:
+        "5 days, 4 nights from Cape Town: Route 62, Cango Caves, a Botlierskop safari, Knysna, Robberg, Cape Agulhas, Hermanus and Betty's Bay penguins.",
+      keywords: [
+        "5 day Garden Route tour",
+        "Botlierskop safari tour",
+        "Botlierskop Private Game Reserve",
+        "Cape Agulhas tour from Cape Town",
+        "Route 62 tour",
+        "Cango Caves tour",
+        "Knysna Heads tour",
+        "Robberg Nature Reserve tour",
+        "Hermanus tour",
+        "Benguela Cove wine tasting",
+        "Betty's Bay penguin colony tour",
+        "Cape Town multi-day tour",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image:
+      "/src/assets/images/tours/packages/5-day-botlierskop-safari/1.webp", // TODO
+    images: getTourImages(
+      "packages/5-day-botlierskop-safari",
+      5, // TODO: number of hero images in the folder
+    ),
+    imageFolder: "packages/5-day-botlierskop-safari",
+    videos: [],
+
+    location:
+      "Oudtshoorn, Botlierskop, Knysna, Cape Agulhas, Hermanus & Betty's Bay, Western Cape, South Africa",
+    duration: "5 Days / 4 Nights",
+
+    priceBase: 29500,
+    minPeople: 2, // QUERY CLIENT: solo travellers not mentioned
+    maxPeople: 10, // QUERY CLIENT: the discount table stops at 10 guests
+    childFriendly: true, // family pricing supplied
+
+    pricing: [
+      {
+        category: "Adult",
+        pricePerPerson: 29500,
+        note: "Per person. A 10% group discount applies for 7–10 guests (R26,550 per person).",
+      },
+      {
+        category: "Child: 4–11 Years",
+        pricePerPerson: 22125,
+        note: "Child rate for guests aged 4–11 years.",
+      },
+      {
+        category: "Child: 12+ Years",
+        pricePerPerson: 29500,
+        note: "Guests aged 12 and over pay the adult rate.",
+      },
+      {
+        category: "Toddler: Under 3 Years",
+        pricePerPerson: 0, // QUERY CLIENT: age 3 is not covered by the source
+        note: "Free of charge.",
+      },
+    ],
+
+    /*
+     * FAMILY TOTALS (supplied by client, ZAR):
+     *   2 Adults                                       R59,000
+     *   2 Adults + 1 child (4–11)                      R81,125
+     *   2 Adults + 2 children (4–11)                   R103,250
+     *   2 Adults + 1 child (12+)                       R88,500
+     *   2 Adults + 1 child (4–11) + 1 child (12+)      R110,625
+     *   2 Adults + 1 child under 3                     R59,000
+     * All are simply the per-person rates above added together, so they are
+     * covered by `pricing`.
+     */
+
+    additionalPricing: [
+      {
+        type: "request",
+        category: "Knysna Sunset Cruise (approx. 90 minutes)",
+        price: null,
+        unit: "per person",
+        currency: "ZAR",
+        note: "Optional. Price on request.", // QUERY CLIENT: the inclusions list has it as included
+      },
+    ],
+
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        {
+          minPeople: 2,
+          maxPeople: 6,
+          perPerson: 29500,
+          label: "2–6 guests",
+          note: "Standard adult rate.", // implied by the family pricing
+        },
+        {
+          minPeople: 7,
+          maxPeople: 10,
+          perPerson: 26550,
+          label: "7–10 guests",
+          note: "Adult rate with 10% group discount already included.",
+        },
+      ],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "Experience the very best of the Western Cape and the Garden Route on a carefully designed 5-day, 4-night journey of coastal beauty, wildlife, adventure and discovery. Travel the scenic Route 62 through the Klein Karoo, explore the famous Cango Caves and the ostrich capital of South Africa, then spend a full day on safari at Botlierskop Private Game Reserve. Discover the natural beauty of Knysna and Robberg Nature Reserve, stand at the southernmost tip of Africa at Cape Agulhas, and enjoy the charm of Hermanus. Taste selected Benguela Cove wines overlooking the lagoon, vineyards and mountains, meet the African penguins at Betty's Bay and return to Cape Town along one of South Africa's most spectacular coastal routes.",
+
+    highlights: [
+      { text: "Route 62 scenic journey" },
+      { text: "Cango Caves guided Heritage Tour" },
+      { text: "Ostrich farm experience in Oudtshoorn" },
+      {
+        text: "Full-day Botlierskop safari: morning and afternoon game drives, professional guide, safari lunch and refreshments",
+      },
+      { text: "Knysna Heads viewpoint and Knysna Waterfront" },
+      { text: "Robberg Nature Reserve coastal scenery and seal colonies" },
+      { text: "Cape Agulhas, the southernmost tip of Africa" },
+      { text: "Hermanus coastal experience" },
+      { text: "Premium wine tasting at Benguela Cove Lagoon Wine Estate" },
+      { text: "African penguins at Stony Point, Betty's Bay" },
+      { text: "Clarence Drive (R44) coastal return to Cape Town" },
+    ],
+
+    included: [
+      { text: "Private air-conditioned vehicle" },
+      { text: "Professional registered driver-guide" },
+      { text: "Airport and hotel transfers" },
+      { text: "Fuel costs" },
+      { text: "Toll fees (where applicable)" },
+      { text: "4 nights' accommodation" },
+      { text: "Daily breakfast (where the accommodation includes breakfast)" },
+      { text: "Cango Caves entrance fee" },
+      { text: "Safari Ostrich Farm entrance and guided tour" },
+      {
+        text: "Botlierskop Private Game Reserve safari experience: 2 game drives, lunch and drinks",
+      },
+      { text: "Robberg Nature Reserve entrance fee" },
+      { text: "Cape Agulhas visit (southernmost tip of Africa)" },
+      { text: "Betty's Bay penguin colony entrance fee" },
+      { text: "Scenic Route 62 journey" },
+      { text: "Knysna Heads visit" },
+      { text: "Benguela Cove premium wine tasting experience" }, // QUERY CLIENT: Day 5 text calls the tasting optional
+    ],
+
+    excluded: [
+      { text: "Lunches (except the Botlierskop safari lunch)" },
+      { text: "Dinners" },
+      { text: "Personal purchases" },
+      { text: "Travel insurance" },
+      { text: "Alcoholic beverages" },
+      { text: "Optional activities" },
+      { text: "Tips and gratuities" },
+      { text: "Additional meals not specified" },
+      { text: "Items of a personal nature" },
+    ],
+
+    pickupOptions: [
+      "Cape Town accommodation (collection and drop-off)",
+    ], // QUERY CLIENT: pickup areas, if limited
+    requirements: [],
+
+    arrangements: {
+      availability: "", // QUERY CLIENT: fixed dates or on request?
+      duration: "5 Days / 4 Nights",
+      operatingTime: "",
+      departure: "07:30 collection from your Cape Town accommodation",
+      return:
+        "Drop-off at your Cape Town accommodation between 16:30 and 17:00 on Day 5",
+      location:
+        "Cape Town → Oudtshoorn → Botlierskop → Knysna → Robberg → Cape Agulhas → Hermanus → Betty's Bay → Cape Town",
+
+      clothing: [],
+      thingsToBring: [],
+
+      passengerPolicy: "",
+
+      notes: [
+        "Night 1: Oudtshoorn",
+        "Nights 2 and 3: Knysna",
+        "Night 4: Hermanus",
+        "There is no overnight on Day 5; the tour ends in Cape Town",
+        "Dinners are at leisure on all four evenings",
+        "Day 4 is a long driving day, so an early start is planned",
+        "Botlierskop safari groups are limited to nine guests per vehicle",
+        "Breakfast is included where the accommodation offers it",
+      ],
+    },
+
+    // null until supplied (empty objects are truthy and would
+    // render empty sections in TourDetails)
+    weatherPolicy: null,
+    cancellationPolicy: null,
+    safetyPolicy: null,
+
+    /*
+     * MULTI-DAY ITINERARY
+     *
+     * Full route: Cape Town → Oudtshoorn → Botlierskop → Knysna → Robberg →
+     * Cape Agulhas → Hermanus → Betty's Bay → Cape Town (kept in
+     * arrangements.location). The timeline route below uses one location per day
+     * start so the Day labels line up, as on the other multi-day tours.
+     */
+    itinerary: {
+      intro: {
+        title: "Your 5-Day Coastal Beauty, Wildlife & Discovery Journey",
+        description:
+          "Route 62 and the Klein Karoo, a full-day Botlierskop safari, Knysna and Robberg, the southernmost tip of Africa, and the penguins of Betty's Bay.",
+      },
+
+      route: {
+        title:
+          "Cape Town → Oudtshoorn → Knysna → Cape Agulhas → Hermanus → Cape Town",
+        description: "",
+      },
+
+      days: [
+        {
+          day: 1,
+          title: "Cape Town → Oudtshoorn (Route 62 & Cango Caves)",
+          route: "Cape Town → Montagu → Barrydale → Oudtshoorn",
+          description:
+            "Leave Cape Town on the scenic Route 62 through the Cape Winelands and Klein Karoo, with a photo stop at Montagu or Barrydale. After lunch, take a guided Heritage Tour of the Cango Caves and visit an ostrich farm before checking in for the night in Oudtshoorn.",
+
+          activities: [
+            {
+              id: "d1-depart",
+              title: "Departure from Cape Town",
+              description:
+                "Collection from your accommodation and the start of the journey towards the Klein Karoo.",
+              time: "07:30",
+              duration: "",
+              type: "transfer",
+              optional: false,
+            },
+            {
+              id: "d1-r62",
+              title: "Scenic Route R62",
+              description:
+                "Travel through the beautiful Cape Winelands and mountain landscapes.",
+              time: "09:00",
+              duration: "",
+              type: "scenic",
+              optional: false,
+            },
+            {
+              id: "d1-montagu",
+              title: "Montagu / Barrydale",
+              description:
+                "A short comfort and photo stop, depending on travel progress.",
+              time: "10:00",
+              duration: "",
+              type: "scenic",
+              optional: false,
+            },
+            {
+              id: "d1-karoo",
+              title: "Continue towards Oudtshoorn",
+              description:
+                "Enjoy the scenery along the R62 as you pass through the Klein Karoo.",
+              time: "11:30",
+              duration: "",
+              type: "scenic",
+              optional: false,
+            },
+            {
+              id: "d1-lunch",
+              title: "Lunch Break",
+              description:
+                "Lunch at a suitable restaurant along the route or in Oudtshoorn (not included).",
+              time: "13:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: false,
+            },
+            {
+              id: "d1-cango",
+              title: "Cango Caves",
+              description:
+                "A guided Heritage Tour through the spectacular limestone chambers and formations.",
+              time: "14:00",
+              duration: "1 hr 30 min",
+              type: "nature",
+              optional: false,
+            },
+            {
+              id: "d1-ostrich",
+              title: "Ostrich Farm Experience",
+              description:
+                "Visit an ostrich farm (Safari Ostrich Farm or Highgate Ostrich Show Farm) to learn about ostrich farming and the history of Oudtshoorn's ostrich industry.",
+              time: "15:30",
+              duration: "1 hour",
+              type: "wildlife",
+              optional: false,
+            },
+            {
+              id: "d1-checkin",
+              title: "Check in at your Oudtshoorn accommodation",
+              description:
+                "Arrive at your accommodation in Oudtshoorn. Dinner is at leisure.",
+              time: "16:30",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+            },
+          ],
+
+          meals: { breakfast: false, lunch: false, dinner: false },
+
+          accommodation: {
+            title: "Oudtshoorn accommodation", // QUERY CLIENT: property name
+            location: "Oudtshoorn, Klein Karoo",
+            availabilityNote: "1 night.",
+            options: [],
+          },
+        },
+
+        {
+          day: 2,
+          title: "Oudtshoorn → Botlierskop Safari & Knysna",
+          route:
+            "Oudtshoorn → Botlierskop Private Game Reserve → Knysna",
+          description:
+            "One of the highlights of the tour: a full day on safari at Botlierskop Private Game Reserve, with a morning and an afternoon game drive and a lunch at the reserve, before travelling on to Knysna for the night.",
+
+          activities: [
+            {
+              id: "d2-depart",
+              title: "Breakfast, Check-out & Depart Oudtshoorn",
+              description:
+                "Breakfast at your accommodation, then travel towards Botlierskop Private Game Reserve.",
+              time: "07:00",
+              duration: "",
+              type: "transfer",
+              optional: false,
+            },
+            {
+              id: "d2-morning-safari",
+              title: "Arrive at Botlierskop & Morning Safari",
+              description:
+                "Registration and preparation, then explore the reserve in an open Land Cruiser with an experienced guide. Look out for elephant, lion, rhino, buffalo, cheetah, giraffe, hippo, mountain zebra and a variety of antelope.",
+              time: "10:00",
+              duration: "2 hr 30 min",
+              type: "safari",
+              optional: false,
+            },
+            {
+              id: "d2-lunch",
+              title: "Lunch at the Reserve",
+              description:
+                "An included two-course safari lunch at the reserve, with refreshing drinks.",
+              time: "12:30",
+              duration: "1 hour",
+              type: "meal",
+              optional: false,
+            },
+            {
+              id: "d2-afternoon-safari",
+              title: "Afternoon Safari",
+              description:
+                "More wildlife viewing across the reserve's roughly 6,000 hectares, in a small group of up to nine guests per vehicle.",
+              time: "13:30",
+              duration: "2 hours",
+              type: "safari",
+              optional: false,
+            },
+            {
+              id: "d2-knysna",
+              title: "Travel to Knysna & Check In",
+              description:
+                "The safari ends at 15:30 and you travel to Knysna, arriving between 17:00 and 17:30. Dinner is at leisure, at the Knysna Waterfront or your accommodation.",
+              time: "15:30",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+            },
+          ],
+
+          meals: { breakfast: true, lunch: true, dinner: false },
+
+          accommodation: {
+            title: "Knysna accommodation", // QUERY CLIENT: property name
+            location: "Knysna, Garden Route",
+            availabilityNote: "Night 1 of 2.",
+            options: [],
+          },
+        },
+
+        {
+          day: 3,
+          title: "Knysna → Robberg & Knysna Heads",
+          route:
+            "Knysna → Robberg Nature Reserve → Knysna Heads → Knysna",
+          description:
+            "A day of coastal exploration, nature and lagoon views: the Robberg Nature Reserve near Plettenberg Bay, the Knysna Heads and the Knysna Waterfront, with an optional sunset cruise.",
+
+          activities: [
+            {
+              id: "d3-breakfast",
+              title: "Breakfast & Depart for Robberg",
+              description:
+                "Breakfast at your accommodation, then travel towards Robberg Nature Reserve near Plettenberg Bay.",
+              time: "07:30",
+              duration: "",
+              type: "meal",
+              optional: false,
+            },
+            {
+              id: "d3-robberg",
+              title: "Robberg Nature Reserve",
+              description:
+                "Explore the spectacular coastal scenery, viewpoints, seal colonies and walking trails.",
+              time: "09:15",
+              duration: "2 hr 15 min",
+              type: "nature",
+              optional: false,
+            },
+            {
+              id: "d3-lunch",
+              title: "Lunch",
+              description:
+                "After returning from Robberg, lunch at a restaurant overlooking the Knysna Lagoon or Waterfront (not included).",
+              time: "12:15",
+              duration: "",
+              type: "meal",
+              optional: false,
+            },
+            {
+              id: "d3-heads",
+              title: "Knysna Heads",
+              description:
+                "Visit the famous Eastern Head viewpoint for spectacular ocean and lagoon views.",
+              time: "13:30",
+              duration: "1 hour",
+              type: "scenic",
+              optional: false,
+            },
+            {
+              id: "d3-waterfront",
+              title: "Knysna Waterfront",
+              description:
+                "Explore the waterfront, its shops and the surrounding attractions.",
+              time: "14:30",
+              duration: "1 hr 30 min",
+              type: "leisure",
+              optional: false,
+            },
+            {
+              id: "d3-return",
+              title: "Return to your Accommodation",
+              description: "Relax and prepare for the evening.",
+              time: "16:00",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+            },
+            {
+              id: "d3-sunset-cruise",
+              title: "Knysna Sunset Cruise",
+              description:
+                "An optional cruise of about 90 minutes across the Knysna Lagoon towards the Heads. Dinner follows at leisure.",
+              time: "17:00",
+              duration: "1 hr 30 min",
+              type: "leisure",
+              optional: true, // QUERY CLIENT: the inclusions list has it as included
+            },
+          ],
+
+          meals: { breakfast: true, lunch: false, dinner: false },
+
+          accommodation: {
+            title: "Knysna accommodation", // QUERY CLIENT: property name
+            location: "Knysna, Garden Route",
+            availabilityNote: "Night 2 of 2.",
+            options: [],
+          },
+        },
+
+        {
+          day: 4,
+          title: "Cape Agulhas → Hermanus",
+          route: "Knysna → Cape Agulhas → Hermanus",
+          description:
+            "An early start for the journey to Cape Agulhas, the southernmost tip of Africa and the meeting point of the Atlantic and Indian Oceans. Visit the historic lighthouse, have lunch, then continue to Hermanus for the night. This is a long driving day.",
+
+          activities: [
+            {
+              id: "d4-depart",
+              title: "Breakfast, Check-out & Depart Knysna",
+              description:
+                "Breakfast at your accommodation, then the journey towards Cape Agulhas.",
+              time: "06:30",
+              duration: "",
+              type: "transfer",
+              optional: false,
+            },
+            {
+              id: "d4-comfort",
+              title: "Comfort Stop",
+              description: "A short refreshments and restroom break.",
+              time: "09:30",
+              duration: "",
+              type: "transfer",
+              optional: false,
+            },
+            {
+              id: "d4-agulhas",
+              title: "Cape Agulhas: Southernmost Tip of Africa",
+              description:
+                "Visit the southernmost tip of Africa and the meeting point of the Atlantic and Indian Oceans.",
+              time: "11:45",
+              duration: "30 min",
+              type: "scenic",
+              optional: false,
+            },
+            {
+              id: "d4-lighthouse",
+              title: "Cape Agulhas Lighthouse",
+              description:
+                "Explore the historic lighthouse and the surrounding coastal scenery.",
+              time: "12:15",
+              duration: "45 min",
+              type: "heritage",
+              optional: false,
+            },
+            {
+              id: "d4-lunch",
+              title: "Lunch Break",
+              description: "Lunch at a local restaurant (not included).",
+              time: "13:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: false,
+            },
+            {
+              id: "d4-hermanus",
+              title: "Travel to Hermanus & Check In",
+              description:
+                "Depart Cape Agulhas at 14:00 and arrive in Hermanus between 15:30 and 16:00. Dinner is at leisure.",
+              time: "14:00",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+            },
+          ],
+
+          meals: { breakfast: true, lunch: false, dinner: false },
+
+          accommodation: {
+            title: "Hermanus accommodation", // QUERY CLIENT: property name
+            location: "Hermanus, Overberg",
+            availabilityNote: "1 night.",
+            options: [],
+          },
+        },
+
+        {
+          day: 5,
+          title: "Hermanus → Benguela Cove → Betty's Bay → Cape Town",
+          route:
+            "Hermanus → Benguela Cove → Betty's Bay → Clarence Drive → Cape Town",
+          description:
+            "A wine estate, African penguins and a scenic coastal return: a tasting at Benguela Cove Lagoon Wine Estate, the Stony Point penguin colony at Betty's Bay and the spectacular Clarence Drive back to Cape Town.",
+
+          activities: [
+            {
+              id: "d5-depart",
+              title: "Breakfast, Check-out & Depart Hermanus",
+              description:
+                "Breakfast at your accommodation, then the scenic journey towards Benguela Cove.",
+              time: "08:00",
+              duration: "",
+              type: "transfer",
+              optional: false,
+            },
+            {
+              id: "d5-benguela",
+              title: "Benguela Cove Lagoon Wine Estate",
+              description:
+                "A guided tasting of selected Benguela Cove wines, with views over the lagoon, vineyards and surrounding mountains.",
+              time: "09:30",
+              duration: "1 hr 30 min",
+              type: "wine",
+              optional: false, // QUERY CLIENT: the Day 5 table calls the tasting optional
+            },
+            {
+              id: "d5-penguins",
+              title: "Stony Point Penguin Colony",
+              description:
+                "Visit the African penguin colony at Betty's Bay and explore the elevated boardwalks.",
+              time: "12:00",
+              duration: "1 hour",
+              type: "wildlife",
+              optional: false,
+            },
+            {
+              id: "d5-lunch",
+              title: "Lunch Break",
+              description:
+                "Lunch at a suitable restaurant in Betty's Bay or along the coastal route (not included).",
+              time: "13:00",
+              duration: "1 hour",
+              type: "meal",
+              optional: false,
+            },
+            {
+              id: "d5-clarence",
+              title: "Scenic Clarence Drive (R44)",
+              description:
+                "Travel along the spectacular R44 coastal road.",
+              time: "14:00",
+              duration: "",
+              type: "scenic",
+              optional: false,
+            },
+            {
+              id: "d5-rooi-els",
+              title: "Rooi Els / Pringle Bay",
+              description:
+                "Optional photo stops, depending on time.",
+              time: "15:00",
+              duration: "",
+              type: "scenic",
+              optional: true,
+            },
+            {
+              id: "d5-return",
+              title: "Arrive in Cape Town",
+              description:
+                "Drop-off at your accommodation between 16:30 and 17:00, concluding the tour.",
+              time: "16:30",
+              duration: "",
+              type: "transfer",
+              optional: false,
+            },
+          ],
+
+          meals: { breakfast: true, lunch: false, dinner: false },
+        },
+      ],
+    },
+
+    stops: null,
+
+    vehicle: null,
+
+    securityAndLiability: null,
+
+    accommodation: {
+      included: true,
+      type: "Hotels & Guesthouses", // QUERY CLIENT: property names, star rating, room type
+      description:
+        "4 nights: 1 night in Oudtshoorn, 2 nights in Knysna and 1 night in Hermanus. Breakfast is included where the accommodation offers it.",
+    },
+
+    needToKnow: [
+      { text: "Adults are R29,500 per person and children aged 12 and over pay the adult rate" },
+      { text: "Children aged 4–11 are R22,125 and children under 3 travel free" },
+      {
+        text: "Family totals: R59,000 for 2 adults, R81,125 with 1 child (4–11), R103,250 with 2 children (4–11), R88,500 with 1 child (12+) and R110,625 with 1 child (4–11) and 1 child (12+)",
+      },
+      { text: "Groups of 7–10 guests pay R26,550 per person, with the 10% discount already included" },
+      { text: "4 nights' accommodation is included, with breakfast where the accommodation offers it; there is no overnight on Day 5" },
+      { text: "The only included lunch is the Botlierskop safari lunch; all other lunches and all dinners are at your own cost" },
+      { text: "The Botlierskop safari has up to nine guests per open vehicle and includes two game drives, lunch and drinks" },
+      { text: "Day 4 is a long driving day, so expect a 06:30 start" },
+      { text: "The Knysna Sunset Cruise on Day 3 is optional" },
+      { text: "Collection from your Cape Town accommodation is at 07:30 on Day 1" },
+      { text: "Alcoholic beverages, tips and gratuities, travel insurance and personal purchases are not included" },
+    ],
+
+    faqs: [
+      {
+        question: "How long is the tour?",
+        answer:
+          "This is a 5-day, 4-night private tour from Cape Town and back, with no overnight on Day 5.",
+      },
+      {
+        question: "Where do we stay?",
+        answer:
+          "One night in Oudtshoorn, two nights in Knysna and one night in Hermanus. Breakfast is included where the accommodation offers it.",
+      },
+      {
+        question: "What is included in the tour price?",
+        answer:
+          "A private air-conditioned vehicle with a professional registered driver-guide, airport and hotel transfers, fuel and tolls, 4 nights' accommodation, daily breakfast where offered, the Cango Caves, an ostrich farm tour, a Botlierskop safari with two game drives, lunch and drinks, Robberg Nature Reserve, Cape Agulhas, the Betty's Bay penguin colony and a Benguela Cove wine tasting.",
+      },
+      {
+        question: "What is not included?",
+        answer:
+          "Lunches (except the Botlierskop safari lunch), dinners, personal purchases, travel insurance, alcoholic beverages, optional activities, tips and gratuities, and any meals not specified.",
+      },
+      {
+        question: "What will we see at Botlierskop?",
+        answer:
+          "Two guided game drives in an open Land Cruiser across about 6,000 hectares of private reserve, in groups of up to nine guests. You may see elephant, lion, rhino, buffalo, cheetah, giraffe, hippo, mountain zebra and several antelope species, with a two-course lunch and refreshments included.",
+      },
+      {
+        question: "Which Cango Caves tour do we do?",
+        answer: "The guided Heritage Tour through the limestone chambers.",
+      },
+      {
+        question: "How much does the tour cost?",
+        answer:
+          "Adults are R29,500 per person. Children aged 4–11 are R22,125, children 12 and over pay the adult rate and children under 3 are free. For 2 adults the total is R59,000.",
+      },
+      {
+        question: "Is there a group discount?",
+        answer:
+          "Yes. Groups of 7 to 10 guests pay R26,550 per person, which already includes a 10% discount.",
+      },
+      {
+        question: "Is the Knysna Sunset Cruise included?",
+        answer:
+          "The cruise is an optional extra of about 90 minutes across Knysna Lagoon. Please ask us for the price.",
+      },
+      {
+        question: "Is Day 4 a long drive?",
+        answer:
+          "Yes. The journey from Knysna to Cape Agulhas and on to Hermanus is a long driving day, so we leave early, at 07:00 after breakfast, with a comfort stop and lunch on the way.",
+      },
+      {
+        question: "Where will we have dinner?",
+        answer:
+          "Dinners are at leisure and are not included, so you can choose where to eat each evening, such as the Knysna Waterfront or your accommodation.",
+      },
+    ],
+
+    tags: [
+      "Garden Route",
+      "Route 62",
+      "Oudtshoorn",
+      "Cango Caves",
+      "Botlierskop",
+      "Safari",
+      "Knysna",
+      "Robberg",
+      "Cape Agulhas",
+      "Hermanus",
+      "Betty's Bay",
+      "Penguins",
+      "Wine Tasting",
+      "Multi-Day",
+      "5 Day Tour",
+      "Family Friendly",
+      "South Africa",
+    ],
+  },
+  // 4 Day Garden Route Tour: Oudtshoorn, Big 5 Safari & Knysna from Cape Town
+  {
+    id: 28, 
+    type: TOUR_TYPES.PACKAGES,
+    category: TOUR_MODIFIERS.MULTI_DAY,
+
+    title: "The Grand Garden Route Discovery: Oudtshoorn, Botlierskop & Knysna",
+    slug: "grand-garden-route-discovery-oudtshoorn-botlierskop-knysna-tour",
+    canonicalPath:
+      "/tours/grand-garden-route-discovery-oudtshoorn-botlierskop-knysna-tour",
+
+    seo: {
+      title:
+        "4 Day / 3 Night Garden Route Tour: Oudtshoorn, Big 5 Safari & Knysna from Cape Town | Cape Frontier Tours",
+      description:
+        "4 days, 3 nights from Cape Town: ostrich farm, meerkat safari and Cango Caves in Oudtshoorn, a Big 5 safari at Botlierskop, Knysna Heads, Featherbed Nature Reserve, a sunset lagoon cruise and Mossel Bay.",
+      keywords: [
+        "4 day Garden Route tour",
+        "Garden Route and safari tour",
+        "Cape Town to Knysna tour",
+        "Oudtshoorn Cango Caves tour",
+        "Meerkat safari Oudtshoorn",
+        "Botlierskop Big 5 safari",
+        "Knysna sunset cruise",
+        "Featherbed Nature Reserve tour",
+        "Knysna Heads tour",
+        "Mossel Bay tour",
+        "Cape Town multi-day tour",
+        "Garden Route family tour",
+      ],
+    },
+
+    workflow: defaultWorkflow,
+
+    image:
+      "/src/assets/images/tours/packages/4-day-garden-route-discovery/1.webp", // TODO
+    images: getTourImages("packages/4-day-garden-route-discovery", 3),
+    imageFolder: "packages/4-day-garden-route-discovery",
+    videos: [],
+
+    location:
+      "Cape Town, Oudtshoorn, Botlierskop Private Game Reserve, Knysna & Mossel Bay, Western Cape, South Africa",
+    duration: "4 Days / 3 Nights",
+
+    priceBase: 18950,
+    minPeople: 2,
+    minAge: null, // QUERY CLIENT: minimum age not supplied
+    childFriendly: true,
+    daysInAdvance: null, // QUERY CLIENT: booking lead time not supplied (balance is due 14 days before departure)
+
+    pricing: [
+      {
+        category: "Adult: 12 Years & Older",
+        pricePerPerson: 18950,
+        note: "Per person sharing. Subject to availability at the time of booking.",
+      },
+      {
+        category: "Toddler: 0–3 Years",
+        pricePerPerson: 0,
+        note: "Free when sharing with parents.",
+      },
+
+      // Children 4–11 left out of pricing on purpose: the client charges them through the
+      // family package totals below, which are not a flat per-child rate (null would render
+      // "R0.00" or "RNaN").
+    ],
+
+    /*
+     * FAMILY PACKAGE TOTALS (supplied by client, ZAR), children aged 4–11:
+     *   2 Adults + 1 Child       R49,900  (approx. saving R6,950)
+     *   2 Adults + 2 Children    R59,900  (approx. saving R15,900)
+     *   2 Adults + 3 Children    R69,900  (approx. saving R24,850)
+     *   2 Adults + 4 Children    R79,900  (approx. saving R33,800)
+     * These are not a flat per-child rate (the first child works out at R12,000 and each
+     * further child at R10,000), so they are kept in familyPricing below.
+     */
+    familyPricing: {
+      enabled: true,
+      icon: "",
+      packages: [
+        { adults: 2, children: 1, total: 49900, saving: 6950, label: "2 Adults + 1 Child" },
+        { adults: 2, children: 2, total: 59900, saving: 15900, label: "2 Adults + 2 Children" },
+        { adults: 2, children: 3, total: 69900, saving: 24850, label: "2 Adults + 3 Children" },
+        { adults: 2, children: 4, total: 79900, saving: 33800, label: "2 Adults + 4 Children" },
+      ],
+      note: "Family package totals apply to children aged 4–11 years. Savings are approximate.",
+    },
+
+    additionalPricing: [
+      {
+        type: "request",
+        category: "Mossel Bay Zipline Experience (optional)",
+        price: null,
+        unit: "per person",
+        currency: "ZAR",
+        note: "Optional activity, not included in the tour price.", // QUERY CLIENT: price
+      },
+    ],
+
+    /*
+     * Group rates supplied for 4, 6, 8, 10 and 12 guests only (totals check out).
+     * QUERY CLIENT: rates for 5, 7, 9 and 11 guests, and for 13+.
+     */
+    groupPricing: {
+      enabled: true,
+      icon: "/icons/savemore.png",
+      tiers: [
+        { minPeople: 4, maxPeople: 4, perPerson: 16950, label: "4 guests", note: "Total group price: R67,800." },
+        { minPeople: 6, maxPeople: 6, perPerson: 15950, label: "6 guests", note: "Total group price: R95,700." },
+        { minPeople: 8, maxPeople: 8, perPerson: 14950, label: "8 guests", note: "Total group price: R119,600." },
+        { minPeople: 10, maxPeople: 10, perPerson: 13950, label: "10 guests", note: "Total group price: R139,500." },
+        { minPeople: 12, maxPeople: 12, perPerson: 12950, label: "12 guests", note: "Total group price: R155,400." },
+      ],
+    },
+
+    rating: null,
+    stars: null,
+    mainReviewerName: "",
+    mainReviewerCountry: "",
+    reviewYear: null,
+    otherReviews: null,
+    mainReview: "",
+
+    description:
+      "Travel from Cape Town through spectacular mountain passes into the Klein Karoo, then along the Garden Route to Knysna on a 4 day / 3 night journey. In Oudtshoorn, visit a working ostrich farm, meet a family of wild meerkats and explore the Cango Caves. Continue to Botlierskop Private Game Reserve for a guided Big 5 game drive, then on to Knysna for lagoon-side dining, Knysna Heads, the Featherbed Eco Experience, Thesen Island and a sunset lagoon cruise. The final day returns to Cape Town along the Garden Route via Sedgefield, Wilderness, Dolphin Point and Mossel Bay, and through the Overberg. Includes three nights' accommodation, daily breakfasts, a private air-conditioned vehicle and a professional driver-guide.",
+
+    highlights: [
+      { text: "Safari Ostrich Farm guided experience in Oudtshoorn" },
+      { text: "Meerkat safari experience in the Klein Karoo" },
+      { text: "Cango Caves limestone chambers" },
+      { text: "Guided Big 5 safari at Botlierskop Private Game Reserve" },
+      { text: "Knysna Heads viewpoints over the lagoon and Indian Ocean" },
+      { text: "Featherbed Eco Experience with ferry crossing, guided eco-tour and lunch" },
+      { text: "Thesen Island boutiques, galleries and marina" },
+      { text: "Sunset lagoon cruise in Knysna" },
+      { text: "Wilderness Map of Africa and Dolphin Point viewpoints" },
+      { text: "Mossel Bay with St Blaize Lighthouse and the Bartolomeu Dias Museum Complex" },
+      { text: "3 nights' accommodation with daily breakfasts" },
+      { text: "Accommodation pick-up and drop-off" },
+    ],
+
+    included: [
+      { text: "3 nights' accommodation" },
+      { text: "Daily breakfasts" },
+      { text: "Safari Ostrich Farm experience" },
+      { text: "Meerkat safari experience" },
+      { text: "Cango Caves entrance fees" },
+      { text: "Big 5 safari experience at Botlierskop Private Game Reserve" },
+      { text: "Featherbed lunch experience, including ferry crossing and guided eco-tour" },
+      { text: "Sunset lagoon cruise, with oysters and drinks" }, // QUERY CLIENT: confirm what is included
+      { text: "Bartolomeu Dias Museum entry" },
+      { text: "Air-conditioned private transport" },
+      { text: "Professional driver-guide" },
+      { text: "Accommodation pick-up and drop-off" },
+    ],
+
+    excluded: [
+      { text: "Dinner meals" },
+      { text: "Lunches, except the Featherbed lunch" }, // QUERY CLIENT: confirm
+      { text: "Personal purchases" },
+      { text: "Travel insurance" },
+      { text: "Alcoholic beverages" },
+      { text: "Optional activities, including the Mossel Bay zipline" },
+      { text: "Gratuities" },
+      { text: "Items not listed" },
+    ],
+
+    pickupOptions: ["Cape Town accommodation pick-up and drop-off"], // QUERY CLIENT: pickup areas and departure time
+
+    requirements: [
+      { text: "A 30% deposit is required to secure your booking" },
+      { text: "The balance is due 14 days before departure, and late bookings require full payment" },
+    ],
+
+    arrangements: {
+      availability:
+        "Subject to availability at the time of booking. Alternative accommodation of a similar standard may be used when required.",
+      duration: "4 Days / 3 Nights",
+      operatingTime: "",
+      departure: "Cape Town accommodation pick-up", // QUERY CLIENT: departure time
+      return: "Cape Town accommodation drop-off, Day 4 (estimated 17:00 – 18:00)",
+      location:
+        "Cape Town → Oudtshoorn → Botlierskop → Knysna → Sedgefield → Wilderness → Mossel Bay → Overberg → Cape Town",
+
+      clothing: [
+        "Comfortable walking shoes",
+        "Lightweight clothing",
+        "Light jacket",
+      ],
+
+      thingsToBring: [
+        "Sun hat",
+        "Sunscreen",
+        "Sunglasses",
+        "Camera",
+        "Reusable water bottle",
+      ],
+
+      passengerPolicy:
+        "Guests are expected to follow the instructions of the professional driver-guide, rangers, boat crew and venue staff.",
+
+      notes: [
+        "Night 1: selected guest house in Oudtshoorn",
+        "Nights 2 and 3: selected waterfront accommodation in Knysna",
+        "Day 4 has no accommodation; the tour concludes in Cape Town",
+        "Dinners are not included and are guest-paid",
+        "The Mossel Bay zipline is optional and not included",
+        "Dolphin and whale sightings from Dolphin Point depend on the season and cannot be guaranteed",
+        "Estimated arrival in Cape Town on Day 4 is 17:00 – 18:00, traffic and stop durations permitting",
+        "Alternative accommodation of a similar standard may be used when required",
+      ],
+    },
+
+    paymentTerms: {
+      summary: "A 30% deposit secures your booking.",
+      items: [
+        { text: "A 30% deposit secures your booking, and booking is confirmed upon receipt of the deposit" },
+        { text: "The balance is due 14 days before departure" },
+        { text: "Late bookings require full payment" },
+        { text: "Payment method: EFT / bank transfer" },
+      ],
+    },
+
+    weatherPolicy: null, // not supplied
+
+    cancellationPolicy: {
+      summary: "Refunds depend on how far ahead of departure you cancel.",
+      items: [
+        { text: "More than 30 days before departure: full refund less admin fee" },
+        { text: "15–30 days before departure: 50% refund" },
+        { text: "7–14 days before departure: 25% refund" },
+        { text: "Less than 7 days before departure: no refund" },
+        { text: "No-show: no refund" },
+      ],
+    },
+
+    safetyPolicy: null, // not supplied
+
+    /*
+     * MULTI-DAY ITINERARY
+     */
+    itinerary: {
+      intro: {
+        title: "Your 4-Day Garden Route Discovery",
+        description:
+          "From the Klein Karoo and a Big 5 safari to the lagoon town of Knysna, then back to Cape Town along the Garden Route coast.",
+      },
+
+      route: {
+        title:
+          "Cape Town → Oudtshoorn → Botlierskop → Knysna → Mossel Bay → Cape Town",
+        description: "",
+      },
+
+      days: [
+        {
+          day: 1,
+          title: "Cape Town → Oudtshoorn",
+          route: "Cape Town → mountain passes → Oudtshoorn",
+          description:
+            "Depart Cape Town from your hotel and travel through spectacular mountain passes, rolling vineyards and charming countryside towns to Oudtshoorn, the \"Ostrich Capital of the World\". Visit a working ostrich farm, meet the meerkats and explore the Cango Caves before an evening at leisure.",
+
+          activities: [
+            {
+              id: "d1-depart",
+              title: "Hotel Pick-up & Drive to Oudtshoorn",
+              description:
+                "Depart Cape Town and travel along some of the Western Cape's most spectacular landscapes towards Oudtshoorn.",
+              time: "",
+              duration: "",
+              type: "transfer",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d1-ostrich",
+              title: "Safari Ostrich Farm Experience",
+              description:
+                "Visit one of the largest and most renowned working ostrich farms in South Africa, with a guided tour covering the history of ostrich farming, breeding practices and the importance of the industry to the Klein Karoo.",
+              time: "",
+              duration: "",
+              type: "wildlife",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d1-meerkats",
+              title: "Meerkat Safari Experience",
+              description:
+                "Watch a family of wild meerkats emerge from their burrows as the first rays of sunlight warm the Karoo, from a comfortable viewing position, and observe them socialising, foraging and sunbathing.",
+              time: "Sunrise", // QUERY CLIENT: sunrise does not fit Day 1 (travel day). Should this be the morning of Day 2?
+              duration: "",
+              type: "wildlife",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d1-cango",
+              title: "Cango Caves",
+              description:
+                "Explore the celebrated limestone caves at the foothills of the Swartberg Mountains, with chambers adorned by stalactites and stalagmites formed over millions of years.",
+              time: "",
+              duration: "",
+              type: "nature",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d1-checkin",
+              title: "Check in at your Oudtshoorn guest house",
+              description:
+                "Check in and enjoy an evening at leisure in the peaceful atmosphere of the Klein Karoo.",
+              time: "Evening",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+              image: "",
+            },
+          ],
+
+          meals: { breakfast: false, lunch: false, dinner: false },
+
+          accommodation: {
+            title: "Selected Oudtshoorn Guest House",
+            location: "Oudtshoorn, Klein Karoo",
+            availabilityNote: "Subject to availability.",
+            options: ["Breakfast"],
+            image: "",
+          },
+        },
+
+        {
+          day: 2,
+          title: "Big 5 Safari & Arrival in Knysna",
+          route: "Oudtshoorn → Botlierskop → Knysna",
+          description:
+            "After breakfast and check-out, travel through dramatic mountain landscapes to Botlierskop Private Game Reserve, set between the Outeniqua Mountains and the Indian Ocean, for a guided Big 5 game drive. Continue to Knysna for a waterfront walk and dinner on the lagoon.",
+
+          activities: [
+            {
+              id: "d2-botlierskop",
+              title: "Botlierskop Big 5 Safari Experience",
+              description:
+                "A professionally guided game drive in search of lion, elephant, buffalo, rhino and leopard, with insight into conservation and ecosystem management. The reserve is also home to giraffe, zebra, hippo, wildebeest, various antelope species and many bird species.",
+              time: "",
+              duration: "",
+              type: "safari",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d2-knysna",
+              title: "Journey to Knysna",
+              description:
+                "Continue along the Garden Route to Knysna, nestled between indigenous forests and a tranquil lagoon.",
+              time: "",
+              duration: "",
+              type: "transfer",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d2-checkin",
+              title: "Check-in at Knysna Accommodation",
+              description: "Settle into your accommodation.",
+              time: "18:00",
+              duration: "",
+              type: "accommodation",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d2-waterfront",
+              title: "Knysna Waterfront Walk",
+              description:
+                "Stroll along the waterfront, with its boutiques, craft shops, restaurants and lagoon views.",
+              time: "",
+              duration: "",
+              type: "leisure",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d2-dinner",
+              title: "Dinner on the Lagoon",
+              description:
+                "Dinner overlooking the Knysna Lagoon as the sun sets behind the surrounding hills (guest-paid).",
+              time: "Evening",
+              duration: "",
+              type: "meal",
+              optional: false,
+              image: "",
+            },
+          ],
+
+          meals: { breakfast: true, lunch: false, dinner: false },
+
+          accommodation: {
+            title: "Selected Knysna Waterfront Accommodation",
+            location: "Knysna, Garden Route",
+            availabilityNote: "Subject to availability.",
+            options: ["Breakfast"],
+            image: "",
+          },
+        },
+
+        {
+          day: 3,
+          title: "Discover Knysna & the Garden Route",
+          route: "Knysna → Knysna Heads → Featherbed → Thesen Island → Sunset Cruise",
+          description:
+            "A full day in Knysna: the Knysna Heads, the Featherbed Eco Experience with lunch, Thesen Island and a sunset cruise across the lagoon, followed by dinner at a waterfront restaurant.",
+
+          activities: [
+            {
+              id: "d3-breakfast",
+              title: "Breakfast at the Waterfront",
+              description:
+                "Breakfast with views of the Knysna Lagoon and the waterfront.",
+              time: "",
+              duration: "",
+              type: "meal",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d3-heads",
+              title: "Knysna Heads",
+              description:
+                "Visit the two dramatic sandstone cliffs guarding the lagoon entrance for panoramic views of the lagoon, ocean and coastline.",
+              time: "",
+              duration: "",
+              type: "scenic",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d3-featherbed",
+              title: "Featherbed Eco Experience",
+              description:
+                "Cross the lagoon by ferry to the Featherbed Nature Reserve for a guided eco-tour through coastal vegetation, with viewpoints over the lagoon and coastline.",
+              time: "",
+              duration: "",
+              type: "nature",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d3-lunch",
+              title: "Lunch at Featherbed Nature Reserve",
+              description: "Lunch surrounded by nature in the reserve.",
+              time: "",
+              duration: "",
+              type: "meal",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d3-thesen",
+              title: "Thesen Island",
+              description:
+                "Explore this former timber-processing island, now a waterfront community with boutique shops, artisan stores, galleries, cafés, walkways and marina views.",
+              time: "Afternoon",
+              duration: "",
+              type: "leisure",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d3-cruise",
+              title: "Sunset Lagoon Cruise",
+              description:
+                "A sunset cruise across the Knysna Lagoon with views of the Knysna Heads from the water.",
+              time: "Sunset",
+              duration: "",
+              type: "cruise",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d3-dinner",
+              title: "Dinner at a Waterfront Restaurant",
+              description:
+                "Dinner at one of Knysna's popular waterfront restaurants (guest-paid).",
+              time: "Evening",
+              duration: "",
+              type: "meal",
+              optional: false,
+              image: "",
+            },
+          ],
+
+          meals: { breakfast: true, lunch: true, dinner: false },
+
+          accommodation: {
+            title: "Selected Knysna Waterfront Accommodation",
+            location: "Knysna, Garden Route",
+            availabilityNote: "Subject to availability.",
+            options: ["Breakfast"],
+            image: "",
+          },
+
+          images: [],
+        },
+
+        {
+          day: 4,
+          title: "Scenic Return Journey to Cape Town",
+          route: "Knysna → Sedgefield → Wilderness → Mossel Bay → Overberg → Cape Town",
+          description:
+            "After breakfast and check-out, travel back along the Garden Route through Sedgefield, Wilderness and Mossel Bay, then through the Overberg to Cape Town, arriving in the late afternoon or early evening.",
+
+          activities: [
+            {
+              id: "d4-depart",
+              title: "Departure from Knysna",
+              description:
+                "Leave Knysna and follow the coastline towards Wilderness, George and Mossel Bay before continuing through the Overberg to Cape Town.",
+              time: "",
+              duration: "",
+              type: "transfer",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d4-sedgefield",
+              title: "Sedgefield Lagoon Viewpoint",
+              description:
+                "A scenic stop with views over the lagoons and wetlands around Sedgefield.",
+              time: "",
+              duration: "",
+              type: "scenic",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d4-wilderness",
+              title: "Wilderness Map of Africa Viewpoint",
+              description:
+                "An elevated viewpoint where the winding Kaaimans River forms a shape resembling the African continent, with views over valleys, rivers and mountains.",
+              time: "",
+              duration: "",
+              type: "scenic",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d4-dolphin-point",
+              title: "Dolphin Point Viewpoint",
+              description:
+                "A scenic lookout over the Indian Ocean and coastline. Dolphins or migrating whales may be spotted offshore in certain seasons.",
+              time: "",
+              duration: "",
+              type: "scenic",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d4-mossel-bay",
+              title: "Mossel Bay Exploration",
+              description:
+                "Free time in the historic coastal town for sightseeing and lunch.",
+              time: "",
+              duration: "",
+              type: "leisure",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d4-lighthouse",
+              title: "St Blaize Lighthouse",
+              description:
+                "Visit the historic lighthouse with panoramic views over the bay and ocean.",
+              time: "",
+              duration: "",
+              type: "scenic",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d4-zipline",
+              title: "Mossel Bay Zipline Experience",
+              description:
+                "One of the world's longest over-ocean ziplines, gliding above the Mossel Bay coastline.",
+              time: "",
+              duration: "",
+              type: "activity",
+              optional: true,
+              image: "",
+            },
+            {
+              id: "d4-museum",
+              title: "Bartolomeu Dias Museum Complex",
+              description:
+                "Learn about the arrival of the Portuguese explorer Bartolomeu Dias and Mossel Bay's role in South Africa's maritime history. Entry is included.",
+              time: "",
+              duration: "",
+              type: "culture",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d4-point",
+              title: "The Point",
+              description:
+                "Dramatic coastal scenery with crashing waves, rocky cliffs and ocean views.",
+              time: "",
+              duration: "",
+              type: "scenic",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d4-lunch",
+              title: "Lunch in Mossel Bay",
+              description:
+                "Lunch at a local restaurant overlooking the ocean or harbour (guest-paid).",
+              time: "",
+              duration: "",
+              type: "meal",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d4-overberg",
+              title: "Through the Overberg",
+              description:
+                "Travel through rolling farmland, mountain scenery and countryside towns, with a possible comfort stop in historic Swellendam.",
+              time: "",
+              duration: "",
+              type: "scenic",
+              optional: false,
+              image: "",
+            },
+            {
+              id: "d4-arrive",
+              title: "Arrival in Cape Town",
+              description:
+                "Arrive back in Cape Town, with drop-off at your accommodation.",
+              time: "17:00 – 18:00 (estimated)",
+              duration: "",
+              type: "transfer",
+              optional: false,
+              image: "",
+            },
+          ],
+
+          meals: { breakfast: true, lunch: false, dinner: false },
+          images: [],
+        },
+      ],
+    },
+
+    stops: null,
+
+    vehicle: null,
+
+    securityAndLiability: null,
+
+    accommodation: {
+      included: true,
+      type: "Guest House & Waterfront Accommodation",
+      description:
+        "1 night in a selected Oudtshoorn guest house and 2 nights in selected Knysna waterfront accommodation, with daily breakfasts. Alternative accommodation of a similar standard may be used when required.",
+    },
+
+    needToKnow: [
+      { text: "The tour price is R18,950 per person sharing, based on 2 adults" },
+      { text: "Group rates: R16,950 pp for 4 guests, R15,950 pp for 6, R14,950 pp for 8, R13,950 pp for 10 and R12,950 pp for 12" },
+      { text: "Family packages: 2 adults + 1 child R49,900, + 2 children R59,900, + 3 children R69,900 and + 4 children R79,900" },
+      { text: "Children aged 0–3 are free when sharing with parents, ages 4–11 use the family package rate and guests aged 12 and older pay the adult rate" },
+      { text: "Accommodation is 1 night in Oudtshoorn and 2 nights in Knysna, with daily breakfasts" },
+      { text: "Lunch at Featherbed Nature Reserve is included; dinners and other lunches are not" },
+      { text: "The Mossel Bay zipline is optional and not included" },
+      { text: "Estimated arrival in Cape Town on Day 4 is 17:00 – 18:00" },
+      { text: "A 30% deposit secures your booking, with the balance due 14 days before departure" },
+      { text: "Cancellations: more than 30 days, full refund less admin fee; 15–30 days, 50%; 7–14 days, 25%; less than 7 days and no-shows, no refund" },
+      { text: "Alternative accommodation of a similar standard may be used when required" },
+    ],
+
+    faqs: [
+      {
+        question: "How long is the tour?",
+        answer:
+          "This is a 4-day, 3-night tour departing from and returning to Cape Town, with accommodation pick-up and drop-off.",
+      },
+      {
+        question: "Where do we stay?",
+        answer:
+          "One night in a selected guest house in Oudtshoorn and two nights in selected waterfront accommodation in Knysna. There is no accommodation on Day 4.",
+      },
+      {
+        question: "What is included in the tour price?",
+        answer:
+          "Three nights' accommodation, daily breakfasts, the ostrich farm and meerkat safari experiences, Cango Caves entrance, a Big 5 safari at Botlierskop, the Featherbed lunch experience, a sunset lagoon cruise, Bartolomeu Dias Museum entry, private air-conditioned transport, a professional driver-guide and accommodation pick-up and drop-off.",
+      },
+      {
+        question: "Are meals included?",
+        answer:
+          "Daily breakfasts and the lunch at Featherbed Nature Reserve are included. Dinners and other lunches are guest-paid.",
+      },
+      {
+        question: "Which animals can we see on the Botlierskop safari?",
+        answer:
+          "The guided game drive looks for the Big 5: lion, elephant, buffalo, rhino and leopard. The reserve is also home to giraffe, zebra, hippo, wildebeest, various antelope and many bird species. Sightings cannot be guaranteed.",
+      },
+      {
+        question: "What is the Featherbed Eco Experience?",
+        answer:
+          "You cross the Knysna Lagoon by ferry to the Featherbed Nature Reserve for a guided eco-tour through coastal vegetation, with viewpoints over the lagoon and coastline, and lunch at the reserve.",
+      },
+      {
+        question: "Is the Mossel Bay zipline included?",
+        answer:
+          "No. The zipline is an optional activity at your own cost.",
+      },
+      {
+        question: "Is this tour suitable for children?",
+        answer:
+          "Yes. Children aged 0–3 are free when sharing with parents, children aged 4–11 are covered by the family package rate and guests aged 12 and older pay the adult rate.",
+      },
+      {
+        question: "What group discounts are available?",
+        answer:
+          "Per-person rates are R16,950 for 4 guests, R15,950 for 6, R14,950 for 8, R13,950 for 10 and R12,950 for 12. Please enquire for other group sizes.",
+      },
+      {
+        question: "How do I book and pay?",
+        answer:
+          "A 30% deposit secures your booking and is confirmed on receipt. The balance is due 14 days before departure, and late bookings require full payment. Payment is by EFT / bank transfer.",
+      },
+      {
+        question: "What is the cancellation policy?",
+        answer:
+          "More than 30 days before departure: full refund less admin fee. 15–30 days: 50% refund. 7–14 days: 25% refund. Less than 7 days and no-shows: no refund.",
+      },
+      {
+        question: "What time do we return to Cape Town?",
+        answer:
+          "The estimated arrival in Cape Town on Day 4 is between 17:00 and 18:00, depending on traffic and stop durations.",
+      },
+    ],
+
+    tags: [
+      "Garden Route",
+      "Oudtshoorn",
+      "Cango Caves",
+      "Meerkats",
+      "Ostrich Farm",
+      "Botlierskop",
+      "Big 5 Safari",
+      "Knysna",
+      "Featherbed",
+      "Sunset Cruise",
+      "Mossel Bay",
+      "Wilderness",
+      "Multi-Day",
+      "4 Day Tour",
+      "Family Friendly",
       "South Africa",
     ],
   },
