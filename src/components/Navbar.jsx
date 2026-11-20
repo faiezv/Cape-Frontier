@@ -16,12 +16,22 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Updated to include a specific target path for Tours
 const navItems = [
-  { label: "Home", target: "Home" },
-  { label: "About", target: "About" },
-  { label: "Stories", target: "Stories" },
-  { label: "Gallery", target: "/gallery" },
-  { label: "Tours", target: "/tours" }, // Routes to /tours page
-  { label: "FAQ", target: "/policies" },
+  { label: "Home", target: "Home", icon: "home" },
+  { label: "About", target: "About", icon: "about" },
+  { label: "Stories", target: "Stories", icon: "stories" },
+  { label: "Gallery", target: "/gallery", icon: "gallery" },
+  { label: "Tours", target: "/tours", icon: "tours" }, // Routes to /tours page
+  { label: "FAQ", target: "/policies", icon: "faq" },
+];
+
+// Policy shortcuts shown in the mobile sidebar
+const policyLinks = [
+  ["Booking policy", "/policies#booking-policy"],
+  ["Pickup policy", "/policies#pickup-policy"],
+  ["Payment flow", "/policies#payment-policy"],
+  ["Cancellations", "/policies#cancellation-policy"],
+  ["Rescheduling", "/policies#reschedule-policy"],
+  ["Private tours", "/policies#private-tour-policy"],
 ];
 
 const LOGO_WHITE_MAX_SCROLL = 40; // px: past this the logo goes back to its normal colour
@@ -33,6 +43,7 @@ const sectionIdMap = {
   Stories: "stories",
   Gallery: "gallery",
   FAQ: "faq",
+  Contact: "contact",
 };
 
 const megaMenus = {
@@ -207,6 +218,70 @@ const megaMenus = {
 };
 
 // --------------------------------------------------
+// SIDEBAR ICONS
+// --------------------------------------------------
+
+const SidebarIcon = ({ name }) => {
+  const paths = {
+    home: (
+      <>
+        <path d="M3 11.5 12 4l9 7.5" />
+        <path d="M5 10v10h14V10" />
+      </>
+    ),
+    about: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 11v5M12 8h.01" />
+      </>
+    ),
+    stories: (
+      <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z" />
+    ),
+    gallery: (
+      <>
+        <rect x="3" y="4" width="18" height="16" rx="3" />
+        <circle cx="9" cy="10" r="1.5" />
+        <path d="m4 18 5-5 4 4 3-3 4 4" />
+      </>
+    ),
+    tours: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="m15.5 8.5-2 5-5 2 2-5z" />
+      </>
+    ),
+    faq: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1.9-1.1 1.8M12 17h.01" />
+      </>
+    ),
+    contact: (
+      <>
+        <rect x="3" y="5" width="18" height="14" rx="3" />
+        <path d="m4 7 8 6 8-6" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      className="h-[18px] w-[18px] shrink-0"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  );
+};
+
+// --------------------------------------------------
 // COLLAPSE (smoothly shrinks a navbar group to nothing)
 // --------------------------------------------------
 
@@ -274,7 +349,7 @@ const Navbar = ({ displayedPath }) => {
   const location = useLocation();
   const shownPath = displayedPath ?? location.pathname;
   const onToursNow =
-    location.pathname === "/tours" || location.pathname === "/gallery"
+    location.pathname === "/tours" || location.pathname === "/gallery";
 
   const mode = useTransitionMode();
   const reduceMotion = useReducedMotion();
@@ -296,23 +371,25 @@ const Navbar = ({ displayedPath }) => {
     ? Math.min(logoWhiteDelay, LOGO_WHITE_MAX_DELAY)
     : 0;
 
+  // On /tours and /gallery the navbar turns white once scrolled, so the
+  // hamburger switches to dark bars there to stay visible.
+  const darkBurger = onToursNow && pastTop;
+
   const isCheckout = shownPath === "/checkout";
   const isBooking = shownPath === "/booking";
   const isSuccess = shownPath === "/success";
   const isTours = shownPath === "/tours" || shownPath.startsWith("/tours/");
 
-  const [language, setLanguage] = useState("EN");
   const [menuOpen, setMenuOpen] = useState(false);
   const [hoverIndex, setHoverIndex] = useState(null);
   const [pendingSection, setPendingSection] = useState(null);
   const [activeMega, setActiveMega] = useState(null);
-  const [activeMobileMega, setActiveMobileMega] = useState(null);
 
   const navbarRef = useRef(null);
   const accentRef = useRef(null);
   const mobilePanelRef = useRef(null);
+  const mobileBackdropRef = useRef(null);
   const megaPanelRef = useRef(null);
-  const mobileMenuContentRef = useRef(null);
   const megaCloseTimerRef = useRef(null);
 
   const activeMegaData = activeMega ? megaMenus[activeMega] : null;
@@ -372,7 +449,7 @@ const Navbar = ({ displayedPath }) => {
   // DESKTOP MEGA MENU
   // --------------------------------------------------
 
-  const openMega = (label, index, event) => {
+  const openMega = (label, index) => {
     if (window.innerWidth < 768) return;
 
     window.clearTimeout(megaCloseTimerRef.current);
@@ -403,6 +480,33 @@ const Navbar = ({ displayedPath }) => {
   };
 
   // --------------------------------------------------
+  // MOBILE SIDEBAR OPEN / CLOSE
+  // --------------------------------------------------
+
+  const closeMenu = () => {
+    const panel = mobilePanelRef.current;
+    const backdrop = mobileBackdropRef.current;
+
+    if (!panel || reduceMotion) {
+      setMenuOpen(false);
+      return;
+    }
+
+    gsap.to(backdrop, { opacity: 0, duration: 0.2, ease: "power1.out" });
+    gsap.to(panel, {
+      xPercent: -100,
+      duration: 0.24,
+      ease: "power2.in",
+      onComplete: () => setMenuOpen(false),
+    });
+  };
+
+  const toggleMenu = () => {
+    if (menuOpen) closeMenu();
+    else setMenuOpen(true);
+  };
+
+  // --------------------------------------------------
   // NAVIGATION
   // --------------------------------------------------
 
@@ -412,7 +516,6 @@ const Navbar = ({ displayedPath }) => {
 
     setMenuOpen(false);
     setActiveMega(null);
-    setActiveMobileMega(null);
     setHoverIndex(null);
 
     // Check for explicit path routes (like /tours)
@@ -464,16 +567,13 @@ const Navbar = ({ displayedPath }) => {
     });
   };
 
-  const toggleMobileMega = (label, event) => {
-    event?.preventDefault?.();
-    event?.stopPropagation?.();
-
-    if (label === "Home") {
-      handleNavClick(label, event);
-      return;
+  // Highlights the current page in the sidebar.
+  const isItemActive = (target) => {
+    if (target === "Home") return shownPath === "/";
+    if (target.startsWith("/")) {
+      return shownPath === target || shownPath.startsWith(`${target}/`);
     }
-
-    setActiveMobileMega((current) => (current === label ? null : label));
+    return false;
   };
 
   // --------------------------------------------------
@@ -517,11 +617,11 @@ const Navbar = ({ displayedPath }) => {
   }, []);
 
   // --------------------------------------------------
-  // MOBILE MENU ANIMATION
+  // MOBILE SIDEBAR: slide in, lock scroll, Escape to close
   // --------------------------------------------------
 
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen) return undefined;
 
     if (navbarRef.current) {
       gsap.to(navbarRef.current, {
@@ -531,21 +631,39 @@ const Navbar = ({ displayedPath }) => {
       });
     }
 
-    if (!mobilePanelRef.current) return;
+    if (mobilePanelRef.current && mobileBackdropRef.current) {
+      if (reduceMotion) {
+        gsap.set(mobilePanelRef.current, { xPercent: 0 });
+        gsap.set(mobileBackdropRef.current, { opacity: 1 });
+      } else {
+        gsap.fromTo(
+          mobilePanelRef.current,
+          { xPercent: -100 },
+          { xPercent: 0, duration: 0.3, ease: "power3.out" },
+        );
+        gsap.fromTo(
+          mobileBackdropRef.current,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.25, ease: "power1.out" },
+        );
+      }
+    }
 
-    gsap.fromTo(
-      mobilePanelRef.current,
-      {
-        opacity: 0,
-        y: -12,
-      },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.24,
-        ease: "power2.out",
-      },
-    );
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.lenis?.stop?.();
+
+    const onKey = (e) => {
+      if (e.key === "Escape") closeMenu();
+    };
+    window.addEventListener("keydown", onKey);
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.lenis?.start?.();
+      window.removeEventListener("keydown", onKey);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuOpen]);
 
   // --------------------------------------------------
@@ -579,46 +697,13 @@ const Navbar = ({ displayedPath }) => {
   }, [activeMega]);
 
   // --------------------------------------------------
-  // MOBILE MEGA ANIMATION
-  // --------------------------------------------------
-
-  useEffect(() => {
-    if (!activeMobileMega || !mobileMenuContentRef.current) {
-      return;
-    }
-
-    const activePanel = mobileMenuContentRef.current.querySelector(
-      `[data-mobile-mega="${activeMobileMega}"]`,
-    );
-
-    if (!activePanel) return;
-
-    gsap.fromTo(
-      activePanel,
-      {
-        height: 0,
-        opacity: 0,
-        y: -6,
-      },
-      {
-        height: "auto",
-        opacity: 1,
-        y: 0,
-        duration: 0.24,
-        ease: "power2.out",
-      },
-    );
-  }, [activeMobileMega]);
-
-  // --------------------------------------------------
   // RESIZE
   // --------------------------------------------------
 
   useEffect(() => {
     const onResize = () => {
-      if (window.innerWidth >= 768) {
+      if (window.innerWidth >= 640) {
         setMenuOpen(false);
-        setActiveMobileMega(null);
       }
 
       if (window.innerWidth < 768) {
@@ -639,7 +724,6 @@ const Navbar = ({ displayedPath }) => {
   useEffect(() => {
     setMenuOpen(false);
     setActiveMega(null);
-    setActiveMobileMega(null);
     setHoverIndex(null);
   }, [location.pathname]);
 
@@ -794,6 +878,8 @@ const Navbar = ({ displayedPath }) => {
     return null;
   }
 
+  const burgerBar = darkBurger ? "bg-blue-700" : "bg-white";
+
   return (
     <>
       {/* =========================================================
@@ -842,6 +928,7 @@ const Navbar = ({ displayedPath }) => {
 
           {/* =====================================================
               RIGHT SIDE: every group collapses on /tours except kids
+              and the mobile hamburger
           ===================================================== */}
 
           <div className="ml-auto flex min-w-0 items-center">
@@ -912,7 +999,7 @@ const Navbar = ({ displayedPath }) => {
                     key={item.label}
                     type="button"
                     onClick={(event) => handleNavClick(item.target, event)}
-                    onMouseEnter={(event) => openMega(item.label, index, event)}
+                    onMouseEnter={() => openMega(item.label, index)}
                     onMouseLeave={scheduleCloseMega}
                     className="rounded-full px-2.5 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-white/20 hover:text-white lg:px-4"
                   >
@@ -967,36 +1054,34 @@ const Navbar = ({ displayedPath }) => {
               </button>
             </Collapse>
 
-            {/* MOBILE MENU BUTTON (collapses on /tours) */}
-            <Collapse open={!isTours} display="grid sm:hidden">
+            {/* MOBILE MENU BUTTON
+                Always visible on mobile, including /tours where it sits
+                to the right of Kids Activities. */}
+            <Collapse open display="grid sm:hidden" pad="left">
               <button
                 type="button"
-                aria-label="Toggle menu"
+                aria-label="Open menu"
                 aria-expanded={menuOpen}
                 onClick={(event) => {
                   event.preventDefault();
                   event.stopPropagation();
-                  setMenuOpen((prev) => !prev);
+                  toggleMenu();
                 }}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/14 bg-white/8 backdrop-blur-sm"
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border backdrop-blur-sm transition-colors duration-200 ${
+                  darkBurger
+                    ? "border-blue-700/25 bg-blue-700/10"
+                    : "border-white/14 bg-white/8"
+                }`}
               >
                 <div className="relative flex h-4 w-5 flex-col justify-between">
                   <span
-                    className={`block h-[2px] w-full rounded-full bg-white transition-all duration-300 ${
-                      menuOpen ? "translate-y-[7px] rotate-45" : ""
-                    }`}
+                    className={`block h-[2px] w-full rounded-full transition-all duration-300 ${burgerBar}`}
                   />
-
                   <span
-                    className={`block h-[2px] w-full rounded-full bg-white transition-all duration-300 ${
-                      menuOpen ? "opacity-0" : "opacity-100"
-                    }`}
+                    className={`block h-[2px] w-full rounded-full transition-all duration-300 ${burgerBar}`}
                   />
-
                   <span
-                    className={`block h-[2px] w-full rounded-full bg-white transition-all duration-300 ${
-                      menuOpen ? "-translate-y-[7px] -rotate-45" : ""
-                    }`}
+                    className={`block h-[2px] w-full rounded-full transition-all duration-300 ${burgerBar}`}
                   />
                 </div>
               </button>
@@ -1013,17 +1098,7 @@ const Navbar = ({ displayedPath }) => {
         activeMegaData &&
         typeof document !== "undefined" &&
         createPortal(
-          <div
-            className="
-              pointer-events-none
-              fixed
-              inset-0
-              z-[9970]
-              bg-black/30
-              backdrop-blur-[2px]
-              md:block
-            "
-          />,
+          <div className="pointer-events-none fixed inset-0 z-[9970] bg-black/30 backdrop-blur-[2px] md:block" />,
           document.body,
         )}
 
@@ -1039,104 +1114,30 @@ const Navbar = ({ displayedPath }) => {
             ref={megaPanelRef}
             onMouseEnter={keepMegaOpen}
             onMouseLeave={scheduleCloseMega}
-            className="
-              fixed
-              left-0
-              right-0
-              top-[5rem]
-              z-[9980]
-              hidden
-              max-h-[calc(100dvh-4rem)]
-              overflow-y-auto
-              overscroll-contain
-              border-y
-              border-black/5
-              bg-linear-to-b
-              from-white
-              to-0%
-              text-black
-              shadow-[0_18px_45px_rgba(0,0,0,0.10)]
-              md:block
-            "
+            className="fixed left-0 right-0 top-[5rem] z-[9980] hidden max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-y border-black/5 bg-linear-to-b from-white to-0% text-black shadow-[0_18px_45px_rgba(0,0,0,0.10)] md:block"
           >
-            <div
-              className="
-                mx-auto
-                w-full
-                max-w-7xl
-                px-4
-                py-5
-                sm:px-6
-                lg:px-8
-              "
-            >
-              <div
-                className="
-                  grid
-                  gap-5
-                  lg:grid-cols-[0.68fr_1.32fr]
-                "
-              >
+            <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+              <div className="grid gap-5 lg:grid-cols-[0.68fr_1.32fr]">
                 {/* Intro */}
 
-                <div
-                  className="
-                    rounded-[1.5rem]
-                    border
-                    border-black/5
-                    bg-neutral-50
-                    p-5
-                  "
-                >
+                <div className="rounded-[1.5rem] border border-black/5 bg-neutral-50 p-5">
                   {activeMegaData.logo && (
                     <img
                       src={activeMegaData.logo}
                       alt="Cape Frontier logo"
-                      className="
-                        mb-4
-                        h-20
-                        w-auto
-                        object-contain
-                      "
+                      className="mb-4 h-20 w-auto object-contain"
                     />
                   )}
 
-                  <p
-                    className="
-                      font-bitter
-                      text-[10px]
-                      font-black
-                      uppercase
-                      tracking-[0.24em]
-                      text-blue-400
-                    "
-                  >
+                  <p className="font-bitter text-[10px] font-black uppercase tracking-[0.24em] text-blue-400">
                     {activeMegaData.eyebrow}
                   </p>
 
-                  <h3
-                    className="
-                      mt-2
-                      font-frank
-                      text-4xl
-                      font-bold
-                      leading-none
-                      text-neutral-950
-                    "
-                  >
+                  <h3 className="mt-2 font-frank text-4xl font-bold leading-none text-neutral-950">
                     {activeMegaData.title}
                   </h3>
 
-                  <p
-                    className="
-                      mt-3
-                      max-w-md
-                      font-bitter
-                      text-sm
-                      leading-6
-                      text-neutral-600
-                    "
-                  >
+                  <p className="mt-3 max-w-md font-bitter text-sm leading-6 text-neutral-600">
                     {activeMegaData.desc}
                   </p>
 
@@ -1148,22 +1149,7 @@ const Navbar = ({ displayedPath }) => {
                         event,
                       )
                     }
-                    className="
-                      mt-5
-                      inline-flex
-                      items-center
-                      gap-2
-                      rounded-full
-                      bg-green-200
-                      px-4
-                      py-2
-                      font-bitter
-                      text-sm
-                      font-bold
-                      text-green-950
-                      transition
-                      hover:-translate-y-0.5
-                    "
+                    className="mt-5 inline-flex items-center gap-2 rounded-full bg-green-200 px-4 py-2 font-bitter text-sm font-bold text-green-950 transition hover:-translate-y-0.5"
                   >
                     Open {activeMegaData.ctaLabel ?? activeMega}
                     <span aria-hidden="true">→</span>
@@ -1173,171 +1159,53 @@ const Navbar = ({ displayedPath }) => {
                 {/* Mega Content */}
 
                 {activeMegaData.layout === "cards" ? (
-                  <div
-                    className="
-                      grid
-                      grid-cols-2
-                      gap-3
-                      lg:grid-cols-4
-                    "
-                  >
+                  <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                     {activeMegaData.cards.map((card) => (
                       <button
                         key={card.title}
                         type="button"
                         onClick={(event) => handleNavClick(card.target, event)}
-                        className="
-                            group
-                            overflow-hidden
-                            rounded-[1.35rem]
-                            border
-                            border-black/5
-                            bg-neutral-50
-                            text-left
-                            shadow-[0_10px_26px_rgba(0,0,0,0.04)]
-                            transition
-                            hover:-translate-y-1
-                            hover:bg-white
-                            hover:shadow-[0_16px_34px_rgba(0,0,0,0.08)]
-                          "
+                        className="group overflow-hidden rounded-[1.35rem] border border-black/5 bg-neutral-50 text-left shadow-[0_10px_26px_rgba(0,0,0,0.04)] transition hover:-translate-y-1 hover:bg-white hover:shadow-[0_16px_34px_rgba(0,0,0,0.08)]"
                       >
-                        <div
-                          className="
-                              relative
-                              h-32
-                              overflow-hidden
-                            "
-                        >
+                        <div className="relative h-32 overflow-hidden">
                           <img
                             src={card.image}
                             alt={card.title}
-                            className="
-                                h-full
-                                w-full
-                                object-cover
-                                transition
-                                duration-500
-                                group-hover:scale-110
-                              "
+                            className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
                             loading="lazy"
                           />
 
-                          <div
-                            className="
-                                absolute
-                                inset-0
-                                bg-gradient-to-t
-                                from-black/60
-                                via-black/10
-                                to-transparent
-                              "
-                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-                          <p
-                            className="
-                                absolute
-                                bottom-3
-                                left-3
-                                rounded-full
-                                bg-white/90
-                                px-3
-                                py-1
-                                font-bitter
-                                text-xs
-                                font-bold
-                                text-black
-                                shadow-sm
-                              "
-                          >
+                          <p className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 font-bitter text-xs font-bold text-black shadow-sm">
                             {card.title}
                           </p>
                         </div>
 
-                        <p
-                          className="
-                              p-3
-                              font-bitter
-                              text-xs
-                              leading-5
-                              text-neutral-600
-                            "
-                        >
+                        <p className="p-3 font-bitter text-xs leading-5 text-neutral-600">
                           {card.desc}
                         </p>
                       </button>
                     ))}
                   </div>
                 ) : (
-                  <div
-                    className="
-                      grid
-                      grid-cols-2
-                      gap-3
-                      lg:grid-cols-4
-                    "
-                  >
+                  <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                     {activeMegaData.links.map((link) => (
                       <button
                         key={link.title}
                         type="button"
                         onClick={(event) => handleNavClick(link.target, event)}
-                        className="
-                            group
-                            rounded-[1.35rem]
-                            border
-                            border-black/5
-                            bg-neutral-50
-                            p-4
-                            text-left
-                            shadow-[0_10px_26px_rgba(0,0,0,0.04)]
-                            transition
-                            hover:-translate-y-1
-                            hover:bg-white
-                            hover:shadow-[0_16px_34px_rgba(0,0,0,0.08)]
-                          "
+                        className="group rounded-[1.35rem] border border-black/5 bg-neutral-50 p-4 text-left shadow-[0_10px_26px_rgba(0,0,0,0.04)] transition hover:-translate-y-1 hover:bg-white hover:shadow-[0_16px_34px_rgba(0,0,0,0.08)]"
                       >
-                        <p
-                          className="
-                              font-bitter
-                              text-sm
-                              font-bold
-                              text-neutral-950
-                            "
-                        >
+                        <p className="font-bitter text-sm font-bold text-neutral-950">
                           {link.title}
                         </p>
 
-                        <p
-                          className="
-                              mt-2
-                              font-bitter
-                              text-xs
-                              leading-5
-                              text-neutral-600
-                            "
-                        >
+                        <p className="mt-2 font-bitter text-xs leading-5 text-neutral-600">
                           {link.desc}
                         </p>
 
-                        <span
-                          className="
-                              mt-3
-                              inline-flex
-                              rounded-full
-                              bg-green-200
-                              px-3
-                              py-1
-                              font-bitter
-                              text-[10px]
-                              font-bold
-                              uppercase
-                              tracking-[0.14em]
-                              text-green-950
-                              transition
-                              group-hover:bg-neutral-950
-                              group-hover:text-white
-                            "
-                        >
+                        <span className="mt-3 inline-flex rounded-full bg-green-200 px-3 py-1 font-bitter text-[10px] font-bold uppercase tracking-[0.14em] text-green-950 transition group-hover:bg-neutral-950 group-hover:text-white">
                           View
                         </span>
                       </button>
@@ -1351,627 +1219,162 @@ const Navbar = ({ displayedPath }) => {
         )}
 
       {/* =========================================================
-          MOBILE MENU
+          MOBILE SIDEBAR (Claude-style slide-in drawer)
+          Available on every page, including /tours.
       ========================================================= */}
 
-      {!isTours &&
-        menuOpen &&
+      {menuOpen &&
         typeof document !== "undefined" &&
         createPortal(
           <div
-            className="
-              fixed
-              inset-0
-              z-[9980]
-              sm:hidden
-            "
-            onClick={() => setMenuOpen(false)}
-            onPointerDown={(event) => event.stopPropagation()}
-            onTouchStart={(event) => event.stopPropagation()}
+            className="fixed inset-0 z-[9995] sm:hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site menu"
           >
             {/* Backdrop */}
-
             <div
-              className="
-                absolute
-                inset-0
-                bg-black/50
-                backdrop-blur-md
-              "
+              ref={mobileBackdropRef}
+              onClick={closeMenu}
+              className="absolute inset-0 bg-black/40"
             />
 
-            <div
+            {/* Drawer */}
+            <aside
               ref={mobilePanelRef}
-              onClick={(event) => event.stopPropagation()}
-              onPointerDown={(event) => event.stopPropagation()}
-              onTouchStart={(event) => event.stopPropagation()}
-              className="
-                absolute
-                bottom-3
-                left-0
-                right-0
-                top-[3.75rem]
-                mx-auto
-                w-full
-                max-w-[calc(100dvw-1.25rem)]
-                px-2.5
-              "
+              className="absolute inset-y-0 left-0 flex w-[86%] max-w-[21rem] flex-col border-r border-black/[0.06] bg-[#F5F4ED] pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] text-neutral-900 shadow-[8px_0_40px_rgba(0,0,0,0.18)]"
             >
-              <div
-                ref={mobileMenuContentRef}
-                className="
-                  h-full
-                  w-full
-                  overflow-y-auto
-                  rounded-[1.7rem]
-                  border
-                  border-white/10
-                  bg-[#06164f]/88
-                  p-3
-                  shadow-[0_18px_45px_rgba(0,0,0,0.30)]
-                  backdrop-blur-2xl
-                "
-                style={{
-                  WebkitOverflowScrolling: "touch",
-                }}
-              >
-                {/* =================================================
-                    MOBILE BRAND
-                ================================================= */}
-
-                <div
-                  className="
-                    relative
-                    overflow-hidden
-                    rounded-[1.35rem]
-                    border
-                    border-white/10
-                    bg-white
-                    p-4
-                    backdrop-blur-xl
-                  "
+              {/* Header: logo + close */}
+              <div className="flex items-center justify-between gap-2 px-4 pb-2 pt-3">
+                <button
+                  type="button"
+                  onClick={(event) => handleNavClick("Home", event)}
+                  aria-label="Cape Frontier home"
+                  className="flex min-w-0 items-center"
                 >
-                  <button
-                    type="button"
-                    onClick={() => setMenuOpen(false)}
-                    className="
-                      absolute
-                      right-3
-                      top-3
-                      flex
-                      h-9
-                      w-9
-                      items-center
-                      justify-center
-                      rounded-full
-                      border
-                      border-white/12
-                      bg-red-400
-                      text-white/85
-                      transition
-                      hover:bg-white/12
-                      hover:text-white
-                    "
-                    aria-label="Close menu"
-                  >
-                    <span
-                      className="
-                        relative
-                        h-4
-                        w-4
-                      "
-                      aria-hidden="true"
-                    >
-                      <span
-                        className="
-                          absolute
-                          left-0
-                          top-1/2
-                          h-[2px]
-                          w-full
-                          -translate-y-1/2
-                          rotate-45
-                          rounded-full
-                          bg-current
-                        "
-                      />
-
-                      <span
-                        className="
-                          absolute
-                          left-0
-                          top-1/2
-                          h-[2px]
-                          w-full
-                          -translate-y-1/2
-                          -rotate-45
-                          rounded-full
-                          bg-current
-                        "
-                      />
-                    </span>
-                  </button>
-
                   <img
                     src="/assets/brand/logo-cf.webp"
-                    alt="Cape Frontier logo"
-                    className="
-                      block
-                      h-24
-                      w-auto
-                      max-w-[230px]
-                      object-contain
-                      object-left
-                    "
+                    alt="Cape Frontier Travel & Tours"
+                    className="block h-12 w-auto max-w-[190px] object-contain object-left"
                   />
+                </button>
 
-                  <div
-                    className="
-                      my-2
-                      rounded-full
-                      border
-                      border-blue-600/20
-                    "
-                  />
-
-                  <div
-                    className="
-                      flex
-                      items-center
-                      justify-center
-                      text-center
-                      gap-4
-                    "
-                  >
-                    <p
-                      className="
-                        text-md
-                        font-bitter
-                        font-bold
-                        
-                      "
-                    >
-                      Affiliated to
-                    </p>
-
-                    <img
-                      src="/assets/brand/logo-love-ct-blue.webp"
-                      alt="Love Cape Town"
-                      className="
-                        block
-                        h-12
-                        w-auto
-                        max-w-[230px]
-                        object-contain
-                        object-left
-                      "
-                    />
-                  </div>
-                </div>
-
-                {/* =================================================
-                    MOBILE NAVIGATION
-                ================================================= */}
-
-                <nav
-                  className="
-                    mt-3
-                    grid
-                    gap-1.5
-                  "
-                  aria-label="Mobile navigation"
+                <button
+                  type="button"
+                  onClick={closeMenu}
+                  autoFocus
+                  aria-label="Close menu"
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-neutral-600 transition hover:bg-black/[0.06] hover:text-neutral-900"
                 >
-                  {navItems
-                    .filter((item) => item.label !== "Contact")
-                    .map((item) => (
+                  <span className="relative block h-4 w-4" aria-hidden="true">
+                    <span className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 rotate-45 rounded-full bg-current" />
+                    <span className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 -rotate-45 rounded-full bg-current" />
+                  </span>
+                </button>
+              </div>
+
+              {/* Primary action */}
+              <div className="px-3 pb-2 pt-1">
+                <button
+                  type="button"
+                  onClick={(event) => handleNavClick("/tours", event)}
+                  className="flex w-full items-center gap-2.5 rounded-xl bg-blue-600 px-3.5 py-2.5 font-bitter text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 active:scale-[0.99]"
+                >
+                  <SidebarIcon name="tours" />
+                  Browse tours
+                </button>
+              </div>
+
+              {/* Scrollable body */}
+              <div
+                className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-3"
+                style={{ WebkitOverflowScrolling: "touch" }}
+              >
+                {/* Navigation */}
+                <nav className="grid gap-0.5 pt-1" aria-label="Mobile navigation">
+                  {navItems.map((item) => {
+                    const active = isItemActive(item.target);
+
+                    return (
                       <button
                         key={item.label}
                         type="button"
                         onClick={(event) => handleNavClick(item.target, event)}
-                        className="
-                          group
-                          flex
-                          w-full
-                          items-center
-                          justify-between
-                          rounded-2xl
-                          border
-                          border-white/[0.08]
-                          bg-white/[0.045]
-                          px-4
-                          py-3.5
-                          text-left
-                          backdrop-blur-md
-                          transition
-                          hover:border-white/14
-                          hover:bg-white/[0.085]
-                        "
+                        aria-current={active ? "page" : undefined}
+                        className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left font-bitter text-[15px] transition ${
+                          active
+                            ? "bg-black/[0.07] font-bold text-neutral-950"
+                            : "font-medium text-neutral-700 hover:bg-black/[0.045] hover:text-neutral-950"
+                        }`}
                       >
                         <span
-                          className="
-                            font-frank
-                            text-[1.45rem]
-                            font-semibold
-                            leading-none
-                            tracking-[-0.01em]
-                            text-white
-                          "
+                          className={active ? "text-blue-600" : "text-neutral-500"}
                         >
-                          {item.label}
+                          <SidebarIcon name={item.icon} />
                         </span>
-
-                        <span
-                          className="
-                            flex
-                            h-8
-                            w-8
-                            items-center
-                            justify-center
-                            rounded-full
-                            bg-white/[0.08]
-                            font-bitter
-                            text-sm
-                            font-black
-                            text-white/78
-                            transition
-                            group-hover:bg-green-200
-                            group-hover:text-blue-950
-                          "
-                        >
-                          →
-                        </span>
+                        {item.label}
                       </button>
-                    ))}
+                    );
+                  })}
                 </nav>
 
-                {/* =================================================
-                    BUSINESS INFO
-                ================================================= */}
+                {/* Policies */}
+                <p className="mb-1 mt-5 px-3 font-bitter text-xs font-medium text-neutral-500">
+                  Policies
+                </p>
 
-                <div
-                  className="
-                    mt-3
-                    rounded-2xl
-                    border
-                    border-white/[0.08]
-                    bg-white/[0.045]
-                    p-3
-                    backdrop-blur-lg
-                  "
-                >
-                  <p
-                    className="
-                      font-bitter
-                      text-[10px]
-                      font-black
-                      uppercase
-                      tracking-[0.2em]
-                      text-green-200
-                    "
-                  >
-                    Business info
-                  </p>
-
-                  <div
-                    className="
-                      mt-3
-                      grid
-                      gap-2
-                    "
-                  >
-                    {/* Location */}
-
-                    <div
-                      className="
-                        flex
-                        items-start
-                        gap-2.5
-                      "
-                    >
-                      <span
-                        className="
-                          mt-0.5
-                          flex
-                          h-7
-                          w-7
-                          shrink-0
-                          items-center
-                          justify-center
-                          rounded-full
-                          bg-white/[0.08]
-                          text-green-200
-                        "
-                      >
-                        <svg
-                          className="h-3.5 w-3.5"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          aria-hidden="true"
-                        >
-                          <path d="M12 21s7-4.4 7-11a7 7 0 1 0-14 0c0 6.6 7 11 7 11Z" />
-
-                          <circle cx="12" cy="10" r="2.5" />
-                        </svg>
-                      </span>
-
-                      <div className="min-w-0">
-                        <p
-                          className="
-                            font-bitter
-                            text-xs
-                            font-black
-                            uppercase
-                            tracking-[0.12em]
-                            text-white/86
-                          "
-                        >
-                          Cape Town based
-                        </p>
-
-                        <p
-                          className="
-                            mt-0.5
-                            font-bitter
-                            text-xs
-                            leading-5
-                            text-white/52
-                          "
-                        >
-                          Guided Cape Town routes, local pickup support, and
-                          manual booking confirmation.
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Secure booking */}
-
-                    <div
-                      className="
-                        flex
-                        items-start
-                        gap-2.5
-                      "
-                    >
-                      <span
-                        className="
-                          mt-0.5
-                          flex
-                          h-7
-                          w-7
-                          shrink-0
-                          items-center
-                          justify-center
-                          rounded-full
-                          bg-white/[0.08]
-                          text-green-200
-                        "
-                      >
-                        <svg
-                          className="h-3.5 w-3.5"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          aria-hidden="true"
-                        >
-                          <path d="M20 7 10 17l-5-5" />
-                        </svg>
-                      </span>
-
-                      <div className="min-w-0">
-                        <p
-                          className="
-                            font-bitter
-                            text-xs
-                            font-black
-                            uppercase
-                            tracking-[0.12em]
-                            text-white/86
-                          "
-                        >
-                          Secure booking flow
-                        </p>
-
-                        <p
-                          className="
-                            mt-0.5
-                            font-bitter
-                            text-xs
-                            leading-5
-                            text-white/52
-                          "
-                        >
-                          Choose your tour, confirm your group, pay online, then
-                          receive confirmation.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* =================================================
-                    TERMS & POLICIES
-                ================================================= */}
-
-                <div
-                  className="
-                    mt-3
-                    rounded-2xl
-                    border
-                    border-white/[0.08]
-                    bg-white/[0.045]
-                    p-3
-                    backdrop-blur-lg
-                  "
-                >
-                  <div
-                    className="
-                      flex
-                      items-center
-                      justify-between
-                      gap-3
-                    "
-                  >
-                    <p
-                      className="
-                        font-bitter
-                        text-[10px]
-                        font-black
-                        uppercase
-                        tracking-[0.2em]
-                        text-green-200
-                      "
-                    >
-                      Terms & policies
-                    </p>
-
+                <div className="grid gap-0.5">
+                  {policyLinks.map(([label, target]) => (
                     <button
+                      key={label}
                       type="button"
-                      onClick={(event) => handleNavClick("/policies", event)}
-                      className="
-                        rounded-full
-                        bg-white/[0.08]
-                        px-3
-                        py-1
-                        font-bitter
-                        text-[10px]
-                        font-black
-                        uppercase
-                        tracking-[0.12em]
-                        text-white/72
-                        transition
-                        hover:bg-white/14
-                        hover:text-white
-                      "
+                      onClick={(event) => handleNavClick(target, event)}
+                      className="w-full truncate rounded-lg px-3 py-2 text-left font-bitter text-sm text-neutral-700 transition hover:bg-black/[0.045] hover:text-neutral-950"
                     >
-                      Open all
+                      {label}
                     </button>
-                  </div>
-
-                  <div
-                    className="
-                      mt-3
-                      grid
-                      grid-cols-2
-                      gap-2
-                    "
-                  >
-                    {[
-                      ["Booking", "/policies#booking-policy"],
-                      ["Pickup", "/policies#pickup-policy"],
-                      ["Payment", "/policies#payment-policy"],
-                      ["Cancellation", "/policies#cancellation-policy"],
-                      ["Reschedule", "/policies#reschedule-policy"],
-                      ["Private tours", "/policies#private-tour-policy"],
-                    ].map(([label, target]) => (
-                      <button
-                        key={label}
-                        type="button"
-                        onClick={(event) => handleNavClick(target, event)}
-                        className="
-                            rounded-xl
-                            border
-                            border-white/[0.08]
-                            bg-white/[0.045]
-                            px-3
-                            py-2
-                            text-left
-                            font-bitter
-                            text-[11px]
-                            font-black
-                            uppercase
-                            tracking-[0.09em]
-                            text-white/68
-                            transition
-                            hover:bg-white/10
-                            hover:text-white
-                          "
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* =================================================
-                    BOTTOM ACTIONS
-                ================================================= */}
-
-                <div
-                  className="
-                    mt-3
-                    grid
-                    grid-cols-2
-                    gap-2
-                    pb-1
-                  "
-                >
-                  <button
-                    type="button"
-                    onClick={(event) => handleNavClick("Contact", event)}
-                    className="
-                      flex
-                      items-center
-                      justify-center
-                      gap-2
-                      rounded-2xl
-                      bg-white
-                      px-4
-                      py-3
-                      font-bitter
-                      text-xs
-                      font-black
-                      uppercase
-                      tracking-[0.12em]
-                      text-blue-950
-                      transition
-                      hover:bg-green-100
-                    "
-                  >
-                    <img
-                      src="/icons/faqBubble.png"
-                      className="
-                        h-5
-                        w-5
-                      "
-                      alt=""
-                      aria-hidden="true"
-                    />
-
-                    <span>FAQ</span>
-                  </button>
+                  ))}
 
                   <button
                     type="button"
-                    onClick={(event) => handleNavClick("Contact", event)}
-                    className="
-                      flex
-                      items-center
-                      justify-center
-                      gap-2
-                      rounded-2xl
-                      bg-green-200
-                      px-4
-                      py-3
-                      font-bitter
-                      text-xs
-                      font-black
-                      uppercase
-                      tracking-[0.12em]
-                      text-green-950
-                      transition
-                      hover:bg-green-100
-                    "
+                    onClick={(event) => handleNavClick("/policies", event)}
+                    className="w-full rounded-lg px-3 py-2 text-left font-bitter text-sm font-bold text-blue-600 transition hover:bg-black/[0.045]"
                   >
-                    <span>Contact</span>
-
-                    <span aria-hidden="true">→</span>
+                    View all policies →
                   </button>
                 </div>
               </div>
-            </div>
+
+              {/* Footer: contact + affiliation */}
+              <div className="border-t border-black/[0.08] px-3 pb-3 pt-3">
+                <button
+                  type="button"
+                  onClick={(event) => handleNavClick("Contact", event)}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left font-bitter text-[15px] font-medium text-neutral-800 transition hover:bg-black/[0.045]"
+                >
+                  <span className="text-neutral-500">
+                    <SidebarIcon name="contact" />
+                  </span>
+                  Contact us
+                </button>
+
+                <div className="mt-2 flex items-center gap-3 rounded-xl border border-black/[0.06] bg-white/70 px-3 py-2.5">
+                  <img
+                    src="/assets/brand/logo-love-ct-blue.webp"
+                    alt="Love Cape Town"
+                    className="h-9 w-auto shrink-0 object-contain"
+                  />
+                  <div className="min-w-0">
+                    <p className="font-bitter text-xs font-bold text-neutral-800">
+                      Affiliated to Love Cape Town
+                    </p>
+                    <p className="font-bitter text-[11px] leading-4 text-neutral-500">
+                      Cape Town based. Bookings confirmed manually.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </aside>
           </div>,
           document.body,
         )}

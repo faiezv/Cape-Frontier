@@ -74,9 +74,11 @@ const policies = [
     summary:
       "All bookings are manually confirmed after payment, and same‑day bookings are not accepted.",
     points: [
-      "Same‑day bookings are not permitted. All tours must be booked at least 24 hours in advance (or more, depending on the tour).",
+      "Same‑day bookings are not permitted. All tours must be booked at least 24/48/72 hours in advance.",
       "After booking and payment, you will receive an email receipt. Cape Frontier will then contact you via your preferred contact method (WhatsApp, email, or phone) to confirm vehicle details, pickup times, and any other relevant tour information not included in the receipt.",
-      "For multi‑day tours, we require a minimum of 14 days' advance booking to secure accommodation and confirm all logistics. Bookings made with less notice may be subject to availability.",
+      "For booking exceeding R30, 000.00 may be paid in two installments: a deposit and a final balance payment of which a payment link will be sent to you for the final balance payment. The booking will only be confirmed once the final balance payment has been received.",
+      "Booking are confirmed once payment has been received and the booking is accepted by Cape Frontier. You will receive a confirmation email with your booking details.",
+      "For multi‑day tours, we require a minimum of 30 days' advance booking to secure accommodation and confirm all logistics. Bookings made with less notice may be subject to availability.",
     ],
   },
   // ---- NEW POLICY ENDS HERE ----

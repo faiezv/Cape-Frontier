@@ -286,7 +286,7 @@ const Contact = () => {
     <section
       id="contact"
       ref={sectionRef}
-      className="relative min-h-[var(--contact-vh,100svh)] overflow-hidden bg-[#eef7f6] text-black"
+      className="relative overflow-hidden bg-[#eef7f6] text-black py-4 pt-18"
     >
       {/* Background artwork
       <img
@@ -304,208 +304,18 @@ const Contact = () => {
       />
 
       {/* Soft colour wash */}
-      <div className="absolute inset-0 z-20 bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(232,246,255,0.90)_46%,rgba(220,252,231,0.94)_100%)]" />
+      <div className="absolute inset-0 z-20 
+      bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(232,246,255,0.90)_46%,rgba(220,252,231,0.94)_100%)]" />
 
       {/* Ambient glow */}
       <div
         ref={glowRef}
-        className="pointer-events-none absolute right-[8%] top-[14%] z-20 h-44 w-44 rounded-full bg-green-200/55 blur-3xl sm:h-64 sm:w-64"
+        className="pointer-events-none absolute right-[8%] z-20 w-44 rounded-full bg-green-200/55 blur-3xl sm:w-64"
       />
 
-      <div className="relative z-30 mx-auto flex min-h-[var(--contact-vh,100svh)] w-full max-w-7xl flex-col px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-7">
+      <div className="relative z-30 mx-auto flex  w-full max-w-7xl flex-col ">
 
-        {/* Main content */}
-        <div className="grid flex-1 items-center gap-7 py-5 sm:gap-9 sm:py-7 lg:grid-cols-[0.75fr_1.25fr] lg:gap-16 lg:py-8">
 
-          {/* Logo + Back to top */}
-          <div className="flex flex-col items-center">
-            {/* Logo */}
-            <div
-              ref={logoRef}
-              className="relative w-full max-w-[rem] sm:max-w-[rem] lg:max-w-[rem]"
-            >
-              <img
-                src="/assets/brand/logo-cf.webp"
-                alt="Cape Frontier"
-                className="relative z-10 h-auto w-full object-contain opacity-[0.98] drop-shadow-[0_18px_40px_rgba(0,0,0,0.16)]"
-              />
-
-              <div className="absolute inset-x-8 bottom-3 h-8 rounded-full bg-blue-950/10 blur-2xl" />
-            </div>
-
-            <p className='text-2xl font-bitter text-black/60'>Explore beyond the ordinary.</p>
-
-            {/* Back to top */}
-            <div className="mt-5 flex items-center justify-end gap-3">
-              <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-900/55">
-                Back to top
-              </span>
-
-              <button
-                type="button"
-                onClick={scrollToTop}
-                aria-label="Back to top"
-                className="
-                  group
-                  flex h-10 w-10 shrink-0 items-center justify-center
-                  border border-slate-900/15
-                  bg-white/50
-                  backdrop-blur-sm
-                  transition-all duration-300 ease-out
-                  hover:-translate-y-1
-                  hover:border-slate-900/40
-                  hover:bg-white/90
-                  focus:outline-none
-                  focus-visible:ring-2
-                  focus-visible:ring-slate-900/20
-                  sm:h-11 sm:w-11
-                "
-              >
-                <img
-                  src="/icons/upArrowDark.png"
-                  alt=""
-                  className="
-                    h-3.5 w-3.5
-                    opacity-70
-                    transition-all duration-300 ease-out
-                    group-hover:-translate-y-0.5
-                    group-hover:opacity-100
-                  "
-                />
-              </button>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div
-            ref={contentRef}
-            className="order-2 flex flex-col gap-5 text-center lg:gap-6 lg:text-left"
-          >
-
-            {/* Heading */}
-            <div>
-              {/* <p className="font-bitter text-[10px] font-black uppercase tracking-[0.28em] text-blue-500 sm:text-xs">
-                Contact Cape Frontier
-              </p> */}
-
-              {/* <h2 className="mt-2 font-frank font-bold leading-[0.88] tracking-[-0.03em] text-[#071f4f] 
-              text-4xl sm:text-4xl md:text-4xl lg:text-4xl xl:text-4xl">
-                Have a question?
-              </h2>
-
-              <p className="mx-auto mt-3 max-w-2xl font-bitter text-[13px] leading-6 text-neutral-600 sm:text-base sm:leading-7 lg:mx-0 lg:text-lg">
-                Message us about tours, pickup details, private trips, custom routes, or booking support. We will help you choose the right Cape Town experience.
-              </p> */}
-            </div>
-
-            {/* Contact area */}
-            <div className="flex w-full gap-4">
-
-              
-
-              {/* Right: Full-height QR */}
-              <div
-                ref={(el) => {
-                  cardsRef.current[1] = el
-                }}
-                className="flex-1 flex w-full flex-col items-center justify-center rounded-[1.5rem] border border-white/0 bg-white/0 p- 
-                text-center hadow-[0_10px_30px_rgba(7,31,79,0.06)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-white/88 
-                hover:shadow-[0_18px_40px_rgba(7,31,79,0.10)] 
-                "
-              >
-                <a
-                  href="https://www.instagram.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Follow Cape Frontier on Instagram"
-                  className="flex h-full w-full flex-col items-center justify-center"
-                >
-                  {/* QR Code */}
-                  <div className="flex min-h-0 flex-1 items-center justify-center">
-                    <div className="relative overflow-hidden rounded-2xl border border-black/5 bg-white/70 p-2 
-                    shadow-[0_8px_24px_rgba(7,31,79,0.06)] transition duration-300 hover:shadow-[0_14px_32px_rgba(7,31,79,0.12)]">
-                      <img
-                        src="/assets/brand/instagram.png"
-                        alt="Scan to follow Cape Frontier on Instagram"
-                        className="h-auto w-full max-w-[16rem] object-contain"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Text below QR */}
-                  {/* <div className="mt-3 shrink-0">
-                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-blue-500">
-                      Instagram
-                    </p>
-
-                    <p className="mt-1 text-xs font-semibold leading-4 text-[#071f4f]">
-                      Scan to follow us
-                    </p>
-                  </div> */}
-                </a>
-              </div>
-
-              {/* Left: Email + buttons */}
-              <div className="flex-1 flex flex-col gap-4">
-
-                {/* Email */}
-                <div
-                  ref={(el) => {
-                    cardsRef.current[0] = el
-                  }}
-                  className="relative w-full rounded-3xl border border-white/70 bg-white/72 p-4 text-left shadow-[0_10px_30px_rgba(7,31,79,0.06)] 
-                  backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-white/88 hover:shadow-[0_18px_40px_rgba(7,31,79,0.10)] sm:p-5"
-                >
-                  <p className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.22em] text-blue-500">
-                    {/* <GmailIcon /> */}
-                    {/* Email */}
-                  </p>
-
-                  <p className="wrap-break-word text-sm font-bold leading-5 text-[#071f4f] sm:text-[15px]">
-                    {CONTACT_EMAIL}
-                  </p>
-
-                  <a
-                    href={`mailto:${CONTACT_EMAIL}`}
-                    className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700 transition hover:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
-                  >
-                    <GmailIcon />
-                    Contact us via email
-                  </a>
-                  <div className='my-3 w-full border border-blue-200/50'/>
-                  <p className="mt-2 text-[10px] font-black uppercase tracking-[0.22em] text-blue-500">
-                    {/* WhatsApp &amp; calls */}
-                  </p>
-
-                  <a
-                    href={WHATSAPP_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm font-bold leading-5 text-[#071f4f] hover:underline sm:text-[15px]"
-                  >
-                    <WhatsAppIcon className="h-4 w-4 shrink-0 text-[#25D366]" />
-                    {CONTACT_NUMBER}
-                  </a>
-
-                  <p className="mt-1 text-xs leading-5 text-neutral-500">
-                    Booking and support
-                  </p>
-                </div>
-
-                {/* Actions */}
-                <a
-                  href={WHATSAPP_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex min-h-[56px] w-full items-center justify-center gap-3 rounded-full bg-[#25D366] px-6 text-base font-bold text-[#06371d] shadow-[0_16px_34px_rgba(37,211,102,0.35)] transition duration-300 hover:-translate-y-1 hover:bg-[#1ebe5b] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-300"
-                >
-                  <WhatsAppIcon className="h-6 w-6" />
-                  Chat on WhatsApp
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Footer (shared with the Tours page) */}
         <div ref={footerRef} className="shrink-0">

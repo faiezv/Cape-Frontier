@@ -53,17 +53,51 @@ const SCROLL_HIDE_LIMIT = 120;
 // Fixed ambient hero clip (title matched against VIDEO_ORDER).
 const HERO_VIDEO_TITLE = "Welcome to Cape Frontier";
 
+// Where the Experience section buttons send people. Change to match your routes.
+const TOURS_PATH = "/tours";
+
+// Video rail auto-scroll speed in px per second. Lower = slower.
+// 20 is very gentle, 30 is calm, 45 is brisk.
+const AUTO_SCROLL_SPEED = 30;
+
+// Highlight cards in the Experience section.
+// imageKey = filename or title of a photo in heroGallery (optional).
+// Leave it "" to auto-pick an unused gallery photo.
+const EXPERIENCE_HIGHLIGHTS = [
+  {
+    key: "mountain",
+    title: "Table Mountain hikes",
+    text: "Guided routes with the best views over the city and the Atlantic.",
+    icon: "mountain",
+    imageKey: "",
+  },
+  {
+    key: "bokaap",
+    title: "Bo-Kaap walks",
+    text: "Colourful streets, local stories and Cape Malay culture up close.",
+    icon: "pin",
+    imageKey: "A Beautiful Part of an Unforgettable Day",
+  },
+  {
+    key: "winelands",
+    title: "Cape Winelands routes",
+    text: "Relaxed tastings and scenic drives through the Western Cape.",
+    icon: "wine",
+    imageKey: "Beautiful Scenery in Stellies",
+  },
+];
+
 // ============================================================
 // 1. MEDIA
 // ============================================================
 
 const videoModules = import.meta.glob(
   "/src/assets/videos/heroGallery/**/*.{mp4,webm,ogg,mov}",
-  { eager: true }
+  { eager: true },
 );
 const imageModules = import.meta.glob(
   "/src/assets/images/heroGallery/**/*.{jpg,jpeg,png,webp,avif}",
-  { eager: true }
+  { eager: true },
 );
 
 const normalize = (s = "") =>
@@ -104,7 +138,7 @@ const orderVideos = (list, order) => {
 
   if (import.meta.env?.DEV) {
     const known = new Set(
-      list.flatMap((v) => [normalize(v.title), normalize(v.filename)])
+      list.flatMap((v) => [normalize(v.title), normalize(v.filename)]),
     );
     const missing = order.filter((k) => !known.has(normalize(k)));
     if (missing.length) {
@@ -112,7 +146,7 @@ const orderVideos = (list, order) => {
         "[Gallery] VIDEO_ORDER entries with no matching video:",
         missing,
         "Available:",
-        list.map((v) => v.title)
+        list.map((v) => v.title),
       );
     }
   }
@@ -140,8 +174,13 @@ const Styles = () => (
     @media (prefers-reduced-motion: no-preference) {
       @keyframes gf-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
       @keyframes gf-fade { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes gf-shine {
+        0%   { transform: translateX(-150%) skewX(-18deg); }
+        55%, 100% { transform: translateX(550%) skewX(-18deg); }
+      }
       .gf-rise { animation: gf-rise .4s cubic-bezier(.2,.7,.2,1) both; }
       .gf-fade { animation: gf-fade .25s ease-out both; }
+      .gf-shine { animation: gf-shine 3.2s ease-in-out infinite; }
     }
   `}</style>
 );
@@ -191,6 +230,13 @@ export const focusRing =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500";
 
 export const hoverZoom = "[@media(hover:hover)]:group-hover:scale-105";
+
+const formatTime = (s) => {
+  if (!Number.isFinite(s) || s <= 0) return "";
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${String(sec).padStart(2, "0")}`;
+};
 
 // ============================================================
 // 3. IMAGES
@@ -286,11 +332,11 @@ const Lightbox = ({ index, onChange, onClose }) => {
 
   const prev = useCallback(
     () => onChange((index - 1 + count) % count),
-    [index, count, onChange]
+    [index, count, onChange],
   );
   const next = useCallback(
     () => onChange((index + 1) % count),
-    [index, count, onChange]
+    [index, count, onChange],
   );
 
   useDialog((e) => {
@@ -305,7 +351,11 @@ const Lightbox = ({ index, onChange, onClose }) => {
     });
     stripRef.current
       ?.querySelector(`[data-thumb-index="${index}"]`)
-      ?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      ?.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
   }, [index, count]);
 
   const onTouchEnd = (e) => {
@@ -417,13 +467,23 @@ const Lightbox = ({ index, onChange, onClose }) => {
 // ============================================================
 
 const PlayIcon = () => (
-  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+  <svg
+    className="h-5 w-5"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+  >
     <path d="M8 5v14l11-7z" />
   </svg>
 );
 
 const PauseIcon = () => (
-  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+  <svg
+    className="h-5 w-5"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+  >
     <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
   </svg>
 );
@@ -486,7 +546,7 @@ const AmbientVideo = ({ video }) => {
     if (!el) return undefined;
     const io = new IntersectionObserver(
       ([entry]) => setInView(entry.isIntersecting),
-      { threshold: 0.2 }
+      { threshold: 0.2 },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -559,7 +619,6 @@ const AmbientVideo = ({ video }) => {
           className="pointer-events-none absolute bottom-3 left-3 z-10 hidden items-center gap-1.5 rounded-full bg-black/55 px-3 py-1.5 text-[11px] font-bold text-white backdrop-blur sm:bottom-4 sm:left-4 sm:inline-flex"
         >
           <VolumeOffIcon />
-          <span className="h-4 w-4 [&_svg]:h-3.5 [&_svg]:w-3.5" />
           Tap <VolumeOnIcon /> for sound
         </div>
       )}
@@ -568,67 +627,315 @@ const AmbientVideo = ({ video }) => {
 };
 
 // ============================================================
-// 5. REMAINING VIDEO THUMB + POPUP PLAYER
+// 5. VIDEO SECTION (auto-scrolling rail + popup player with prev/next)
 // ============================================================
 
-const VideoThumb = ({ video, onOpen }) => {
-  const onThumbEnter = (e) => {
-    const v = e.currentTarget;
+const VideoThumb = memo(({ video, index, onOpen }) => {
+  const videoRef = useRef(null);
+  const barRef = useRef(null);
+  const [duration, setDuration] = useState(0);
+  const [previewing, setPreviewing] = useState(false);
+
+  const startPreview = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    setPreviewing(true);
     v.currentTime = 0;
     v.play().catch(() => {});
   };
-  const onThumbLeave = (e) => {
-    const v = e.currentTarget;
+
+  const stopPreview = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    setPreviewing(false);
     v.pause();
     try {
       v.currentTime = 0;
     } catch {
       /* ignore */
     }
+    if (barRef.current) barRef.current.style.width = "0%";
+  };
+
+  const onTimeUpdate = (e) => {
+    const v = e.currentTarget;
+    if (barRef.current && v.duration) {
+      barRef.current.style.width = `${(v.currentTime / v.duration) * 100}%`;
+    }
   };
 
   return (
     <button
       type="button"
-      onClick={() => onOpen(video)}
+      onClick={() => onOpen(index)}
       aria-label={`Play ${video.title}`}
-      className={`group relative w-40 shrink-0 snap-start overflow-hidden rounded-xl border border-black/[0.06] text-left transition hover:border-blue-300 sm:w-48 sm:rounded-2xl lg:w-56 ${focusRing}`}
+      className={`group relative block w-44 shrink-0 snap-start overflow-hidden rounded-2xl border border-black/[0.06] bg-neutral-900 text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl sm:w-52 lg:w-60 ${focusRing}`}
     >
       <div className="relative aspect-[3/4]">
         <video
+          ref={videoRef}
           src={`${video.src}#t=0.1`}
           className={`h-full w-full object-cover transition-transform duration-500 ${hoverZoom}`}
           muted
           playsInline
           preload="metadata"
-          onMouseEnter={onThumbEnter}
-          onMouseLeave={onThumbLeave}
+          onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+          onTimeUpdate={onTimeUpdate}
+          onMouseEnter={startPreview}
+          onMouseLeave={stopPreview}
         />
-        <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
-        <span className="absolute inset-x-2 bottom-2 line-clamp-2 font-frank text-xs font-bold leading-tight text-white sm:text-sm">
-          {video.title}
-        </span>
-        <span className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-black/55 text-white backdrop-blur transition group-hover:bg-blue-500">
+
+        <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+
+        {/* Duration chip */}
+        {duration > 0 && (
+          <span className="pointer-events-none absolute left-2.5 top-2.5 rounded-full bg-black/55 px-2 py-0.5 font-bitter text-[11px] font-bold tabular-nums text-white backdrop-blur">
+            {formatTime(duration)}
+          </span>
+        )}
+
+        {/* Centre play button */}
+        <span
+          aria-hidden="true"
+          className={`pointer-events-none absolute left-1/2 top-1/2 grid h-14 w-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-blue-700 shadow-lg backdrop-blur transition duration-300 ${
+            previewing
+              ? "scale-75 opacity-0"
+              : "scale-100 opacity-90 [@media(hover:hover)]:group-hover:scale-110 [@media(hover:hover)]:group-hover:bg-blue-600 [@media(hover:hover)]:group-hover:text-white"
+          }`}
+        >
           <svg
-            className="h-3.5 w-3.5"
+            className="ml-0.5 h-6 w-6"
             viewBox="0 0 24 24"
             fill="currentColor"
-            aria-hidden="true"
           >
             <path d="M8 5v14l11-7z" />
           </svg>
         </span>
+
+        {/* Title */}
+        <span className="absolute inset-x-3 bottom-4 line-clamp-2 font-frank text-sm font-bold leading-tight text-white sm:text-base">
+          {video.title}
+        </span>
+
+        {/* Preview progress */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-white/20"
+        >
+          <span ref={barRef} className="block h-full w-0 bg-blue-400" />
+        </span>
       </div>
     </button>
   );
+});
+
+const VideoRail = ({ list, onOpen, paused = false }) => {
+  const railRef = useRef(null);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+
+  // Auto-scroll state (refs so the rAF loop never causes re-renders).
+  const posRef = useRef(0);
+  const holdRef = useRef(false); // hover / touch / focus
+  const inViewRef = useRef(true);
+  const pausedRef = useRef(paused);
+  const resumeAtRef = useRef(0);
+  const phaseRef = useRef("run"); // "run" | "rewind"
+
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
+
+  const update = useCallback(() => {
+    const el = railRef.current;
+    if (!el) return;
+    setCanPrev(el.scrollLeft > 4);
+    setCanNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return undefined;
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      el.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [update, list.length]);
+
+  // Slow auto-scroll to the right. Pauses on hover/touch/focus, when the rail
+  // is off-screen, or while the video popup is open. Rewinds to the start
+  // after lingering at the end. Disabled for reduced-motion users.
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return undefined;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      return undefined;
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        inViewRef.current = entry.isIntersecting;
+      },
+      { threshold: 0.1 },
+    );
+    io.observe(el);
+
+    let raf;
+    let last = performance.now();
+
+    const tick = (now) => {
+      const dt = Math.min(now - last, 64);
+      last = now;
+      const max = el.scrollWidth - el.clientWidth;
+
+      const active =
+        max > 4 &&
+        !pausedRef.current &&
+        !holdRef.current &&
+        inViewRef.current &&
+        now >= resumeAtRef.current;
+
+      if (active) {
+        // If the user scrolled manually, continue from where they are.
+        if (Math.abs(el.scrollLeft - posRef.current) > 2) {
+          posRef.current = el.scrollLeft;
+        }
+
+        if (phaseRef.current === "rewind") {
+          posRef.current = 0;
+          el.scrollTo({ left: 0, behavior: "smooth" });
+          phaseRef.current = "run";
+          resumeAtRef.current = now + 1800;
+        } else if (posRef.current >= max - 1) {
+          phaseRef.current = "rewind";
+          resumeAtRef.current = now + 1500; // linger at the end
+        } else {
+          posRef.current = Math.min(
+            max,
+            posRef.current + (AUTO_SCROLL_SPEED * dt) / 1000,
+          );
+          el.scrollLeft = posRef.current;
+        }
+      }
+
+      raf = requestAnimationFrame(tick);
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      io.disconnect();
+    };
+  }, [list.length]);
+
+  const hold = () => {
+    holdRef.current = true;
+  };
+  const release = (delay = 0) => {
+    holdRef.current = false;
+    resumeAtRef.current = performance.now() + delay;
+  };
+
+  const scrollByPage = (dir) => {
+    const el = railRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: "smooth" });
+  };
+
+  const arrowClass = `hidden h-11 w-11 place-items-center rounded-full border border-black/10 bg-white text-neutral-700 shadow-sm transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-black/10 disabled:hover:text-neutral-700 sm:grid ${focusRing}`;
+
+  return (
+    <section aria-labelledby="videos-heading">
+      <div className="mb-4 flex items-end justify-between gap-4 sm:mb-5">
+        <div className="min-w-0">
+          <h2
+            id="videos-heading"
+            className="font-frank text-2xl font-bold leading-none sm:text-3xl"
+          >
+            More from our tours
+          </h2>
+          <p className="mt-2 font-bitter text-xs text-neutral-500 sm:text-sm">
+            Guest stories and moments from the trail.{" "}
+            <span className="text-neutral-400">
+              {list.length} {list.length === 1 ? "clip" : "clips"}. Hover a clip
+              for a preview, click to watch.
+            </span>
+          </p>
+        </div>
+
+        {list.length > 2 && (
+          <div className="flex shrink-0 gap-2">
+            <button
+              type="button"
+              onClick={() => scrollByPage(-1)}
+              disabled={!canPrev}
+              aria-label="Scroll videos left"
+              className={arrowClass}
+            >
+              <Chevron dir="left" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollByPage(1)}
+              disabled={!canNext}
+              aria-label="Scroll videos right"
+              className={arrowClass}
+            >
+              <Chevron dir="right" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* No snap / scroll-smooth classes here: both fight with the per-frame
+          scrollLeft updates used by the auto-scroll. */}
+      <div
+        ref={railRef}
+        onMouseEnter={hold}
+        onMouseLeave={() => release(600)}
+        onFocus={hold}
+        onBlur={() => release(600)}
+        onTouchStart={hold}
+        onTouchEnd={() => release(2500)}
+        className="flex gap-3 overflow-x-auto overscroll-x-contain px-0.5 pb-4 pt-1 sm:gap-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        role="list"
+        aria-label="More tour videos"
+      >
+        {list.map((video, i) => (
+          <div role="listitem" key={video.id} className="shrink-0">
+            <VideoThumb video={video} index={i} onOpen={onOpen} />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 };
 
-const VideoModal = ({ video, onClose }) => {
+const VideoModal = ({ list, index, onChange, onClose }) => {
+  const video = list[index];
+  const count = list.length;
+
+  const prev = useCallback(
+    () => onChange((index - 1 + count) % count),
+    [index, count, onChange],
+  );
+  const next = useCallback(
+    () => onChange((index + 1) % count),
+    [index, count, onChange],
+  );
+
   useDialog((e) => {
     if (e.key === "Escape") onClose();
+    if (e.key === "ArrowLeft" && count > 1) prev();
+    if (e.key === "ArrowRight" && count > 1) next();
   });
 
   if (!video || typeof document === "undefined") return null;
+
+  const navClass = `absolute top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/45 text-white backdrop-blur transition hover:bg-black/70 sm:h-12 sm:w-12 ${focusRing}`;
 
   return createPortal(
     <div
@@ -652,27 +959,294 @@ const VideoModal = ({ video, onClose }) => {
           <CloseIcon />
         </button>
 
-        <div className="overflow-hidden rounded-xl bg-black sm:rounded-2xl">
+        <div className="relative overflow-hidden rounded-xl bg-black sm:rounded-2xl">
+          {count > 1 && (
+            <button
+              type="button"
+              onClick={prev}
+              aria-label="Previous video"
+              className={`${navClass} left-2 sm:left-4`}
+            >
+              <Chevron dir="left" />
+            </button>
+          )}
+
           <video
+            key={video.id}
             src={video.src}
             className="gf-fade max-h-[72dvh] w-full object-contain"
             controls
             autoPlay
             playsInline
+            onEnded={count > 1 ? next : undefined}
           />
+
+          {count > 1 && (
+            <button
+              type="button"
+              onClick={next}
+              aria-label="Next video"
+              className={`${navClass} right-2 sm:right-4`}
+            >
+              <Chevron dir="right" />
+            </button>
+          )}
         </div>
 
-        <p className="mt-3 truncate font-frank text-base font-bold text-white sm:text-xl">
-          {video.title}
-        </p>
+        <div className="flex items-center justify-between gap-4 px-1 pt-3">
+          <p className="truncate font-frank text-base font-bold text-white sm:text-xl">
+            {video.title}
+          </p>
+          <span className="shrink-0 font-bitter text-xs font-bold text-white/60">
+            {index + 1} / {count}
+          </span>
+        </div>
+
+        {count > 1 && (
+          <p className="px-1 pt-1 font-bitter text-xs text-white/40">
+            Plays the next clip automatically. Use the arrow keys to skip.
+          </p>
+        )}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 
 // ============================================================
-// 6. MAIN COMPONENT
+// 6. EXPERIENCE SECTION (highlight cards with photos + CTA)
+// ============================================================
+
+const findImage = (key) =>
+  key
+    ? images.find(
+        (i) =>
+          normalize(i.title) === normalize(key) ||
+          normalize(i.filename) === normalize(key),
+      )
+    : undefined;
+
+// Resolve each card's photo: explicit imageKey first, then unused gallery
+// photos in order.
+const experienceCards = (() => {
+  const used = new Set();
+  const withKeys = EXPERIENCE_HIGHLIGHTS.map((h) => {
+    const image = findImage(h.imageKey);
+    if (image) used.add(image.id);
+    return { ...h, image };
+  });
+  const spare = images.filter((i) => !used.has(i.id));
+  return withKeys.map((h) =>
+    h.image ? h : { ...h, image: spare.shift() || null },
+  );
+})();
+
+const ExperienceIcon = ({ name }) => {
+  const paths = {
+    mountain: (
+      <>
+        <path d="M3 20 9 9l4 6 3-4 5 9z" />
+        <path d="m9 9 1.5 2.5" />
+      </>
+    ),
+    pin: (
+      <>
+        <path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z" />
+        <circle cx="12" cy="10" r="2.5" />
+      </>
+    ),
+    wine: (
+      <>
+        <path d="M8 3h8l-1 7a3 3 0 0 1-6 0z" />
+        <path d="M12 13v7M8 21h8" />
+      </>
+    ),
+  };
+  return (
+    <svg
+      className="h-6 w-6"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  );
+};
+
+const ExperienceSection = ({ onExplore }) => {
+  const sectionRef = useRef(null);
+
+  // Staggered reveal on scroll.
+  useLayoutEffect(() => {
+    const root = sectionRef.current;
+    if (!root) return undefined;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      return undefined;
+    }
+
+    const ctx = gsap.context(() => {
+      gsap.from("[data-reveal]", {
+        y: 28,
+        opacity: 0,
+        duration: 0.7,
+        ease: "power3.out",
+        stagger: 0.12,
+        clearProps: "transform,opacity",
+        scrollTrigger: {
+          trigger: root,
+          start: "top 80%",
+          once: true,
+        },
+      });
+    }, root);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section ref={sectionRef} aria-labelledby="experience-heading">
+      <div className="relative overflow-hidden rounded-3xl border border-blue-100 bg-white/70 p-5 shadow-[0_12px_40px_rgba(15,23,42,0.08)] backdrop-blur sm:p-8 lg:p-10">
+        {/* Soft decorative glows */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-blue-200/40 blur-3xl"
+        />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-20 -left-16 h-56 w-56 rounded-full bg-indigo-200/40 blur-3xl"
+        />
+
+        <div className="relative">
+          {/* Heading */}
+          <div data-reveal className="mx-auto max-w-2xl text-center">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600">
+              The Cape Frontier experience
+            </p>
+            <h2
+              id="experience-heading"
+              className="mt-2 font-frank text-2xl font-bold leading-tight text-neutral-900 sm:text-3xl lg:text-4xl"
+            >
+              Moments like these are waiting for you
+            </h2>
+            <p className="mt-3 font-bitter text-sm leading-relaxed text-neutral-600 sm:text-base">
+              Every photo and clip above is from a real tour. Pick an experience
+              and we will take care of the rest.
+            </p>
+          </div>
+
+          {/* Highlight cards with photos */}
+          <ul className="mt-8 grid gap-4 sm:mt-10 sm:grid-cols-3 sm:gap-5">
+            {experienceCards.map((h) => (
+              <li key={h.key} data-reveal>
+                <button
+                  type="button"
+                  onClick={onExplore}
+                  className={`group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-black/[0.06] bg-white text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg ${focusRing}`}
+                >
+                  {/* Photo */}
+                  <span className="relative block aspect-[4/3] w-full overflow-hidden bg-neutral-100">
+                    {h.image && (
+                      <img
+                        src={h.image.src}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className={`absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-500 ease-out ${hoverZoom}`}
+                      />
+                    )}
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"
+                    />
+                    <span className="absolute bottom-3 left-3 grid h-11 w-11 place-items-center rounded-xl bg-blue-600 text-white shadow-md shadow-black/30 transition group-hover:bg-blue-700">
+                      <ExperienceIcon name={h.icon} />
+                    </span>
+                  </span>
+
+                  {/* Text */}
+                  <span className="flex flex-1 flex-col items-start gap-2 p-5">
+                    <span className="font-frank text-lg font-bold text-neutral-900">
+                      {h.title}
+                    </span>
+                    <span className="font-bitter text-sm leading-relaxed text-neutral-600">
+                      {h.text}
+                    </span>
+                    <span className="mt-auto inline-flex items-center gap-1 pt-2 text-sm font-bold text-blue-600 transition group-hover:gap-2">
+                      Explore tours
+                      <svg
+                        className="h-4 w-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M5 12h14M13 6l6 6-6 6" />
+                      </svg>
+                    </span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          {/* CTA banner: thick gradient outline, soft blue fill, gradient button with shine */}
+          <div
+            data-reveal
+            className="hero-gradient-bl mt-8 rounded-full bg-blue-250 p-[5px] shadow-[0_10px_30px_rgba(30,64,175,0.2)] sm:mt-10"
+          >
+            <div className="flex flex-col items-center gap-5 rounded-full bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100 px-5 py-8 text-center sm:flex-row sm:justify-between sm:gap-6 sm:px-8 sm:text-left">
+              <div>
+                <p className="font-frank text-xl font-bold leading-tight text-neutral-900 sm:text-2xl">
+                  Ready to make your own memories?
+                </p>
+                <p className="mt-1 font-bitter text-sm text-neutral-700 sm:text-base">
+                  Small-group and private tours across Cape Town and the Western
+                  Cape.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={onExplore}
+                className={`group relative inline-flex shrink-0 items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/30 ring-1 ring-inset ring-white/20 transition duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/40 hover:brightness-110 active:translate-y-0 active:scale-95 ${focusRing}`}
+              >
+                {/* Moving highlight */}
+                <span
+                  aria-hidden="true"
+                  className="gf-shine pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 bg-gradient-to-r from-transparent via-white/60 to-transparent"
+                />
+                <span className="relative">Browse our tours</span>
+                <svg
+                  className="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ============================================================
+// 7. MAIN COMPONENT
 // ============================================================
 
 const GALLERY_TITLE =
@@ -687,7 +1261,7 @@ const Gallery = () => {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(null);
-  const [modalVideo, setModalVideo] = useState(null);
+  const [videoIndex, setVideoIndex] = useState(null);
   const bgRef = useRef(null);
   const imagesSectionRef = useRef(null);
 
@@ -696,12 +1270,12 @@ const Gallery = () => {
     () =>
       videos.find((v) => normalize(v.title) === normalize(HERO_VIDEO_TITLE)) ||
       videos[0],
-    []
+    [],
   );
 
   const remainingVideos = useMemo(
     () => (welcomeVideo ? videos.filter((v) => v.id !== welcomeVideo.id) : []),
-    [welcomeVideo]
+    [welcomeVideo],
   );
 
   // Navbar panel past the doubled hide limit.
@@ -749,7 +1323,8 @@ const Gallery = () => {
 
   const openLightbox = useCallback((i) => setLightboxIndex(i), []);
   const closeLightbox = useCallback(() => setLightboxIndex(null), []);
-  const closeModal = useCallback(() => setModalVideo(null), []);
+  const openVideo = useCallback((i) => setVideoIndex(i), []);
+  const closeVideo = useCallback(() => setVideoIndex(null), []);
 
   const scrollToGallery = useCallback(() => {
     imagesSectionRef.current?.scrollIntoView({
@@ -757,6 +1332,8 @@ const Gallery = () => {
       block: "start",
     });
   }, []);
+
+  const goToTours = useCallback(() => navigate(TOURS_PATH), [navigate]);
 
   return (
     <>
@@ -880,30 +1457,18 @@ const Gallery = () => {
                 </section>
               )}
 
-              {/* ── REMAINING VIDEOS: horizontal scrollable row ── */}
+              {/* ── VIDEOS: auto-scrolling rail with previews ── */}
               {remainingVideos.length > 0 && (
-                <section>
-                  <div className="mb-4 flex items-end justify-between gap-4 sm:mb-5">
-                    <h2 className="font-frank text-2xl font-bold leading-none sm:text-3xl">
-                      More from our tours
-                    </h2>
-                    <p className="hidden font-bitter text-xs text-neutral-400 lg:block">
-                      Scroll to browse — click a clip to play it.
-                    </p>
-                  </div>
+                <VideoRail
+                  list={remainingVideos}
+                  onOpen={openVideo}
+                  paused={videoIndex !== null}
+                />
+              )}
 
-                  <div
-                    className="flex snap-x gap-3 overflow-x-auto overscroll-x-contain pb-3 sm:gap-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-                    role="list"
-                    aria-label="More tour videos"
-                  >
-                    {remainingVideos.map((video) => (
-                      <div role="listitem" key={video.id} className="shrink-0">
-                        <VideoThumb video={video} onOpen={setModalVideo} />
-                      </div>
-                    ))}
-                  </div>
-                </section>
+              {/* ── EXPERIENCE: photo cards + CTA ── */}
+              {(hasImages || hasVideos) && (
+                <ExperienceSection onExplore={goToTours} />
               )}
 
               {/* Fallback if no media has been added yet */}
@@ -940,7 +1505,14 @@ const Gallery = () => {
       )}
 
       {/* Video popup player */}
-      {modalVideo && <VideoModal video={modalVideo} onClose={closeModal} />}
+      {videoIndex !== null && (
+        <VideoModal
+          list={remainingVideos}
+          index={videoIndex}
+          onChange={setVideoIndex}
+          onClose={closeVideo}
+        />
+      )}
     </>
   );
 };
